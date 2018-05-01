@@ -1,0 +1,87 @@
+import { IndexedDb } from "../IndexedDb";
+import { IRepositories } from "./IRepositories";
+import { HistoryRepository } from "./HistoryRepository";
+import { IDatastore } from "../IDatastore";
+import { ITable } from "../../Models/ITable";
+import { Repositories } from "./RepositoryEnum";
+import { SettingsRepository } from "./SettingsRepository";
+import { Repository } from "./Repository";
+import { Entity } from "../../../../Shared/Models/Entity";
+import { ISenderInfo } from "../../../Models/ISenderInfo";
+import { Settings } from "../../../../Shared/Models/Settings";
+import { Notification } from "../../../../Shared/Models/Notification";
+
+/**
+ * @class Factory to return repositories.
+ */
+export class RepositoryFactory {
+    /**
+     * @property Holds an instance of itself
+     * @private
+     * @type {RepositoryFactory}
+     */
+    private static instance: RepositoryFactory;
+
+    /**
+     * @property Handle to the low level database api
+     * @private
+     * @type {RepositoryFactory}
+     */
+    private mDatastore: IDatastore<Entity>;
+
+    /**
+     * @property Holds the repositories
+     * @private
+     * @type {IRepositories}
+     */
+    private mRepositoryStore: IRepositories;
+
+    /**
+     * @constructor Constructor Initialises member variables and sets up the database
+     * @param datastore The low level database layer
+     */
+    private constructor(datastore: IDatastore<Entity>) {
+        this.mDatastore = datastore;
+
+        const historyRepository = new HistoryRepository(this.mDatastore as IDatastore<Notification & ISenderInfo>);
+        const settingsRepository = new SettingsRepository(this.mDatastore as IDatastore<Settings>);
+
+        this.mRepositoryStore = {
+            history: historyRepository,
+            settings: settingsRepository
+        };
+
+        const tableNames = [];
+
+        for (const key in this.mRepositoryStore) {
+            if (this.mRepositoryStore.hasOwnProperty(key)) {
+                const table = {
+                    name: this.mRepositoryStore[key]['TABLENAME'],
+                    indexName: '',
+                    index: ''
+                };
+
+                tableNames.push(table);
+            }
+        }
+
+        this.mDatastore.initialise(1, tableNames);
+    }
+
+    /**
+     * @method Returns the singleton instance of itself
+     * @returns {RepositoryFactory} Returns an instance of itself
+     */
+    public static get Instance() {
+        return this.instance || (this.instance = new this(new IndexedDb(window.indexedDB)));
+    }
+
+    /**
+     * @method Returns the selected repository
+     * @param repositoryName The name of the repository you want to retrieve
+     * @returns {Repository} The repository selected
+     */
+    public getRepository<T extends Entity>(repositoryName: string): Repository<T> {
+        return this.mRepositoryStore[repositoryName] as Repository<T>;
+    }
+}

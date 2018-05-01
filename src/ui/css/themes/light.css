@@ -1,0 +1,43 @@
+:root {
+    --body-background-color:#eff0f1;
+    --header-background-color: #eff0f1;
+    --footer-background-color:#eff0f1;
+    --notification-background-color:#F2F4F6;
+    --text-color: #4D4E5E;
+    --text-color-hover:rgb(0, 0, 0);
+    --app-icon-background-color:#dcddde;
+}
+
+body {
+    background-color:var(--body-background-color);
+}
+
+.footer { 
+    background-color: var(--footer-background-color);
+}
+
+#footerContainer{
+    color: var(--text-color);
+}
+
+#notification-inbox-list > li {
+    background-color:var(--notification-background-color);
+    color:var(--text-color);
+}
+
+.notification-close-x:hover {
+    background-color:var(--app-icon-background-color);
+}
+
+.square {
+    background-color:var(--app-icon-background-color);
+}
+
+.square:hover{
+    background-color:var(--notification-background-color);
+}
+
+.navbar{
+    background-color:var(--header-background-color);
+}
+

@@ -1,0 +1,18 @@
+{
+    "devtools_port": 9090,
+    "startup_app": {
+        "name": "notifications",
+        "description": "notifications",
+        "url": "https://cdn.openfin.co/services/openfin/notifications/demo/appService.html",
+        "uuid": "notifications",
+        "autoShow": true,
+        "defaultHeight": 500,
+        "defaultWidth": 500,
+        "showTaskbarIcon": false
+    },
+    "runtime": {
+        "arguments":"--v=1 --enable-crash-reporting",
+        "version": "8.56.30.42"
+    },
+    "shortcut": {}
+}
