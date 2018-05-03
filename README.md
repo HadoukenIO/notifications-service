@@ -65,15 +65,14 @@ npm install openfin-notifications
 ### API Documentation
 
 
-- `fin.notifications`
-   - `create(id: String, options: NotificationOptions)`
+- `create(id: String, options: NotificationOptions)`
 Creates a notification and sends it to the Notifications manager
-Promise resolves to ID of notification created.   If ID is not supplied, it will be auto-generated.
+Promise resolves to ID of notification created.
 - `getAll()`
 Promise resolves to all notifications sent by the App to Notification manager that are still active (not cleared)
 - `clear(id: String)`
 Clears the notification from the Notification Center UI  
-- `clearAppNotifications()`
+- `clearAll()`
 Clears all notifications sent from the application
 -  `addEventListener(eventName: String, handler: Function)`
 Application global event listener invoked when the use clicks the event, or button on the event
