@@ -7,7 +7,7 @@
   },
   "author": "openfin",
   "dependencies": {
-    "openfin-notifications": "^0.0.2"
+    "openfin-notifications": "^0.0.3"
   },
   "devDependencies": {
     "@types/openfin": "^17.0.4",
