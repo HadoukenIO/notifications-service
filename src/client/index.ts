@@ -61,10 +61,9 @@ export async function create(id: string, options: NotificationOptions) {
 /**
  * @method getAll get all notifications for this app
  */
-export async function fetchAppNotifications(uuid: string) {
+export async function getAll() {
     const plugin = await clientP;
-    const payload = {uuid};
-    const appNotifications = await plugin.dispatch('fetch-app-notifications', payload);
+    const appNotifications = await plugin.dispatch('fetch-app-notifications', {});
     return appNotifications;
 }
 
@@ -72,7 +71,7 @@ export async function fetchAppNotifications(uuid: string) {
  * @method clear clears a notification by it's ID
  * @param {string} id The id of the notification
  */
-export async function clearNotification(id: string) {
+export async function clear(id: string) {
     const plugin = await clientP;
     const payload = {id};
     const result = await plugin.dispatch('clear-notification', payload);
@@ -82,7 +81,7 @@ export async function clearNotification(id: string) {
 /**
  * @method clearAll clears all notifications for an app
  */
-export async function clearAppNotifications(){
+export async function clearAll() {
     const plugin = await clientP;
     const result = await plugin.dispatch('clear-app-notifications');
     return result;

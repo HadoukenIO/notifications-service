@@ -1,15 +1,15 @@
-import * as notes from "openfin-notifications"
+import * as ofnotes from "openfin-notifications"
 
 function makeNote(id, opts) {
-    return notes.create(id,opts);
+    return ofnotes.create(id,opts);
 }
 
 function clearNote(id) {
-   return notes.clearNotification(id);
+   return ofnotes.clear(id);
 }
 
 function getNotes() {
-    return notes.fetchAppNotifications();
+    return ofnotes.getAll();
 }
 
 document.addEventListener("DOMContentLoaded", function (event) {
