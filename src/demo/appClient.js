@@ -45,11 +45,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 
 fin.desktop.main(async () => {
-    notes.addEventListener('click', (payload) => {
+    ofnotes.addEventListener('click', (payload) => {
         document.getElementById('clientResponse').innerHTML = `CLICK action received from notification ${payload.id}`
     });
     
-    notes.addEventListener('close', (payload) => {
+    ofnotes.addEventListener('close', (payload) => {
         document.getElementById('clientResponse').innerHTML = `CLOSE action received from notification ${payload.id}`
     });
 });
