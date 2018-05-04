@@ -16,7 +16,7 @@ if(env === 'dev'){
     console.log("running from CDN app configs")
 }
 
-const NS = path.resolve('./dist/demo/appService' + ext);
+// const NS = path.resolve('./dist/demo/appService' + ext);
 const NClient = path.resolve('./dist/demo/appClient' + ext);
 const NClient2 = path.resolve('./dist/demo/appClient2' + ext);
 
@@ -37,8 +37,6 @@ app.use(express.static('./dist'));
 
 https.createServer(httpsConfig, app).listen(9048, () => {
     console.log("Server Created!");
-    console.log("Starting NS");
-    launchOpenFin(NS);
     console.log("Starting NClient");
     launchOpenFin(NClient);
     console.log("Starting NClient2");
