@@ -1,6 +1,7 @@
 import { Fin } from '../../fin';
 import { WindowInfo } from './WindowInfo';
 import { TrayMenu } from './TrayMenu';
+import { deregister } from 'openfin-layouts';
 
 declare var fin: Fin;
 
@@ -11,6 +12,10 @@ export class WindowManager {
     constructor() {
         this.setEventListeners();
         this.trayMenu = new TrayMenu("https://openfin.co/favicon-32x32.png", this);
+
+        
+        //opts out of openfin layouts docking
+        deregister();
     }
 
     /**
