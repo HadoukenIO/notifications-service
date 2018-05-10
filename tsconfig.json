@@ -6,6 +6,7 @@
     "alwaysStrict": true,
     "noImplicitAny": true,
     "jsx": "react",
+    "moduleResolution": "node",
     "outDir": "./dist/",
     "forceConsistentCasingInFileNames": true,
     "lib": [

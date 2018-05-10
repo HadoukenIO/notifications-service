@@ -38,6 +38,7 @@ async function createClientPromise() {
         fin.desktop.main(() => resolve());
     });
     const client = await fin.desktop.Service.connect( { uuid: 'notifications', payload: { version: '0.0.1'} });
+    // tslint:disable-next-line:no-any
     client.register('WARN', (payload: any) => console.warn(payload));
     client.register('notification-clicked', (payload: Notification & ISenderInfo, sender: ISenderInfo) => { callbacks.notificationClicked(payload, sender); });
     client.register('notification-closed', (payload: Notification & ISenderInfo, sender: ISenderInfo) => { callbacks.notificationClosed(payload, sender); });
