@@ -23,7 +23,7 @@ export class Header extends React.Component<IHeaderProps> {
                     <div className='sort-button' onClick={() => this.props.handleGroupBy(eGroupMethod.DATE)}>DATE</div>
                 </div>
 
-                <img id="exitLink" src="image/shapes/arrows.svg" alt="" />
+                <img id="exitLink" src="image/shapes/close-x.svg" alt="" />
             </div>
         );
     }
