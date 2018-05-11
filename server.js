@@ -37,6 +37,8 @@ app.use(express.static('./dist'));
 
 https.createServer(httpsConfig, app).listen(9048, () => {
     console.log("Server Created!");
+    // console.log("Starting NS");
+    // launchOpenFin(NS);
     console.log("Starting NClient");
     launchOpenFin(NClient);
     console.log("Starting NClient2");

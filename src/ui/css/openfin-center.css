@@ -163,9 +163,9 @@ ul {
 
 #exitLink {
     position: fixed;
-    top: 12px;
+    top: 18px;
     right: 12px;
-    height: 15px;
+    height: 10px;
     padding: 5px;
     cursor: pointer;
     z-index: 100000;
