@@ -15,7 +15,17 @@ export class WindowManager {
 
         
         //opts out of openfin layouts docking
-        deregister();
+        deregister()
+            .then(() => {
+                fin.desktop.Window.getCurrent().animate({
+                    opacity: {
+                        opacity: 1,
+                        duration: 200
+                    }
+                }, {
+                    interrupt: false
+                })
+            });
     }
 
     /**
