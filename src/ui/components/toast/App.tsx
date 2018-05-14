@@ -18,7 +18,17 @@ export class App extends React.Component<{}, IToastAppState> {
         window.onNotificationMessage = this.onNotificationMessage.bind(this);
 
         //deregisters window from openfin-layouts docking
-        deregister();
+        deregister()
+            .then(() => {
+                fin.desktop.Window.getCurrent().animate({
+                    opacity: {
+                        opacity: 1,
+                        duration: 200
+                    }
+                }, {
+                        interrupt: false
+                    })
+            });
     }
 
     public render() {
