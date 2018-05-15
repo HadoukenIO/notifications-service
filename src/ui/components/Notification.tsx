@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { NotificationTime } from './NotificationTime';
+import { Button } from './Button';
 import { INotificationProps } from '../models/INotificationProps';
 import { Fin } from "../../fin";
 declare var fin: Fin;
@@ -9,6 +10,17 @@ declare var fin: Fin;
  */
 export class Notification extends React.Component<INotificationProps, {}> {
     public render(): React.ReactNode {
+        let buttons = null;
+        if (this.props.meta.buttons) {
+            buttons = this.props.meta.buttons.map((button, idx) => {
+                return <Button key={idx} buttonIndex={idx} meta={this.props.meta} button={button} />
+            });
+            console.log("buttons", buttons);
+            console.log("buttons", buttons);
+            console.log("buttons", buttons);
+            console.log("buttons", buttons);
+        }
+
         return (
             <li className="notification-item" onClick={() => fin.notifications.clickHandler(this.props.meta)}>
                 <img 
@@ -30,6 +42,9 @@ export class Notification extends React.Component<INotificationProps, {}> {
                     </div>
                     <div className="notification-body-title">{this.props.meta.title}</div>
                     <div className="notification-body-text">{this.props.meta.body}</div>
+                    <div id='notification-body-buttons'>
+                        {buttons}
+                    </div>
                 </div>
             </li>
         );

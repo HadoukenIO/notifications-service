@@ -15,7 +15,7 @@ function getNotes() {
 document.addEventListener("DOMContentLoaded", function (event) {
     for (let index = 1; index < 7; index++) {
         document.getElementById(`button${index}`).addEventListener('click', () => {
-            makeNote(`1q2w3e4r${index}`, { body: 'Notification Body ', title: 'Notification Title ', subtitle: 'testSubtitle', icon: 'favicon.ico', context: { testContext: 'testContext'}, date: Date.now()})
+            makeNote(`1q2w3e4r${index}`, { body: 'Notification Body ', title: 'Notification Title ', subtitle: 'testSubtitle', icon: 'favicon.ico', context: { testContext: 'testContext' }, date: Date.now(), buttons: [{ title: 'test1', icon: 'favicon.ico' }, { title: 'test2', icon: 'favicon.ico' }]})
                 .then((notification) => {
                     if (!notification.success) {
                         document.getElementById('clientResponse').innerHTML = `
@@ -51,5 +51,11 @@ fin.desktop.main(async () => {
     
     ofnotes.addEventListener('close', (payload) => {
         document.getElementById('clientResponse').innerHTML = `CLOSE action received from notification ${payload.id}`
+    });
+    ofnotes.addEventListener('button-click', (payload) => {
+        let buttonClicked = payload.buttons[payload.buttonIndex]
+        console.log(buttonClicked);
+        let buttonTitle = buttonClicked.title
+        document.getElementById('clientResponse').innerHTML = `Button Click on ${buttonTitle} action received from notification ${payload.id}`
     });
 });

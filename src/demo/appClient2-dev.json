@@ -10,11 +10,6 @@
         "defaultWidth": 360,
         "defaultLeft": 950
     },
-    "services": [
-        {
-            "name": "notifications"
-        }
-    ],
     "runtime": {
         "arguments":"--noerrdialogs --v=1  --allow-insecure-localhost --disable-web-security --allow-running-insecure-content --ignore-certificate-errors --remember-cert-error-decisions",
         "version": "8.56.30.55"

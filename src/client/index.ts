@@ -20,6 +20,14 @@ const notificationClicked = (payload: NotificationEvent, sender: ISenderInfo) =>
 };
 
 // For testing/display purposes
+const notificationButtonClicked = (payload: any, sender: ISenderInfo) => {
+    console.log("notificationButtonClicked hit");
+    console.log("payload", payload);
+    console.log("sender", sender);
+    return "notificationClicked success";
+};
+
+// For testing/display purposes
 const notificationClosed = (payload: NotificationEvent, sender: ISenderInfo) => {
     console.log("notificationClosed hit");
     console.log("payload", payload);
@@ -27,7 +35,7 @@ const notificationClosed = (payload: NotificationEvent, sender: ISenderInfo) => 
     return "notificationClosed success";
 };
 
-const callbacks = {notificationClicked, notificationClosed};
+const callbacks = { notificationClicked, notificationButtonClicked, notificationClosed};
 
 async function createClientPromise() {
     await new Promise((resolve, reject) => {
@@ -37,10 +45,11 @@ async function createClientPromise() {
         }
         fin.desktop.main(() => resolve());
     });
-    const client = await fin.desktop.Service.connect( { uuid: 'notifications', payload: { version: '0.0.1'} });
+    const client = await fin.desktop.Service.connect( { uuid: 'notifications', payload: { version: '0.0.3'} });
     // tslint:disable-next-line:no-any
     client.register('WARN', (payload: any) => console.warn(payload));
     client.register('notification-clicked', (payload: Notification & ISenderInfo, sender: ISenderInfo) => { callbacks.notificationClicked(payload, sender); });
+    client.register('notification-button-clicked', (payload: any, sender: ISenderInfo) => { callbacks.notificationButtonClicked(payload, sender); });
     client.register('notification-closed', (payload: Notification & ISenderInfo, sender: ISenderInfo) => { callbacks.notificationClosed(payload, sender); });
     return client;
 }
@@ -98,5 +107,7 @@ export async function addEventListener(evt: string, cb: (payload: NotificationEv
         callbacks.notificationClicked = cb;
     } else if (evt === 'close') {
         callbacks.notificationClosed = cb;
+    } else if (evt === 'button-click') {
+        callbacks.notificationButtonClicked = cb;
     }
 }
