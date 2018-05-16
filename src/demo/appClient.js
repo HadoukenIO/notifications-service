@@ -12,15 +12,45 @@ function getNotes() {
     return ofnotes.getAll();
 }
 
+let noteOptions1 = { 
+    body: 'Notification Body', 
+    title: 'Notification Title ', 
+    subtitle: 'testSubtitle', 
+    icon: 'favicon.ico', 
+    context: { testContext: 'testContext' }, 
+    date: Date.now()
+};
+
+let noteOptions2 = { 
+    body: 'Notification Body', 
+    title: 'Notification Title ', 
+    subtitle: 'testSubtitle', 
+    icon: 'favicon.ico', 
+    context: { testContext: 'testContext' }, 
+    date: Date.now(), 
+    buttons: [
+        { title: 'test1', icon: 'favicon.ico' }, 
+        { title: 'test2', icon: 'favicon.ico' }
+    ] 
+};
+
+function makeNoteOfType(index) {
+    if (index % 2 === 1) {
+        return makeNote(`1q2w3e4r${index}`, noteOptions1)
+    } else {
+        return makeNote(`1q2w3e4r${index}`, noteOptions2)
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function (event) {
     for (let index = 1; index < 7; index++) {
         document.getElementById(`button${index}`).addEventListener('click', () => {
-            makeNote(`1q2w3e4r${index}`, { body: 'Notification Body ', title: 'Notification Title ', subtitle: 'testSubtitle', icon: 'favicon.ico', context: { testContext: 'testContext' }, date: Date.now(), buttons: [{ title: 'test1', icon: 'favicon.ico' }, { title: 'test2', icon: 'favicon.ico' }]})
+            makeNoteOfType(index)
                 .then((notification) => {
                     if (!notification.success) {
                         document.getElementById('clientResponse').innerHTML = `
-                                Notification ids must be unique! This id already exists!
-                            `
+                                    Notification ids must be unique! This id already exists!
+                                `
                     }
                 })
         });

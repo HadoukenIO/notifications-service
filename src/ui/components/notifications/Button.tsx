@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Fin } from "../../fin";
+import { Fin } from "../../../fin";
 declare var fin: Fin;
 
 export class Button extends React.Component<any, {}> {
