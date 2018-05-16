@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { NotificationTime } from './NotificationTime';
-import { Button } from './Button';
 import { INotificationProps } from '../../models/INotificationProps';
 import { Fin } from "../../../fin";
 declare var fin: Fin;
