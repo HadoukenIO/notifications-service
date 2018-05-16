@@ -6,7 +6,7 @@ import { INotificationProps } from '../models/INotificationProps';
 declare var fin: Fin;
 
 /**
- * Displays a single notification within the UI
+ * Determines what type of notification to display in the UI
  */
 export class NotificationType extends React.Component<INotificationProps, {}> {
     public render(): React.ReactNode {
