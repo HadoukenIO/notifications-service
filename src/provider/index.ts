@@ -106,7 +106,7 @@ fin.desktop.main(() => {
     const notificationCenter = new fin.desktop.Window({
         name: "Notification-Center",
         url: pageUrl,
-        autoShow: true,
+        autoShow: false,
         defaultHeight: 400,
         defaultWidth: 500,
         resizable: false,
