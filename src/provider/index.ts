@@ -8,6 +8,7 @@ import { Notification } from "../Shared/Models/Notification";
 import { Repositories } from "./Persistence/DataLayer/Repositories/RepositoryEnum";
 import { ISenderInfo } from "./Models/ISenderInfo";
 import { NotificationEvent } from "../Shared/Models/NotificationEvent";
+import { NotificationTypes, TypeResolver } from '../Shared/Models/NotificationTypes';
 
 declare var fin: Fin;
 declare var window: Window & {fin: Fin};
@@ -156,7 +157,8 @@ async function createNotification(payload: Notification, sender: ISenderInfo) {
 
     const fullPayload: Notification & ISenderInfo = Object.assign({}, payload, sender);
     const encodedID: string = encodeID(fullPayload);
-    const fullPayloadEncoded: Notification & ISenderInfo = Object.assign({}, fullPayload, { id: encodedID });
+    const noteType: NotificationTypes = TypeResolver(fullPayload);
+    const fullPayloadEncoded: Notification & ISenderInfo = Object.assign({}, fullPayload, { id: encodedID, type: noteType});
 
     // Manipulate notification data store
     const result = await historyRepository.create(fullPayloadEncoded);

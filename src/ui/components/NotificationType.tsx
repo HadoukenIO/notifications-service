@@ -3,6 +3,8 @@ import { Fin } from "../../fin";
 import { Notification } from './notifications/Notification';
 import { ButtonNotification } from './notifications/ButtonNotification';
 import { INotificationProps } from '../models/INotificationProps';
+import { NotificationTypes } from '../../Shared/Models/NotificationTypes';
+
 declare var fin: Fin;
 
 /**
@@ -10,10 +12,19 @@ declare var fin: Fin;
  */
 export class NotificationType extends React.Component<INotificationProps, {}> {
     public render(): React.ReactNode {
-        if (this.props.meta.buttons) {
-            return <ButtonNotification meta={this.props.meta} />
-        } else {
-            return <Notification meta={this.props.meta} />
+        alert(this.props.meta.type);
+        switch(this.props.meta.type){
+            case NotificationTypes.BUTTON: {
+                return <ButtonNotification meta={this.props.meta} />;
+            }
+            default: {
+                return <Notification meta={this.props.meta} />;
+            }
         }
+        // if (this.props.meta.buttons) {
+        //     return <ButtonNotification meta={this.props.meta} />;
+        // } else {
+        //     return <Notification meta={this.props.meta} />;
+        // }
     }
 }
