@@ -11,9 +11,9 @@ declare var fin: Fin;
 export class NotificationType extends React.Component<INotificationProps, {}> {
     public render(): React.ReactNode {
         if (this.props.meta.buttons) {
-            return <ButtonNotification meta={this.props.meta} />
+            return <ButtonNotification meta={this.props.meta} />;
         } else {
-            return <Notification meta={this.props.meta} />
+            return <Notification meta={this.props.meta} />;
         }
     }
 }

@@ -51,10 +51,6 @@ fin.desktop.main(async () => {
             // Handle a click on a notification
             const plugin = await pluginP;
             const fullPayload = Object.assign({}, payload, {buttonIndex});
-            console.log("fullPayload", fullPayload)
-            console.log("fullPayload", fullPayload)
-            console.log("fullPayload", fullPayload)
-            console.log("fullPayload", fullPayload)
             const success = await plugin.dispatch('notification-button-clicked', fullPayload);
             console.log("success", success);
         },

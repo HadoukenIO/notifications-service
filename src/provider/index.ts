@@ -68,7 +68,7 @@ async function registerService() {
             const success = await providerChannelPlugin.dispatch({ name: payload.name, uuid: payload.uuid }, 'notification-clicked', payload);
             console.log("success", success);
         },
-        notificationButtonClicked: async (payload: any) => {
+        notificationButtonClicked: async (payload: Notification & ISenderInfo) => {
             // Send notification clicked to the Client
             const providerChannelPlugin = await providerChannel;
             const success = await providerChannelPlugin.dispatch({ name: payload.name, uuid: payload.uuid }, 'notification-button-clicked', payload);
@@ -227,7 +227,7 @@ function notificationClicked(payload: Notification & ISenderInfo, sender: ISende
 }
 
 
-function notificationButtonClicked(payload: any, sender: ISenderInfo) {
+function notificationButtonClicked(payload: Notification & ISenderInfo, sender: ISenderInfo) {
     // For testing/display purposes
     console.log("notificationButtonClicked hit");
 

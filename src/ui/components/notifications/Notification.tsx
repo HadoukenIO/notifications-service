@@ -13,7 +13,7 @@ export class Notification extends React.Component<INotificationProps, {}> {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
         fin.notifications.closeHandler(this.props.meta);
-    };
+    }
 
     public render(): React.ReactNode {
         return (

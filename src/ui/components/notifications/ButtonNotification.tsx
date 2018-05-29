@@ -14,13 +14,13 @@ export class ButtonNotification extends React.Component<INotificationProps, {}> 
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
         fin.notifications.closeHandler(this.props.meta);
-    };
+    }
 
     public render(): React.ReactNode {
         let buttons = null;
         if (this.props.meta.buttons) {
             buttons = this.props.meta.buttons.map((button, idx) => {
-                return <Button key={idx} buttonIndex={idx} meta={this.props.meta}/>
+                return <Button key={idx} buttonIndex={idx} meta={this.props.meta}/>;
             });
         }
 

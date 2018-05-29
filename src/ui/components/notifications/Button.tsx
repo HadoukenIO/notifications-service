@@ -10,10 +10,10 @@ export class Button extends React.Component<INotificationButtonProps, INotificat
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
         fin.notifications.buttonClickHandler(this.props.meta, this.props.buttonIndex);
-    };
+    }
 
     public render(): React.ReactNode {
-        let button = this.props.meta.buttons[this.props.buttonIndex];
+        const button = this.props.meta.buttons[this.props.buttonIndex];
 
         return (
             <div className='notification-button' onClick={(e) => this.handleButtonClick(e)} >
