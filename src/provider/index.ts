@@ -8,6 +8,7 @@ import { Notification } from "../Shared/Models/Notification";
 import { Repositories } from "./Persistence/DataLayer/Repositories/RepositoryEnum";
 import { ISenderInfo } from "./Models/ISenderInfo";
 import { NotificationEvent } from "../Shared/Models/NotificationEvent";
+import { NotificationTypes, TypeResolver } from '../Shared/Models/NotificationTypes';
 
 declare var fin: Fin;
 declare var window: Window & {fin: Fin};
@@ -37,6 +38,7 @@ async function registerService() {
 
     // Functions called by the Notification Center
     providerChannel.register('notification-clicked', notificationClicked);
+    providerChannel.register('notification-button-clicked', notificationButtonClicked);
     providerChannel.register('notification-closed', notificationClosed);
     providerChannel.register('fetch-all-notifications', fetchAllNotifications);
     providerChannel.register('clear-all-notifications', clearAllNotifications);
@@ -65,6 +67,12 @@ async function registerService() {
             // Send notification clicked to the Client
             const providerChannelPlugin = await providerChannel;
             const success = await providerChannelPlugin.dispatch({ name: payload.name, uuid: payload.uuid }, 'notification-clicked', payload);
+            console.log("success", success);
+        },
+        notificationButtonClicked: async (payload: Notification & ISenderInfo & { buttonIndex: number }) => {
+            // Send notification clicked to the Client
+            const providerChannelPlugin = await providerChannel;
+            const success = await providerChannelPlugin.dispatch({ name: payload.name, uuid: payload.uuid }, 'notification-button-clicked', payload);
             console.log("success", success);
         },
         notificationClosed: async (payload: NotificationEvent) => {
@@ -99,7 +107,7 @@ fin.desktop.main(() => {
     const notificationCenter = new fin.desktop.Window({
         name: "Notification-Center",
         url: pageUrl,
-        autoShow: true,
+        autoShow: false,
         defaultHeight: 400,
         defaultWidth: 500,
         resizable: false,
@@ -147,8 +155,10 @@ async function createNotification(payload: Notification, sender: ISenderInfo) {
 
     testDisplay('createNotification', payload, sender);
 
-    const fullPayload: Notification & ISenderInfo = Object.assign({}, payload, sender);
+    const noteType: NotificationTypes = TypeResolver(payload);
+    const fullPayload: Notification & ISenderInfo = Object.assign({}, payload, sender, { type: noteType });
     const encodedID: string = encodeID(fullPayload);
+    
     const fullPayloadEncoded: Notification & ISenderInfo = Object.assign({}, fullPayload, { id: encodedID });
 
     // Manipulate notification data store
@@ -217,6 +227,23 @@ function notificationClicked(payload: Notification & ISenderInfo, sender: ISende
 
     // TODO: What should we return?
     return "notificationClicked returned";
+}
+
+
+function notificationButtonClicked(payload: Notification & ISenderInfo & { buttonIndex: number } , sender: ISenderInfo) {
+    // For testing/display purposes
+    console.log("notificationButtonClicked hit");
+
+    console.log("payload", payload);
+    console.log("sender", sender);
+
+    testDisplay('notificationButtonClicked', payload, sender);
+
+    // Send notification clicked event to uuid with the context.
+    fin.notifications.notificationButtonClicked(payload);
+
+    // TODO: What should we return?
+    return "notificationButtonClicked returned";
 }
 
 /**

@@ -47,6 +47,13 @@ fin.desktop.main(async () => {
             const success = await plugin.dispatch('notification-clicked', payload);
             console.log("success", success);
         },
+        buttonClickHandler: async (payload: Notification & ISenderInfo, buttonIndex: number) => {
+            // Handle a click on a notification
+            const plugin = await pluginP;
+            const fullPayload = Object.assign({}, payload, {buttonIndex});
+            const success = await plugin.dispatch('notification-button-clicked', fullPayload);
+            console.log("success", success);
+        },
         closeHandler: async (payload: Notification & ISenderInfo) => {
             // Handle a close on a notification
             const plugin = await pluginP;

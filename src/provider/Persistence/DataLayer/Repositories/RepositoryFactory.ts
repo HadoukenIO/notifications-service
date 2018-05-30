@@ -65,7 +65,7 @@ export class RepositoryFactory {
             }
         }
 
-        this.mDatastore.initialise(1, tableNames);
+        this.mDatastore.initialise(2, tableNames);
     }
 
     /**
