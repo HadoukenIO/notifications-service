@@ -69,7 +69,7 @@ async function registerService() {
             const success = await providerChannelPlugin.dispatch({ name: payload.name, uuid: payload.uuid }, 'notification-clicked', payload);
             console.log("success", success);
         },
-        notificationButtonClicked: async (payload: any) => {
+        notificationButtonClicked: async (payload: Notification & ISenderInfo & { buttonIndex: number }) => {
             // Send notification clicked to the Client
             const providerChannelPlugin = await providerChannel;
             const success = await providerChannelPlugin.dispatch({ name: payload.name, uuid: payload.uuid }, 'notification-button-clicked', payload);
@@ -155,10 +155,11 @@ async function createNotification(payload: Notification, sender: ISenderInfo) {
 
     testDisplay('createNotification', payload, sender);
 
-    const fullPayload: Notification & ISenderInfo = Object.assign({}, payload, sender);
+    const noteType: NotificationTypes = TypeResolver(payload);
+    const fullPayload: Notification & ISenderInfo = Object.assign({}, payload, sender, { type: noteType });
     const encodedID: string = encodeID(fullPayload);
-    const noteType: NotificationTypes = TypeResolver(fullPayload);
-    const fullPayloadEncoded: Notification & ISenderInfo = Object.assign({}, fullPayload, { id: encodedID, type: noteType});
+    
+    const fullPayloadEncoded: Notification & ISenderInfo = Object.assign({}, fullPayload, { id: encodedID });
 
     // Manipulate notification data store
     const result = await historyRepository.create(fullPayloadEncoded);
@@ -229,7 +230,7 @@ function notificationClicked(payload: Notification & ISenderInfo, sender: ISende
 }
 
 
-function notificationButtonClicked(payload: any, sender: ISenderInfo) {
+function notificationButtonClicked(payload: Notification & ISenderInfo & { buttonIndex: number } , sender: ISenderInfo) {
     // For testing/display purposes
     console.log("notificationButtonClicked hit");
 

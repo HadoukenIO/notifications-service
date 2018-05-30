@@ -20,7 +20,7 @@ const notificationClicked = (payload: NotificationEvent, sender: ISenderInfo) =>
 };
 
 // For testing/display purposes
-const notificationButtonClicked = (payload: any, sender: ISenderInfo) => {
+const notificationButtonClicked = (payload: Notification & ISenderInfo & { buttonIndex: number }, sender: ISenderInfo) => {
     console.log("notificationButtonClicked hit");
     console.log("payload", payload);
     console.log("sender", sender);
@@ -49,7 +49,7 @@ async function createClientPromise() {
     // tslint:disable-next-line:no-any
     client.register('WARN', (payload: any) => console.warn(payload));
     client.register('notification-clicked', (payload: Notification & ISenderInfo, sender: ISenderInfo) => { callbacks.notificationClicked(payload, sender); });
-    client.register('notification-button-clicked', (payload: any, sender: ISenderInfo) => { callbacks.notificationButtonClicked(payload, sender); });
+    client.register('notification-button-clicked', (payload: Notification & ISenderInfo & { buttonIndex: number }, sender: ISenderInfo) => { callbacks.notificationButtonClicked(payload, sender); });
     client.register('notification-closed', (payload: Notification & ISenderInfo, sender: ISenderInfo) => { callbacks.notificationClosed(payload, sender); });
     return client;
 }
