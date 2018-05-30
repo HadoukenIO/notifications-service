@@ -17,8 +17,7 @@ let normalNote = {
     title: 'Notification Title ', 
     subtitle: 'testSubtitle', 
     icon: 'favicon.ico', 
-    context: { testContext: 'testContext' }, 
-    date: Date.now()
+    context: { testContext: 'testContext' }
 };
 
 let buttonNote = { 
@@ -27,7 +26,6 @@ let buttonNote = {
     subtitle: 'testSubtitle', 
     icon: 'favicon.ico', 
     context: { testContext: 'testContext' }, 
-    date: Date.now(), 
     buttons: [
         { title: 'test1', icon: 'favicon.ico' }, 
         { title: 'test2', icon: 'favicon.ico' }
@@ -36,9 +34,9 @@ let buttonNote = {
 
 function makeNoteOfType(index) {
     if (index % 2 === 1) {
-        return makeNote(`1q2w3e4r${index}`, normalNote)
+        return makeNote(`1q2w3e4r${index}`, Object.assign(normalNote, { date: Date.now() }))
     } else {
-        return makeNote(`1q2w3e4r${index}`, buttonNote)
+        return makeNote(`1q2w3e4r${index}`, Object.assign(buttonNote, { date: Date.now() }))
     }
 }
 
