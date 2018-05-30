@@ -1,7 +1,7 @@
 import * as ofnotes from "openfin-notifications"
 
 function makeNote(id, opts) {
-    return ofnotes.create(id,opts);
+    return ofnotes.create(id, Object.assign({date: Date.now()}, opts));
 }
 
 function clearNote(id) {
@@ -34,9 +34,9 @@ let buttonNote = {
 
 function makeNoteOfType(index) {
     if (index % 2 === 1) {
-        return makeNote(`1q2w3e4r${index}`, Object.assign({}, normalNote, { date: Date.now() }))
+        return makeNote(`1q2w3e4r${index}`, normalNote);
     } else {
-        return makeNote(`1q2w3e4r${index}`, Object.assign({}, buttonNote, { date: Date.now() }))
+        return makeNote(`1q2w3e4r${index}`, buttonNote);
     }
 }
 
