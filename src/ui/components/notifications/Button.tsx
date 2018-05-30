@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Fin } from "../../../fin";
-declare var fin: Fin;
 import { INotificationButton, INotificationButtonProps } from '../../models/INotificationButton';
 
+declare var fin: Fin;
 
 export class Button extends React.Component<INotificationButtonProps, INotificationButton> {
 
@@ -10,10 +10,10 @@ export class Button extends React.Component<INotificationButtonProps, INotificat
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
         fin.notifications.buttonClickHandler(this.props.meta, this.props.buttonIndex);
-    };
+    }
 
     public render(): React.ReactNode {
-        let button = this.props.meta.buttons[this.props.buttonIndex];
+        const button = this.props.meta.buttons[this.props.buttonIndex];
 
         return (
             <div className='notification-button' onClick={(e) => this.handleButtonClick(e)} >
