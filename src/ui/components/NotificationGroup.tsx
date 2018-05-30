@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Notification } from './Notification';
+import { NotificationType } from './NotificationType';
 import { INotification } from '../models/INotification';
 import { INotificationGroupProps } from '../models/INotificationGroupProps';
 import { ISenderInfo } from '../../provider/Models/ISenderInfo';
@@ -24,7 +24,7 @@ export class NotificationGroup extends React.Component<INotificationGroupProps, 
                 const bDate = new Date(b.date);
                 return aDate > bDate ? -1 : aDate < bDate ? 1 : 0;
             });
-            const notificationArray: React.ReactNode[] = sortedNotifications.map(note => <Notification key={[note.uuid, note.id].join(":")} meta={note} />);
+            const notificationArray: React.ReactNode[] = sortedNotifications.map(note => <NotificationType key={[note.uuid, note.id].join(":")} meta={note} />);
 
             return (
                     <div className="notification-group-wrap">

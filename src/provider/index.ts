@@ -37,6 +37,7 @@ async function registerService() {
 
     // Functions called by the Notification Center
     providerChannel.register('notification-clicked', notificationClicked);
+    providerChannel.register('notification-button-clicked', notificationButtonClicked);
     providerChannel.register('notification-closed', notificationClosed);
     providerChannel.register('fetch-all-notifications', fetchAllNotifications);
     providerChannel.register('clear-all-notifications', clearAllNotifications);
@@ -65,6 +66,12 @@ async function registerService() {
             // Send notification clicked to the Client
             const providerChannelPlugin = await providerChannel;
             const success = await providerChannelPlugin.dispatch({ name: payload.name, uuid: payload.uuid }, 'notification-clicked', payload);
+            console.log("success", success);
+        },
+        notificationButtonClicked: async (payload: Notification & ISenderInfo) => {
+            // Send notification clicked to the Client
+            const providerChannelPlugin = await providerChannel;
+            const success = await providerChannelPlugin.dispatch({ name: payload.name, uuid: payload.uuid }, 'notification-button-clicked', payload);
             console.log("success", success);
         },
         notificationClosed: async (payload: NotificationEvent) => {
@@ -99,7 +106,7 @@ fin.desktop.main(() => {
     const notificationCenter = new fin.desktop.Window({
         name: "Notification-Center",
         url: pageUrl,
-        autoShow: true,
+        autoShow: false,
         defaultHeight: 400,
         defaultWidth: 500,
         resizable: false,
@@ -217,6 +224,23 @@ function notificationClicked(payload: Notification & ISenderInfo, sender: ISende
 
     // TODO: What should we return?
     return "notificationClicked returned";
+}
+
+
+function notificationButtonClicked(payload: Notification & ISenderInfo, sender: ISenderInfo) {
+    // For testing/display purposes
+    console.log("notificationButtonClicked hit");
+
+    console.log("payload", payload);
+    console.log("sender", sender);
+
+    testDisplay('notificationButtonClicked', payload, sender);
+
+    // Send notification clicked event to uuid with the context.
+    fin.notifications.notificationButtonClicked(payload);
+
+    // TODO: What should we return?
+    return "notificationButtonClicked returned";
 }
 
 /**
