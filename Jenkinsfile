@@ -1,4 +1,4 @@
-node ('windows') {
+node ('james-bond') {
 
     properties([
         parameters([
