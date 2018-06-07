@@ -13,8 +13,10 @@ pipeline {
                 checkout scm
                 sh "npm i"
                 sh "npm run build"
-                GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
-                sh "echo ${GIT_SHORT_SHA} > ./dist/SHA.txt"
+                script {
+                    GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
+                    sh "echo ${GIT_SHORT_SHA} > ./dist/SHA.txt"
+                }
             }
         }
 
