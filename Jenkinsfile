@@ -1,11 +1,13 @@
 pipeline {
 
     agent { label 'james-bond' }
-    
+
     stages {
 
         stage ('checkout'){
-            checkout scm
+            steps {
+                checkout scm
+            }
         }
 
         stage ('build'){
