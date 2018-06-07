@@ -22,7 +22,9 @@ pipeline {
 
         stage ('test'){
             agent { label 'windows' }
-            when { changeRequest target: 'develop' }
+            when { 
+                expression { return env.BRANCH_NAME == 'develop'; }
+            }
             steps {
                 checkout scm
                 sh "npm i"
