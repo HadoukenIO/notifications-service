@@ -6,9 +6,7 @@ pipeline {
 
         stage ('build') {
             agent { label 'james-bond' }
-            when { 
-                expression { return env.BRANCH_NAME == 'develop'; }
-            }
+            when { branch "develop" }
             steps {
                 checkout scm
                 sh "npm i"
@@ -22,9 +20,7 @@ pipeline {
 
         stage ('test'){
             agent { label 'windows' }
-            when { 
-                expression { return env.BRANCH_NAME == 'develop'; }
-            }
+            when { not { branch "develop" } }
             steps {
                 checkout scm
                 sh "npm i"
