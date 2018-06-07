@@ -1,20 +1,16 @@
 pipeline {
 
-    agent { label 'james-bond' }
+    agent any
 
     stages {
 
-        stage ('checkout'){
-            steps {
-                checkout scm
-            }
-        }
-
-        stage ('build'){
+        stage ('build') {
+            agent { label 'james-bond' }
             when { 
                 expression { return env.BRANCH_NAME == 'develop'; }
             }
             steps {
+                checkout scm
                 sh "npm i"
                 sh "npm run build"
                 GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
@@ -23,8 +19,10 @@ pipeline {
         }
 
         stage ('test'){
+            agent { label 'windows' }
             when { changeRequest target: 'develop' }
             steps {
+                checkout scm
                 sh "npm i"
                 sh "npm run build"
             }
