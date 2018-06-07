@@ -8,7 +8,6 @@ pipeline {
             agent { label 'james-bond' }
             when { branch "develop" }
             steps {
-                checkout scm
                 sh "npm i"
                 sh "npm run build"
                 script {
@@ -19,10 +18,9 @@ pipeline {
         }
 
         stage ('test'){
-            agent { label 'windows' }
+            agent { label 'james-bond' }
             when { not { branch "develop" } }
             steps {
-                checkout scm
                 sh "npm i"
                 sh "npm run build"
             }
