@@ -1,6 +1,9 @@
-pipeline{
-    agent ('james-bond') 
+pipeline {
+
+    agent { label 'james-bond' }
+    
     stages {
+
         stage ('checkout'){
             checkout scm
         }
