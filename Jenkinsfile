@@ -12,8 +12,11 @@ pipeline {
                 sh "npm run build"
                 script {
                     GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
-                    sh "echo ${GIT_SHORT_SHA} > ./dist/SHA.txt"
+                    VERSION = sh ( script: "node -pe \"require('./package.json').version\"", returnStdout: true ).trim()
+                    S3_LOC = env.DSERVICE_S3_ROOT_STAGING + "notifications/" + VERSION + "-" + env.BUILD_NUMBER
                 }
+                sh "echo ${GIT_SHORT_SHA} > ./dist/SHA.txt"
+                sh "aws s3 cp ./dist ${S3_LOC}/ --recursive"
             }
         }
 
@@ -24,6 +27,13 @@ pipeline {
                 sh "npm i"
                 sh "npm run build"
             }
+                script {
+                    GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
+                    VERSION = sh ( script: "node -pe \"require('./package.json').version\"", returnStdout: true ).trim()
+                    S3_LOC = env.DSERVICE_S3_ROOT_STAGING + "notifications/" + VERSION + "-" + env.BUILD_NUMBER
+                }
+                sh "echo ${GIT_SHORT_SHA} > ./dist/SHA.txt"
+                sh "aws s3 cp ./dist ${S3_LOC}/ --recursive --dryrun"
         }
     }
 }
