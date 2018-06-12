@@ -26,7 +26,6 @@ pipeline {
             steps {
                 sh "npm i"
                 sh "npm run build"
-            }
                 script {
                     GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
                     VERSION = sh ( script: "node -pe \"require('./package.json').version\"", returnStdout: true ).trim()
@@ -34,6 +33,7 @@ pipeline {
                 }
                 sh "echo ${GIT_SHORT_SHA} > ./dist/SHA.txt"
                 sh "aws s3 cp ./dist ${S3_LOC}/ --recursive --dryrun"
+            }
         }
     }
 }
