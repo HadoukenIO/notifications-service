@@ -5,7 +5,7 @@ pipeline {
     stages {
 
         stage ('build') {
-            agent { label 'james-bond' }
+            agent { label 'linux-slave' }
             when { branch "develop" }
             steps {
                 sh "npm i"
@@ -21,7 +21,7 @@ pipeline {
         }
 
         stage ('test'){
-            agent { label 'james-bond' }
+            agent { label 'linux-slave' }
             when { not { branch "develop" } }
             steps {
                 sh "npm i"
