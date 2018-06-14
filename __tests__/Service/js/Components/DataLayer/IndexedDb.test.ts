@@ -1,5 +1,5 @@
 import 'jest';
-import IndexedDb from '../../../../../Service/js/Components/DataLayer/IndexedDb';
+import {IndexedDb} from '../../../../../src/provider/Persistence/DataLayer/IndexedDb';
 
 // One time setup for the test suite
 beforeEach(() => {
@@ -23,7 +23,7 @@ describe('Initialise the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.initialise(null);
+        indexedDb.initialise(null, null);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -38,7 +38,7 @@ describe('Create table in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.createTable(null);
+        indexedDb.create(null, null);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -53,7 +53,7 @@ describe('Create entry in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.create(null, {});
+        indexedDb.create(null, {id:'asdf'});
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -81,7 +81,7 @@ describe('Create table in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.createTable(null);
+        indexedDb.create(null, null);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -124,7 +124,7 @@ describe('update an entry in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.update(null, {});
+        indexedDb.update(null, {id:'asdf'});
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
