@@ -121,9 +121,16 @@ function createWebpackConfigForProvider() {
                 new CopyWebpackPlugin([
                     { from: './src/ui', to: 'ui/' },
                     { from: './src/demo', to: 'demo/' },
-                    { from: './src/provider.html' },
-                    { from: './src/app.json' }
+                    { from: './src/provider.html' }
+                ]),
+                new CopyWebpackPlugin([
+                    { from: './src/app.template.json', to: 'app.json', transform: (content) => {
+                        const config = JSON.parse(content);
+                        config.startup_app.url =  'https://cdn.openfin.co/services/openfin/notifications/' + process.env.GIT_SHORT_SHA + '/provider.html';
+                        return JSON.stringify(config);
+                    }}
                 ])
+
             ]
         }
     )
