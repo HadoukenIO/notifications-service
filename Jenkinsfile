@@ -14,7 +14,7 @@ pipeline {
                     STAGING_JSON = env.DSERVICE_S3_ROOT + "notifications/" + "app.staging.json"
                 }
                 sh "npm i"
-                sh "GIT_SHORT_SHA=${GIT_SHORT_SHA} && npm run build"
+                sh "GIT_SHORT_SHA=${GIT_SHORT_SHA} npm run build"
                 sh "echo ${GIT_SHORT_SHA} > ./dist/SHA.txt"
                 sh "aws s3 cp ./dist ${S3_LOC}/ --recursive"
                 sh "aws s3 cp ./dist/app.json ${STAGING_JSON}"
