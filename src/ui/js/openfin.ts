@@ -15,17 +15,7 @@ export class WindowManager {
 
         
         //opts out of openfin layouts docking
-        deregister()
-            .then(() => {
-                fin.desktop.Window.getCurrent().animate({
-                    opacity: {
-                        opacity: 1,
-                        duration: 200
-                    }
-                }, {
-                    interrupt: false
-                })
-            });
+        deregister();
     }
 
     /**
@@ -56,7 +46,7 @@ export class WindowManager {
      * @returns void
      */
     public onWindowLoad(): void {
-        this.sizeToFit(true);
+        this.sizeToFit(false);
 
         document.getElementById('exitLink').addEventListener('click', () => this.hideWindow());
     }

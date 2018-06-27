@@ -6,7 +6,7 @@ export class WindowInfo {
     private window: fin.OpenFinWindow;
     private idealHeight: number = 0;
     private idealWidth: number = 388;
-    private isShowing: boolean = true;
+    private isShowing: boolean = false;
     private static singleton: WindowInfo;
 
     constructor() {
