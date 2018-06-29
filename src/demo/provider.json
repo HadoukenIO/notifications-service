@@ -3,7 +3,7 @@
     "startup_app": {
         "name": "notifications",
         "description": "notifications",
-        "url": "https://localhost:9048/demo/appService.html",
+        "url": "http://localhost:9048/demo/provider.html",
         "uuid": "notifications",
         "autoShow": true,
         "defaultHeight": 500,
@@ -11,7 +11,7 @@
         "showTaskbarIcon": false
     },
     "runtime": {
-        "arguments":"--noerrdialogs --v=1  --allow-insecure-localhost --disable-web-security --allow-running-insecure-content --ignore-certificate-errors --remember-cert-error-decisions",
+        "arguments": "--v=1 --enable-crash-reporting",
         "version": "8.56.30.55"
     },
     "shortcut": {}
