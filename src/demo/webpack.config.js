@@ -18,7 +18,7 @@ function createConfig(projectPath, entryPoint) {
                     from: 'apps.json', 
                     transform: (content) => {
                         const config = JSON.parse(content);
-                        config.startup_app.url = getAppStartupUrl('app.html');
+                        config.startup_app.url = getAppStartupUrl('demo/apps.html');
                         return JSON.stringify(config);
                     }
                 }
@@ -28,7 +28,7 @@ function createConfig(projectPath, entryPoint) {
                     from: 'provider.json', 
                     transform: (content) => {
                         const config = JSON.parse(content);
-                        config.startup_app.url = getAppStartupUrl('provider.html');
+                        config.startup_app.url = getAppStartupUrl('demo/provider.html');
                         return JSON.stringify(config);
                     }
                 }
