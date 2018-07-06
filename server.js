@@ -20,7 +20,7 @@ http.createServer(app).listen(port, () => {
     // on OS X we need to launch the provider manually (no RVM)
     if (os.platform() === 'darwin') {
         console.log("Starting Provider for Mac OS");
-        const providerConf = path.resolve('./dist/demo/provider.json');
+        const providerConf = path.resolve('./dist/app.json');
         openfinLauncher.launchOpenFin({ configPath: providerConf }).catch(err => console.log(err));
     }
 });

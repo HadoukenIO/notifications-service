@@ -126,8 +126,8 @@ function createWebpackConfigForProvider() {
                 new CopyWebpackPlugin([
                     { from: './src/app.template.json', to: 'app.json', transform: (content) => {
                         const config = JSON.parse(content);
-                        config.startup_app.url = getAppStartupUrl('provider.html');
-                        return JSON.stringify(config);
+                        const newConfig = prepConfig(config);
+                        return JSON.stringify(newConfig);
                     }}
                 ])
 
@@ -136,11 +136,16 @@ function createWebpackConfigForProvider() {
     )
 }
 
-function getAppStartupUrl(page) {
+function prepConfig(config) {
+    const newConf = Object.assign({}, config);
     if (typeof process.env.GIT_SHORT_SHA != 'undefined' && process.env.GIT_SHORT_SHA != "" ) {
-        return 'https://cdn.openfin.co/services/openfin/notifications/' + process.env.GIT_SHORT_SHA + '/' + page;
+        newConf.startup_app.url = 'https://cdn.openfin.co/services/openfin/notifications/' + process.env.GIT_SHORT_SHA + '/provider.html';
+        newConf.startup_app.autoShow = false;
+    } else {
+        newConf.startup_app.url = 'http://localhost:9048/provider.html';
+        newConf.startup_app.autoShow = true;
     }
-    return 'http://localhost:9048/' + page;
+    return newConf;
 }
 
 /**

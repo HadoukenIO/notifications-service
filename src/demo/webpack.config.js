@@ -22,16 +22,6 @@ function createConfig(projectPath, entryPoint) {
                         return JSON.stringify(config);
                     }
                 }
-            ]),
-            new CopyWebpackPlugin([
-                { 
-                    from: 'provider.json', 
-                    transform: (content) => {
-                        const config = JSON.parse(content);
-                        config.startup_app.url = getAppStartupUrl('demo/provider.html');
-                        return JSON.stringify(config);
-                    }
-                }
             ])
         ]
     });
