@@ -141,9 +141,10 @@ function prepConfig(config) {
     if (typeof process.env.GIT_SHORT_SHA != 'undefined' && process.env.GIT_SHORT_SHA != "" ) {
         newConf.startup_app.url = 'https://cdn.openfin.co/services/openfin/notifications/' + process.env.GIT_SHORT_SHA + '/provider.html';
         newConf.startup_app.autoShow = false;
+    } else if (typeof process.env.CDN_ROOT_URL != 'undefined' && process.env.CDN_ROOT_URL != "" ) {
+        newConf.startup_app.url = process.env.CDN_ROOT_URL + '/provider.html';
     } else {
         newConf.startup_app.url = 'http://localhost:9048/provider.html';
-        newConf.startup_app.autoShow = true;
     }
     return newConf;
 }

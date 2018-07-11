@@ -1,8 +1,13 @@
-const numApps = 3;
+import { Fin } from "../fin";
+declare var fin: Fin;
+declare var window: Window & {fin: Fin};
+declare var console: Console;
 
-const baseUrl = window.location.href.split('/').slice(0, -1).join('/');
+const numApps:number = 3;
 
-console.log(`spawning apps in: ${baseUrl}`)
+const baseUrl:string = window.location.href.split('/').slice(0, -1).join('/');
+
+console.log(`creating ${numApps} apps at: ${baseUrl}`);
 
 fin.desktop.main(async () => {
 
@@ -14,8 +19,8 @@ fin.desktop.main(async () => {
             , "mainWindowOptions": {
                 "defaultHeight": 420,
                 "defaultWidth": 250,
-                "defaultTop": 100*i,
-                "defaultLeft": 100*i,
+                "defaultTop": 100*i+40,
+                "defaultLeft": 100*i+40,
                 "saveWindowState" : false,
                 "autoShow": true
             }
