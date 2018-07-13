@@ -1,0 +1,20 @@
+{
+    "devtools_port": 9090,
+    "startup_app": {
+        "name": "Notifications Demo",
+        "description": "Demo of Openfin Notifications",
+        "url": "http://localhost:9048/demo/apps.html",
+        "uuid": "notifications-demo",
+        "autoShow": true
+    },
+    "services": [
+        {
+            "name": "notifications"
+        }
+    ],
+    "runtime": {
+        "arguments": "--v=1 --enable-crash-reporting",
+        "version": "8.56.30.55"
+    },
+    "shortcut": {}
+}

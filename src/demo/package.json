@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/openfin": "^17.0.4",
     "typescript": "^2.7.2",
-    "webpack": "3.10.0"
+    "webpack": "3.10.0",
+    "copy-webpack-plugin": "^4.5.1"
   }
 }

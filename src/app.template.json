@@ -5,7 +5,7 @@
         "description": "OpenFin Notifications Desktop Service",
         "url": "https://cdn.openfin.co/services/openfin/notifications/index.html",
         "uuid": "notifications",
-        "autoShow": false,
+        "autoShow": true,
         "showTaskbarIcon": false,
         "defaultHeight": 400,
         "defaultWidth": 500
