@@ -1,6 +1,5 @@
-BasedOnStyle:    Google
----
 Language:        JavaScript
+BasedOnStyle:    Google
 IndentWidth:     4
 ColumnLimit:     160
 BinPackArguments: false
