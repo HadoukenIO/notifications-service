@@ -1,11 +1,8 @@
 const path = require('path');
-//const es2015 = require('babel-preset-es2015');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const es2015 = require('babel-preset-es2015');
-const react = require('react');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const outputDir = path.resolve(__dirname, './dist')
+const outputDir = path.resolve(__dirname, './build')
 
 /**
  * creates a webpack config for the UI (provider UI aka notification center)
@@ -15,7 +12,6 @@ const outputDir = path.resolve(__dirname, './dist')
  * @return {Object} A webpack module for the project
  */
 function createWebpackConfigForProviderUI(projectPath, entryPoint) {
-    const includePathToProject = path.resolve(__dirname, `./src/${projectPath}`);
 
     return Object.assign({
         entry: entryPoint,
@@ -31,10 +27,12 @@ function createWebpackConfigForProviderUI(projectPath, entryPoint) {
             rules: [
                 {
                     test: /\.css$/,
-                    use: ExtractTextPlugin.extract({
-                        fallback: 'style-loader',
-                        use: 'css-loader'
-                    })
+                    use: [
+                        {
+                            loader: MiniCssExtractPlugin.loader
+                        },
+                        "css-loader"
+                    ]
                 },
                 {
                     test: /\.(png|jpg|gif|otf|svg)$/,
@@ -50,27 +48,11 @@ function createWebpackConfigForProviderUI(projectPath, entryPoint) {
                 {
                     test: /\.tsx?$/,
                     loader: 'ts-loader'
-                },
-                // {
-                //     test: /\.jsx$/,
-                //     include: [includePathToProject],
-                //     loader: 'babel-loader',
-                //     query: {
-                //         presets: [react, es2015]
-                //     }
-                // },
-                {
-                    test: /\.js$/,
-                    include: [includePathToProject],
-                    loader: 'babel-loader',
-                    query: {
-                        presets: [es2015, "react"]
-                    }
                 }
 
             ]
         },
-        plugins: [new ExtractTextPlugin({ filename: 'bundle.css' })]
+        plugins: [new MiniCssExtractPlugin({ filename: 'bundle.css' })]
     });
 }
 
@@ -120,7 +102,6 @@ function createWebpackConfigForProvider() {
             plugins: [
                 new CopyWebpackPlugin([
                     { from: './src/ui', to: 'ui/' },
-                    { from: './src/demo', to: 'demo/', ignore: ['node_modules/**/*'] },
                     { from: './src/provider.html' }
                 ]),
                 new CopyWebpackPlugin([

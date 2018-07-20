@@ -1,5 +1,5 @@
 export interface ITable {
-    name: string;
-    indexName: string;
-    index: string;
+  name: string;
+  indexName: string;
+  index: string;
 }

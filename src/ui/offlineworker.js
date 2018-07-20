@@ -6,9 +6,8 @@ self.addEventListener('install', function (event) {
         caches.open(cacheName).then(function (cache) {
             return cache.addAll([
                 'index.html',
-                '../../dist/bundle.css',
-                '../../dist/ui-bundle.js'
-                // etc
+                '../../build/bundle.css',
+                '../../build/ui-bundle.js'
             ]);
         })
     );

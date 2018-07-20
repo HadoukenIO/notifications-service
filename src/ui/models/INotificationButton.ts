@@ -1,9 +1,9 @@
-import { INotification } from './INotification';
+import {INotification} from './INotification';
 
 export interface INotificationButton {
-    buttonTitle: string;
+  buttonTitle: string;
 }
 export interface INotificationButtonProps {
-    meta: INotification;
-    buttonIndex: number;
+  meta: INotification;
+  buttonIndex: number;
 }

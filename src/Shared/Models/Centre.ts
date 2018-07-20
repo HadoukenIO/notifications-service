@@ -1,4 +1,4 @@
 export interface Centre {
-    order: string;
-    history: number;
+  order: string;
+  history: number;
 }

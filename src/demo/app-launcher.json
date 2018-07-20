@@ -3,7 +3,7 @@
     "startup_app": {
         "name": "Notifications Demo",
         "description": "Demo of Openfin Notifications",
-        "url": "http://localhost:9048/demo/apps.html",
+        "url": "http://localhost:9048/demo/app-launcher.html",
         "uuid": "notifications-demo",
         "autoShow": true
     },
