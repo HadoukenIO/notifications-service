@@ -1,6 +1,6 @@
 export interface INotificationTime {
-  date: string;
+    date: string;
 }
 export interface INotificationTimeProps {
-  date: Date;
+    date: Date;
 }

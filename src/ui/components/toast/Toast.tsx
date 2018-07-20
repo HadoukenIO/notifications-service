@@ -61,18 +61,18 @@ export class Toast extends React.Component<IToastProps, {}> {
                                 onClick={() => {
                                     this.clickHandler(ClickEvents.Closed);
                                 }}
-                                />
+                            />
                             <div
                                 className="notification-body"
                                 onClick={() => {
                                     this.clickHandler(ClickEvents.BodyClick);
                                 }}
-                                >
+                            >
                                 <div className="notification-source">
                                     <img
                                         src={this.props.meta.icon}
                                         className="notification-small-img"
-                                        />
+                                    />
                                     <span className="notification-source-text">
                                         {this.props.meta.name}
                                     </span>

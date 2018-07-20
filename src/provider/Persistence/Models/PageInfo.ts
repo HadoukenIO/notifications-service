@@ -5,7 +5,7 @@ import {Sorts} from './Sort';
  * number and the number of items for the page
  */
 export interface PageInfo {
-  pageNumber: number;
-  numberOfItems: number;
-  sort: Sorts;
+    pageNumber: number;
+    numberOfItems: number;
+    sort: Sorts;
 }

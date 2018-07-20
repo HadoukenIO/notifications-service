@@ -12,68 +12,55 @@ declare var fin: Fin;
 declare var window: Window&{fin: Fin};
 
 // For testing/display purposes
-const notificationClicked =
-    (payload: NotificationEvent, sender: ISenderInfo) => {
-      console.log('notificationClicked hit');
-      console.log('payload', payload);
-      console.log('sender', sender);
-      return 'notificationClicked success';
-    };
+const notificationClicked = (payload: NotificationEvent, sender: ISenderInfo) => {
+    console.log('notificationClicked hit');
+    console.log('payload', payload);
+    console.log('sender', sender);
+    return 'notificationClicked success';
+};
 
 // For testing/display purposes
-const notificationButtonClicked =
-    (payload: NotificationEvent&ISenderInfo&{buttonIndex: number},
-     sender: ISenderInfo) => {
-      console.log('notificationButtonClicked hit');
-      console.log('payload', payload);
-      console.log('sender', sender);
-      return 'notificationClicked success';
-    };
+const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) => {
+    console.log('notificationButtonClicked hit');
+    console.log('payload', payload);
+    console.log('sender', sender);
+    return 'notificationClicked success';
+};
 
 // For testing/display purposes
-const notificationClosed =
-    (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
-      console.log('notificationClosed hit');
-      console.log('payload', payload);
-      console.log('sender', sender);
-      return 'notificationClosed success';
-    };
+const notificationClosed = (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+    console.log('notificationClosed hit');
+    console.log('payload', payload);
+    console.log('sender', sender);
+    return 'notificationClosed success';
+};
 
 const callbacks = {
-  notificationClicked,
-  notificationButtonClicked,
-  notificationClosed
+    notificationClicked,
+    notificationButtonClicked,
+    notificationClosed
 };
 
 async function createClientPromise() {
-  await new Promise((resolve, reject) => {
-    if (!fin) {
-      reject(
-          'fin is not defined, This module is only intended for use in an OpenFin application.');
-    }
-    fin.desktop.main(() => resolve());
-  });
-  const client = await fin.desktop.Service.connect(
-      {uuid: 'notifications', payload: {version: '0.0.3'}});
-  // tslint:disable-next-line:no-any
-  client.register('WARN', (payload: any) => console.warn(payload));
-  client.register(
-      'notification-clicked',
-      (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+    await new Promise((resolve, reject) => {
+        if (!fin) {
+            reject('fin is not defined, This module is only intended for use in an OpenFin application.');
+        }
+        fin.desktop.main(() => resolve());
+    });
+    const client = await fin.desktop.Service.connect({uuid: 'notifications', payload: {version: '0.0.3'}});
+    // tslint:disable-next-line:no-any
+    client.register('WARN', (payload: any) => console.warn(payload));
+    client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
         callbacks.notificationClicked(payload, sender);
-      });
-  client.register(
-      'notification-button-clicked',
-      (payload: NotificationEvent&ISenderInfo&{buttonIndex: number},
-       sender: ISenderInfo) => {
+    });
+    client.register('notification-button-clicked', (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) => {
         callbacks.notificationButtonClicked(payload, sender);
-      });
-  client.register(
-      'notification-closed',
-      (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+    });
+    client.register('notification-closed', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
         callbacks.notificationClosed(payload, sender);
-      });
-  return client;
+    });
+    return client;
 }
 
 const clientP = createClientPromise();
@@ -84,19 +71,19 @@ const clientP = createClientPromise();
  * @param {NotificationOptions} options notification options
  */
 export async function create(id: string, options: NotificationOptions) {
-  const plugin = await clientP;
-  const payload: Notification = Object.assign({}, {id}, options);
-  const notification = await plugin.dispatch('create-notification', payload);
-  return notification;
+    const plugin = await clientP;
+    const payload: Notification = Object.assign({}, {id}, options);
+    const notification = await plugin.dispatch('create-notification', payload);
+    return notification;
 }
 
 /**
  * @method getAll get all notifications for this app
  */
 export async function getAll() {
-  const plugin = await clientP;
-  const appNotifications = await plugin.dispatch('fetch-app-notifications', {});
-  return appNotifications;
+    const plugin = await clientP;
+    const appNotifications = await plugin.dispatch('fetch-app-notifications', {});
+    return appNotifications;
 }
 
 /**
@@ -104,19 +91,19 @@ export async function getAll() {
  * @param {string} id The id of the notification
  */
 export async function clear(id: string) {
-  const plugin = await clientP;
-  const payload = {id};
-  const result = await plugin.dispatch('clear-notification', payload);
-  return result;
+    const plugin = await clientP;
+    const payload = {id};
+    const result = await plugin.dispatch('clear-notification', payload);
+    return result;
 }
 
 /**
  * @method clearAll clears all notifications for an app
  */
 export async function clearAll() {
-  const plugin = await clientP;
-  const result = await plugin.dispatch('clear-app-notifications');
-  return result;
+    const plugin = await clientP;
+    const result = await plugin.dispatch('clear-app-notifications');
+    return result;
 }
 
 /**
@@ -124,14 +111,12 @@ export async function clearAll() {
  * @param {string} evt the event name
  * @param {(payload: NotificationEvent, sender: ISenderInfo) => string)} cb event handler callback
  */
-export async function addEventListener(
-    evt: string,
-    cb: (payload: NotificationEvent, sender: ISenderInfo) => string) {
-  if (evt === 'click') {
-    callbacks.notificationClicked = cb;
-  } else if (evt === 'close') {
-    callbacks.notificationClosed = cb;
-  } else if (evt === 'button-click') {
-    callbacks.notificationButtonClicked = cb;
-  }
+export async function addEventListener(evt: string, cb: (payload: NotificationEvent, sender: ISenderInfo) => string) {
+    if (evt === 'click') {
+        callbacks.notificationClicked = cb;
+    } else if (evt === 'close') {
+        callbacks.notificationClosed = cb;
+    } else if (evt === 'button-click') {
+        callbacks.notificationButtonClicked = cb;
+    }
 }

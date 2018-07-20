@@ -5,14 +5,17 @@
   "main": "module_dist/client/index.js",
   "types": "module_dist/client/index.d.ts",
   "scripts": {
-    "test": "jest && npm run lint",
+    "test": "jest && npm run check",
     "check": "gts check",
     "fix": "gts fix",
     "clean": "gts clean",
     "build": "webpack --mode production",
     "build:demo": "webpack --mode development && cd ./src/demo && npm install && npm run build",
     "start": "node server.js",
-    "prepare": "tsc --outDir module_dist src/client/index.ts --lib DOM,ES6 --declaration --target ES2017 --module commonjs"
+    "prepare": "tsc --outDir module_dist src/client/index.ts --lib DOM,ES6 --declaration --target ES2017 --module commonjs",
+    "compile": "tsc -p .",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
   },
   "repository": {
     "type": "git",
@@ -51,7 +54,7 @@
     "style-loader": "^0.21.0",
     "ts-jest": "^22.4.1",
     "ts-loader": "^4.4.2",
-    "typescript": "^2.7.2",
+    "typescript": "~2.8.0",
     "url-loader": "^1.0.1",
     "webpack": "^4.16.1",
     "webpack-cli": "^3.0.8"

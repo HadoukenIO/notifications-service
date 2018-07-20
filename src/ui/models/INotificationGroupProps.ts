@@ -1,13 +1,13 @@
 import {INotification} from './INotification';
 
 export enum eGroupMethod {
-  APPLICATION,
-  DATE
+    APPLICATION,
+    DATE
 }
 
 export interface INotificationGroupProps {
-  name: string;
-  notifications?: INotification[];
-  groupBy?: eGroupMethod;
-  id?: number;
+    name: string;
+    notifications?: INotification[];
+    groupBy?: eGroupMethod;
+    id?: number;
 }

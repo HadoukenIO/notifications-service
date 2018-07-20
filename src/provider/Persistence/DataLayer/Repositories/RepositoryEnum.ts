@@ -3,6 +3,6 @@
  * invalid values
  */
 export enum Repositories {
-  history = 'history',
-  settings = 'settings'
+    history = 'history',
+    settings = 'settings'
 }
