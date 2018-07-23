@@ -34,6 +34,7 @@ Will launch a demo for OpenFin Notifications
 - Node 8.11 LTS.
 ```bash
 npm install
+npm run build:demo
 npm run start
 ```
 
