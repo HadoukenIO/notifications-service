@@ -1,4 +1,4 @@
-declare var window: Window & fin.OpenFinWindow & {WindowInfo: WindowInfo};
+declare var window: Window&fin.OpenFinWindow&{WindowInfo: WindowInfo};
 
 export class WindowInfo {
     private height: number = 0;
@@ -16,17 +16,22 @@ export class WindowInfo {
 
         this.recalibrate();
 
-        fin.desktop.System.addEventListener(
-            'monitor-info-changed',
-            this.recalibrate.bind(this)
-        );
+        fin.desktop.System.addEventListener('monitor-info-changed', this.recalibrate.bind(this));
 
         this.window.addEventListener('bounds-changed', this.recalibrate.bind(this));
-        this.window.addEventListener('minimized', () => { this.setShowing(false); });
-        this.window.addEventListener('hidden', () => { this.setShowing(false); });
-        this.window.addEventListener('shown', () => { this.setShowing(true); });
-        this.window.addEventListener('restored', () => { this.setShowing(true); });
-        
+        this.window.addEventListener('minimized', () => {
+            this.setShowing(false);
+        });
+        this.window.addEventListener('hidden', () => {
+            this.setShowing(false);
+        });
+        this.window.addEventListener('shown', () => {
+            this.setShowing(true);
+        });
+        this.window.addEventListener('restored', () => {
+            this.setShowing(true);
+        });
+
 
         WindowInfo.singleton = this;
     }
@@ -88,9 +93,7 @@ export class WindowInfo {
     public setShowing(showing: boolean): void {
         this.isShowing = showing;
 
-        window.dispatchEvent(new CustomEvent('WindowShowingUpdate', {
-            detail: {showing}
-        }));
+        window.dispatchEvent(new CustomEvent('WindowShowingUpdate', {detail: {showing}}));
     }
 
     /**
@@ -112,5 +115,4 @@ export class WindowInfo {
             return new WindowInfo();
         }
     }
-
 }

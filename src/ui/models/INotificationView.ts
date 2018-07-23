@@ -1,4 +1,4 @@
-import { INotificationGroupProps } from './INotificationGroupProps';
+import {INotificationGroupProps} from './INotificationGroupProps';
 
 export interface INotificationView {
     NotificationGroups: INotificationGroupProps[];

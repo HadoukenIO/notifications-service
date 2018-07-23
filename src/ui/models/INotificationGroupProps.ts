@@ -1,4 +1,4 @@
-import { INotification } from './INotification';
+import {INotification} from './INotification';
 
 export enum eGroupMethod {
     APPLICATION,

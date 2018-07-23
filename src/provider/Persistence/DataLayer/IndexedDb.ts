@@ -1,11 +1,13 @@
-﻿import { IDatastore } from './IDatastore';
-import { ITable } from '../Models/ITable';
-import { PageInfo } from '../Models/PageInfo';
-import { Sorts } from '../Models/Sort';
-import { Entity } from '../../../Shared/Models/Entity';
+﻿import {Entity} from '../../../Shared/Models/Entity';
+import {ITable} from '../Models/ITable';
+import {PageInfo} from '../Models/PageInfo';
+import {Sorts} from '../Models/Sort';
+
+import {IDatastore} from './IDatastore';
 
 /**
- * @description An IndexedDb implementation implementing the IDatastore interface
+ * @description An IndexedDb implementation implementing the IDatastore
+ * interface
  */
 export class IndexedDb<T extends Entity> implements IDatastore<T> {
     /**
@@ -44,7 +46,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
             try {
                 tablesToCreate.forEach(table => {
                     if (!db.objectStoreNames.contains(table.name)) {
-                        const store = db.createObjectStore(table.name, { keyPath: 'id' });
+                        const store = db.createObjectStore(table.name, {keyPath: 'id'});
 
                         if (table.indexName && table.index) {
                             const index = store.createIndex(table.indexName, [table.index]);
@@ -67,12 +69,12 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public create<T extends Entity>(tableName: string, entry: T): Promise<boolean> {
         if (!tableName) {
             console.error('No table name has been passed');
-            return;
+            return Promise.reject('No table name has been passed');
         }
 
         if (!entry) {
             console.error('No entry has been passed');
-            return;
+            return Promise.reject('No entry has been passed');
         }
 
         return new Promise((resolve, reject) => {
@@ -100,15 +102,15 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
      * @public
      * @returns {Promise<boolean>} A value of whether it was successfully created or not
      */
-    public remove<T extends string | number>(tableName: string, id: T): Promise<boolean> {
+    public remove<T extends string|number>(tableName: string, id: T): Promise<boolean> {
         if (!tableName) {
             console.error('No table name has been passed');
-            return;
+            return Promise.reject('No table name has been passed');
         }
 
         if (!id) {
             console.error('No id has been passed');
-            return;
+            return Promise.reject('No id has been passed');
         }
 
         return new Promise((resolve, reject) => {
@@ -130,7 +132,8 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method removeAll Deletes all entries in the database based on the table name
+     * @method removeAll Deletes all entries in the database based on the table
+     * name
      * @param {string} tableName The name of the table to perform
      * @public
      * @returns {Promise<boolean>} A value of whether it was successfully created or not
@@ -138,7 +141,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public removeAll(tableName: string): Promise<boolean> {
         if (!tableName) {
             console.error('No table name has been passed');
-            return;
+            return Promise.reject('No table name has been passed');
         }
 
         return new Promise((resolve, reject) => {
@@ -160,7 +163,8 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method removeByUuid Deletes all entries corresponding to the uuid passed in
+     * @method removeByUuid Deletes all entries corresponding to the uuid passed
+     * in
      * @param {string} tableName The name of the table to perform
      * @param {string} uuid The uuid of the app
      * @public
@@ -174,7 +178,8 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
                         this.remove(tableName, notification.id);
                     });
                     resolve(true);
-                }).catch((err) => {
+                })
+                .catch((err) => {
                     resolve(false);
                 });
         });
@@ -190,12 +195,12 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public update<T extends Entity>(tableName: string, entry: T): Promise<boolean> {
         if (!tableName) {
             console.error('No table name has been passed');
-            return;
+            return Promise.reject('No table name has been passed');
         }
 
         if (!entry) {
             console.error('No entry has been passed');
-            return;
+            return Promise.reject('No entry has been passed');
         }
 
         return new Promise((resolve, reject) => {
@@ -226,13 +231,11 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public read(tableName: string, id: string): Promise<T> {
         return new Promise((resolve, reject) => {
             if (!tableName) {
-                console.error('No table name has been passed');
-                return;
+                reject('No table name has been passed');
             }
 
             if (!id) {
-                console.error('No id has been passed in');
-                return;
+                reject('No id has been passed in');
             }
 
             const db = this.mDbOpenRequest.result as IDBDatabase;
@@ -285,7 +288,8 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method readByUuid Gets all entries from the database corresponding to the Uuid
+     * @method readByUuid Gets all entries from the database corresponding to the
+     * Uuid
      * @param tableName The name of the table to perform actions on
      * @param uuid The uuid to query by
      * @public
@@ -322,7 +326,8 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     /**
      * @method readByPage Gets the result on the page specified
      * @param tableName The table to be read from
-     * @param pageInfo The requested page and the number of items to be returned from the apge
+     * @param pageInfo The requested page and the number of items to be returned
+     * from the apge
      * @public
      * @returns {Promise<T[]>} Returns a promise to retrieve the data requested
      */

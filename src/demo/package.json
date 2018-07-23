@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack --mode development"
   },
   "author": "openfin",
   "dependencies": {
@@ -11,8 +11,9 @@
   },
   "devDependencies": {
     "@types/openfin": "^17.0.4",
+    "copy-webpack-plugin": "^4.5.1",
     "typescript": "^2.7.2",
-    "webpack": "3.10.0",
-    "copy-webpack-plugin": "^4.5.1"
+    "webpack": "^4.16.1",
+    "webpack-cli": "^3.0.8"
   }
 }

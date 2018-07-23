@@ -1,7 +1,8 @@
-import { Sorts } from "./Sort";
+import {Sorts} from './Sort';
 
 /**
- * @description The meta data about the page they are requesting, the page number and the number of items for the page
+ * @description The meta data about the page they are requesting, the page
+ * number and the number of items for the page
  */
 export interface PageInfo {
     pageNumber: number;

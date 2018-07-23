@@ -1,5 +1,5 @@
-import { OptionButton } from "../../Shared/Models/OptionButton";
-import { NotificationTypes } from '../../Shared/Models/NotificationTypes';
+import {NotificationTypes} from '../../Shared/Models/NotificationTypes';
+import {OptionButton} from '../../Shared/Models/OptionButton';
 
 export interface INotification {
     date: number;

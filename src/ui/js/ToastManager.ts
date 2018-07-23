@@ -1,9 +1,10 @@
-import { INotification } from "../models/INotification";
-import { WindowInfo } from "./WindowInfo";
-import { IToast } from "../models/toast/IToast";
-import { Fin } from "../../fin";
-import { ISenderInfo } from '../../provider/Models/ISenderInfo';
-import { Notification } from '../../Shared/Models/Notification';
+import {Fin} from '../../fin';
+import {ISenderInfo} from '../../provider/Models/ISenderInfo';
+import {Notification} from '../../Shared/Models/Notification';
+import {INotification} from '../models/INotification';
+import {IToast} from '../models/toast/IToast';
+
+import {WindowInfo} from './WindowInfo';
 
 declare var fin: Fin;
 
@@ -21,7 +22,7 @@ export class ToastManager {
             return ToastManager.singleton;
         }
 
-        window.addEventListener("WindowShowingUpdate", this.windowShowingEventHandler.bind(this));
+        window.addEventListener('WindowShowingUpdate', this.windowShowingEventHandler.bind(this));
         ToastManager.singleton = this;
     }
 
@@ -30,17 +31,14 @@ export class ToastManager {
      * @param {INotification} meta Notification Information
      * @param {boolean} force Force show a notification, regardless of window showing or not
      */
-    public create(meta: Notification & ISenderInfo, force:boolean = false) {
+    public create(meta: Notification&ISenderInfo, force: boolean = false) {
         if (!force) {
             if (this.windowInfo.getShowingStatus()) {
                 return;
             }
         }
 
-        const note: fin.OpenFinNotification = new fin.desktop.Notification({
-            url: "Toast.html", 
-            message: meta
-        });
+        const note: fin.OpenFinNotification = new fin.desktop.Notification({url: 'Toast.html', message: meta});
 
         const toast: IToast = {note, meta};
         this.toasts.push(toast);
@@ -50,7 +48,7 @@ export class ToastManager {
      * @method closeAll Closes all Toasts
      * @returns void
      */
-    public closeAll():void {
+    public closeAll(): void {
         this.toasts.forEach((toast) => {
             toast.note.close();
         });
@@ -58,10 +56,10 @@ export class ToastManager {
 
     /**
      * @method windowShowingEventHandler Handler for the WindowShowingUpdate Event
-     * @param {CustomEvent} e  
+     * @param {CustomEvent} e
      */
     private windowShowingEventHandler(e: CustomEvent): void {
-        if(e.detail.showing) {
+        if (e.detail.showing) {
             this.closeAll();
         }
     }
@@ -71,7 +69,7 @@ export class ToastManager {
      * @returns {ToastManager}
      * @static
      */
-    public static get instance():ToastManager {
+    public static get instance(): ToastManager {
         if (ToastManager.singleton) {
             return ToastManager.singleton;
         } else {

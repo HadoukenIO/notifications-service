@@ -1,5 +1,5 @@
-import { NotificationContext } from "./Notification";
-import { OptionButton } from "./OptionButton";
+import {NotificationContext} from './Notification';
+import {OptionButton} from './OptionButton';
 /**
  * @description interface for notification event
  */

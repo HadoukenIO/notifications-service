@@ -1,56 +1,65 @@
-console.log("Client index.js loaded");
+console.log('Client index.js loaded');
 
-import { Fin } from "../fin";
-import { OptionButton } from '../Shared/Models/OptionButton';
-import { Notification } from '../Shared/Models/Notification';
-import { ISenderInfo } from '../provider/Models/ISenderInfo';
-import { OptionInput } from '../Shared/Models/OptionInput';
-import { NotificationEvent } from '../Shared/Models/NotificationEvent';
-import { NotificationOptions } from './Models/NotificationOptions';
+import {Fin} from '../fin';
+import {OptionButton} from '../Shared/Models/OptionButton';
+import {Notification} from '../Shared/Models/Notification';
+import {ISenderInfo} from '../provider/Models/ISenderInfo';
+import {OptionInput} from '../Shared/Models/OptionInput';
+import {NotificationEvent} from '../Shared/Models/NotificationEvent';
+import {NotificationOptions} from './Models/NotificationOptions';
 
 declare var fin: Fin;
-declare var window: Window & {fin: Fin};
+declare var window: Window&{fin: Fin};
 
 // For testing/display purposes
 const notificationClicked = (payload: NotificationEvent, sender: ISenderInfo) => {
-    console.log("notificationClicked hit");
-    console.log("payload", payload);
-    console.log("sender", sender);
-    return "notificationClicked success";
+    console.log('notificationClicked hit');
+    console.log('payload', payload);
+    console.log('sender', sender);
+    return 'notificationClicked success';
 };
 
 // For testing/display purposes
-const notificationButtonClicked = (payload: Notification & ISenderInfo & { buttonIndex: number }, sender: ISenderInfo) => {
-    console.log("notificationButtonClicked hit");
-    console.log("payload", payload);
-    console.log("sender", sender);
-    return "notificationClicked success";
+const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) => {
+    console.log('notificationButtonClicked hit');
+    console.log('payload', payload);
+    console.log('sender', sender);
+    return 'notificationClicked success';
 };
 
 // For testing/display purposes
-const notificationClosed = (payload: NotificationEvent, sender: ISenderInfo) => {
-    console.log("notificationClosed hit");
-    console.log("payload", payload);
-    console.log("sender", sender);
-    return "notificationClosed success";
+const notificationClosed = (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+    console.log('notificationClosed hit');
+    console.log('payload', payload);
+    console.log('sender', sender);
+    return 'notificationClosed success';
 };
 
-const callbacks = { notificationClicked, notificationButtonClicked, notificationClosed};
+const callbacks = {
+    notificationClicked,
+    notificationButtonClicked,
+    notificationClosed
+};
 
 async function createClientPromise() {
     await new Promise((resolve, reject) => {
         if (!fin) {
-            reject(
-                'fin is not defined, This module is only intended for use in an OpenFin application.');
+            reject('fin is not defined, This module is only intended for use in an OpenFin application.');
         }
         fin.desktop.main(() => resolve());
     });
-    const client = await fin.desktop.Service.connect( { uuid: 'notifications', payload: { version: '0.0.3'} });
+    const client = await fin.desktop.Service.connect({uuid: 'notifications', payload: {version: '0.0.3'}});
     // tslint:disable-next-line:no-any
     client.register('WARN', (payload: any) => console.warn(payload));
-    client.register('notification-clicked', (payload: Notification & ISenderInfo, sender: ISenderInfo) => { callbacks.notificationClicked(payload, sender); });
-    client.register('notification-button-clicked', (payload: Notification & ISenderInfo & { buttonIndex: number }, sender: ISenderInfo) => { callbacks.notificationButtonClicked(payload, sender); });
-    client.register('notification-closed', (payload: Notification & ISenderInfo, sender: ISenderInfo) => { callbacks.notificationClosed(payload, sender); });
+    client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+        callbacks.notificationClicked(payload, sender);
+    });
+    client.register('notification-button-clicked', (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) => {
+        callbacks.notificationButtonClicked(payload, sender);
+    });
+    client.register('notification-closed', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+        callbacks.notificationClosed(payload, sender);
+    });
     return client;
 }
 

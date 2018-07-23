@@ -17,10 +17,24 @@ export class Header extends React.Component<IHeaderProps> {
     public render(): JSX.Element {
         return (
             <div id="header">
-                <div className='sort-buttons'>
-                    <div className='sort-title'> Sort By: </div>
-                    <div className='sort-button' onClick={() => this.props.handleGroupBy(eGroupMethod.APPLICATION)}>APPLICATION</div>
-                    <div className='sort-button' onClick={() => this.props.handleGroupBy(eGroupMethod.DATE)}>DATE</div>
+                <div className="sort-buttons">
+                    <div className="sort-title">Sort By : </div>
+                    <div
+                        className="sort-button"
+                        onClick={() =>
+                            this.props.handleGroupBy(eGroupMethod.APPLICATION)
+                        }
+                    >
+                        APPLICATION
+                    </div>
+                    <div
+                        className="sort-button"
+                        onClick={() =>
+                            this.props.handleGroupBy(eGroupMethod.DATE)
+                        }
+                    >
+                        DATE
+                    </div>
                 </div>
 
                 <img id="exitLink" src="image/shapes/arrowsv2.svg" alt="" />
@@ -33,6 +47,6 @@ export class Header extends React.Component<IHeaderProps> {
     }
 
     private convertToEnum(method: string): eGroupMethod {
-        return parseFloat(method) as eGroupMethod;  //tslint:disable-line:ban
+        return parseFloat(method) as eGroupMethod; // tslint:disable-line:ban
     }
 }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
-import {INotificationTime, INotificationTimeProps} from '../../models/INotificationTime';
+
+import { INotificationTime, INotificationTimeProps } from '../../models/INotificationTime';
 
 /**
  * @class NotificationTime Handles Time updates in Notifications
@@ -8,10 +9,10 @@ import {INotificationTime, INotificationTimeProps} from '../../models/INotificat
 export class NotificationTime extends React.Component<INotificationTimeProps, INotificationTime> {
     private interval: number;
 
-    constructor(props: INotificationTimeProps){
+    constructor(props: INotificationTimeProps) {
         super(props);
     }
-    
+
     /**
      * @method render Renders the time in Notifications
      * @returns ReactNode
@@ -19,7 +20,9 @@ export class NotificationTime extends React.Component<INotificationTimeProps, IN
     public render(): React.ReactNode {
         return (
             <div className="time-div">
-                <span className="time">{moment(this.props.date).fromNow()}</span>
+                <span className="time">
+                    {moment(this.props.date).fromNow()}
+                </span>
             </div>
         );
     }

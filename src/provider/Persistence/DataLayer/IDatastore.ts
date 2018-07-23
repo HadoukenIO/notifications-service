@@ -1,6 +1,6 @@
-import { ITable } from "../Models/ITable";
-import { PageInfo } from "../Models/PageInfo";
-import { Entity } from "../../../Shared/Models/Entity";
+import {Entity} from '../../../Shared/Models/Entity';
+import {ITable} from '../Models/ITable';
+import {PageInfo} from '../Models/PageInfo';
 
 /**
  *  @description Interface for low level database access layer
@@ -27,10 +27,11 @@ export interface IDatastore<T extends Entity> {
      * @param {T} id The id of the entry we want to remove
      * @returns {Promise<boolean>} A value of whether it was successfully removed or not
      */
-    remove<T extends string | number>(tableName: string, id: T): Promise<boolean>;
+    remove<T extends string|number>(tableName: string, id: T): Promise<boolean>;
 
     /**
-     * @method removeAll Deletes all entries in the database based on the table name
+     * @method removeAll Deletes all entries in the database based on the table
+     * name
      * @param {string} tableName The name of the table to perform
      * @returns {Promise<boolean>} A value of whether it has successfully removed all or not
      */
@@ -61,7 +62,8 @@ export interface IDatastore<T extends Entity> {
     read(tableName: string, id: string|number): Promise<T>;
 
     /**
-     * @method readByUuid Gets all entries from the database corresponding to the Uuid
+     * @method readByUuid Gets all entries from the database corresponding to the
+     * Uuid
      * @param tableName The name of the table to perform actions on
      * @param uuid The uuid to query by
      * @returns {Promise<T[]>} Returns a promise to retrieve the data requested
@@ -78,7 +80,8 @@ export interface IDatastore<T extends Entity> {
     /**
      * @method readByPage Gets the result on the page specified
      * @param tableName The table to be read from
-     * @param pageInfo The requested page and the number of items to be returned from the apge
+     * @param pageInfo The requested page and the number of items to be returned
+     * from the apge
      * @returns {Promise<T>} Returns a promise to retrieve the data requested
      */
     readByPage(tableName: string, pageInfo: PageInfo): Promise<T[]>;

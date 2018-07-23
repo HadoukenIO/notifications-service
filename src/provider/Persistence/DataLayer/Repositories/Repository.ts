@@ -1,8 +1,8 @@
-import { IDatastore } from "../IDatastore";
-import { VoidResult, ReturnResult } from "../../../../Shared/Models/Result";
-import { PageInfo } from "../../Models/PageInfo";
-import { Settings } from "../../../../Shared/Models/Settings";
-import { Entity } from "../../../../Shared/Models/Entity";
+import {Entity} from '../../../../Shared/Models/Entity';
+import {ReturnResult, VoidResult} from '../../../../Shared/Models/Result';
+import {Settings} from '../../../../Shared/Models/Settings';
+import {PageInfo} from '../../Models/PageInfo';
+import {IDatastore} from '../IDatastore';
 
 /**
  * @class Base repository for all child repositories
@@ -50,24 +50,16 @@ export abstract class Repository<T extends Entity> {
      */
     protected async genericCreate(entity: T): Promise<ReturnResult<T>> {
         if (!entity) {
-            console.error('No entity was passed');
-            return;
+            throw new Error('No entity was passed');
         }
 
         const result = await this.mDataStore.create(this.TABLENAME, entity);
 
         if (!result) {
-            return {
-                success: result,
-                errorMsg: 'Could not insert into database: ' + JSON.stringify(entity),
-                value: null
-            };
+            return {success: result, errorMsg: 'Could not insert into database: ' + JSON.stringify(entity), value: null};
         }
 
-        return {
-            success: result,
-            value: entity
-        };
+        return {success: result, value: entity};
     }
 
     /**
@@ -79,17 +71,10 @@ export abstract class Repository<T extends Entity> {
         const result = await this.mDataStore.readAll(this.TABLENAME);
 
         if (result == null) {
-            return {
-                success: false,
-                errorMsg: `Could not retrieve all entities from the table ${this.TABLENAME}`,
-                value: null
-            };
+            return {success: false, errorMsg: `Could not retrieve all entities from the table ${this.TABLENAME}`, value: null};
         }
 
-        return {
-            success: true,
-            value: result
-        };
+        return {success: true, value: result};
     }
 
     /**
@@ -100,50 +85,37 @@ export abstract class Repository<T extends Entity> {
      */
     protected async genericGetById(id: string|number): Promise<ReturnResult<T>> {
         if (!id) {
-            console.error('No id was passed');
-            return;
+            throw new Error('No id was passed');
         }
 
         const result = await this.mDataStore.read(this.TABLENAME, id);
 
         if (!result) {
-            return {
-                success: false,
-                errorMsg: `Notification with the id ${id} was not found`,
-                value: null
-            };
+            return {success: false, errorMsg: `Notification with the id ${id} was not found`, value: null};
         }
 
-        return {
-            success: true,
-            value: result
-        };
+        return {success: true, value: result};
     }
 
     /**
-     * @method genericRemove Deletes an entry in the database based on the entity ID
+     * @method genericRemove Deletes an entry in the database based on the entity
+     * ID
      * @param {tring|number} id The id of the entry we want to remove
      * @protected
      * @returns {Promise<VoidResult>} A value of whether it was successfully removed or not
      */
     protected async genericRemove(id: string|number): Promise<VoidResult> {
         if (!id) {
-            console.error('No id was passed');
-            return;
+            throw new Error('No id was passed');
         }
 
         const result = await this.mDataStore.remove(this.TABLENAME, id);
 
         if (!result) {
-            return {
-                success: result,
-                errorMsg: `The given id ${id} could not be removed from the database`
-            };
+            return {success: result, errorMsg: `The given id ${id} could not be removed from the database`};
         }
 
-        return {
-            success: result
-        };
+        return {success: result};
     }
 
     /**
@@ -155,15 +127,10 @@ export abstract class Repository<T extends Entity> {
         const result = await this.mDataStore.removeAll(this.TABLENAME);
 
         if (!result) {
-            return {
-                success: result,
-                errorMsg: 'Could not remove all entries in the database'
-            };
+            return {success: result, errorMsg: 'Could not remove all entries in the database'};
         }
 
-        return {
-            success: result
-        };
+        return {success: result};
     }
 
     /**
@@ -174,34 +141,22 @@ export abstract class Repository<T extends Entity> {
      */
     protected async genericUpdate(entity: T): Promise<ReturnResult<T>> {
         if (!entity) {
-            console.error('No updated entity has been passed');
-            return;
+            throw new Error('No updated entity has been passed');
         }
 
         const read = await this.genericGetById(entity.id);
 
         if (!read.success) {
-            return {
-                success: read.success,
-                errorMsg: `No entry matching the id: ${entity.id}, so there is no entry to be updated`,
-                value: null
-            };
+            return {success: read.success, errorMsg: `No entry matching the id: ${entity.id}, so there is no entry to be updated`, value: null};
         }
 
         const result = await this.mDataStore.update(this.TABLENAME, entity);
 
         if (!result) {
-            return {
-                success: result,
-                errorMsg: 'The entity could not be updated',
-                value: null
-            };
+            return {success: result, errorMsg: 'The entity could not be updated', value: null};
         }
 
-        return {
-            success: result,
-            value: entity
-        };
+        return {success: result, value: entity};
     }
 
     /**
@@ -212,23 +167,15 @@ export abstract class Repository<T extends Entity> {
      */
     protected async genericGetByPage(pageInfo: PageInfo): Promise<ReturnResult<T[]>> {
         if (!pageInfo) {
-            console.error('No page info has been passed');
-            return;
+            throw new Error('No page info has been passed');
         }
 
         const result = await this.mDataStore.readByPage(this.TABLENAME, pageInfo);
 
         if (result == null) {
-            return {
-                success: false,
-                errorMsg: 'Could not retrieve the page requested',
-                value: null
-            };
+            return {success: false, errorMsg: 'Could not retrieve the page requested', value: null};
         }
 
-        return {
-            success: true,
-            value: result
-        };
+        return {success: true, value: result};
     }
 }
