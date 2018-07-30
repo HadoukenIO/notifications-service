@@ -1,6 +1,6 @@
 {
   "name": "openfin-notifications",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "module_dist/client/index.js",
   "types": "module_dist/client/index.d.ts",
