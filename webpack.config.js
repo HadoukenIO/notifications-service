@@ -111,7 +111,6 @@ function createWebpackConfigForProvider() {
                         return JSON.stringify(newConfig);
                     }}
                 ])
-
             ]
         }
     )
