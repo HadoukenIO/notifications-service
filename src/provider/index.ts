@@ -30,7 +30,7 @@ async function registerService() {
     console.log('providerChannel', providerChannel);
 
     // handle client connections
-    providerChannel.onConnection((app,payload) => {
+    providerChannel.onConnection((app, payload) => {
         console.log(`connection from client: ${app.name}, version: ${payload.version}`);
     });
 
