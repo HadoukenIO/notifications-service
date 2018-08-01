@@ -29,6 +29,11 @@ async function registerService() {
     const providerChannel = await fin.desktop.Service.register();
     console.log('providerChannel', providerChannel);
 
+    // handle client connections
+    providerChannel.onConnection((app,payload) => {
+        console.log(`connection from client: ${app.name}, version: ${payload.version}`);
+    });
+
     // Functions called by the client
     providerChannel.register('create-notification', createNotification);
 

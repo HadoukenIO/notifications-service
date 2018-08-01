@@ -8,6 +8,8 @@ import {OptionInput} from '../Shared/Models/OptionInput';
 import {NotificationEvent} from '../Shared/Models/NotificationEvent';
 import {NotificationOptions} from './Models/NotificationOptions';
 
+const pkg = require('../../package.json');
+
 declare var fin: Fin;
 declare var window: Window&{fin: Fin};
 
@@ -48,7 +50,7 @@ async function createClientPromise() {
         }
         fin.desktop.main(() => resolve());
     });
-    const client = await fin.desktop.Service.connect({uuid: 'notifications', payload: {version: '0.0.3'}});
+    const client = await fin.desktop.Service.connect({uuid: 'notifications', payload: {version: pkg.version}});
     // tslint:disable-next-line:no-any
     client.register('WARN', (payload: any) => console.warn(payload));
     client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
