@@ -31,7 +31,11 @@ async function registerService() {
 
     // handle client connections
     providerChannel.onConnection((app, payload) => {
-        console.log(`connection from client: ${app.name}, version: ${payload.version}`);
+        if (payload && payload.version && payload.version.length > 0) {
+            console.log(`connection from client: ${app.name}, version: ${payload.version}`);
+        } else {
+            console.log(`connection from client: ${app.name}, unable to determine version`);
+        }
     });
 
     // Functions called by the client

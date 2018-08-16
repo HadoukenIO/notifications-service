@@ -1,6 +1,7 @@
 node_modules
 build
-module_dist
+dist
+staging
 .tmp
 .sass-cache
 bower_components
@@ -9,7 +10,6 @@ OpenFinRVM.exe
 OpenFin
 /MarketDataPlugin/service/DataProvider/.vs
 npm-debug.log
-build
 .vscode/**
 coverage/**
 Thumbs.db

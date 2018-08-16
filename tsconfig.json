@@ -10,9 +10,7 @@
         "types": ["node", "openfin", "jest"]
     },
     "include": [
-        "src/*.ts",
-        "src/**/*.ts",
-        "test/*.ts",
-        "test/**/*.ts"
+        "src/client/index.ts",
+        "src/provider/index.ts"
     ]
 }

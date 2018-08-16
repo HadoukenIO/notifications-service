@@ -66,7 +66,7 @@ fin.desktop.main(async () => {
         fetchAllNotifications: async () => {
             // Fetch all notifications for the center
             const plugin = await pluginP;
-            const allNotifications = await plugin.dispatch('fetch-all-notifications');
+            const allNotifications = await plugin.dispatch('fetch-all-notifications', {});
             return allNotifications;
         },
         clearAllNotifications: async (payload: Notification[]) => {

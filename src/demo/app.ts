@@ -1,4 +1,4 @@
-import * as ofnotes from '../client/index';
+import * as ofnotes from 'openfin-notifications';
 import {NotificationOptions} from '../client/Models/NotificationOptions';
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
 import {NotificationEvent} from '../Shared/Models/NotificationEvent';
