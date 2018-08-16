@@ -7,7 +7,7 @@ import {Notification} from '../Shared/Models/Notification';
 declare var fin: Fin;
 
 fin.desktop.main(async () => {
-    const pluginP = fin.desktop.Service.connect({uuid: 'notifications'});
+    const pluginP = fin.desktop.Service.connect({uuid: 'notifications', name: 'notifications'});
 
 
     function notificationCreated(payload: Notification&ISenderInfo, sender: ISenderInfo) {
