@@ -108,7 +108,7 @@ function createWebpackConfigForProvider() {
                     { from: './src/app.template.json', to: 'app.json', transform: (content) => {
                         const config = JSON.parse(content);
                         const newConfig = prepConfig(config);
-                        return JSON.stringify(newConfig);
+                        return JSON.stringify(newConfig, null, 4);
                     }}
                 ])
             ]
