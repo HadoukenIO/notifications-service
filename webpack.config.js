@@ -84,14 +84,6 @@ function createWebpackConfigForTS(infile, outfile) {
 }
 
 /**
- * build webpack config for the client side
- * @return {Object} A webpack module
- */
-function createWebpackConfigForClient() {
-    return createWebpackConfigForTS('./src/client/index.ts', 'client');
-}
-
-/**
  * build webpack config for the provider side
  * @return {Object} A webpack module
  */
@@ -133,7 +125,6 @@ function prepConfig(config) {
  * Modules to be exported
  */
 module.exports = [
-    createWebpackConfigForClient(),
     createWebpackConfigForProvider(),
     createWebpackConfigForProviderUI('Service/UI', {
         react: './src/ui/js/index.tsx',

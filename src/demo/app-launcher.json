@@ -9,12 +9,13 @@
     },
     "services": [
         {
-            "name": "notifications"
+            "name": "notifications",
+            "manifestUrl": "http://localhost:9048/app.json"
         }
     ],
     "runtime": {
         "arguments": "--v=1 --enable-crash-reporting",
-        "version": "8.56.30.55"
+        "version": "9.61.33.32"
     },
     "shortcut": {}
 }

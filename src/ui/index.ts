@@ -7,7 +7,7 @@ import {Notification} from '../Shared/Models/Notification';
 declare var fin: Fin;
 
 fin.desktop.main(async () => {
-    const pluginP = fin.desktop.Service.connect({uuid: 'notifications'});
+    const pluginP = fin.desktop.Service.connect({uuid: 'notifications', name: 'notifications'});
 
 
     function notificationCreated(payload: Notification&ISenderInfo, sender: ISenderInfo) {
@@ -66,7 +66,7 @@ fin.desktop.main(async () => {
         fetchAllNotifications: async () => {
             // Fetch all notifications for the center
             const plugin = await pluginP;
-            const allNotifications = await plugin.dispatch('fetch-all-notifications');
+            const allNotifications = await plugin.dispatch('fetch-all-notifications', {});
             return allNotifications;
         },
         clearAllNotifications: async (payload: Notification[]) => {
