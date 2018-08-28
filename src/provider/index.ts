@@ -105,10 +105,7 @@ async function registerService() {
 fin.desktop.main(() => {
     registerService();
 
-    let baseUrl = '/ui';
-    if (window.location.href.indexOf('cdn.openfin.co') > -1) {
-        baseUrl = 'https://cdn.openfin.co/services/openfin/notifications/ui';
-    }
+    const baseUrl = 'ui';
     const pageUrl = baseUrl + '/index.html';
     const favUrl = baseUrl + '/favicon.ico';
 
