@@ -6,9 +6,6 @@
     "build": "webpack --mode development"
   },
   "author": "openfin",
-  "dependencies": {
-    "openfin-notifications": "file:../../dist"
-  },
   "devDependencies": {
     "@types/openfin": "^17.0.4",
     "copy-webpack-plugin": "^4.5.1",

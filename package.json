@@ -18,7 +18,7 @@
     "package": "webpack",
     "build": "npm run compile && npm run package",
     "build:demo": "npm run build:demo:prep && npm run build:demo:package",
-    "build:demo:prep": "npm run build && node mockDistDir.js",
+    "build:demo:prep": "npm run build",
     "build:demo:package": "cd ./src/demo && npm i && npm run build",
     "start": "node server.js"
   },
