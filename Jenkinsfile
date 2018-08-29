@@ -38,5 +38,27 @@ pipeline {
                 sh "npm version --no-git-tag-version " + VERSION
             }
         }
+
+        stage ('build-prod') {
+            agent { label 'linux-slave' }
+            when { branch "master" }
+            steps {
+                script {
+                    GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
+                    VERSION = sh ( script: "node -pe \"require('./package.json').version\"", returnStdout: true ).trim()
+                    S3_LOC = env.DSERVICE_S3_ROOT + "notifications/" + GIT_SHORT_SHA
+                    PROD_JSON = env.DSERVICE_S3_ROOT + "notifications/" + "app-" + VERSION + ".json"
+                }
+                sh "npm i"
+                sh "GIT_SHORT_SHA=${GIT_SHORT_SHA} npm run build"
+                sh "echo ${GIT_SHORT_SHA} > ./build/SHA.txt"
+                sh "aws s3 cp ./build ${S3_LOC}/ --recursive"
+                sh "aws s3 cp ./build/app.json ${PROD_JSON}"
+                withCredentials([string(credentialsId: "NPM_TOKEN_WRITE", variable: 'NPM_TOKEN')]) {
+                    sh "echo //registry.npmjs.org/:_authToken=$NPM_TOKEN > $WORKSPACE/.npmrc"
+                }
+                sh "npm publish"
+            }
+        }
     }
 }
