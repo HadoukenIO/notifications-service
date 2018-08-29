@@ -8,7 +8,12 @@ import {OptionInput} from '../Shared/Models/OptionInput';
 import {NotificationEvent} from '../Shared/Models/NotificationEvent';
 import {NotificationOptions} from './Models/NotificationOptions';
 
-const pkg = require('../../package.json');
+import {version} from './version';
+
+const IDENTITY = {
+    uuid: 'notifications-service',
+    name: 'Notifications-Service'
+};
 
 declare var fin: Fin;
 declare var window: Window&{fin: Fin};
@@ -50,7 +55,7 @@ async function createClientPromise() {
         }
         fin.desktop.main(() => resolve());
     });
-    const client = await fin.desktop.Service.connect({uuid: 'notifications', payload: {version: pkg.version}});
+    const client = await fin.desktop.Service.connect({...IDENTITY, payload: {version}});
     // tslint:disable-next-line:no-any
     client.register('WARN', (payload: any) => console.warn(payload));
     client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
