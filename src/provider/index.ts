@@ -22,7 +22,7 @@ const settingsRepository = repositoryFactory.getRepository(Repositories.settings
  */
 async function registerService() {
     // service UUID
-    const serviceUUID = 'notifications';
+    const serviceUUID = fin.desktop.Application.getCurrent().uuid;
     const serviceSenderInfo = {name: 'Notification-Center', uuid: serviceUUID};
 
     // Register the service
