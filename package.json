@@ -15,11 +15,10 @@
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run check",
-    "package": "webpack",
+    "package": "webpack --mode production",
+    "package:dev": "webpack --mode development",
     "build": "npm run compile && npm run package",
-    "build:demo": "npm run build:demo:prep && npm run build:demo:package",
-    "build:demo:prep": "npm run build",
-    "build:demo:package": "cd ./src/demo && npm i && npm run build",
+    "build:dev": "npm run compile && npm run package:dev",
     "start": "node server.js"
   },
   "repository": {
@@ -32,13 +31,15 @@
     "url": "https://github.com/openfin/Notification-Service/issues"
   },
   "homepage": "https://github.com/openfin/Notification-Service#readme",
-  "dependencies": {},
+  "dependencies": {
+    "openfin-layouts": "^0.9.1"
+  },
   "devDependencies": {
     "@types/cucumber": "^4.0.1",
     "@types/jest": "^22.2.0",
     "@types/moment": "^2.13.0",
     "@types/node": "^9.4.6",
-    "@types/openfin": "^17.0.4",
+    "@types/openfin": "^34.0.0",
     "@types/react": "^16.3.12",
     "@types/react-dom": "^16.0.5",
     "copy-webpack-plugin": "^4.5.1",
@@ -49,11 +50,10 @@
     "fs": "0.0.1-security",
     "genversion": "^2.1.0",
     "gts": "^0.8.0",
-    "hadouken-js-adapter": "^0.32.1-alpha.5",
+    "hadouken-js-adapter": "^0.35.1-alpha.2",
     "jest": "^22.4.2",
     "mini-css-extract-plugin": "^0.4.1",
     "moment": "^2.22.1",
-    "openfin-layouts": "^0.0.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "rimraf": "^2.6.2",
@@ -61,7 +61,7 @@
     "style-loader": "^0.21.0",
     "ts-jest": "^22.4.1",
     "ts-loader": "^4.4.2",
-    "typescript": "~2.8.0",
+    "typescript": "^3.1.1",
     "url-loader": "^1.0.1",
     "webpack": "^4.16.1",
     "webpack-cli": "^3.0.8"

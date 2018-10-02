@@ -1,11 +1,7 @@
 import {deregister} from 'openfin-layouts';
 
-import {Fin} from '../../fin';
-
 import {TrayMenu} from './TrayMenu';
 import {WindowInfo} from './WindowInfo';
-
-declare var fin: Fin;
 
 export class WindowManager {
     private windowInfo: WindowInfo = new WindowInfo();

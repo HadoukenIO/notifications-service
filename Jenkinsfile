@@ -25,7 +25,7 @@ pipeline {
                     STAGING_JSON = env.DSERVICE_S3_ROOT + "notifications/" + "app.staging.json"
                 }
                 sh "npm i"
-                sh "GIT_SHORT_SHA=${GIT_SHORT_SHA} npm run build"
+                sh "SERVICE_VERSION=${PREREL_VERSION} npm run build:dev"
                 sh "echo ${GIT_SHORT_SHA} > ./build/SHA.txt"
                 sh "aws s3 cp ./build ${S3_LOC}/ --recursive"
                 sh "aws s3 cp ./build/app.json ${STAGING_JSON}"
@@ -50,7 +50,7 @@ pipeline {
                     PROD_JSON = env.DSERVICE_S3_ROOT + "notifications/" + "app-" + VERSION + ".json"
                 }
                 sh "npm i"
-                sh "GIT_SHORT_SHA=${GIT_SHORT_SHA} npm run build"
+                sh "SERVICE_VERSION=${VERSION} npm run build"
                 sh "echo ${GIT_SHORT_SHA} > ./build/SHA.txt"
                 sh "aws s3 cp ./build ${S3_LOC}/ --recursive"
                 sh "aws s3 cp ./build/app.json ${PROD_JSON}"

@@ -1,19 +1,19 @@
-console.log('UI index.js loaded');
-
-import {Fin} from '../fin';
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
 import {Notification} from '../Shared/Models/Notification';
-
-declare var fin: Fin;
+import {INotification} from './models/INotification';
+import {NotificationCenterAPI} from './NotificationCenterAPI';
+declare var window: Window&{notifications: NotificationCenterAPI};
 
 const IDENTITY = {
     uuid: 'notifications-service',
-    name: 'Notifications-Service'
+    name: 'Notifications-Service',
+    channelName: 'notifications-service'
 };
 
-fin.desktop.main(async () => {
-    const pluginP = fin.desktop.Service.connect({...IDENTITY});
 
+fin.desktop.main(async () => {
+    const opts = {...IDENTITY, payload: {version:'center'}};
+    const pluginP = fin.InterApplicationBus.Channel.connect(opts);
 
     function notificationCreated(payload: Notification&ISenderInfo, sender: ISenderInfo) {
         // For testing/display purposes
@@ -41,14 +41,14 @@ fin.desktop.main(async () => {
 
     const callbacks = {notificationCreated, notificationCleared, appNotificationsCleared};
 
-    fin.notifications = {
-        clickHandler: async (payload: Notification&ISenderInfo) => {
+    window.notifications = {
+        clickHandler: async (payload: Notification) => {
             // Handle a click on a notification
             const plugin = await pluginP;
             const success = await plugin.dispatch('notification-clicked', payload);
             console.log('success', success);
         },
-        buttonClickHandler: async (payload: Notification&ISenderInfo, buttonIndex: number) => {
+        buttonClickHandler: async (payload: Notification, buttonIndex: number) => {
             // Handle a click on a notification
             const plugin = await pluginP;
             const fullPayload = Object.assign({}, payload, {buttonIndex});
@@ -66,12 +66,18 @@ fin.desktop.main(async () => {
             const plugin = await pluginP;
             const payload = {uuid};
             const appNotifications = await plugin.dispatch('fetch-app-notifications', payload);
+            appNotifications.forEach(n => {
+                n.date = new Date(n.date);
+            });
             console.log('appNotifications', appNotifications);
         },
-        fetchAllNotifications: async () => {
+        fetchAllNotifications: async() => {
             // Fetch all notifications for the center
             const plugin = await pluginP;
             const allNotifications = await plugin.dispatch('fetch-all-notifications', {});
+            allNotifications.forEach(n => {
+                n.date = new Date(n.date);
+            });
             return allNotifications;
         },
         clearAllNotifications: async (payload: Notification[]) => {
@@ -87,7 +93,7 @@ fin.desktop.main(async () => {
             const success = await plugin.dispatch('clear-app-notifications', payload);
             console.log('success', success);
         },
-        addEventListener: async (event: string, cb: (payload: Notification|ISenderInfo, sender: ISenderInfo) => string) => {
+        addEventListener: async (event: string, cb: (payload: any, sender: ISenderInfo) => string) => {
             if (event === 'notificationCreated') {
                 callbacks.notificationCreated = cb;
             } else if (event === 'notificationCleared') {
@@ -107,7 +113,7 @@ fin.desktop.main(async () => {
 
 function allNotificationsCleared(payload: {id: string}&ISenderInfo, sender: ISenderInfo) {
     // Should remove the notification from the store/from the DOM
-    fin.desktop.InterApplicationBus.publish('ui-all-notifications-clear', payload);
+    fin.InterApplicationBus.publish('ui-all-notifications-clear', payload);
 
     // For testing/display purposes
     console.log('allNotificationsCleared hit');

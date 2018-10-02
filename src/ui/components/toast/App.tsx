@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { Toast } from './Toast';
 import { ISenderInfo } from '../../../provider/Models/ISenderInfo';
+import {INotification} from '../../models/INotification'
 import { deregister } from 'openfin-layouts';
 
 declare var window: Window & {
-    onNotificationMessage: (message: Notification & ISenderInfo) => void;
+    onNotificationMessage: (message: INotification & ISenderInfo) => void;
 };
 
 interface IToastAppState {
-    meta: Notification & ISenderInfo;
+    meta: INotification & ISenderInfo;
 }
 
 export class App extends React.Component<{}, IToastAppState> {
@@ -35,7 +36,7 @@ export class App extends React.Component<{}, IToastAppState> {
         return null;
     }
 
-    private onNotificationMessage(message: Notification & ISenderInfo): void {
+    private onNotificationMessage(message: INotification & ISenderInfo): void {
         console.log(message);
         this.setState({ meta: message });
     }
