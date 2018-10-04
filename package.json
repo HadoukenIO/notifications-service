@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/openfin/Notification-Service#readme",
   "dependencies": {
-    "openfin-layouts": "^0.9.1"
+    "openfin-layouts": "^0.9.2"
   },
   "devDependencies": {
     "@types/cucumber": "^4.0.1",
