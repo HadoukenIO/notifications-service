@@ -315,7 +315,6 @@ async function fetchAllNotifications(payload: undefined, sender: ISenderInfo) {
 
         allNotifications.forEach((notification) => {
             notification.id = decodeID(notification);
-            // notification.date = new Date(notification.date);
         });
 
         return allNotifications;
@@ -355,7 +354,6 @@ async function fetchAppNotifications(payload: NotificationEvent, sender: ISender
         appNotifications.forEach((notification) => {
             console.log('notification', notification);
             notification.id = decodeID(notification);
-            // notification.date = new Date(notification.date);
         });
 
         result.value = appNotifications;

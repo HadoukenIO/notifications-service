@@ -112,9 +112,6 @@ fin.desktop.main(async () => {
 });
 
 function allNotificationsCleared(payload: {id: string}&ISenderInfo, sender: ISenderInfo) {
-    // Should remove the notification from the store/from the DOM
-    fin.InterApplicationBus.publish('ui-all-notifications-clear', payload);
-
     // For testing/display purposes
     console.log('allNotificationsCleared hit');
     console.log('payload', payload);
