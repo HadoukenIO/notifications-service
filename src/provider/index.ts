@@ -1,33 +1,67 @@
-console.log('YOURE IN THE PROVIDER');
+import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
-import {Fin} from '../fin';
-import {RepositoryFactory} from './Persistence/DataLayer/Repositories/RepositoryFactory';
-import {HistoryRepository} from './Persistence/DataLayer/Repositories/HistoryRepository';
-import {SettingsRepository} from './Persistence/DataLayer/Repositories/SettingsRepository';
 import {Notification} from '../Shared/Models/Notification';
-import {Repositories} from './Persistence/DataLayer/Repositories/RepositoryEnum';
-import {ISenderInfo} from './Models/ISenderInfo';
 import {NotificationEvent} from '../Shared/Models/NotificationEvent';
 import {NotificationTypes, TypeResolver} from '../Shared/Models/NotificationTypes';
 
-declare var fin: Fin;
-declare var window: Window&{fin: Fin};
+import {ISenderInfo} from './Models/ISenderInfo';
+import {HistoryRepository} from './Persistence/DataLayer/Repositories/HistoryRepository';
+import {Repositories} from './Persistence/DataLayer/Repositories/RepositoryEnum';
+import {RepositoryFactory} from './Persistence/DataLayer/Repositories/RepositoryFactory';
+import {SettingsRepository} from './Persistence/DataLayer/Repositories/SettingsRepository';
+
 const repositoryFactory = RepositoryFactory.Instance;
 const historyRepository = repositoryFactory.getRepository(Repositories.history) as HistoryRepository;
 const settingsRepository = repositoryFactory.getRepository(Repositories.settings) as SettingsRepository;
+
+let providerChannel: ChannelProvider;
+let serviceUUID: string;
+const centerIdentity = {
+    name: 'Notification-Center',
+    uuid: '',
+    channelId: '',
+    channelName: ''
+};
+
+/**
+ * @description Main entry point to the service
+ */
+fin.desktop.main(() => {
+    registerService();
+
+    const winConfig = {
+        name: 'Notification-Center',
+        url: 'ui/index.html',
+        autoShow: false,
+        defaultHeight: 400,
+        defaultWidth: 500,
+        resizable: false,
+        saveWindowState: false,
+        defaultTop: 0,
+        frame: false,
+        icon: 'ui/favicon.ico',
+        'showTaskbarIcon': false
+    };
+
+    const notificationCenter = new fin.desktop.Window(
+        winConfig,
+        () => {
+            console.log('Notification Center created');
+        },
+        (error: string) => {
+            console.log('Error creating Notification Center:', error);
+        });
+});
 
 /**
  * @method registerService Registers the service and any functions that can be
  * consumed
  */
 async function registerService() {
-    // service UUID
-    const serviceUUID = fin.desktop.Application.getCurrent().uuid;
-    const serviceSenderInfo = {name: 'Notification-Center', uuid: serviceUUID};
-
     // Register the service
-    const providerChannel = await fin.desktop.Service.register();
-    console.log('providerChannel', providerChannel);
+    const serviceId = fin.desktop.Application.getCurrent().uuid;
+    providerChannel = await fin.InterApplicationBus.Channel.create(serviceId);
+    centerIdentity.uuid = serviceUUID = serviceId;
 
     // handle client connections
     providerChannel.onConnection((app, payload) => {
@@ -52,88 +86,60 @@ async function registerService() {
     providerChannel.register('notification-closed', notificationClosed);
     providerChannel.register('fetch-all-notifications', fetchAllNotifications);
     providerChannel.register('clear-all-notifications', clearAllNotifications);
-
-    // Functions called within the Service
-    window.fin.notifications = {
-        notificationCreated: async (payload: Notification&ISenderInfo) => {
-            // Send notification created to the UI
-            const providerChannelPlugin = await providerChannel;
-            const success = await providerChannelPlugin.dispatch(serviceSenderInfo, 'notification-created', payload);
-            console.log('success', success);
-        },
-        notificationCleared: async (payload: {id: string}&ISenderInfo) => {
-            // Send notification cleared to the UI
-            const providerChannelPlugin = await providerChannel;
-            const success = await providerChannelPlugin.dispatch(serviceSenderInfo, 'notification-cleared', payload);
-            console.log('success', success);
-        },
-        appNotificationsCleared: async (payload: {uuid: string}) => {
-            // Send app notifications cleared to the UI
-            const providerChannelPlugin = await providerChannel;
-            const success = await providerChannelPlugin.dispatch(serviceSenderInfo, 'app-notifications-cleared', payload);
-            console.log('success', success);
-        },
-        notificationClicked: async (payload: NotificationEvent) => {
-            // Send notification clicked to the Client
-            const providerChannelPlugin = await providerChannel;
-            const success = await providerChannelPlugin.dispatch({name: payload.name, uuid: payload.uuid}, 'notification-clicked', payload);
-            console.log('success', success);
-        },
-        notificationButtonClicked: async (payload: Notification&ISenderInfo&{buttonIndex: number}) => {
-            // Send notification clicked to the Client
-            const providerChannelPlugin = await providerChannel;
-            const success = await providerChannelPlugin.dispatch({name: payload.name, uuid: payload.uuid}, 'notification-button-clicked', payload);
-            console.log('success', success);
-        },
-        notificationClosed: async (payload: NotificationEvent) => {
-            // Send notification closed to the Client
-            const providerChannelPlugin = await providerChannel;
-            const success = await providerChannelPlugin.dispatch({name: payload.name, uuid: payload.uuid}, 'notification-closed', payload);
-            console.log('success', success);
-        },
-        allNotificationsCleared: async (payload: NotificationEvent) => {
-            const providerChannelPlugin = await providerChannel;
-            const success = await providerChannelPlugin.dispatch(serviceSenderInfo, 'all-notifications-cleared', payload);
-            console.log('success', success);
-        }
-    };
 }
 
-/**
- * @description Main entry point to the service
- */
-fin.desktop.main(() => {
-    registerService();
+// Send notification created to the UI
+const dispatchNotificationCreated = async (payload: Notification&ISenderInfo) => {
+    const providerChannelPlugin = await providerChannel;
+    const success = await providerChannelPlugin.dispatch(centerIdentity, 'notification-created', payload);
+    console.log('success', success);
+};
 
-    const baseUrl = 'ui';
-    const pageUrl = baseUrl + '/index.html';
-    const favUrl = baseUrl + '/favicon.ico';
+// Send notification cleared to the UI
+const dispatchNotificationCleared = async (payload: Notification&ISenderInfo) => {
+    const providerChannelPlugin = await providerChannel;
+    const success = await providerChannelPlugin.dispatch(centerIdentity, 'notification-cleared', payload);
+    console.log('success', success);
+};
 
-    console.log('launching UI from: ' + pageUrl);
+// Send app notifications cleared to the UI
+const dispatchAppNotificationsCleared = async (payload: {uuid: string}) => {
+    const providerChannelPlugin = await providerChannel;
+    const success = await providerChannelPlugin.dispatch(centerIdentity, 'app-notifications-cleared', payload);
+    console.log('success', success);
+};
 
-    const notificationCenter = new fin.desktop.Window(
-        {
-            name: 'Notification-Center',
-            url: pageUrl,
-            autoShow: false,
-            defaultHeight: 400,
-            defaultWidth: 500,
-            resizable: false,
-            saveWindowState: false,
-            defaultTop: 0,
-            frame: false,
-            smallWindow: true,
-            icon: favUrl,
-            applicationIcon: favUrl,
-            'showTaskbarIcon': false
-        },
-        () => {
-            console.log('WINDOW SUCCESSFULLY CREATED');
-        },
-        (error: string) => {
-            console.log('Error creating window:', error);
-        });
-});
+// Send notification clicked to the Client
+const dispatchNotificationClicked = async (payload: NotificationEvent) => {
+    const providerChannelPlugin = await providerChannel;
+    const clientIdentity = {name: payload.name, uuid: payload.uuid, channelId: '', channelName: ''};
+    const success = await providerChannelPlugin.dispatch(clientIdentity, 'notification-clicked', payload);
+    console.log('success', success);
+};
+
+// Send notification clicked to the Client
+const dispatchNotificationButtonClicked = async (payload: Notification&ISenderInfo&{buttonIndex: number}) => {
+    const providerChannelPlugin = await providerChannel;
+    const clientIdentity = {name: payload.name, uuid: payload.uuid, channelId: '', channelName: ''};
+    const success = await providerChannelPlugin.dispatch(clientIdentity, 'notification-button-clicked', payload);
+    console.log('success', success);
+};
+
+// Send notification closed to the Client
+const dispatchNotificationClosed = async (payload: NotificationEvent) => {
+    const providerChannelPlugin = await providerChannel;
+    const clientIdentity = {name: payload.name, uuid: payload.uuid, channelId: '', channelName: ''};
+    const success = await providerChannelPlugin.dispatch(clientIdentity, 'notification-closed', payload);
+    console.log('success', success);
+};
+
+const dispatchAllNotificationsCleared = async (payload: Notification) => {
+    const providerChannelPlugin = await providerChannel;
+    const success = await providerChannelPlugin.dispatch(centerIdentity, 'all-notifications-cleared', payload);
+    console.log('success', success);
+};
+
+
 
 /**
  * Encodes the Id which currently is the uuid:id
@@ -176,7 +182,7 @@ async function createNotification(payload: Notification, sender: ISenderInfo) {
 
     // Create the notification/toast in the UI
     if (result.success) {
-        fin.notifications.notificationCreated(fullPayload);
+        dispatchNotificationCreated(fullPayload);
     }
 
     // Return a notification event with the notification context/id to the client
@@ -204,7 +210,7 @@ async function clearNotification(payload: Notification, sender: ISenderInfo) {
         return 'ERROR: Must supply a notification ID to clear!';
     }
 
-    const fullPayload: {id: string}&ISenderInfo = Object.assign({}, payload, sender);
+    const fullPayload: Notification&ISenderInfo = Object.assign({}, payload, sender);
     const encodedID: string = encodeID(fullPayload);
 
     // Delete notification from indexeddb
@@ -212,7 +218,7 @@ async function clearNotification(payload: Notification, sender: ISenderInfo) {
 
     // Delete the notification/toast in UI
     if (result.success) {
-        fin.notifications.notificationCleared(fullPayload);
+        dispatchNotificationCleared(fullPayload);
     }
 
     return result;
@@ -223,7 +229,7 @@ async function clearNotification(payload: Notification, sender: ISenderInfo) {
  * @param {object} payload Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
  * @param {object} sender UI Window info. Not important.
  */
-function notificationClicked(payload: Notification&ISenderInfo, sender: ISenderInfo) {
+function notificationClicked(payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) {
     // For testing/display purposes
     console.log('notificationClicked hit');
 
@@ -233,7 +239,7 @@ function notificationClicked(payload: Notification&ISenderInfo, sender: ISenderI
     testDisplay('notificationClicked', payload, sender);
 
     // Send notification clicked event to uuid with the context.
-    fin.notifications.notificationClicked(payload);
+    dispatchNotificationClicked(payload);
 
     // TODO: What should we return?
     return 'notificationClicked returned';
@@ -250,7 +256,7 @@ function notificationButtonClicked(payload: Notification&ISenderInfo&{buttonInde
     testDisplay('notificationButtonClicked', payload, sender);
 
     // Send notification clicked event to uuid with the context.
-    fin.notifications.notificationButtonClicked(payload);
+    dispatchNotificationButtonClicked(payload);
 
     // TODO: What should we return?
     return 'notificationButtonClicked returned';
@@ -262,7 +268,7 @@ function notificationButtonClicked(payload: Notification&ISenderInfo&{buttonInde
  * @param {object} payload Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
  * @param {object} sender UI Window info. Not important.
  */
-async function notificationClosed(payload: NotificationEvent, sender: ISenderInfo) {
+async function notificationClosed(payload: Notification&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) {
     // For testing/display purposes
     console.log('notificationClosed hit');
 
@@ -278,8 +284,8 @@ async function notificationClosed(payload: NotificationEvent, sender: ISenderInf
 
     // Send notification closed event to uuid with the context.
     if (result.success) {
-        fin.notifications.notificationCleared(payload);
-        fin.notifications.notificationClosed(payload);
+        dispatchNotificationCleared(payload);
+        dispatchNotificationClosed(payload);
     }
 
     // TODO: What should we return?
@@ -311,10 +317,10 @@ async function fetchAllNotifications(payload: undefined, sender: ISenderInfo) {
             notification.id = decodeID(notification);
         });
 
-        result.value = allNotifications;
+        return allNotifications;
     }
 
-    return result;
+    return [];
 }
 
 /**
@@ -374,7 +380,7 @@ async function clearAllNotifications(payload: Notification, sender: ISenderInfo)
     const result = await historyRepository.removeAll();
 
     if (result.success) {
-        fin.notifications.allNotificationsCleared(payload);
+        dispatchAllNotificationsCleared(payload);
     }
 
     // TODO: What should we return?
@@ -394,7 +400,7 @@ function clearAppNotifications(payload: {uuid: string}, sender: ISenderInfo) {
 
     // Delete the notifications/toasts in UI (TODO: NEED TO REGISTER
     // APP-NOTIFICATIONS-CLEARED IN UI)
-    fin.notifications.appNotificationsCleared(payload);
+    dispatchAppNotificationsCleared(payload);
 
 
     // TODO: What should we return?

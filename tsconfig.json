@@ -7,11 +7,11 @@
         "declaration": false,
         "strict": false,
         "lib": ["es2016", "dom"],
-        "types": ["node", "openfin", "jest"],
         "target": "es2017"
     },
     "include": [
         "src/client/index.ts",
+        "src/ui/index.ts",
         "src/provider/index.ts"
     ]
 }

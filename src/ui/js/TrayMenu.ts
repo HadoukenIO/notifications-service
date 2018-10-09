@@ -1,11 +1,8 @@
 import {deregister} from 'openfin-layouts';
 
-import {Fin} from '../../fin';
-
 import {WindowManager} from './openfin';
 import {WindowInfo} from './WindowInfo';
 
-declare var fin: Fin;
 declare var window: Window&{createWindow: () => fin.OpenFinWindow};
 
 interface IClickInfo {
@@ -44,7 +41,6 @@ export class TrayMenu {
                 autoShow: false,
                 alwaysOnTop: true,
                 state: 'normal',
-                smallWindow: true,
                 showTaskbarIcon: false
 
             },

@@ -2,11 +2,10 @@ import * as React from 'react';
 import { NotificationType } from './NotificationType';
 import { INotification } from '../models/INotification';
 import { INotificationGroupProps } from '../models/INotificationGroupProps';
-import { ISenderInfo } from '../../provider/Models/ISenderInfo';
-import { Fin } from '../../fin';
 import { eGroupMethod } from './App';
 
-declare var fin: Fin;
+import {NotificationCenterAPI} from '../NotificationCenterAPI';
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 /**
  * @class NotificationGroup Contains Grouping of Notifications
@@ -20,9 +19,7 @@ export class NotificationGroup extends React.Component<INotificationGroupProps, 
         if (this.props.notifications.length > 0) {
             const sortedNotifications = this.props.notifications.sort(
                 (a: INotification, b: INotification) => {
-                    const aDate = new Date(a.date);
-                    const bDate = new Date(b.date);
-                    return aDate > bDate ? -1 : aDate < bDate ? 1 : 0;
+                    return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
                 }
             );
             const notificationArray: React.ReactNode[] = sortedNotifications.map(
@@ -65,10 +62,10 @@ export class NotificationGroup extends React.Component<INotificationGroupProps, 
 
     private handleClearAll(): void {
         if (this.props.groupBy === eGroupMethod.APPLICATION) {
-            fin.notifications.clearAppNotifications(this.props.name);
+            window.openfin.notifications.clearAppNotifications(this.props.name);
         } else {
             this.props.notifications.forEach(notification => {
-                fin.notifications.closeHandler(notification);
+                window.openfin.notifications.closeHandler(notification);
             });
         }
     }

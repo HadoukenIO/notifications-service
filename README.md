@@ -34,7 +34,7 @@ Will launch a demo for OpenFin Notifications
 - Node 8.11 LTS.
 ```bash
 npm install
-npm run build:demo
+npm run build:dev
 npm run start
 ```
 
@@ -122,16 +122,15 @@ All code lives under the src directory which can be broken down into 5 areas: cl
 
 We use a handful of NPM scripts to handle most of the typical tasks in a project like compile, stage, run, etc.
 
-* build - run webpack and stage (see below)
-* clean - runs gts clean (deletes the ./build directory)
-* lint - runs a linter
-* stage - moves the rest of the assets (non-TS and non-packed)
-* start:dev - runs build and serve:dev
-* start:prod - runs build and serve:prod
-* serve:dev - runs a local server serving all files locally
-* serve:prod - runs local server pointing at deployed files on the CDN
+* build - run webpack in prod mode
+* build:dev - run webpack in dev mode
+* check - runs gts check
+* clean - runs gts clean
+* compile - runs tsc on client/provider
+* docs - builds type docs
+* fix - runs gts fix
+* start - runs local server, serves locally compiles/packed files
 * test - runs all project tests
-* webpack - runs webpack and compiles all TS -> JS
 
 
 ## Build

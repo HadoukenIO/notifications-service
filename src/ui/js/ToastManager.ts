@@ -1,12 +1,8 @@
-import {Fin} from '../../fin';
 import {ISenderInfo} from '../../provider/Models/ISenderInfo';
 import {Notification} from '../../Shared/Models/Notification';
-import {INotification} from '../models/INotification';
 import {IToast} from '../models/toast/IToast';
 
 import {WindowInfo} from './WindowInfo';
-
-declare var fin: Fin;
 
 /**
  * @class ToastManager Handles all toasts

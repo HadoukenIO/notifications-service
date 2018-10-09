@@ -11,16 +11,18 @@ const port = process.env.port || 9048
 
 app.use(express.static('./build'));
 
-http.createServer(app).listen(port, () => {
+http.createServer(app).listen(port, async () => {
     console.log(`Server running on port: ${port}`);
-
-    // launch the main demo apps launcher
-    openfinLauncher.launch({ manifestUrl: appsConf }).catch(err => console.log(err));
 
     // on OS X we need to launch the provider manually (no RVM)
     if (os.platform() === 'darwin') {
         console.log("Starting Provider for Mac OS");
         const providerConf = path.resolve('./build/app.json');
-        openfinLauncher.launch({ manifestUrl: providerConf }).catch(err => console.log(err));
+        await openfinLauncher.launch({ manifestUrl: providerConf }).catch(err => console.log(err));
     }
+
+    // launch the main demo apps launcher
+    console.log('launching demo app');
+    await openfinLauncher.launch({ manifestUrl: appsConf }).catch(err => console.log(err));
+
 });

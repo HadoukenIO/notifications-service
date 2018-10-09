@@ -1,6 +1,3 @@
-import {Fin} from '../fin';
-declare var fin: Fin;
-declare var window: Window&{fin: Fin};
 declare var console: Console;
 
 const numApps: number = 3;
