@@ -21,7 +21,7 @@ pipeline {
                     GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
                     VERSION = sh ( script: "node -pe \"require('./package.json').version\"", returnStdout: true ).trim()
                     PREREL_VERSION = VERSION + "-alpha." + env.BUILD_NUMBER
-                    S3_LOC = env.DSERVICE_S3_ROOT + "notifications/" + GIT_SHORT_SHA
+                    S3_LOC = env.DSERVICE_S3_ROOT + "notifications/" + PREREL_VERSION
                     STAGING_JSON = env.DSERVICE_S3_ROOT + "notifications/" + "app.staging.json"
                 }
                 sh "npm i"
@@ -46,8 +46,8 @@ pipeline {
                 script {
                     GIT_SHORT_SHA = sh ( script: "git rev-parse --short HEAD", returnStdout: true ).trim()
                     VERSION = sh ( script: "node -pe \"require('./package.json').version\"", returnStdout: true ).trim()
-                    S3_LOC = env.DSERVICE_S3_ROOT + "notifications/" + GIT_SHORT_SHA
-                    PROD_JSON = env.DSERVICE_S3_ROOT + "notifications/" + "app-" + VERSION + ".json"
+                    S3_LOC = env.DSERVICE_S3_ROOT + "notifications/" + VERSION
+                    PROD_JSON = env.DSERVICE_S3_ROOT + "notifications/app.json"
                 }
                 sh "npm i"
                 sh "SERVICE_VERSION=${VERSION} npm run build"
