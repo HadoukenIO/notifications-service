@@ -9,5 +9,5 @@ export interface NotificationCenterAPI {
     fetchAllNotifications: () => Promise<INotification[]>;
     clearAppNotifications: (uuid: string) => {};
     clearAllNotifications: (payload: INotification[]) => {};
-    addEventListener: (event: string, cb: (payload: any, sender?: ISenderInfo) => string) => {};
+    addEventListener: (event: string, cb: (payload: INotification|ISenderInfo, sender?: ISenderInfo) => string) => {};
 }

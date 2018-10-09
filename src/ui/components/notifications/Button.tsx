@@ -1,14 +1,14 @@
 import * as React from 'react';
 import {INotificationButton, INotificationButtonProps} from '../../models/INotificationButton';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
-declare var window: Window&{notifications: NotificationCenterAPI};
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 export class Button extends React.Component<INotificationButtonProps, INotificationButton> {
 
     private handleButtonClick(e: React.MouseEvent<HTMLElement>) {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        window.notifications.buttonClickHandler(
+        window.openfin.notifications.buttonClickHandler(
             this.props.meta,
             this.props.buttonIndex
         );

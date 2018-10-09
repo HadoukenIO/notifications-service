@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NotificationTime } from './NotificationTime';
 import { INotificationProps } from '../../models/INotificationProps';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
-declare var window: Window&{notifications: NotificationCenterAPI};
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 /**
  * Displays a single notification within the UI
@@ -11,14 +11,14 @@ export class Notification extends React.Component<INotificationProps, {}> {
     private handleNotificationClose(e: React.MouseEvent<HTMLElement>) {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        window.notifications.closeHandler(this.props.meta);
+        window.openfin.notifications.closeHandler(this.props.meta);
     }
 
     public render(): React.ReactNode {
         return (
             <li
                 className="notification-item"
-                onClick={() => window.notifications.clickHandler(this.props.meta)}
+                onClick={() => window.openfin.notifications.clickHandler(this.props.meta)}
             >
                 <img
                     className="notification-close-x"

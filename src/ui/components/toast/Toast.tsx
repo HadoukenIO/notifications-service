@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ISenderInfo } from '../../../provider/Models/ISenderInfo';
 import {INotification} from '../../models/INotification';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
-declare var window: Window&{notifications: NotificationCenterAPI};
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 interface IToastProps {
     meta: INotification & ISenderInfo;
@@ -30,11 +30,11 @@ export class Toast extends React.Component<IToastProps, {}> {
 
         switch (clickEventName) {
             case ClickEvents.BodyClick: {
-                window.notifications.clickHandler(this.props.meta);
+                window.openfin.notifications.clickHandler(this.props.meta);
                 break;
             }
             case ClickEvents.Closed: {
-                window.notifications.closeHandler(this.props.meta);
+                window.openfin.notifications.closeHandler(this.props.meta);
                 fin.desktop.Notification.getCurrent().close();
                 break;
             }

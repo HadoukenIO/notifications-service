@@ -3,7 +3,7 @@ import { NotificationTime } from './NotificationTime';
 import { Button } from './Button';
 import { INotificationProps } from '../../models/INotificationProps';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
-declare var window: Window&{notifications: NotificationCenterAPI};
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 /**
  * Displays a button notification within the UI
@@ -12,7 +12,7 @@ export class ButtonNotification extends React.Component<INotificationProps, {}> 
     private handleNotificationClose(e: React.MouseEvent<HTMLElement>) {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-        window.notifications.closeHandler(this.props.meta);
+        window.openfin.notifications.closeHandler(this.props.meta);
     }
 
     public render(): React.ReactNode {
@@ -32,7 +32,7 @@ export class ButtonNotification extends React.Component<INotificationProps, {}> 
         return (
             <li
                 className="notification-item"
-                onClick={() => window.notifications.clickHandler(this.props.meta)}
+                onClick={() => window.openfin.notifications.clickHandler(this.props.meta)}
             >
                 <img
                     className="notification-close-x"

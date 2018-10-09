@@ -11,6 +11,7 @@
     },
     "include": [
         "src/client/index.ts",
+        "src/ui/index.ts",
         "src/provider/index.ts"
     ]
 }

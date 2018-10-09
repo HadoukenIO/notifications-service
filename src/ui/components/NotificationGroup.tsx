@@ -5,7 +5,7 @@ import { INotificationGroupProps } from '../models/INotificationGroupProps';
 import { eGroupMethod } from './App';
 
 import {NotificationCenterAPI} from '../NotificationCenterAPI';
-declare var window: Window&{notifications: NotificationCenterAPI};
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 /**
  * @class NotificationGroup Contains Grouping of Notifications
@@ -62,10 +62,10 @@ export class NotificationGroup extends React.Component<INotificationGroupProps, 
 
     private handleClearAll(): void {
         if (this.props.groupBy === eGroupMethod.APPLICATION) {
-            window.notifications.clearAppNotifications(this.props.name);
+            window.openfin.notifications.clearAppNotifications(this.props.name);
         } else {
             this.props.notifications.forEach(notification => {
-                window.notifications.closeHandler(notification);
+                window.openfin.notifications.closeHandler(notification);
             });
         }
     }

@@ -7,7 +7,7 @@ import { ISenderInfo } from '../../provider/Models/ISenderInfo';
 import { eGroupMethod } from './App';
 import { ToastManager } from '../js/ToastManager';
 import {NotificationCenterAPI} from '../NotificationCenterAPI';
-declare var window: Window&{notifications: NotificationCenterAPI};
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 interface INotificationProps {
     groupBy?: eGroupMethod;
@@ -62,10 +62,10 @@ export class NotificationView extends React.Component<INotificationProps, INotif
 
     public componentDidMount(): void {
         fin.desktop.main(async () => {
-            const allNotifications = await window.notifications.fetchAllNotifications();
+            const allNotifications = await window.openfin.notifications.fetchAllNotifications();
             this.setState({ notifications: allNotifications });
 
-            window.notifications.addEventListener(
+            window.openfin.notifications.addEventListener(
                 'notificationCreated',
                 (payload: INotification & ISenderInfo):string => {
                     const notifications: INotification[] = this.state.notifications.slice(),
@@ -96,7 +96,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
                 }
             );
 
-            window.notifications.addEventListener(
+            window.openfin.notifications.addEventListener(
                 'notificationCleared',
                 (payload: { id: string } & ISenderInfo):string => {
                     const notifications: INotification[] = this.state.notifications.slice();
@@ -118,7 +118,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
                 }
             );
 
-            window.notifications.addEventListener(
+            window.openfin.notifications.addEventListener(
                 'appNotificationsCleared',
                 (payload: { uuid: string }): string => {
                     const newNotifications: INotification[] = this.state.notifications.filter(
