@@ -1,14 +1,6 @@
-import { OptionButton } from "../../Shared/Models/OptionButton";
-import { NotificationTypes } from '../../Shared/Models/NotificationTypes';
+import {Notification} from '../../Shared/Models/Notification';
 
-export interface INotification {
-    date: number;
-    icon: string;
-    title: string;
-    body: string;
+export interface INotification extends Notification {
     name: string;
-    id: string;
     uuid: string;
-    buttons?: OptionButton[];
-    type?: NotificationTypes;
 }

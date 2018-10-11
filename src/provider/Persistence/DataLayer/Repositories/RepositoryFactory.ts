@@ -1,15 +1,16 @@
-import { IndexedDb } from "../IndexedDb";
-import { IRepositories } from "./IRepositories";
-import { HistoryRepository } from "./HistoryRepository";
-import { IDatastore } from "../IDatastore";
-import { ITable } from "../../Models/ITable";
-import { Repositories } from "./RepositoryEnum";
-import { SettingsRepository } from "./SettingsRepository";
-import { Repository } from "./Repository";
-import { Entity } from "../../../../Shared/Models/Entity";
-import { ISenderInfo } from "../../../Models/ISenderInfo";
-import { Settings } from "../../../../Shared/Models/Settings";
-import { Notification } from "../../../../Shared/Models/Notification";
+import {Entity} from '../../../../Shared/Models/Entity';
+import {Notification} from '../../../../Shared/Models/Notification';
+import {Settings} from '../../../../Shared/Models/Settings';
+import {ISenderInfo} from '../../../Models/ISenderInfo';
+import {ITable} from '../../Models/ITable';
+import {IDatastore} from '../IDatastore';
+import {IndexedDb} from '../IndexedDb';
+
+import {HistoryRepository} from './HistoryRepository';
+import {IRepositories} from './IRepositories';
+import {Repository} from './Repository';
+import {Repositories} from './RepositoryEnum';
+import {SettingsRepository} from './SettingsRepository';
 
 /**
  * @class Factory to return repositories.
@@ -37,29 +38,23 @@ export class RepositoryFactory {
     private mRepositoryStore: IRepositories;
 
     /**
-     * @constructor Constructor Initialises member variables and sets up the database
+     * @constructor Constructor Initialises member variables and sets up the
+     * database
      * @param datastore The low level database layer
      */
     private constructor(datastore: IDatastore<Entity>) {
         this.mDatastore = datastore;
 
-        const historyRepository = new HistoryRepository(this.mDatastore as IDatastore<Notification & ISenderInfo>);
+        const historyRepository = new HistoryRepository(this.mDatastore as IDatastore<Notification&ISenderInfo>);
         const settingsRepository = new SettingsRepository(this.mDatastore as IDatastore<Settings>);
 
-        this.mRepositoryStore = {
-            history: historyRepository,
-            settings: settingsRepository
-        };
+        this.mRepositoryStore = {history: historyRepository, settings: settingsRepository};
 
         const tableNames = [];
 
         for (const key in this.mRepositoryStore) {
             if (this.mRepositoryStore.hasOwnProperty(key)) {
-                const table = {
-                    name: this.mRepositoryStore[key]['TABLENAME'],
-                    indexName: '',
-                    index: ''
-                };
+                const table = {name: this.mRepositoryStore[key]['TABLENAME'], indexName: '', index: ''};
 
                 tableNames.push(table);
             }

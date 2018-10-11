@@ -26,7 +26,10 @@ export class App extends React.Component<{}, IAppState> {
     public render(): JSX.Element {
         return (
             <div>
-                <Header groupBy={this.state.groupBy} handleGroupBy={this.state.handleGroupBy} />
+                <Header
+                    groupBy={this.state.groupBy}
+                    handleGroupBy={this.state.handleGroupBy}
+                />
                 <NotificationView groupBy={this.state.groupBy} />
                 <Footer />
             </div>
@@ -34,6 +37,6 @@ export class App extends React.Component<{}, IAppState> {
     }
 
     private handleGroupBy(groupBy: eGroupMethod): void {
-        this.setState(Object.assign({}, this.state, {groupBy}));
+        this.setState(Object.assign({}, this.state, { groupBy }));
     }
 }

@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "rootDir": "src",
+      "outDir": "dist",
+      "module": "commonjs",
+      "sourceMap": true,
+      "declaration": true,
+      "skipLibCheck": true
+    },
+    "include": [
+      "src/client/index.ts"
+    ]
+  }

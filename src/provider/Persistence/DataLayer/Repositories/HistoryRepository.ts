@@ -1,19 +1,19 @@
-import { IDatastore } from '../IDatastore';
-import { Notification } from '../../../../Shared/Models/Notification';
-import { ISenderInfo } from '../../../../provider/Models/ISenderInfo';
-import { PageInfo } from '../../Models/PageInfo';
-import { VoidResult, ReturnResult } from '../../../../Shared/Models/Result';
-import { Repository } from './Repository';
-import { Entity } from '../../../../Shared/Models/Entity';
+import {ISenderInfo} from '../../../../provider/Models/ISenderInfo';
+import {Entity} from '../../../../Shared/Models/Entity';
+import {Notification} from '../../../../Shared/Models/Notification';
+import {ReturnResult, VoidResult} from '../../../../Shared/Models/Result';
+import {PageInfo} from '../../Models/PageInfo';
+import {IDatastore} from '../IDatastore';
 
-//Shorthand for the intersection-type stored in the repositry
-type DataType = Notification & ISenderInfo;
+import {Repository} from './Repository';
+
+// Shorthand for the intersection-type stored in the repositry
+type DataType = Notification&ISenderInfo;
 
 /**
  * @class Repository for history of notification
  */
 export class HistoryRepository extends Repository<DataType> {
-
     /**
      * @constructor Constructor
      * @param {IDatastore} datastore The low level database layer
@@ -37,7 +37,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async create(notification: Notification & ISenderInfo): Promise<ReturnResult<DataType>> {
+    public async create(notification: Notification&ISenderInfo): Promise<ReturnResult<DataType>> {
         return await super.genericCreate(notification);
     }
 
@@ -70,17 +70,10 @@ export class HistoryRepository extends Repository<DataType> {
         const result = await this.mDataStore.readByUuid(this.TABLENAME, uuid);
 
         if (result == null) {
-            return {
-                success: false,
-                errorMsg: 'Could not retrieve by uuid: ' + uuid,
-                value: null
-            };
+            return {success: false, errorMsg: 'Could not retrieve by uuid: ' + uuid, value: null};
         }
 
-        return {
-            success: true,
-            value: result
-        };
+        return {success: true, value: result};
     }
 
     /**
@@ -103,29 +96,24 @@ export class HistoryRepository extends Repository<DataType> {
     }
 
     /**
-     * @method removeByUuid Removes all notification related to a specific application
+     * @method removeByUuid Removes all notification related to a specific
+     * application
      * @param {string} uuid The uuid of the application
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async removeByUuid(uuid: string): Promise<VoidResult> {
         if (!uuid) {
-            console.error('No uuid was supplied');
-            return;
+            throw new Error('No uuid was supplied');
         }
 
         const result = await this.mDataStore.removeByUuid(this.TABLENAME, uuid);
 
         if (!result) {
-            return {
-                success: result,
-                errorMsg: 'Could not remove all entries in the database with the given uuid: ' + uuid
-            };
+            return {success: result, errorMsg: 'Could not remove all entries in the database with the given uuid: ' + uuid};
         }
 
-        return {
-            success: result
-        };
+        return {success: result};
     }
 
     /**
@@ -134,7 +122,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async update(updatedNotification: Notification & ISenderInfo): Promise<ReturnResult<DataType>> {
+    public async update(updatedNotification: Notification&ISenderInfo): Promise<ReturnResult<DataType>> {
         return await super.genericUpdate(updatedNotification);
     }
 

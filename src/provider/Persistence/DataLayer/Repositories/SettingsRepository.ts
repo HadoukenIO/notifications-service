@@ -1,7 +1,8 @@
-import { Repository } from "./Repository";
-import { IDatastore } from "../IDatastore";
-import { Settings } from "../../../../Shared/Models/Settings";
-import { ReturnResult, VoidResult } from "../../../../Shared/Models/Result";
+import {ReturnResult, VoidResult} from '../../../../Shared/Models/Result';
+import {Settings} from '../../../../Shared/Models/Settings';
+import {IDatastore} from '../IDatastore';
+
+import {Repository} from './Repository';
 
 /**
  * @class A class that represents the settings table in the datastore
@@ -34,19 +35,11 @@ export class SettingsRepository extends Repository<Settings> {
         const settings = await this.genericGetAll();
 
         if (!settings.success) {
-            return {
-                success: false,
-                errorMsg: settings.errorMsg,
-                value: null
-            };
+            return {success: false, errorMsg: settings.errorMsg, value: null};
         }
 
         if (settings.success && settings.value.length === 1 && this.instanceOf(settings.value[0])) {
-            return {
-                success: false,
-                errorMsg: 'There are already settings saved',
-                value: null
-            };
+            return {success: false, errorMsg: 'There are already settings saved', value: null};
         }
 
         return await super.genericCreate(setting);
@@ -61,17 +54,10 @@ export class SettingsRepository extends Repository<Settings> {
         const result = await super.genericGetAll();
 
         if (result.value.length < 1) {
-            return {
-                success: false,
-                errorMsg: 'There were no settings to be found',
-                value: null
-            };
+            return {success: false, errorMsg: 'There were no settings to be found', value: null};
         }
 
-        return {
-            success: true,
-            value: result.value[0]
-        };
+        return {success: true, value: result.value[0]};
     }
 
     /**
@@ -98,7 +84,7 @@ export class SettingsRepository extends Repository<Settings> {
      * @param {any} object The object we are checking
      * @returns {}
      */
-    private instanceOf(object: Settings | string): object is Settings {
+    private instanceOf(object: Settings|string): object is Settings {
         return (object as Settings).id !== undefined;
     }
 }

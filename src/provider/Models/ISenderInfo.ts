@@ -6,4 +6,6 @@ export interface ISenderInfo {
     name: string;
     parentFrame: string;
     uuid: string;
+    channelId: string;
+    channelName: string;
 }

@@ -1,9 +1,7 @@
-import { Fin } from '../../fin';
-import { WindowInfo } from './WindowInfo';
-import { TrayMenu } from './TrayMenu';
-import { deregister } from 'openfin-layouts';
+import {deregister} from 'openfin-layouts';
 
-declare var fin: Fin;
+import {TrayMenu} from './TrayMenu';
+import {WindowInfo} from './WindowInfo';
 
 export class WindowManager {
     private windowInfo: WindowInfo = new WindowInfo();
@@ -11,10 +9,10 @@ export class WindowManager {
 
     constructor() {
         this.setEventListeners();
-        this.trayMenu = new TrayMenu("https://openfin.co/favicon-32x32.png", this);
+        this.trayMenu = new TrayMenu('https://openfin.co/favicon-32x32.png', this);
 
-        
-        //opts out of openfin layouts docking
+
+        // opts out of openfin layouts docking
         deregister();
     }
 
@@ -23,22 +21,14 @@ export class WindowManager {
      * @returns void
      */
     public setEventListeners(): void {
-        //When window is ready
-        window.addEventListener(
-            'DOMContentLoaded',
-            this.onWindowLoad.bind(this)
-        );
+        // When window is ready
+        window.addEventListener('DOMContentLoaded', this.onWindowLoad.bind(this));
 
-        //On window close requested
-        this.windowInfo
-            .getWindow()
-            .addEventListener('close-requested', () => this.hideWindow());
+        // On window close requested
+        this.windowInfo.getWindow().addEventListener('close-requested', () => this.hideWindow());
 
-        //On monitor dimension change
-        fin.desktop.System.addEventListener(
-            'monitor-info-changed',
-            this.sizeToFit.bind(this)
-        );
+        // On monitor dimension change
+        fin.desktop.System.addEventListener('monitor-info-changed', this.sizeToFit.bind(this));
     }
 
     /**
@@ -58,8 +48,7 @@ export class WindowManager {
     public sizeToFit(forceShow: boolean = false): void {
         fin.desktop.System.getMonitorInfo((monitorInfo: fin.MonitorInfo) => {
             this.windowInfo.getWindow().setBounds(
-                monitorInfo.primaryMonitor.availableRect.right -
-                    this.windowInfo.getIdealWidth(),
+                monitorInfo.primaryMonitor.availableRect.right - this.windowInfo.getIdealWidth(),
                 0,
                 this.windowInfo.getIdealWidth(),
                 monitorInfo.primaryMonitor.availableRect.bottom,
@@ -70,8 +59,7 @@ export class WindowManager {
                 },
                 (reason: string) => {
                     console.warn('MOVED FAILED', reason);
-                }
-            );
+                });
         });
     }
 
@@ -81,8 +69,8 @@ export class WindowManager {
      */
     public showWindow(): void {
         this.fade(true, 450);
-        this.windowInfo.getWindow().resizeBy(1, 0, "top-left");
-        this.windowInfo.getWindow().resizeBy(-1, 0, "top-left");
+        this.windowInfo.getWindow().resizeBy(1, 0, 'top-left');
+        this.windowInfo.getWindow().resizeBy(-1, 0, 'top-left');
         this.windowInfo.setShowing(true);
     }
 
@@ -97,30 +85,19 @@ export class WindowManager {
 
     /**
      * @method fade Fades the window in or out
-     * @param fadeOut 
-     * @param timeout 
+     * @param fadeOut
+     * @param timeout
      */
     public fade(fadeOut: boolean, timeout: number): void {
         if (fadeOut) {
             this.windowInfo.getWindow().show();
         }
 
-        this.windowInfo.getWindow().animate(
-            {
-                opacity: {
-                    opacity: fadeOut ? 1 : 0,
-                    duration: timeout
-                }
-            },
-            { interrupt: false },
-            () => {
-                !fadeOut
-                    ? this.windowInfo.getWindow().hide()
-                    : this.windowInfo.getWindow().focus();
-            }
-        );
+        this.windowInfo.getWindow().animate({opacity: {opacity: fadeOut ? 1 : 0, duration: timeout}}, {interrupt: false}, () => {
+            !fadeOut ? this.windowInfo.getWindow().hide() : this.windowInfo.getWindow().focus();
+        });
     }
 }
 
-//Run the window manager right away
-new WindowManager();    // tslint:disable-line:no-unused-expression
+// Run the window manager right away
+new WindowManager();  // tslint:disable-line:no-unused-expression

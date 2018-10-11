@@ -1,6 +1,6 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { App } from '../components/App';
+import* as React from 'react';
+import* as ReactDOM from 'react-dom';
+import{App} from '../components/App';
 
 import '../css/launch-bar.css';
 import '../css/notifications.css';

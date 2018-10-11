@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { ISenderInfo } from '../../../provider/Models/ISenderInfo';
-import { Fin } from '../../../fin';
-
-declare var fin: Fin;
+import {INotification} from '../../models/INotification';
+import {NotificationCenterAPI} from '../../NotificationCenterAPI';
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 interface IToastProps {
-    meta: Notification & ISenderInfo;
+    meta: INotification & ISenderInfo;
 }
 
 const enum ClickEvents {
@@ -30,11 +30,11 @@ export class Toast extends React.Component<IToastProps, {}> {
 
         switch (clickEventName) {
             case ClickEvents.BodyClick: {
-                fin.notifications.clickHandler(this.props.meta);
+                window.openfin.notifications.clickHandler(this.props.meta);
                 break;
             }
             case ClickEvents.Closed: {
-                fin.notifications.closeHandler(this.props.meta);
+                window.openfin.notifications.closeHandler(this.props.meta);
                 fin.desktop.Notification.getCurrent().close();
                 break;
             }
@@ -61,18 +61,18 @@ export class Toast extends React.Component<IToastProps, {}> {
                                 onClick={() => {
                                     this.clickHandler(ClickEvents.Closed);
                                 }}
-                                />
+                            />
                             <div
                                 className="notification-body"
                                 onClick={() => {
                                     this.clickHandler(ClickEvents.BodyClick);
                                 }}
-                                >
+                            >
                                 <div className="notification-source">
                                     <img
                                         src={this.props.meta.icon}
                                         className="notification-small-img"
-                                        />
+                                    />
                                     <span className="notification-source-text">
                                         {this.props.meta.name}
                                     </span>

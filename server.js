@@ -1,49 +1,28 @@
-const openfinLauncher = require('openfin-launcher');
+const openfinLauncher = require('hadouken-js-adapter');
 const express = require('express');
+const os = require('os')
 const app = express();
 const path = require('path');
-const https = require('https');
-const fs = require('fs');
 const http = require('http');
 
-var env = process.env.NODE_ENV || 'prod';
-var ext = ".json";
+const appsConf  = path.resolve('./build/demo/app-launcher.json');
 
-if(env === 'dev'){
-    ext = '-dev' + ext;
-    console.log("running from local app configs")
-} else {
-    console.log("running from CDN app configs")
-}
+const port = process.env.port || 9048
 
-const NS = path.resolve('./dist/demo/appService' + ext);
-const NClient = path.resolve('./dist/demo/appClient' + ext);
-const NClient2 = path.resolve('./dist/demo/appClient2' + ext);
+app.use(express.static('./build'));
 
-const httpsConfig = {
-    cert: fs.readFileSync(path.join(__dirname, 'certs', 'certificate.pem')),
-    key: fs.readFileSync(path.join(__dirname, 'certs', 'key.pem')),
-    passphrase: 'salesdemo'
-};
+http.createServer(app).listen(port, async () => {
+    console.log(`Server running on port: ${port}`);
 
-//Update our config and launch openfin.
-function launchOpenFin(config) {
-    openfinLauncher
-        .launchOpenFin({ configPath: config })
-        .catch(err => console.log(err));
-}
-
-app.use(express.static('./dist'));
-
-https.createServer(httpsConfig, app).listen(9048, () => {
-    console.log("Server Created!");
-    if (env === 'dev') {
-        console.log("Starting NS");
-        launchOpenFin(NS);
+    // on OS X we need to launch the provider manually (no RVM)
+    if (os.platform() === 'darwin') {
+        console.log("Starting Provider for Mac OS");
+        const providerConf = path.resolve('./build/app.json');
+        await openfinLauncher.launch({ manifestUrl: providerConf }).catch(err => console.log(err));
     }
-    console.log("Starting NClient");
-    launchOpenFin(NClient);
-    console.log("Starting NClient2");
-    launchOpenFin(NClient2);
-});
 
+    // launch the main demo apps launcher
+    console.log('launching demo app');
+    await openfinLauncher.launch({ manifestUrl: appsConf }).catch(err => console.log(err));
+
+});

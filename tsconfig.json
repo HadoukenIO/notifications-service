@@ -1,26 +1,17 @@
 {
-  "compilerOptions": {
-    "allowJs": true,
-    "target": "es2017",
-    "noFallthroughCasesInSwitch": true,
-    "alwaysStrict": true,
-    "noImplicitAny": true,
-    "jsx": "react",
-    "moduleResolution": "node",
-    "outDir": "./dist/",
-    "forceConsistentCasingInFileNames": true,
-    "lib": [
-        "es2015",
-        "dom"
-    ],
-    "types": [
-      "node",
-      "openfin",
-      "jest"
+    "extends": "./node_modules/gts/tsconfig-google.json",
+    "compilerOptions": {
+        "rootDir": ".",
+        "outDir": "build",
+        "jsx": "react",
+        "declaration": false,
+        "strict": false,
+        "lib": ["es2016", "dom"],
+        "target": "es2017"
+    },
+    "include": [
+        "src/client/index.ts",
+        "src/ui/index.ts",
+        "src/provider/index.ts"
     ]
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ]
 }

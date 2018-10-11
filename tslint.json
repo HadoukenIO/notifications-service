@@ -1,5 +1,5 @@
 {
-    "extends": "./node_modules/gts/tslint.json",
+    "extends": "gts/tslint.json",
     "rules": {
         "interface-name": false,
         "member-access": true,
