@@ -63,18 +63,20 @@ export class TrayMenu {
             // left click
             if (WindowInfo.instance.getShowingStatus()) {
                 // Commented out until we resolve the runtime tray icon toast delay bug
-                // this.parent.hideWindow();
+                this.parent.hideWindow();
             } else {
                 // closes any open OpenFin notifications on window show
                 // notificationManager.closeAll();
                 this.parent.showWindow();
             }
         } else if (clickInfo.button === 2) {
-            // right click
-            this.window.moveTo(clickInfo.x, clickInfo.y - 35);
-            this.window.show();
-            this.window.setAsForeground();
-            this.window.focus();
+            // BSS - this destroys the service and is very ugly
+
+            // // right click
+            // this.window.moveTo(clickInfo.x, clickInfo.y - 35);
+            // this.window.show();
+            // this.window.setAsForeground();
+            // this.window.focus();
         }
     }
 
