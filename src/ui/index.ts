@@ -1,3 +1,5 @@
+import {CHANNEL_NAME} from '../Shared/config';
+
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
 import {INotification} from './models/INotification';
 import {NotificationCenterAPI} from './NotificationCenterAPI';
@@ -11,8 +13,9 @@ const IDENTITY = {
 
 
 fin.desktop.main(async () => {
-    const opts = {...IDENTITY, payload: {version: 'center'}};
-    const pluginP = fin.InterApplicationBus.Channel.connect(opts);
+    const opts = {payload: {version: 'center'}};
+    // @ts-ignore v36 types not yet available. This is the new syntax.
+    const pluginP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts);
 
     function notificationCreated(payload: INotification&ISenderInfo, sender: ISenderInfo) {
         // For testing/display purposes

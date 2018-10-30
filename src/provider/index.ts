@@ -1,3 +1,5 @@
+import { CHANNEL_NAME } from '../Shared/config';
+
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
 import {Notification} from '../Shared/Models/Notification';
@@ -60,7 +62,8 @@ fin.desktop.main(() => {
 async function registerService() {
     // Register the service
     const serviceId = fin.desktop.Application.getCurrent().uuid;
-    providerChannel = await fin.InterApplicationBus.Channel.create(serviceId);
+    // @ts-ignore v36 types not yet available. This is the new syntax.
+    providerChannel = await fin.InterApplicationBus.Channel.create(CHANNEL_NAME);
     centerIdentity.uuid = serviceUUID = serviceId;
 
     // handle client connections
