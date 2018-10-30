@@ -1,6 +1,6 @@
 console.log('Client index.js loaded');
 
-import { CHANNEL_NAME } from '../Shared/config';
+import {CHANNEL_NAME} from '../Shared/config';
 
 import {OptionButton} from '../Shared/Models/OptionButton';
 import {Notification} from '../Shared/Models/Notification';

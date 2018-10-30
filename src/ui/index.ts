@@ -1,8 +1,9 @@
+import {ISenderInfo} from '../provider/Models/ISenderInfo';
 import {CHANNEL_NAME} from '../Shared/config';
 
-import {ISenderInfo} from '../provider/Models/ISenderInfo';
 import {INotification} from './models/INotification';
 import {NotificationCenterAPI} from './NotificationCenterAPI';
+
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 const IDENTITY = {
