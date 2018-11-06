@@ -1,5 +1,7 @@
 console.log('Client index.js loaded');
 
+import {CHANNEL_NAME} from '../Shared/config';
+
 import {OptionButton} from '../Shared/Models/OptionButton';
 import {Notification} from '../Shared/Models/Notification';
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
@@ -54,8 +56,9 @@ async function createClientPromise() {
     });
 
     try {
-        const opts = {...IDENTITY, payload: {version}};
-        const clientP = fin.InterApplicationBus.Channel.connect(opts).then((client) => {
+        const opts = {payload: {version}};
+        // @ts-ignore v36 types not yet available. This is the new syntax.
+        const clientP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts).then((client) => {
             // tslint:disable-next-line:no-any
             client.register('WARN', (payload: any) => console.warn(payload));
             client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
