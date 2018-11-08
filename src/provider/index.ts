@@ -1,5 +1,6 @@
-import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {deregister} from 'openfin-layouts';
+import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
+
 import {CHANNEL_NAME} from '../Shared/config';
 import {Notification} from '../Shared/Models/Notification';
 import {NotificationEvent} from '../Shared/Models/NotificationEvent';
