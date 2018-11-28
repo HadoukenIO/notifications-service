@@ -78,6 +78,7 @@ async function registerService() {
 
     // Functions called by the client
     providerChannel.register('create-notification', createNotification);
+    providerChannel.register('toggle-notification-center', toggleNotificationCenter);
 
     // Functions called either by the client or the Notification Center
     providerChannel.register('clear-notification', clearNotification);
@@ -143,6 +144,11 @@ const dispatchAllNotificationsCleared = async (payload: Notification) => {
     console.log('success', success);
 };
 
+const dispatchToggleNotificationCenter = async (payload: undefined) => {
+    const providerChannelPlugin = await providerChannel;
+    const success = await providerChannelPlugin.dispatch(centerIdentity, 'toggle-notification-center', payload);
+    console.log('success', success);
+};
 
 
 /**
@@ -192,6 +198,23 @@ async function createNotification(payload: Notification, sender: ISenderInfo) {
     // Return a notification event with the notification context/id to the client
     // that created the notification Or return the payload?
     return result;
+}
+
+/**
+ * @method toggleNotificationCenter Dispatch the notification center toggle action to the UI
+ * @param {object} sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
+ */
+async function toggleNotificationCenter(payload: undefined, sender: ISenderInfo) {
+    // For testing/display purposes
+    console.log('toggleNotificationCenter hit');
+
+    console.log('payload', payload);
+    console.log('sender', sender);
+
+    // Toggle the notification center
+    dispatchToggleNotificationCenter(undefined);
+
+    return '';
 }
 
 /**

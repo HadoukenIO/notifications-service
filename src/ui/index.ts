@@ -1,10 +1,11 @@
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
 import {CHANNEL_NAME} from '../Shared/config';
 
+import {WindowManager} from './js/openfin';
 import {INotification} from './models/INotification';
 import {NotificationCenterAPI} from './NotificationCenterAPI';
 
-declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI, WindowManager: WindowManager}};
 
 const IDENTITY = {
     uuid: 'notifications-service',
@@ -44,7 +45,7 @@ fin.desktop.main(async () => {
 
     const callbacks = {notificationCreated, notificationCleared, appNotificationsCleared};
 
-    window.openfin = {
+    window.openfin = Object.assign({}, window.openfin, {
         notifications: {
             clickHandler: async (payload: INotification) => {
                 // Handle a click on a notification
@@ -107,13 +108,14 @@ fin.desktop.main(async () => {
                 }
             }
         }
-    };
+    });
 
     const plugin = await pluginP;
     plugin.register('notification-created', (payload: INotification&ISenderInfo, sender: ISenderInfo) => callbacks.notificationCreated(payload, sender));
     plugin.register('notification-cleared', (payload: INotification&ISenderInfo, sender: ISenderInfo) => callbacks.notificationCleared(payload, sender));
     plugin.register('app-notifications-cleared', (payload: ISenderInfo, sender: ISenderInfo) => callbacks.appNotificationsCleared(payload, sender));
     plugin.register('all-notifications-cleared', allNotificationsCleared);
+    plugin.register('toggle-notification-center', toggleNotificationCenter);
 });
 
 function allNotificationsCleared(payload: ISenderInfo, sender: ISenderInfo) {
@@ -122,4 +124,9 @@ function allNotificationsCleared(payload: ISenderInfo, sender: ISenderInfo) {
     console.log('payload', payload);
     console.log('sender', sender);
     return 'allNotificationsCleared success';
+}
+
+function toggleNotificationCenter() {
+    window.openfin.WindowManager.toggleWindow();
+    return '';
 }

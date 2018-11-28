@@ -3,6 +3,8 @@ import {deregister} from 'openfin-layouts';
 import {TrayMenu} from './TrayMenu';
 import {WindowInfo} from './WindowInfo';
 
+declare var window: Window&{openfin: {WindowManager: WindowManager}};
+
 export class WindowManager {
     private windowInfo: WindowInfo = new WindowInfo();
     private trayMenu: TrayMenu;
@@ -82,6 +84,18 @@ export class WindowManager {
         this.fade(false, 450);
         this.windowInfo.setShowing(false);
     }
+    
+    /**
+     * @method toggleWindow Hides or shows the center.
+     * @returns void
+     */
+    public toggleWindow(): void {
+        if (this.windowInfo.getShowingStatus()) {
+            this.hideWindow();
+        } else {
+            this.showWindow();
+        }
+    }
 
     /**
      * @method fade Fades the window in or out
@@ -100,4 +114,4 @@ export class WindowManager {
 }
 
 // Run the window manager right away
-new WindowManager();  // tslint:disable-line:no-unused-expression
+window.openfin = Object.assign({}, window.openfin, {WindowManager: new WindowManager()});   // tslint:disable-line:no-unused-expression

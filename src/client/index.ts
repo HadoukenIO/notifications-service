@@ -123,6 +123,15 @@ export async function clearAll() {
 }
 
 /**
+ * @method toggleNotificationCenter either hides or shows the notification center
+ */
+export async function toggleNotificationCenter() {
+    const plugin = await clientP;
+    const result = await plugin.dispatch('toggle-notification-center');
+    return result;
+}
+
+/**
  * @method clearAll clears all notifications for an app
  * @param {string} evt the event name
  * @param {(payload: NotificationEvent, sender: ISenderInfo) => string)} cb event handler callback

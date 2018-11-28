@@ -121,6 +121,10 @@ fin.desktop.main(async () => {
             logit(`${notifications.value.length} notifications received from the Notification Center`);
         });
     });
+    
+    document.getElementById(`toggleNotificationCenter`).addEventListener('click', () => {
+        ofnotes.toggleNotificationCenter();
+    });
 
     ofnotes.addEventListener('click', (payload: NotificationEvent, sender: ISenderInfo) => {
         // document.getElementById('clientResponse').innerHTML = `CLICK action
