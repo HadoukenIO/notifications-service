@@ -3,19 +3,24 @@ import {deregister} from 'openfin-layouts';
 import {TrayMenu} from './TrayMenu';
 import {WindowInfo} from './WindowInfo';
 
-declare var window: Window&{openfin: {WindowManager: WindowManager}};
+declare var window: Window&{WindowManager: WindowManager};
 
 export class WindowManager {
     private windowInfo: WindowInfo = new WindowInfo();
     private trayMenu: TrayMenu;
+    private static singleton: WindowManager;
 
     constructor() {
+        if (WindowManager.singleton) {
+            return WindowManager.singleton;
+        }
         this.setEventListeners();
         this.trayMenu = new TrayMenu('https://openfin.co/favicon-32x32.png', this);
 
 
         // opts out of openfin layouts docking
         deregister();
+        WindowManager.singleton = this;
     }
 
     /**
@@ -111,7 +116,19 @@ export class WindowManager {
             !fadeOut ? this.windowInfo.getWindow().hide() : this.windowInfo.getWindow().focus();
         });
     }
+
+    /**
+     * @method instance Gets this WindowManager instance on the window.
+     * @returns WindowManager
+     */
+    public static get instance(): WindowManager {
+        if (WindowManager.singleton) {
+            return WindowManager.singleton;
+        } else {
+            return new WindowManager();
+        }
+    }
 }
 
 // Run the window manager right away
-window.openfin = Object.assign({}, window.openfin, {WindowManager: new WindowManager()});   // tslint:disable-line:no-unused-expression
+new WindowManager();   // tslint:disable-line:no-unused-expression

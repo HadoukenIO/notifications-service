@@ -5,7 +5,7 @@ import {WindowManager} from './js/openfin';
 import {INotification} from './models/INotification';
 import {NotificationCenterAPI} from './NotificationCenterAPI';
 
-declare var window: Window&{openfin: {notifications: NotificationCenterAPI, WindowManager: WindowManager}};
+declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 const IDENTITY = {
     uuid: 'notifications-service',
@@ -127,6 +127,6 @@ function allNotificationsCleared(payload: ISenderInfo, sender: ISenderInfo) {
 }
 
 function toggleNotificationCenter() {
-    window.openfin.WindowManager.toggleWindow();
+    WindowManager.instance.toggleWindow();
     return '';
 }
