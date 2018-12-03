@@ -2,9 +2,6 @@ import * as ofnotes from '../client/index';
 import {NotificationOptions} from '../client/Models/NotificationOptions';
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
 import {NotificationEvent} from '../Shared/Models/NotificationEvent';
-import {CHANNEL_NAME} from '../Shared/config';
-import {version} from '../client/version';
-
 
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(id, Object.assign(opts, {date: Date.now()}));
