@@ -131,4 +131,4 @@ export class WindowManager {
 }
 
 // Run the window manager right away
-new WindowManager();   // tslint:disable-line:no-unused-expression
+new WindowManager();  // tslint:disable-line:no-unused-expression

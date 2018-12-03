@@ -45,7 +45,7 @@ fin.desktop.main(async () => {
 
     const callbacks = {notificationCreated, notificationCleared, appNotificationsCleared};
 
-    window.openfin = Object.assign({}, window.openfin, {
+    window.openfin = {
         notifications: {
             clickHandler: async (payload: INotification) => {
                 // Handle a click on a notification
@@ -108,7 +108,7 @@ fin.desktop.main(async () => {
                 }
             }
         }
-    });
+    };
 
     const plugin = await pluginP;
     plugin.register('notification-created', (payload: INotification&ISenderInfo, sender: ISenderInfo) => callbacks.notificationCreated(payload, sender));
