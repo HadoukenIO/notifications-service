@@ -128,5 +128,5 @@ function allNotificationsCleared(payload: ISenderInfo, sender: ISenderInfo) {
 
 function toggleNotificationCenter() {
     WindowManager.instance.toggleWindow();
-    return '';
+    return 'toggleNotificationCenter success';
 }
