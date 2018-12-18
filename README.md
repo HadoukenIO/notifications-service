@@ -23,11 +23,6 @@ This project consist of 2 parts:
 * Attach handlers for click/close events
 * Persist notifications in the Notification Center
 
-### Demo Installer
-
-This [windows installer](https://install.openfin.co/download/?config=https%3A%2F%2Fcdn.openfin.co%2Fservices%2Fopenfin%2Fnotifications%2Fdemo%2FappClient.json&fileName=notifications-demo)
-Will launch a demo for OpenFin Notifications
-
 ### Run Locally
 - To run the project locally the npm scripts require git bash.
 - Windows support only.
