@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { Toast } from './Toast';
 import { ISenderInfo } from '../../../provider/Models/ISenderInfo';
-import {INotification} from '../../models/INotification'
-import { deregister } from 'openfin-layouts';
+import {INotification} from '../../models/INotification';
 
 declare var window: Window & {
     onNotificationMessage: (message: INotification & ISenderInfo) => void;
@@ -18,14 +17,10 @@ export class App extends React.Component<{}, IToastAppState> {
         this.state = { meta: null };
 
         window.onNotificationMessage = this.onNotificationMessage.bind(this);
-
-        // deregisters window from openfin-layouts docking
-        deregister().then(() => {
-            fin.desktop.Window.getCurrent().animate(
-                { opacity: { opacity: 1, duration: 200 } },
-                { interrupt: false }
-            );
-        });
+        fin.desktop.Window.getCurrent().animate(
+            { opacity: { opacity: 1, duration: 200 } },
+            { interrupt: false }
+        );
     }
 
     public render() {

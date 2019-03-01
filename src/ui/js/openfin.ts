@@ -1,5 +1,3 @@
-import {deregister} from 'openfin-layouts';
-
 import {TrayMenu} from './TrayMenu';
 import {WindowInfo} from './WindowInfo';
 
@@ -17,9 +15,6 @@ export class WindowManager {
         this.setEventListeners();
         this.trayMenu = new TrayMenu('https://openfin.co/favicon-32x32.png', this);
 
-
-        // opts out of openfin layouts docking
-        deregister();
         WindowManager.singleton = this;
     }
 
