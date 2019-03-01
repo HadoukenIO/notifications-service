@@ -57,7 +57,6 @@ async function createClientPromise() {
 
     try {
         const opts = {payload: {version}};
-        // @ts-ignore v36 types not yet available. This is the new syntax.
         const clientP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts).then((client) => {
             // tslint:disable-next-line:no-any
             client.register('WARN', (payload: any) => console.warn(payload));

@@ -61,7 +61,6 @@ fin.desktop.main(() => {
 async function registerService() {
     // Register the service
     const serviceId = fin.desktop.Application.getCurrent().uuid;
-    // @ts-ignore v36 types not yet available. This is the new syntax.
     providerChannel = await fin.InterApplicationBus.Channel.create(CHANNEL_NAME);
     centerIdentity.uuid = serviceUUID = serviceId;
 
