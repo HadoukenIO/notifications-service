@@ -53,7 +53,7 @@ function createWebpackConfigForProviderUI(entryPoint) {
         plugins: [
             new MiniCssExtractPlugin({ filename: 'bundle.css' }),
             new CopyWebpackPlugin([
-                { from: './src/ui', to: '..', ignore: ["**/*.ts", "**/*.tsx"] }
+                { from: './res/provider/ui', to: '..', ignore: ["**/*.ts", "**/*.tsx"] }
             ])
         ]
     });
@@ -69,10 +69,10 @@ function createWebpackConfigForProvider() {
         devtool:'source-map',
         plugins: [
             new CopyWebpackPlugin([
-                { from: './src/provider.html' }
+                { from: './res/provider/provider.html' }
             ]),
             new CopyWebpackPlugin([
-                { from: './src/app.template.json', to: 'app.json', transform: (content) => {
+                { from: './res/provider/app.template.json', to: 'app.json', transform: (content) => {
                     const config = JSON.parse(content);
                     const newConfig = prepConfig(config, 'http://localhost:9048/provider.html');
                     return JSON.stringify(newConfig, null, 4);
@@ -103,13 +103,13 @@ function createWebpackConfigForDemo(entryPoint) {
         },
         plugins: [
             new CopyWebpackPlugin([
-                { from: './src/demo/app-launcher.html'},
-                { from: './src/demo/app.css'},
-                { from: './src/demo/app.html'}
+                { from: './res/demo/app-launcher.html'},
+                { from: './res/demo/app.css'},
+                { from: './res/demo/app.html'}
             ]),
             new CopyWebpackPlugin([
                 { 
-                    from: './src/demo/app-launcher.json', 
+                    from: './res/demo/app-launcher.json', 
                     transform: (content) => {
                         const config = JSON.parse(content);
                         const newConfig = prepConfig(config, 'http://localhost:9048/demo/app-launcher.html');
@@ -138,10 +138,10 @@ function prepConfig(config, defaultUrl) {
 module.exports = [
     createWebpackConfigForProvider(),
     createWebpackConfigForProviderUI({
-        react: './src/ui/js/index.tsx',
-        serviceui: './src/ui/index.ts',
-        openfin: './src/ui/js/openfin.ts',
-        toast: './src/ui/js/toast/index.tsx'
+        react: './src/provider/ui/js/index.tsx',
+        serviceui: './src/provider/ui/index.ts',
+        openfin: './src/provider/ui/js/openfin.ts',
+        toast: './src/provider/ui/js/toast/index.tsx'
     }),
     createWebpackConfigForDemo({
         app: './src/demo/app.ts',

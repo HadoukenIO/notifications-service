@@ -1,12 +1,12 @@
 console.log('Client index.js loaded');
 
-import {CHANNEL_NAME} from '../Shared/config';
+import {CHANNEL_NAME} from '../shared/config';
 
-import {OptionButton} from '../Shared/Models/OptionButton';
-import {Notification} from '../Shared/Models/Notification';
+import {OptionButton} from '../shared/Models/OptionButton';
+import {Notification} from '../shared/Models/Notification';
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
-import {OptionInput} from '../Shared/Models/OptionInput';
-import {NotificationEvent} from '../Shared/Models/NotificationEvent';
+import {OptionInput} from '../shared/Models/OptionInput';
+import {NotificationEvent} from '../shared/Models/NotificationEvent';
 import {NotificationOptions} from './Models/NotificationOptions';
 
 import {version} from './version';

@@ -1,6 +1,6 @@
-import {NotificationContext} from '../../Shared/Models/Notification';
-import {OptionButton} from '../../Shared/Models/OptionButton';
-import {OptionInput} from '../../Shared/Models/OptionInput';
+import {NotificationContext} from '../../shared/Models/Notification';
+import {OptionButton} from '../../shared/Models/OptionButton';
+import {OptionInput} from '../../shared/Models/OptionInput';
 
 /**
  * @description Options for notifications

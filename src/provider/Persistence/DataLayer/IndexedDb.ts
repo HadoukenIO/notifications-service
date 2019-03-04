@@ -1,4 +1,4 @@
-﻿import {Entity} from '../../../Shared/Models/Entity';
+﻿import {Entity} from '../../../shared/Models/Entity';
 import {ITable} from '../Models/ITable';
 import {PageInfo} from '../Models/PageInfo';
 import {Sorts} from '../Models/Sort';

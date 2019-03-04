@@ -1,7 +1,7 @@
 // this file simply copies/modifies root package.json into the 
 // dist dir with the correct paths
 
-// this is only useful for ./src/demo
+// this is only useful for ./res/demo
 
 // the copy of the file at dist/package.json is npm-ignored
 
