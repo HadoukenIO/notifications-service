@@ -1,4 +1,4 @@
-import {Entity} from '../../../../Shared/Models/Entity';
+import {Entity} from '../../../../shared/Models/Entity';
 
 import {HistoryRepository} from './HistoryRepository';
 import {Repository} from './Repository';

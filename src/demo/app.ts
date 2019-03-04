@@ -1,7 +1,7 @@
 import * as ofnotes from '../client/index';
 import {NotificationOptions} from '../client/Models/NotificationOptions';
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
-import {NotificationEvent} from '../Shared/Models/NotificationEvent';
+import {NotificationEvent} from '../shared/Models/NotificationEvent';
 
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(id, Object.assign(opts, {date: Date.now()}));

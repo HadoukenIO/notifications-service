@@ -1,9 +1,9 @@
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
-import {CHANNEL_NAME} from '../Shared/config';
-import {Notification} from '../Shared/Models/Notification';
-import {NotificationEvent} from '../Shared/Models/NotificationEvent';
-import {NotificationTypes, TypeResolver} from '../Shared/Models/NotificationTypes';
+import {CHANNEL_NAME} from '../shared/config';
+import {Notification} from '../shared/Models/Notification';
+import {NotificationEvent} from '../shared/Models/NotificationEvent';
+import {NotificationTypes, TypeResolver} from '../shared/Models/NotificationTypes';
 
 import {ISenderInfo} from './Models/ISenderInfo';
 import {HistoryRepository} from './Persistence/DataLayer/Repositories/HistoryRepository';
