@@ -1,5 +1,3 @@
-import {deregister} from 'openfin-layouts';
-
 import {WindowManager} from './openfin';
 import {WindowInfo} from './WindowInfo';
 
@@ -44,10 +42,7 @@ export class TrayMenu {
                 showTaskbarIcon: false
 
             },
-            () => {
-                // deregisters window from layout docking
-                deregister({uuid: fin.desktop.Application.getCurrent().uuid, name: 'TrayIconOptions'});
-            },
+            () => {},
             (error: string) => {
                 console.error('Failed to create TrayMenu Window', error);
             });

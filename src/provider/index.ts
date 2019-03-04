@@ -1,4 +1,3 @@
-import {deregister} from 'openfin-layouts';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
 import {CHANNEL_NAME} from '../Shared/config';
@@ -29,7 +28,6 @@ const centerIdentity = {
  * @description Main entry point to the service
  */
 fin.desktop.main(() => {
-    deregister();
     registerService();
 
     const winConfig = {
@@ -63,7 +61,6 @@ fin.desktop.main(() => {
 async function registerService() {
     // Register the service
     const serviceId = fin.desktop.Application.getCurrent().uuid;
-    // @ts-ignore v36 types not yet available. This is the new syntax.
     providerChannel = await fin.InterApplicationBus.Channel.create(CHANNEL_NAME);
     centerIdentity.uuid = serviceUUID = serviceId;
 
