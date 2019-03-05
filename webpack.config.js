@@ -1,17 +1,9 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-// const SchemaToDefaultsPlugin = require('./scripts/plugins/SchemaToDefaultsPlugin');
-// const SchemaToTypeScriptPlugin = require('./scripts/plugins/SchemaToTypeScriptPlugin');
 
 const version = require("./package.json").version;
 const outputDir = path.resolve(__dirname, './dist');
-// const schemaRoot = path.resolve(__dirname, './res/provider/config');
-// const schemaOutput = path.resolve(__dirname, './gen/provider/config');
-// const defaultsOutput = path.resolve(__dirname, './gen/provider/config/defaults.json');
-
-
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 /**
  * Shared function to create a webpack config for an entry point
@@ -131,7 +123,7 @@ module.exports = [
         serviceui: './src/provider/ui/index.ts',
         openfin: './src/provider/ui/js/openfin.ts',
         toast: './src/provider/ui/js/toast/index.tsx'
-    }, undefined, new MiniCssExtractPlugin({ filename: 'bundle.css' })),
+    }),
     createConfig(`${outputDir}/demo`, {
         app: './src/demo/app.ts',
         launcher: './src/demo/launcher.ts'
