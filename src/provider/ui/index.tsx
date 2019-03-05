@@ -5,6 +5,13 @@ import {WindowManager} from './js/openfin';
 import {INotification} from './models/INotification';
 import {NotificationCenterAPI} from './NotificationCenterAPI';
 
+import * as ReactDOM from 'react-dom';
+import {App} from './container/App';
+
+import '../../../../res/provider/ui/css/launch-bar.css';
+import '../../../../res/provider/ui/css/notifications.css';
+import '../../../../res/provider/ui/css/openfin-center.css';
+
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 const IDENTITY = {
@@ -129,3 +136,5 @@ function toggleNotificationCenter() {
     WindowManager.instance.toggleWindow();
     return 'toggleNotificationCenter success';
 }
+
+ReactDOM.render(<App />, document.getElementById('react-app'));
