@@ -1,9 +1,12 @@
+import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
+
+import {CHANNEL_NAME} from '../../Shared/config';
+import {Notification} from '../../Shared/Models/Notification';
 import {ISenderInfo} from '../Models/ISenderInfo';
-import {CHANNEL_NAME} from '../../shared/config';
 
 import {WindowManager} from './js/openfin';
 import {INotification} from './models/INotification';
-import {NotificationCenterAPI} from './NotificationCenterAPI';
+import {NotificationCenterAPI, NotificationCenterEventMap} from './NotificationCenterAPI';
 
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
@@ -18,7 +21,7 @@ fin.desktop.main(async () => {
     const opts = {payload: {version: 'center'}};
     const pluginP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts);
 
-    function notificationCreated(payload: INotification&ISenderInfo, sender: ISenderInfo) {
+    function notificationCreated(payload: INotification&ISenderInfo, sender: ProviderIdentity) {
         // For testing/display purposes
         console.log('notificationCreated hit');
         console.log('payload', payload);
@@ -26,7 +29,7 @@ fin.desktop.main(async () => {
         return 'notificationCreated success';
     }
 
-    function notificationCleared(payload: INotification&ISenderInfo, sender: ISenderInfo) {
+    function notificationCleared(payload: INotification&ISenderInfo, sender: ProviderIdentity) {
         // For testing/display purposes
         console.log('notificationCleared hit');
         console.log('payload', payload);
@@ -34,7 +37,7 @@ fin.desktop.main(async () => {
         return 'notificationCleared success';
     }
 
-    function appNotificationsCleared(payload: ISenderInfo, sender: ISenderInfo) {
+    function appNotificationsCleared(payload: ISenderInfo, sender: ProviderIdentity) {
         // For testing/display purposes
         console.log('appNotificationsCleared hit');
         console.log('payload', payload);
@@ -42,7 +45,8 @@ fin.desktop.main(async () => {
         return 'appNotificationsCleared success';
     }
 
-    const callbacks = {notificationCreated, notificationCleared, appNotificationsCleared};
+    // tslint:disable-next-line:no-any
+    const callbacks: any = {notificationCreated, notificationCleared, appNotificationsCleared};
 
     window.openfin = {
         notifications: {
@@ -59,7 +63,7 @@ fin.desktop.main(async () => {
                 const success = await plugin.dispatch('notification-button-clicked', fullPayload);
                 console.log('success', success);
             },
-            closeHandler: async (payload: INotification&ISenderInfo) => {
+            closeHandler: async (payload: INotification) => {
                 // Handle a close on a notification
                 const plugin = await pluginP;
                 const success = await plugin.dispatch('notification-closed', payload);
@@ -69,7 +73,7 @@ fin.desktop.main(async () => {
                 // Fetch all notifications for the center
                 const plugin = await pluginP;
                 const payload = {uuid};
-                const appNotifications = await plugin.dispatch('fetch-app-notifications', payload);
+                const appNotifications = await plugin.dispatch('fetch-app-notifications', payload) as (Notification & ISenderInfo)[];
                 appNotifications.forEach(n => {
                     n.date = new Date(n.date);
                 });
@@ -78,7 +82,7 @@ fin.desktop.main(async () => {
             fetchAllNotifications: async () => {
                 // Fetch all notifications for the center
                 const plugin = await pluginP;
-                const allNotifications = await plugin.dispatch('fetch-all-notifications', {});
+                const allNotifications = await plugin.dispatch('fetch-all-notifications', {}) as (Notification & ISenderInfo)[];
                 allNotifications.forEach(n => {
                     n.date = new Date(n.date);
                 });
@@ -97,7 +101,8 @@ fin.desktop.main(async () => {
                 const success = await plugin.dispatch('clear-app-notifications', payload);
                 console.log('success', success);
             },
-            addEventListener: async (event: string, cb: (payload: INotification|ISenderInfo, sender: ISenderInfo) => string) => {
+            addEventListener<K extends keyof NotificationCenterEventMap>(
+                event: K, cb: (payload: NotificationCenterEventMap[K], sender: ProviderIdentity) => void) {
                 if (event === 'notificationCreated') {
                     callbacks.notificationCreated = cb;
                 } else if (event === 'notificationCleared') {
@@ -110,14 +115,14 @@ fin.desktop.main(async () => {
     };
 
     const plugin = await pluginP;
-    plugin.register('notification-created', (payload: INotification&ISenderInfo, sender: ISenderInfo) => callbacks.notificationCreated(payload, sender));
-    plugin.register('notification-cleared', (payload: INotification&ISenderInfo, sender: ISenderInfo) => callbacks.notificationCleared(payload, sender));
-    plugin.register('app-notifications-cleared', (payload: ISenderInfo, sender: ISenderInfo) => callbacks.appNotificationsCleared(payload, sender));
+    plugin.register('notification-created', (payload: INotification&ISenderInfo, sender: ProviderIdentity) => callbacks.notificationCreated(payload, sender));
+    plugin.register('notification-cleared', (payload: INotification&ISenderInfo, sender: ProviderIdentity) => callbacks.notificationCleared(payload, sender));
+    plugin.register('app-notifications-cleared', (payload: ISenderInfo, sender: ProviderIdentity) => callbacks.appNotificationsCleared(payload, sender));
     plugin.register('all-notifications-cleared', allNotificationsCleared);
     plugin.register('toggle-notification-center', toggleNotificationCenter);
 });
 
-function allNotificationsCleared(payload: ISenderInfo, sender: ISenderInfo) {
+function allNotificationsCleared(payload: ISenderInfo, sender: ProviderIdentity) {
     // For testing/display purposes
     console.log('allNotificationsCleared hit');
     console.log('payload', payload);

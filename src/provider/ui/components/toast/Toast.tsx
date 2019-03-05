@@ -25,7 +25,7 @@ export class Toast extends React.Component<IToastProps, {}> {
      * @method clickHandler Handles click events from the notification DOM
      * @param {ClickEvents} clickEventName Type of the click event
      */
-    private clickHandler(clickEventName: ClickEvents): void {
+    private clickHandler(event: React.MouseEvent<HTMLElement>, clickEventName: ClickEvents): void {
         event.stopPropagation();
 
         switch (clickEventName) {
@@ -58,14 +58,14 @@ export class Toast extends React.Component<IToastProps, {}> {
                                 className="notification-close-x"
                                 src="image/shapes/notifications-x.png"
                                 alt=""
-                                onClick={() => {
-                                    this.clickHandler(ClickEvents.Closed);
+                                onClick={(event) => {
+                                    this.clickHandler(event, ClickEvents.Closed);
                                 }}
                             />
                             <div
                                 className="notification-body"
-                                onClick={() => {
-                                    this.clickHandler(ClickEvents.BodyClick);
+                                onClick={(event) => {
+                                    this.clickHandler(event, ClickEvents.BodyClick);
                                 }}
                             >
                                 <div className="notification-source">

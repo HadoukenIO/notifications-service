@@ -3,7 +3,7 @@
     "startup_app": {
         "name": "Notifications-Service",
         "description": "OpenFin Notifications Desktop Service",
-        "url": "https://cdn.openfin.co/services/openfin/notifications/index.html",
+        "url": "https://cdn.openfin.co/services/openfin/notifications/provider.html",
         "uuid": "notifications-service",
         "autoShow": true,
         "showTaskbarIcon": false,

@@ -1,7 +1,9 @@
+import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
+
 import * as ofnotes from '../client/index';
 import {NotificationOptions} from '../client/Models/NotificationOptions';
 import {ISenderInfo} from '../provider/Models/ISenderInfo';
-import {NotificationEvent} from '../shared/Models/NotificationEvent';
+import {NotificationEvent} from '../Shared/Models/NotificationEvent';
 
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(id, Object.assign(opts, {date: Date.now()}));
@@ -85,7 +87,7 @@ function makeNoteOfType(index: number) {
 // });
 
 fin.desktop.main(async () => {
-    const clientResponse = document.getElementById('clientResponse');
+    const clientResponse = document.getElementById('clientResponse')!;
 
 
     function logit(msg: string) {
@@ -95,7 +97,7 @@ fin.desktop.main(async () => {
     }
 
     for (let index = 1; index < 7; index++) {
-        document.getElementById(`button${index}`).addEventListener('click', () => {
+        document.getElementById(`button${index}`)!.addEventListener('click', () => {
             makeNoteOfType(index).then((notification) => {
                 if (!notification.success) {
                     // document.getElementById('clientResponse').innerHTML = `
@@ -107,12 +109,12 @@ fin.desktop.main(async () => {
             });
         });
 
-        document.getElementById(`clearbutton${index}`).addEventListener('click', () => {
+        document.getElementById(`clearbutton${index}`)!.addEventListener('click', () => {
             clearNote(`1q2w3e4r${index}`);
         });
     }
 
-    document.getElementById(`fetchAppNotifications`).addEventListener('click', () => {
+    document.getElementById(`fetchAppNotifications`)!.addEventListener('click', () => {
         getNotes().then((notifications) => {
             // document.getElementById('clientResponse').innerHTML = `
             //     ${notifications.value.length} notifications received from the
@@ -122,20 +124,20 @@ fin.desktop.main(async () => {
         });
     });
 
-    ofnotes.addEventListener('click', (payload: NotificationEvent, sender: ISenderInfo) => {
+    ofnotes.addEventListener('click', (payload: NotificationEvent, sender: ProviderIdentity) => {
         // document.getElementById('clientResponse').innerHTML = `CLICK action
         // received from notification ${payload.id}`
         logit(`CLICK action received from notification ${payload.id}`);
         return '';
     });
 
-    ofnotes.addEventListener('close', (payload: NotificationEvent, sender: ISenderInfo) => {
+    ofnotes.addEventListener('close', (payload: NotificationEvent, sender: ProviderIdentity) => {
         // document.getElementById('clientResponse').innerHTML = `CLOSE action
         // received from notification ${payload.id}`
         logit(`CLOSE action received from notification ${payload.id}`);
         return '';
     });
-    ofnotes.addEventListener('button-click', (payload: NotificationEvent, sender: ISenderInfo) => {
+    ofnotes.addEventListener('button-click', (payload: NotificationEvent, sender: ProviderIdentity) => {
         const buttonClicked = payload.buttons[payload.buttonIndex];
         console.log(buttonClicked);
         const buttonTitle = buttonClicked.title;

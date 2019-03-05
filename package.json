@@ -8,18 +8,11 @@
     "test": "jest",
     "check": "gts check",
     "fix": "gts fix",
-    "clean": "gts clean && rimraf dist staging",
-    "compile": "npm run compile:client && npm run compile:provider",
-    "compile:client": "genversion --es6 --semi src/client/version.ts && tsc -p tsconfig.client.json",
-    "compile:provider": "tsc -p tsconfig.provider.json",
-    "docs": "typedoc --name \"OpenFin Notifications\" --out ./build/docs --excludeNotExported --excludePrivate --excludeProtected --hideGenerator --tsconfig tsconfig.client.json --readme none",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
+    "clean": "gts clean",
+    "docs": "typedoc --name \"OpenFin Notifications\" --out ./dist/docs --excludeNotExported --excludePrivate --excludeProtected --hideGenerator --tsconfig src/client/tsconfig.json --readme none",
     "posttest": "npm run check",
-    "package": "webpack --mode production",
-    "package:dev": "webpack --mode development",
-    "build": "npm run compile && npm run package",
-    "build:dev": "npm run compile && npm run package:dev",
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
     "start": "node server.js"
   },
   "repository": {
@@ -61,10 +54,12 @@
     "style-loader": "^0.21.0",
     "ts-jest": "^23.10.4",
     "ts-loader": "^4.4.2",
+    "typedoc": "^0.14.2",
     "typescript": "^3.1.1",
     "url-loader": "^1.0.1",
     "webpack": "^4.16.1",
-    "webpack-cli": "^3.0.8"
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-middleware": "^3.6.0"
   },
   "jest": {
     "verbose": true,

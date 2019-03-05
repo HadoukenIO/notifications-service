@@ -22,7 +22,7 @@ export class Header extends React.Component<IHeaderProps> {
                     <div
                         className="sort-button"
                         onClick={() =>
-                            this.props.handleGroupBy(eGroupMethod.APPLICATION)
+                            this.props.handleGroupBy && this.props.handleGroupBy(eGroupMethod.APPLICATION)
                         }
                     >
                         APPLICATION
@@ -30,7 +30,7 @@ export class Header extends React.Component<IHeaderProps> {
                     <div
                         className="sort-button"
                         onClick={() =>
-                            this.props.handleGroupBy(eGroupMethod.DATE)
+                            this.props.handleGroupBy && this.props.handleGroupBy(eGroupMethod.DATE)
                         }
                     >
                         DATE
@@ -43,7 +43,9 @@ export class Header extends React.Component<IHeaderProps> {
     }
 
     private handleGroupBy(event: ChangeEvent<HTMLSelectElement>): void {
-        this.props.handleGroupBy(this.convertToEnum(event.target.value));
+        if (this.props.handleGroupBy) {
+            this.props.handleGroupBy(this.convertToEnum(event.target.value));
+        }
     }
 
     private convertToEnum(method: string): eGroupMethod {

@@ -16,7 +16,7 @@ export class NotificationGroup extends React.Component<INotificationGroupProps, 
      * @returns ReactNode
      */
     public render(): React.ReactNode {
-        if (this.props.notifications.length > 0) {
+        if (this.props.notifications && this.props.notifications.length > 0) {
             const sortedNotifications = this.props.notifications.sort(
                 (a: INotification, b: INotification) => {
                     return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
@@ -63,7 +63,7 @@ export class NotificationGroup extends React.Component<INotificationGroupProps, 
     private handleClearAll(): void {
         if (this.props.groupBy === eGroupMethod.APPLICATION) {
             window.openfin.notifications.clearAppNotifications(this.props.name);
-        } else {
+        } else if (this.props.notifications) {
             this.props.notifications.forEach(notification => {
                 window.openfin.notifications.closeHandler(notification);
             });

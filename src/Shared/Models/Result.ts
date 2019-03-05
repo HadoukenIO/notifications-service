@@ -4,13 +4,27 @@
  * This interface is used for operations that return data. If an operation has
  * no return value, it will use VoidResult instead.
  */
-export interface ReturnResult<T> extends VoidResult {
+export type ReturnResult<T> = ReturnResultSuccess<T>|ReturnResultFailure<T>;
+
+export interface ReturnResultSuccess<T> extends VoidResult {
+    success: true;
+
     /**
      * Returns the results of the operation.
      *
      * If the operation failed (see 'success'), null will be returned.
      */
     value: T;
+}
+export interface ReturnResultFailure<T> extends VoidResult {
+    success: false;
+
+    /**
+     * Returns the results of the operation.
+     *
+     * If the operation failed (see 'success'), null will be returned.
+     */
+    value: null;
 }
 
 /**

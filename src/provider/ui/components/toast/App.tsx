@@ -8,7 +8,7 @@ declare var window: Window & {
 };
 
 interface IToastAppState {
-    meta: INotification & ISenderInfo;
+    meta: (INotification & ISenderInfo)|null;
 }
 
 export class App extends React.Component<{}, IToastAppState> {
