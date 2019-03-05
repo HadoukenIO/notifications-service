@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { NotificationType } from './NotificationType';
-import { INotification } from '../models/INotification';
-import { INotificationGroupProps } from '../models/INotificationGroupProps';
-import { eGroupMethod } from './App';
+import { Notification } from '../Notification/Notification';
+import { INotification } from '../../models/INotification';
+import { INotificationGroupProps } from '../../models/INotificationGroupProps';
+import { eGroupMethod } from '../../container/App';
 
-import {NotificationCenterAPI} from '../NotificationCenterAPI';
+import {NotificationCenterAPI} from '../../NotificationCenterAPI';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 /**
@@ -24,10 +24,7 @@ export class NotificationGroup extends React.Component<INotificationGroupProps, 
             );
             const notificationArray: React.ReactNode[] = sortedNotifications.map(
                 note => (
-                    <NotificationType
-                        key={[note.uuid, note.id].join(':')}
-                        meta={note}
-                    />
+                    <Notification key={[note.uuid, note.id].join(':')} meta={note} />
                 )
             );
 

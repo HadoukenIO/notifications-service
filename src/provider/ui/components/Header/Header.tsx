@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ChangeEvent } from 'react';
-import { eGroupMethod } from './App';
+import { eGroupMethod } from '../../container/App';
 
 interface IHeaderProps {
     groupBy?: eGroupMethod;

@@ -1,10 +1,10 @@
-import* as React from 'react';
-import* as ReactDOM from 'react-dom';
-import{App} from '../../components/toast/App';
-import { INotification } from '../../models/INotification';
-import { ISenderInfo } from '../../../Models/ISenderInfo';
-import { CHANNEL_NAME } from '../../../../shared/config';
-import { NotificationCenterAPI } from '../../NotificationCenterAPI';
+import * as ReactDOM from 'react-dom';
+import * as React from 'react';
+import {App} from './container/App';
+import { INotification } from '../models/INotification';
+import { ISenderInfo } from '../../Models/ISenderInfo';
+import { CHANNEL_NAME } from '../../../shared/config';
+import { NotificationCenterAPI } from '../NotificationCenterAPI';
 
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 

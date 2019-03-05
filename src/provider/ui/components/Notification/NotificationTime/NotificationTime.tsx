@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
 
-import { INotificationTime, INotificationTimeProps } from '../../models/INotificationTime';
+import { INotificationTime, INotificationTimeProps } from '../../../models/INotificationTime';
 
 /**
  * @class NotificationTime Handles Time updates in Notifications

@@ -141,7 +141,7 @@ module.exports = [
         react: './src/provider/ui/js/index.tsx',
         serviceui: './src/provider/ui/index.ts',
         openfin: './src/provider/ui/js/openfin.ts',
-        toast: './src/provider/ui/js/toast/index.tsx'
+        toast: './src/provider/ui/toast/index.tsx'
     }),
     createWebpackConfigForDemo({
         app: './src/demo/app.ts',
