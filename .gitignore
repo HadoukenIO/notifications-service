@@ -4,9 +4,7 @@
 npm-debug.log
 openfin-notifications-*.tgz
 Thumbs.db
-build
 dist
 gen
 node_modules
 test/coverage
-staging
