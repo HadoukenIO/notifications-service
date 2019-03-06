@@ -1,5 +1,5 @@
-import {ReturnResult, VoidResult} from '../../../../shared/Models/Result';
-import {Settings} from '../../../../shared/Models/Settings';
+import {ReturnResult, VoidResult} from '../../../../shared/models/Result';
+import {Settings} from '../../../../shared/models/Settings';
 import {IDatastore} from '../IDatastore';
 
 import {Repository} from './Repository';
@@ -53,15 +53,15 @@ export class SettingsRepository extends Repository<Settings> {
     public async get(): Promise<ReturnResult<Settings>> {
         const result = await super.genericGetAll();
 
-        if (result.value.length < 1) {
+        if (!result.success || result.value.length < 1) {
             return {success: false, errorMsg: 'There were no settings to be found', value: null};
+        } else {
+            return {success: true, value: result.value[0]};
         }
-
-        return {success: true, value: result.value[0]};
     }
 
     /**
-     * @method remove Removes settings fomr the settings store
+     * @method remove Removes settings from the settings store
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */

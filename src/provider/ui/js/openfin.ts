@@ -5,7 +5,7 @@ declare var window: Window&{WindowManager: WindowManager};
 
 export class WindowManager {
     private windowInfo: WindowInfo = new WindowInfo();
-    private trayMenu: TrayMenu;
+    private trayMenu!: TrayMenu;
     private static singleton: WindowManager;
 
     constructor() {
@@ -30,7 +30,7 @@ export class WindowManager {
         this.windowInfo.getWindow().addEventListener('close-requested', () => this.hideWindow());
 
         // On monitor dimension change
-        fin.desktop.System.addEventListener('monitor-info-changed', this.sizeToFit.bind(this));
+        fin.desktop.System.addEventListener('monitor-info-changed', this.onMonitorInfoChanged.bind(this));
     }
 
     /**
@@ -40,7 +40,7 @@ export class WindowManager {
     public onWindowLoad(): void {
         this.sizeToFit(false);
 
-        document.getElementById('exitLink').addEventListener('click', () => this.hideWindow());
+        document.getElementById('exitLink')!.addEventListener('click', () => this.hideWindow());
     }
 
     /**
@@ -84,7 +84,7 @@ export class WindowManager {
         this.fade(false, 450);
         this.windowInfo.setShowing(false);
     }
-    
+
     /**
      * @method toggleWindow Hides or shows the center.
      * @returns void
@@ -122,6 +122,10 @@ export class WindowManager {
         } else {
             return new WindowManager();
         }
+    }
+
+    private onMonitorInfoChanged(): void {
+        this.sizeToFit();
     }
 }
 

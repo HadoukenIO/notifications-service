@@ -1,7 +1,7 @@
-﻿import {Entity} from '../../../shared/Models/Entity';
-import {ITable} from '../Models/ITable';
-import {PageInfo} from '../Models/PageInfo';
-import {Sorts} from '../Models/Sort';
+﻿import {Entity} from '../../../shared/models/Entity';
+import {ITable} from '../models/ITable';
+import {PageInfo} from '../models/PageInfo';
+import {Sorts} from '../models/Sort';
 
 import {IDatastore} from './IDatastore';
 
@@ -18,7 +18,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     /**
      * @property Holds an instance of open store
      */
-    private mDbOpenRequest: IDBOpenDBRequest;
+    private mDbOpenRequest!: IDBOpenDBRequest;
 
     /**
      * @constructor Constructor for IndexedDb
@@ -250,7 +250,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
 
             request.onerror = (event: Event) => {
                 console.error('The entry could not be updated: ', event);
-                resolve(null);
+                resolve(undefined);
             };
         });
     }
@@ -268,7 +268,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
             const transaction = db.transaction(tableName, 'readonly');
             const store = transaction.objectStore(tableName);
 
-            const cursorRequest = store.openCursor(null, 'next');
+            const cursorRequest = store.openCursor(undefined, 'next');
 
             cursorRequest.onsuccess = (event: Event) => {
                 const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
@@ -282,7 +282,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
 
             cursorRequest.onerror = (event: Event) => {
                 console.error('Could not read from table ' + tableName, event);
-                resolve(null);
+                resolve(undefined);
             };
         });
     }
@@ -302,7 +302,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
             const transaction = db.transaction(tableName, 'readonly');
             const store = transaction.objectStore(tableName);
 
-            const cursorRequest = store.openCursor(null, 'next');
+            const cursorRequest = store.openCursor(undefined, 'next');
 
             cursorRequest.onsuccess = (event: Event) => {
                 const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
@@ -318,7 +318,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
 
             cursorRequest.onerror = (event: Event) => {
                 console.error('Could not read from table ' + tableName, event);
-                resolve(null);
+                resolve(undefined);
             };
         });
     }
@@ -337,7 +337,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
             this.readAll(tableName).then((notifications: T[]) => {
                 if (notifications.length === 0) {
                     console.error('There are no entries in the database');
-                    resolve(null);
+                    resolve(undefined);
                 } else {
                     const offset = (pageInfo.pageNumber - 1) * pageInfo.numberOfItems;
 

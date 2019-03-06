@@ -1,8 +1,7 @@
-import {ISenderInfo} from '../../../../provider/Models/ISenderInfo';
-import {Entity} from '../../../../shared/Models/Entity';
-import {Notification} from '../../../../shared/Models/Notification';
-import {ReturnResult, VoidResult} from '../../../../shared/Models/Result';
-import {PageInfo} from '../../Models/PageInfo';
+import {ISenderInfo} from '../../../../provider/models/ISenderInfo';
+import {Notification} from '../../../../shared/models/Notification';
+import {ReturnResult, VoidResult} from '../../../../shared/models/Result';
+import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
 
 import {Repository} from './Repository';

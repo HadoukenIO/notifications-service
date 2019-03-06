@@ -1,6 +1,6 @@
-import {Entity} from '../../../shared/Models/Entity';
-import {ITable} from '../Models/ITable';
-import {PageInfo} from '../Models/PageInfo';
+import {Entity} from '../../../shared/models/Entity';
+import {ITable} from '../models/ITable';
+import {PageInfo} from '../models/PageInfo';
 
 /**
  *  @description Interface for low level database access layer

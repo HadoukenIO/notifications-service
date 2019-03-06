@@ -7,8 +7,6 @@ import { INotificationTime, INotificationTimeProps } from '../../models/INotific
  * @class NotificationTime Handles Time updates in Notifications
  */
 export class NotificationTime extends React.Component<INotificationTimeProps, INotificationTime> {
-    private interval: number;
-
     constructor(props: INotificationTimeProps) {
         super(props);
     }

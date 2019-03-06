@@ -2,14 +2,18 @@ console.log('Client index.js loaded');
 
 import {CHANNEL_NAME} from '../shared/config';
 
-import {OptionButton} from '../shared/Models/OptionButton';
-import {Notification} from '../shared/Models/Notification';
-import {ISenderInfo} from '../provider/Models/ISenderInfo';
-import {OptionInput} from '../shared/Models/OptionInput';
-import {NotificationEvent} from '../shared/Models/NotificationEvent';
-import {NotificationOptions} from './Models/NotificationOptions';
+import {Notification} from '../shared/models/Notification';
+import {ISenderInfo} from '../provider/models/ISenderInfo';
+import {NotificationEvent} from '../shared/models/NotificationEvent';
+import {NotificationOptions} from './models/NotificationOptions';
+import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
-import {version} from './version';
+/**
+ * The version of the NPM package.
+ *
+ * Webpack replaces any instances of this constant with a hard-coded string at build time.
+ */
+declare const PACKAGE_VERSION: string;
 
 const IDENTITY = {
     uuid: 'notifications-service',
@@ -18,7 +22,7 @@ const IDENTITY = {
 };
 
 // For testing/display purposes
-const notificationClicked = (payload: NotificationEvent, sender: ISenderInfo) => {
+const notificationClicked = (payload: NotificationEvent, sender: ProviderIdentity) => {
     console.log('notificationClicked hit');
     console.log('payload', payload);
     console.log('sender', sender);
@@ -26,7 +30,7 @@ const notificationClicked = (payload: NotificationEvent, sender: ISenderInfo) =>
 };
 
 // For testing/display purposes
-const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) => {
+const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) => {
     console.log('notificationButtonClicked hit');
     console.log('payload', payload);
     console.log('sender', sender);
@@ -34,7 +38,7 @@ const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{butto
 };
 
 // For testing/display purposes
-const notificationClosed = (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+const notificationClosed = (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
     console.log('notificationClosed hit');
     console.log('payload', payload);
     console.log('sender', sender);
@@ -56,17 +60,17 @@ async function createClientPromise() {
     });
 
     try {
-        const opts = {payload: {version}};
+        const opts = {payload: {version: PACKAGE_VERSION}};
         const clientP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts).then((client) => {
             // tslint:disable-next-line:no-any
             client.register('WARN', (payload: any) => console.warn(payload));
-            client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+            client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
                 callbacks.notificationClicked(payload, sender);
             });
-            client.register('notification-button-clicked', (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) => {
+            client.register('notification-button-clicked', (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) => {
                 callbacks.notificationButtonClicked(payload, sender);
             });
-            client.register('notification-closed', (payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) => {
+            client.register('notification-closed', (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
                 callbacks.notificationClosed(payload, sender);
             });
             return client;
@@ -74,7 +78,7 @@ async function createClientPromise() {
         return clientP;
     } catch (e) {
         console.error(e);
-        return null;
+        throw e;
     }
 }
 
@@ -126,7 +130,7 @@ export async function clearAll() {
  * @param {string} evt the event name
  * @param {(payload: NotificationEvent, sender: ISenderInfo) => string)} cb event handler callback
  */
-export async function addEventListener(evt: string, cb: (payload: NotificationEvent, sender: ISenderInfo) => string) {
+export async function addEventListener(evt: string, cb: (payload: NotificationEvent, sender: ProviderIdentity) => string) {
     if (evt === 'click') {
         callbacks.notificationClicked = cb;
     } else if (evt === 'close') {
