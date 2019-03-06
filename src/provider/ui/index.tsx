@@ -1,16 +1,16 @@
+import * as React from 'react';
+import {render} from 'react-dom';
 import {ISenderInfo} from '../Models/ISenderInfo';
 import {CHANNEL_NAME} from '../../shared/config';
 
-import {WindowManager} from './js/openfin';
+import {WindowManager} from './openfin';
 import {INotification} from './models/INotification';
 import {NotificationCenterAPI} from './NotificationCenterAPI';
-
-import * as ReactDOM from 'react-dom';
 import {App} from './container/App';
 
-import '../../../../res/provider/ui/css/launch-bar.css';
-import '../../../../res/provider/ui/css/notifications.css';
-import '../../../../res/provider/ui/css/openfin-center.css';
+import '../../../res/provider/ui/css/launch-bar.css';
+import '../../../res/provider/ui/css/notifications.css';
+import '../../../res/provider/ui/css/openfin-center.css';
 
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
@@ -137,4 +137,4 @@ function toggleNotificationCenter() {
     return 'toggleNotificationCenter success';
 }
 
-ReactDOM.render(<App />, document.getElementById('react-app'));
+render(<App />, document.getElementById('react-app'));

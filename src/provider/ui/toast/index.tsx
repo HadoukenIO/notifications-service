@@ -1,4 +1,4 @@
-import * as ReactDOM from 'react-dom';
+import {render} from 'react-dom';
 import * as React from 'react';
 import {App} from './container/App';
 import { INotification } from '../models/INotification';
@@ -109,4 +109,4 @@ fin.desktop.main(async () => {
     plugin.register('app-notifications-cleared', (payload: ISenderInfo, sender: ISenderInfo) => callbacks.appNotificationsCleared(payload, sender));
 });
 
-ReactDOM.render(<App />, document.getElementById('toast-app'));
+render(<App />, document.getElementById('toast-app'));

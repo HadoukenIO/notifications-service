@@ -13,28 +13,17 @@ const enum ClickEvents {
     Closed
 }
 
-/**
- * @class Toast Holds Indivual Toast functionality
- */
-export class Toast extends React.Component<IToastProps, {}> {
-    constructor(props: IToastProps) {
-        super(props);
-    }
-
-    /**
-     * @method clickHandler Handles click events from the notification DOM
-     * @param {ClickEvents} clickEventName Type of the click event
-     */
-    private clickHandler(clickEventName: ClickEvents): void {
+export function Toast(props: IToastProps){
+    function clickHandler(clickEventName: ClickEvents): void {
         event.stopPropagation();
 
         switch (clickEventName) {
             case ClickEvents.BodyClick: {
-                window.openfin.notifications.clickHandler(this.props.meta);
+                window.openfin.notifications.clickHandler(props.meta);
                 break;
             }
             case ClickEvents.Closed: {
-                window.openfin.notifications.closeHandler(this.props.meta);
+                window.openfin.notifications.closeHandler(props.meta);
                 fin.desktop.Notification.getCurrent().close();
                 break;
             }
@@ -45,49 +34,44 @@ export class Toast extends React.Component<IToastProps, {}> {
         }
     }
 
-    /**
-     * @method render Renders the Toast React Node
-     */
-    public render(): React.ReactNode {
-        return (
-            <div className="notification-container">
-                <div className="notification-inbox" id="notification-inbox">
-                    <ul id="notification-inbox-list">
-                        <li className="notification-item">
-                            <img
-                                className="notification-close-x"
-                                src="image/shapes/notifications-x.png"
-                                alt=""
-                                onClick={() => {
-                                    this.clickHandler(ClickEvents.Closed);
-                                }}
-                            />
-                            <div
-                                className="notification-body"
-                                onClick={() => {
-                                    this.clickHandler(ClickEvents.BodyClick);
-                                }}
-                            >
-                                <div className="notification-source">
-                                    <img
-                                        src={this.props.meta.icon}
-                                        className="notification-small-img"
-                                    />
-                                    <span className="notification-source-text">
-                                        {this.props.meta.name}
-                                    </span>
-                                </div>
-                                <div className="notification-body-title">
-                                    {this.props.meta.title}
-                                </div>
-                                <div className="notification-body-text">
-                                    {this.props.meta.body}
-                                </div>
+    return (
+        <div className="notification-container">
+            <div className="notification-inbox" id="notification-inbox">
+                <ul id="notification-inbox-list">
+                    <li className="notification-item">
+                        <img
+                            className="notification-close-x"
+                            src="image/shapes/notifications-x.png"
+                            alt=""
+                            onClick={() => {
+                                clickHandler(ClickEvents.Closed);
+                            }}
+                        />
+                        <div
+                            className="notification-body"
+                            onClick={() => {
+                                clickHandler(ClickEvents.BodyClick);
+                            }}
+                        >
+                            <div className="notification-source">
+                                <img
+                                    src={props.meta.icon}
+                                    className="notification-small-img"
+                                />
+                                <span className="notification-source-text">
+                                    {props.meta.name}
+                                </span>
                             </div>
-                        </li>
-                    </ul>
-                </div>
+                            <div className="notification-body-title">
+                                {props.meta.title}
+                            </div>
+                            <div className="notification-body-text">
+                                {props.meta.body}
+                            </div>
+                        </div>
+                    </li>
+                </ul>
             </div>
-        );
-    }
+        </div>
+    );
 }

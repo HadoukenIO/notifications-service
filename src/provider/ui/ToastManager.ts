@@ -1,6 +1,6 @@
-import {ISenderInfo} from '../../Models/ISenderInfo';
-import {Notification} from '../../../shared/Models/Notification';
-import {IToast} from '../models/toast/IToast';
+import {ISenderInfo} from '../Models/ISenderInfo';
+import {Notification} from '../../shared/Models/Notification';
+import {IToast} from './models/toast/IToast';
 
 import {WindowInfo} from './WindowInfo';
 

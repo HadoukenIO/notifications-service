@@ -138,9 +138,8 @@ function prepConfig(config, defaultUrl) {
 module.exports = [
     createWebpackConfigForProvider(),
     createWebpackConfigForProviderUI({
-        react: './src/provider/ui/js/index.tsx',
-        serviceui: './src/provider/ui/index.ts',
-        openfin: './src/provider/ui/js/openfin.ts',
+        serviceui: './src/provider/ui/index.tsx',
+        openfin: './src/provider/ui/openfin.ts',
         toast: './src/provider/ui/toast/index.tsx'
     }),
     createWebpackConfigForDemo({

@@ -1,11 +1,11 @@
 import * as React from 'react';
+
 import * as moment from 'moment';
 import { NotificationGroup } from '../NotificationGroup/NotificationGroup';
 import { INotification } from '../../models/INotification';
-import { Notification } from '../../../../shared/Models/Notification';
 import { ISenderInfo } from '../../../Models/ISenderInfo';
 import { eGroupMethod } from '../../container/App';
-import { ToastManager } from '../../js/ToastManager';
+import { ToastManager } from '../../ToastManager';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
