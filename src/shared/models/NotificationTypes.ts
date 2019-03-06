@@ -1,4 +1,4 @@
-import {ISenderInfo} from '../../provider/Models/ISenderInfo';
+import {ISenderInfo} from '../../provider/models/ISenderInfo';
 import {Notification} from './Notification';
 
 export enum NotificationTypes {

@@ -1,5 +1,5 @@
 import 'jest';
-import {IndexedDb} from '../../src/provider/Persistence/DataLayer/IndexedDb';
+import {IndexedDb} from '../../src/provider/persistence/dataLayer/IndexedDb';
 
 /**
  * @describe After each test we reset the mock to restore its defaults

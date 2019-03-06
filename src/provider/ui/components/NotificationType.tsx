@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Notification } from './notifications/Notification';
 import { ButtonNotification } from './notifications/ButtonNotification';
 import { INotificationProps } from '../models/INotificationProps';
-import { NotificationTypes } from '../../../Shared/Models/NotificationTypes';
+import { NotificationTypes } from '../../../shared/models/NotificationTypes';
 
 /**
  * Determines what type of notification to display in the UI

@@ -1,8 +1,8 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
-import {CHANNEL_NAME} from '../../Shared/config';
-import {Notification} from '../../Shared/Models/Notification';
-import {ISenderInfo} from '../Models/ISenderInfo';
+import {CHANNEL_NAME} from '../../shared/config';
+import {Notification} from '../../shared/models/Notification';
+import {ISenderInfo} from '../models/ISenderInfo';
 
 import {WindowManager} from './js/openfin';
 import {INotification} from './models/INotification';

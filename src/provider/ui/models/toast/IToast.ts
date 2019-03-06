@@ -1,6 +1,5 @@
-import {Notification} from '../../../../Shared/Models/Notification';
-import {ISenderInfo} from '../../../Models/ISenderInfo';
-import {INotification} from '../INotification';
+import {Notification} from '../../../../shared/models/Notification';
+import {ISenderInfo} from '../../../models/ISenderInfo';
 
 export interface IToast {
     note: fin.OpenFinNotification;

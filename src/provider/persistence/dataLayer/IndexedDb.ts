@@ -1,7 +1,7 @@
-﻿import {Entity} from '../../../Shared/Models/Entity';
-import {ITable} from '../Models/ITable';
-import {PageInfo} from '../Models/PageInfo';
-import {Sorts} from '../Models/Sort';
+﻿import {Entity} from '../../../shared/models/Entity';
+import {ITable} from '../models/ITable';
+import {PageInfo} from '../models/PageInfo';
+import {Sorts} from '../models/Sort';
 
 import {IDatastore} from './IDatastore';
 

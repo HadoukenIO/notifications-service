@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Toast } from './Toast';
-import { ISenderInfo } from '../../../Models/ISenderInfo';
+import { ISenderInfo } from '../../../models/ISenderInfo';
 import {INotification} from '../../models/INotification';
 
 declare var window: Window & {

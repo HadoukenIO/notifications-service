@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ISenderInfo } from '../../../Models/ISenderInfo';
+import { ISenderInfo } from '../../../models/ISenderInfo';
 import {INotification} from '../../models/INotification';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};

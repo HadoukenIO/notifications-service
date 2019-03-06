@@ -1,7 +1,6 @@
-import {Entity} from '../../../../Shared/Models/Entity';
-import {ReturnResult, VoidResult} from '../../../../Shared/Models/Result';
-import {Settings} from '../../../../Shared/Models/Settings';
-import {PageInfo} from '../../Models/PageInfo';
+import {Entity} from '../../../../shared/models/Entity';
+import {ReturnResult, VoidResult} from '../../../../shared/models/Result';
+import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
 
 /**

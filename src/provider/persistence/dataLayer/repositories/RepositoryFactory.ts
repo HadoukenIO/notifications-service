@@ -1,15 +1,13 @@
-import {Entity} from '../../../../Shared/Models/Entity';
-import {Notification} from '../../../../Shared/Models/Notification';
-import {Settings} from '../../../../Shared/Models/Settings';
-import {ISenderInfo} from '../../../Models/ISenderInfo';
-import {ITable} from '../../Models/ITable';
+import {Entity} from '../../../../shared/models/Entity';
+import {Notification} from '../../../../shared/models/Notification';
+import {Settings} from '../../../../shared/models/Settings';
+import {ISenderInfo} from '../../../models/ISenderInfo';
 import {IDatastore} from '../IDatastore';
 import {IndexedDb} from '../IndexedDb';
 
 import {HistoryRepository} from './HistoryRepository';
 import {IRepositories} from './IRepositories';
 import {Repository} from './Repository';
-import {Repositories} from './RepositoryEnum';
 import {SettingsRepository} from './SettingsRepository';
 
 /**

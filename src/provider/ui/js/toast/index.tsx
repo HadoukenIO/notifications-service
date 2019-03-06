@@ -2,11 +2,11 @@ import* as React from 'react';
 import* as ReactDOM from 'react-dom';
 import{App} from '../../components/toast/App';
 import { INotification } from '../../models/INotification';
-import { ISenderInfo } from '../../../Models/ISenderInfo';
-import { CHANNEL_NAME } from '../../../../Shared/config';
+import { ISenderInfo } from '../../../models/ISenderInfo';
+import { CHANNEL_NAME } from '../../../../shared/config';
 import { NotificationCenterAPI, NotificationCenterEventMap } from '../../NotificationCenterAPI';
 import { ProviderIdentity } from 'openfin/_v2/api/interappbus/channel/channel';
-import { Notification } from '../../../../Shared/Models/Notification';
+import { Notification } from '../../../../shared/models/Notification';
 
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 

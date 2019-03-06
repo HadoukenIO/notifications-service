@@ -1,16 +1,16 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
-import {CHANNEL_NAME} from '../Shared/config';
-import {Notification} from '../Shared/Models/Notification';
-import {NotificationEvent} from '../Shared/Models/NotificationEvent';
-import {NotificationTypes, TypeResolver} from '../Shared/Models/NotificationTypes';
+import {CHANNEL_NAME} from '../shared/config';
+import {Notification} from '../shared/models/Notification';
+import {NotificationEvent} from '../shared/models/NotificationEvent';
+import {NotificationTypes, TypeResolver} from '../shared/models/NotificationTypes';
 
-import {ISenderInfo} from './Models/ISenderInfo';
-import {HistoryRepository} from './Persistence/DataLayer/Repositories/HistoryRepository';
-import {Repositories} from './Persistence/DataLayer/Repositories/RepositoryEnum';
-import {RepositoryFactory} from './Persistence/DataLayer/Repositories/RepositoryFactory';
-import {SettingsRepository} from './Persistence/DataLayer/Repositories/SettingsRepository';
+import {ISenderInfo} from './models/ISenderInfo';
+import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';
+import {Repositories} from './persistence/dataLayer/repositories/RepositoryEnum';
+import {RepositoryFactory} from './persistence/dataLayer/repositories/RepositoryFactory';
+import {SettingsRepository} from './persistence/dataLayer/repositories/SettingsRepository';
 
 const repositoryFactory = RepositoryFactory.Instance;
 const historyRepository = repositoryFactory.getRepository(Repositories.history) as HistoryRepository;

@@ -1,6 +1,6 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
-import {ISenderInfo} from '../Models/ISenderInfo';
+import {ISenderInfo} from '../models/ISenderInfo';
 
 import {INotification} from './models/INotification';
 
