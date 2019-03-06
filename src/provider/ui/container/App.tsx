@@ -5,8 +5,8 @@ import { NotificationView } from '../components/NotificationView/NotificationVie
 import { Footer } from '../components/Footer/Footer';
 
 interface IAppState {
-    groupBy?: eGroupMethod;
-    handleGroupBy?: (groupBy: eGroupMethod) => void;
+    groupBy: eGroupMethod;
+    handleGroupBy: (groupBy: eGroupMethod) => void;
 }
 
 export enum eGroupMethod {

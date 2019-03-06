@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 import { NotificationGroup } from '../NotificationGroup/NotificationGroup';
 import { INotification } from '../../models/INotification';
-import { ISenderInfo } from '../../models/ISenderInfo';
+import { ISenderInfo } from '../../../models/ISenderInfo';
 import { eGroupMethod } from '../../container/App';
 import { ToastManager } from '../../ToastManager';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';

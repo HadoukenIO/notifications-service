@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ISenderInfo } from '../../../../Models/ISenderInfo';
+import { ISenderInfo } from '../../../../models/ISenderInfo';
 import {INotification} from '../../../models/INotification';
 import {NotificationCenterAPI} from '../../../NotificationCenterAPI';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
@@ -15,8 +15,6 @@ const enum ClickEvents {
 
 export function Toast(props: IToastProps){
     function clickHandler(clickEventName: ClickEvents): void {
-        event.stopPropagation();
-
         switch (clickEventName) {
             case ClickEvents.BodyClick: {
                 window.openfin.notifications.clickHandler(props.meta);

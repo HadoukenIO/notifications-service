@@ -3,7 +3,7 @@ import { eGroupMethod } from '../../container/App';
 
 interface IHeaderProps {
     groupBy: eGroupMethod;
-    handleGroupBy?: (groupBy: eGroupMethod) => void;
+    handleGroupBy: (groupBy: eGroupMethod) => void;
 }
 
 export function Header(props: IHeaderProps) {

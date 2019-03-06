@@ -3,7 +3,7 @@ import { NotificationTime } from './NotificationTime/NotificationTime';
 import { INotificationProps } from '../../models/INotificationProps';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
 import {Button} from '../Button/Button';
-import { NotificationTypes } from '../../../../shared/Models/NotificationTypes';
+import { NotificationTypes } from '../../../../shared/models/NotificationTypes';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 /**
