@@ -7,7 +7,7 @@ export enum eGroupMethod {
 
 export interface INotificationGroupProps {
     name: string;
-    notifications?: INotification[];
+    notifications: INotification[];
     groupBy?: eGroupMethod;
     id?: number;
 }

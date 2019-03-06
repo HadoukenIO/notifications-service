@@ -1,21 +1,14 @@
-import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
-
-import {CHANNEL_NAME} from '../../shared/config';
-import {Notification} from '../../shared/models/Notification';
-import {ISenderInfo} from '../models/ISenderInfo';
-
-import {WindowManager} from './js/openfin';
-import {INotification} from './models/INotification';
-import {NotificationCenterAPI, NotificationCenterEventMap} from './NotificationCenterAPI';
+import {render} from 'react-dom';
+import * as React from 'react';
+import {App} from './container/App';
+import { INotification } from '../models/INotification';
+import { ISenderInfo } from '../../models/ISenderInfo';
+import { CHANNEL_NAME } from '../../../shared/config';
+import { NotificationCenterAPI, NotificationCenterEventMap } from '../NotificationCenterAPI';
+import { ProviderIdentity } from 'openfin/_v2/api/interappbus/channel/channel';
+import { Notification } from '../../../shared/models/Notification';
 
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
-
-const IDENTITY = {
-    uuid: 'notifications-service',
-    name: 'Notifications-Service',
-    channelName: 'notifications-service'
-};
-
 
 fin.desktop.main(async () => {
     const opts = {payload: {version: 'center'}};
@@ -73,7 +66,7 @@ fin.desktop.main(async () => {
                 // Fetch all notifications for the center
                 const plugin = await pluginP;
                 const payload = {uuid};
-                const appNotifications = await plugin.dispatch('fetch-app-notifications', payload) as (Notification & ISenderInfo)[];
+                const appNotifications = await plugin.dispatch('fetch-app-notifications', payload) as (Notification&ISenderInfo)[];
                 appNotifications.forEach(n => {
                     n.date = new Date(n.date);
                 });
@@ -82,7 +75,7 @@ fin.desktop.main(async () => {
             fetchAllNotifications: async () => {
                 // Fetch all notifications for the center
                 const plugin = await pluginP;
-                const allNotifications = await plugin.dispatch('fetch-all-notifications', {}) as (Notification & ISenderInfo)[];
+                const allNotifications = await plugin.dispatch('fetch-all-notifications', {}) as (Notification&ISenderInfo)[];
                 allNotifications.forEach(n => {
                     n.date = new Date(n.date);
                 });
@@ -101,8 +94,7 @@ fin.desktop.main(async () => {
                 const success = await plugin.dispatch('clear-app-notifications', payload);
                 console.log('success', success);
             },
-            addEventListener<K extends keyof NotificationCenterEventMap>(
-                event: K, cb: (payload: NotificationCenterEventMap[K], sender: ProviderIdentity) => void) {
+            addEventListener<K extends keyof NotificationCenterEventMap>(event: K, cb: (payload: NotificationCenterEventMap[K], sender: ProviderIdentity) => void) {
                 if (event === 'notificationCreated') {
                     callbacks.notificationCreated = cb;
                 } else if (event === 'notificationCleared') {
@@ -118,19 +110,6 @@ fin.desktop.main(async () => {
     plugin.register('notification-created', (payload: INotification&ISenderInfo, sender: ProviderIdentity) => callbacks.notificationCreated(payload, sender));
     plugin.register('notification-cleared', (payload: INotification&ISenderInfo, sender: ProviderIdentity) => callbacks.notificationCleared(payload, sender));
     plugin.register('app-notifications-cleared', (payload: ISenderInfo, sender: ProviderIdentity) => callbacks.appNotificationsCleared(payload, sender));
-    plugin.register('all-notifications-cleared', allNotificationsCleared);
-    plugin.register('toggle-notification-center', toggleNotificationCenter);
 });
 
-function allNotificationsCleared(payload: ISenderInfo, sender: ProviderIdentity) {
-    // For testing/display purposes
-    console.log('allNotificationsCleared hit');
-    console.log('payload', payload);
-    console.log('sender', sender);
-    return 'allNotificationsCleared success';
-}
-
-function toggleNotificationCenter() {
-    WindowManager.instance.toggleWindow();
-    return 'toggleNotificationCenter success';
-}
+render(<App />, document.getElementById('toast-app'));

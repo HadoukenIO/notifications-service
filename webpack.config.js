@@ -119,10 +119,9 @@ module.exports = [
     createConfig(`${outputDir}/client`, './src/client/index.ts', {minify: true, isLibrary: true, libraryName: 'OpenFinNotifications', outputFilename: "openfin-notifications"}, versionPlugin),
     createConfig(`${outputDir}/provider`, './src/provider/index.ts', undefined, manifestPlugin),
     createConfig(`${outputDir}/provider/ui`, {
-        react: './src/provider/ui/js/index.tsx',
-        serviceui: './src/provider/ui/index.ts',
-        openfin: './src/provider/ui/js/openfin.ts',
-        toast: './src/provider/ui/js/toast/index.tsx'
+        serviceui: './src/provider/ui/index.tsx',
+        openfin: './src/provider/ui/openfin.ts',
+        toast: './src/provider/ui/toast/index.tsx'
     }),
     createConfig(`${outputDir}/demo`, {
         app: './src/demo/app.ts',
