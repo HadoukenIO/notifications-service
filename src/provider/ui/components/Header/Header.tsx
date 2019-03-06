@@ -2,7 +2,7 @@ import * as React from 'react';
 import { eGroupMethod } from '../../container/App';
 
 interface IHeaderProps {
-    groupBy?: eGroupMethod;
+    groupBy: eGroupMethod;
     handleGroupBy?: (groupBy: eGroupMethod) => void;
 }
 

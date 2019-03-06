@@ -1,5 +1,5 @@
-import {ISenderInfo} from '../Models/ISenderInfo';
-import {Notification} from '../../shared/Models/Notification';
+import {ISenderInfo} from '../models/ISenderInfo';
+import {Notification} from '../../shared/models/Notification';
 import {IToast} from './models/toast/IToast';
 
 import {WindowInfo} from './WindowInfo';
@@ -8,7 +8,7 @@ import {WindowInfo} from './WindowInfo';
  * @class ToastManager Handles all toasts
  */
 export class ToastManager {
-    private static singleton: ToastManager = null;
+    private static singleton: ToastManager;
 
     private toasts: IToast[] = [];
     private windowInfo: WindowInfo = WindowInfo.instance;
@@ -18,7 +18,7 @@ export class ToastManager {
             return ToastManager.singleton;
         }
 
-        window.addEventListener('WindowShowingUpdate', this.windowShowingEventHandler.bind(this));
+        window.addEventListener('WindowShowingUpdate', this.windowShowingEventHandler.bind(this) as (evt: Event) => void);
         ToastManager.singleton = this;
     }
 
@@ -54,7 +54,7 @@ export class ToastManager {
      * @method windowShowingEventHandler Handler for the WindowShowingUpdate Event
      * @param {CustomEvent} e
      */
-    private windowShowingEventHandler(e: CustomEvent): void {
+    private windowShowingEventHandler(e: CustomEvent<{showing: boolean}>): void {
         if (e.detail.showing) {
             this.closeAll();
         }

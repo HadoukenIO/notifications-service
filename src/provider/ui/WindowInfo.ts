@@ -3,7 +3,7 @@ declare var window: Window&fin.OpenFinWindow&{WindowInfo: WindowInfo};
 export class WindowInfo {
     private height: number = 0;
     private width: number = 0;
-    private window: fin.OpenFinWindow;
+    private window!: fin.OpenFinWindow;
     private idealHeight: number = 0;
     private idealWidth: number = 388;
     private isShowing: boolean = false;
@@ -18,6 +18,7 @@ export class WindowInfo {
 
         fin.desktop.System.addEventListener('monitor-info-changed', this.recalibrate.bind(this));
 
+        this.window = fin.desktop.Window.getCurrent();
         this.window.addEventListener('bounds-changed', this.recalibrate.bind(this));
         this.window.addEventListener('minimized', () => {
             this.setShowing(false);

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Toast } from '../components/Toast/Toast';
-import { ISenderInfo } from '../../../Models/ISenderInfo';
+import { ISenderInfo } from '../../../models/ISenderInfo';
 import {INotification} from '../../models/INotification';
 
 declare var window: Window & {
@@ -8,7 +8,7 @@ declare var window: Window & {
 };
 
 interface IToastAppState {
-    meta: INotification & ISenderInfo;
+    meta: (INotification & ISenderInfo)|null;
 }
 
 export class App extends React.Component<{}, IToastAppState> {

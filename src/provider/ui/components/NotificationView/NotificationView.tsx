@@ -3,10 +3,11 @@ import * as React from 'react';
 import * as moment from 'moment';
 import { NotificationGroup } from '../NotificationGroup/NotificationGroup';
 import { INotification } from '../../models/INotification';
-import { ISenderInfo } from '../../../Models/ISenderInfo';
+import { ISenderInfo } from '../../models/ISenderInfo';
 import { eGroupMethod } from '../../container/App';
 import { ToastManager } from '../../ToastManager';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
+
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 interface INotificationProps {
@@ -154,7 +155,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
     private formatNotificationsAppSorted( notifications: INotification[] ): INotificationGroup[] {
         const groupLookup: { [groupKey: string]: INotificationGroup } = {};
         const groups: INotificationGroup[] = [];
-        const groupMethod: eGroupMethod = this.props.groupBy;
+        const groupMethod: eGroupMethod = this.props.groupBy || eGroupMethod.APPLICATION;
 
         function getOrCreateGroup(
             groupName: string,
@@ -183,7 +184,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
             if (groupMethod === eGroupMethod.APPLICATION) {
                 return notification.name;
             } else if (groupMethod === eGroupMethod.DATE) {
-                return moment(notification.date).calendar(null, {
+                return moment(notification.date).calendar(undefined, {
                     sameDay: '[Today]',
                     nextDay: '[Tomorrow]',
                     nextWeek: 'dddd',
