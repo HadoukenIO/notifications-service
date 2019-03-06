@@ -1,141 +1,59 @@
-console.log('Client index.js loaded');
+import { tryServiceDispatch, eventEmitter } from "./connection";
+import { APITopic } from "./internal";
 
-import {CHANNEL_NAME} from '../shared/config';
 
-import {Notification} from '../shared/models/Notification';
-import {ISenderInfo} from '../provider/models/ISenderInfo';
-import {NotificationEvent} from '../shared/models/NotificationEvent';
-import {NotificationOptions} from './models/NotificationOptions';
-import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
-
-/**
- * The version of the NPM package.
- *
- * Webpack replaces any instances of this constant with a hard-coded string at build time.
- */
-declare const PACKAGE_VERSION: string;
-
-const IDENTITY = {
-    uuid: 'notifications-service',
-    name: 'Notifications-Service',
-    channelName: 'notifications-service'
-};
-
-// For testing/display purposes
-const notificationClicked = (payload: NotificationEvent, sender: ProviderIdentity) => {
-    console.log('notificationClicked hit');
-    console.log('payload', payload);
-    console.log('sender', sender);
-    return 'notificationClicked success';
-};
-
-// For testing/display purposes
-const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) => {
-    console.log('notificationButtonClicked hit');
-    console.log('payload', payload);
-    console.log('sender', sender);
-    return 'notificationClicked success';
-};
-
-// For testing/display purposes
-const notificationClosed = (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
-    console.log('notificationClosed hit');
-    console.log('payload', payload);
-    console.log('sender', sender);
-    return 'notificationClosed success';
-};
-
-const callbacks = {
-    notificationClicked,
-    notificationButtonClicked,
-    notificationClosed
-};
-
-async function createClientPromise() {
-    await new Promise((resolve, reject) => {
-        if (!fin) {
-            reject('fin is not defined, This module is only intended for use in an OpenFin application.');
-        }
-        fin.desktop.main(() => resolve());
-    });
-
-    try {
-        const opts = {payload: {version: PACKAGE_VERSION}};
-        const clientP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts).then((client) => {
-            // tslint:disable-next-line:no-any
-            client.register('WARN', (payload: any) => console.warn(payload));
-            client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
-                callbacks.notificationClicked(payload, sender);
-            });
-            client.register('notification-button-clicked', (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) => {
-                callbacks.notificationButtonClicked(payload, sender);
-            });
-            client.register('notification-closed', (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
-                callbacks.notificationClosed(payload, sender);
-            });
-            return client;
-        });
-        return clientP;
-    } catch (e) {
-        console.error(e);
-        throw e;
-    }
+export interface NotificationClickedEvent {
+    type: 'notification-clicked';
+    id: string;
+}
+export interface NotificationClosedEvent {
+    type: 'notification-closed';
+    id: string;
+}
+export interface NotificationButtonClickedEvent {
+    type: 'notification-button-clicked';
+    id: string;
+    button: any;
 }
 
-const clientP = createClientPromise();
+export type NotificationEvent = NotificationClickedEvent | NotificationClosedEvent | NotificationButtonClickedEvent;
 
-/**
- * @method create Creates a new notification
- * @param {string} id The id of the notification
- * @param {NotificationOptions} options notification options
- */
+export interface NotificationOptions {
+
+}
+
+export function addEventListener<K extends NotificationEvent>(eventType: K['type'], listener: (event: K) => void): void {
+    if (typeof fin === 'undefined') {
+        throw new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.');
+    }
+
+    eventEmitter.addListener(eventType, listener);
+}
+
+export function removeEventListener<K extends NotificationEvent>(eventType: K['type'], listener: (event: K) => void): void {
+    if (typeof fin === 'undefined') {
+        throw new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.');
+    }
+
+    eventEmitter.removeListener(eventType, listener);
+}
+
 export async function create(id: string, options: NotificationOptions) {
-    const plugin = await clientP;
-    const payload: Notification = Object.assign({}, {id}, options);
-    const notification = await plugin.dispatch('create-notification', payload);
-    return notification;
+    // Should have some sort of input validation here...
+    return tryServiceDispatch(APITopic.CREATE, {id, ...options});
 }
 
-/**
- * @method getAll get all notifications for this app
- */
-export async function getAll() {
-    const plugin = await clientP;
-    const appNotifications = await plugin.dispatch('fetch-app-notifications', {});
-    return appNotifications;
-}
-
-/**
- * @method clear clears a notification by it's ID
- * @param {string} id The id of the notification
- */
 export async function clear(id: string) {
-    const plugin = await clientP;
-    const payload = {id};
-    const result = await plugin.dispatch('clear-notification', payload);
-    return result;
+    // Should have some sort of input validation here...
+    return tryServiceDispatch(APITopic.CLEAR, {id});
 }
 
-/**
- * @method clearAll clears all notifications for an app
- */
+export async function getAll() {
+    // Should have some sort of input validation here...
+    return tryServiceDispatch(APITopic.GET_ALL, undefined);
+}
+
 export async function clearAll() {
-    const plugin = await clientP;
-    const result = await plugin.dispatch('clear-app-notifications');
-    return result;
-}
-
-/**
- * @method clearAll clears all notifications for an app
- * @param {string} evt the event name
- * @param {(payload: NotificationEvent, sender: ISenderInfo) => string)} cb event handler callback
- */
-export async function addEventListener(evt: string, cb: (payload: NotificationEvent, sender: ProviderIdentity) => string) {
-    if (evt === 'click') {
-        callbacks.notificationClicked = cb;
-    } else if (evt === 'close') {
-        callbacks.notificationClosed = cb;
-    } else if (evt === 'button-click') {
-        callbacks.notificationButtonClicked = cb;
-    }
+    // Should have some sort of input validation here...
+    return tryServiceDispatch(APITopic.CLEAR_ALL, undefined);
 }
