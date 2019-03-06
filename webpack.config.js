@@ -99,7 +99,7 @@ const manifestPlugin = new CopyWebpackPlugin([{
             config.startup_app.autoShow = false;
         } else {
             console.warn("Using 'npm run build' (or build:dev) when running locally. Can debug without building first by running 'npm start'.");
-            config.startup_app.url = 'http://localhost:1337/provider/provider.html';
+            config.startup_app.url = 'http://localhost:3922/provider/provider.html';
         }
 
         return JSON.stringify(config, null, 4);
