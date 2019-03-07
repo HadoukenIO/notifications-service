@@ -1,5 +1,6 @@
 import { tryServiceDispatch, eventEmitter } from "./connection";
 import { APITopic } from "./internal";
+import { Notification } from '../shared/models/Notification';
 
 
 export interface NotificationClickedEvent {
@@ -13,15 +14,14 @@ export interface NotificationClosedEvent {
 export interface NotificationButtonClickedEvent {
     type: 'notification-button-clicked';
     id: string;
-    // tslint:disable-next-line:no-any Need to work out exactly what the shape of the returned data will be in this case
+    // tslint:disable-next-line:no-any TODO: work out exactly what the shape of the returned data will be in this case
     button: any;
 }
 
 export type NotificationEvent = NotificationClickedEvent | NotificationClosedEvent | NotificationButtonClickedEvent;
 
-export interface NotificationOptions {
-
-}
+// TODO: This should be revisited when the provider-side types have been made more sensible
+export type NotificationOptions = Partial<Notification>;
 
 export function addEventListener<K extends NotificationEvent>(eventType: K['type'], listener: (event: K) => void): void {
     if (typeof fin === 'undefined') {
