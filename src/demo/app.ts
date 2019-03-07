@@ -73,7 +73,9 @@ fin.desktop.main(async () => {
             //     ${notifications.value.length} notifications received from the
             //     Notification Center!
             // `
-            logit(`${notifications.length} notifications received from the Notification Center`);
+            if(notifications.success) {
+                logit(`${notifications.value.length} notifications received from the Notification Center`);
+            }
         });
     });
 

@@ -9,6 +9,9 @@
  * This file is excluded from the public-facing TypeScript documentation.
  */
 import {NotificationOptions} from './index';
+import {VoidResult, ReturnResult} from '../shared/models/Result';
+import {Notification} from '../shared/models/Notification';
+import {ISenderInfo} from '../provider/models/ISenderInfo';
 
 /**
  * The identity of the main application window of the service provider
@@ -32,7 +35,6 @@ export const enum APITopic {
 
 export type CreatePayload = {id: string;} & NotificationOptions;
 
-
 export interface ClearPayload {
     id: string;
 }
@@ -45,8 +47,8 @@ export interface TopicPayloadMap {
 }
 
 export interface TopicResponseMap {
-    [APITopic.CREATE]: void;
-    [APITopic.CLEAR]: void;
-    [APITopic.CLEAR_ALL]: void;
-    [APITopic.GET_ALL]: NotificationOptions[];
+    [APITopic.CREATE]: ReturnResult<Notification&ISenderInfo>;
+    [APITopic.CLEAR]: VoidResult;
+    [APITopic.CLEAR_ALL]: string;
+    [APITopic.GET_ALL]: ReturnResult<(Notification&ISenderInfo)[]>;
 }

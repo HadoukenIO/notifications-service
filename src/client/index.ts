@@ -13,6 +13,7 @@ export interface NotificationClosedEvent {
 export interface NotificationButtonClickedEvent {
     type: 'notification-button-clicked';
     id: string;
+    // tslint:disable-next-line:no-any Need to work out exactly what the shape of the returned data will be in this case
     button: any;
 }
 
