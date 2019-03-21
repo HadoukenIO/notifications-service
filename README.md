@@ -52,7 +52,7 @@ NotificationOptions {
 ```
 
 ## Roadmap
-This is a WIP. Items on our immediate roadmap include:
+Items on our immediate roadmap include:
 - Support for buttons/links
 - Inline reply
 - Configuration
