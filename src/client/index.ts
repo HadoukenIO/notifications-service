@@ -2,9 +2,9 @@ console.log('Client index.js loaded');
 
 import {CHANNEL_NAME} from '../shared/config';
 
-import {Notification} from '../shared/models/Notification';
+import {Notification} from './models/Notification';
 import {ISenderInfo} from '../provider/models/ISenderInfo';
-import {NotificationEvent} from '../shared/models/NotificationEvent';
+import {NotificationEvent} from './models/NotificationEvent';
 import {NotificationOptions} from './models/NotificationOptions';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 

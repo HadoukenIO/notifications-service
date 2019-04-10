@@ -1,4 +1,4 @@
-import {Notification} from '../../../shared/models/Notification';
+import {Notification} from '../../../client/models/Notification';
 
 export interface INotification extends Notification {
     name: string;

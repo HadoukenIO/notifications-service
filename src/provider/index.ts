@@ -2,9 +2,9 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
 import {CHANNEL_NAME} from '../shared/config';
-import {Notification} from '../shared/models/Notification';
-import {NotificationEvent} from '../shared/models/NotificationEvent';
-import {NotificationTypes, TypeResolver} from '../shared/models/NotificationTypes';
+import {Notification, NotificationTypes} from '../client/models/Notification';
+import {NotificationEvent} from '../client/models/NotificationEvent';
+import {TypeResolver} from '../shared/models/NotificationTypes';
 
 import {ISenderInfo} from './models/ISenderInfo';
 import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';
@@ -92,14 +92,14 @@ async function registerService() {
 }
 
 // Send notification created to the UI
-const dispatchNotificationCreated = async (payload: Notification&ISenderInfo) => {
+const dispatchNotificationCreated = async (payload: Notification & ISenderInfo) => {
     const providerChannelPlugin = await providerChannel;
     const success = await providerChannelPlugin.dispatch(centerIdentity, 'notification-created', payload);
     console.log('success', success);
 };
 
 // Send notification cleared to the UI
-const dispatchNotificationCleared = async (payload: Notification&ISenderInfo) => {
+const dispatchNotificationCleared = async (payload: Notification & ISenderInfo) => {
     const providerChannelPlugin = await providerChannel;
     const success = await providerChannelPlugin.dispatch(centerIdentity, 'notification-cleared', payload);
     console.log('success', success);
@@ -121,7 +121,7 @@ const dispatchNotificationClicked = async (payload: NotificationEvent) => {
 };
 
 // Send notification clicked to the Client
-const dispatchNotificationButtonClicked = async (payload: Notification&ISenderInfo&{buttonIndex: number}) => {
+const dispatchNotificationButtonClicked = async (payload: Notification & ISenderInfo & {buttonIndex: number}) => {
     const providerChannelPlugin = await providerChannel;
     const clientIdentity = {name: payload.name, uuid: payload.uuid, channelId: '', channelName: ''};
     const success = await providerChannelPlugin.dispatch(clientIdentity, 'notification-button-clicked', payload);
@@ -153,7 +153,7 @@ const dispatchToggleNotificationCenter = async (payload: undefined) => {
  * Encodes the Id which currently is the uuid:id
  * @param payload The notification object
  */
-function encodeID(payload: Notification&ISenderInfo|NotificationEvent|{id: string}&ISenderInfo): string {
+function encodeID(payload: Notification & ISenderInfo | NotificationEvent | {id: string} & ISenderInfo): string {
     return `${payload.uuid}:${payload.id}`;
 }
 
@@ -161,7 +161,7 @@ function encodeID(payload: Notification&ISenderInfo|NotificationEvent|{id: strin
  * @method decodeID This function retrieves the notification Id
  * @param payload The notification object
  */
-function decodeID(payload: Notification&ISenderInfo|NotificationEvent|{id: string}&ISenderInfo): string {
+function decodeID(payload: Notification & ISenderInfo | NotificationEvent | {id: string} & ISenderInfo): string {
     return payload.id.slice(payload.uuid.length + 1);
 }
 
@@ -180,10 +180,10 @@ async function createNotification(payload: Notification, sender: ProviderIdentit
     testDisplay('createNotification', payload, sender);
 
     const noteType: NotificationTypes = TypeResolver(payload);
-    const fullPayload: Notification&ISenderInfo = Object.assign({}, payload, sender as ISenderInfo, {type: noteType});
+    const fullPayload: Notification & ISenderInfo = Object.assign({}, payload, sender as ISenderInfo, {type: noteType});
     const encodedID: string = encodeID(fullPayload);
 
-    const fullPayloadEncoded: Notification&ISenderInfo = Object.assign({}, fullPayload, {id: encodedID});
+    const fullPayloadEncoded: Notification & ISenderInfo = Object.assign({}, fullPayload, {id: encodedID});
 
     // Manipulate notification data store
     const result = await historyRepository.create(fullPayloadEncoded);
@@ -235,7 +235,7 @@ async function clearNotification(payload: Notification, sender: ProviderIdentity
         return 'ERROR: Must supply a notification ID to clear!';
     }
 
-    const fullPayload: Notification&ISenderInfo = Object.assign({}, payload, sender as ISenderInfo);
+    const fullPayload: Notification & ISenderInfo = Object.assign({}, payload, sender as ISenderInfo);
     const encodedID: string = encodeID(fullPayload);
 
     // Delete notification from indexeddb
@@ -254,7 +254,7 @@ async function clearNotification(payload: Notification, sender: ProviderIdentity
  * @param {object} payload Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
  * @param {object} sender UI Window info. Not important.
  */
-function notificationClicked(payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) {
+function notificationClicked(payload: NotificationEvent & ISenderInfo, sender: ProviderIdentity) {
     // For testing/display purposes
     console.log('notificationClicked hit');
 
@@ -271,7 +271,7 @@ function notificationClicked(payload: NotificationEvent&ISenderInfo, sender: Pro
 }
 
 
-function notificationButtonClicked(payload: Notification&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) {
+function notificationButtonClicked(payload: Notification & ISenderInfo & {buttonIndex: number}, sender: ProviderIdentity) {
     // For testing/display purposes
     console.log('notificationButtonClicked hit');
 
@@ -293,7 +293,7 @@ function notificationButtonClicked(payload: Notification&ISenderInfo&{buttonInde
  * @param {object} payload Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
  * @param {object} sender UI Window info. Not important.
  */
-async function notificationClosed(payload: Notification&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) {
+async function notificationClosed(payload: Notification & ISenderInfo & {buttonIndex: number}, sender: ProviderIdentity) {
     // For testing/display purposes
     console.log('notificationClosed hit');
 
@@ -439,7 +439,7 @@ function clearAppNotifications(payload: {uuid: string}, sender: ProviderIdentity
  * @param {Notification} payload The notification payload
  * @param {ISenderInfo} sender The sender info
  */
-function testDisplay(action: string, payload: Notification|NotificationEvent|{uuid: string}, sender: ProviderIdentity) {
+function testDisplay(action: string, payload: Notification | NotificationEvent | {uuid: string}, sender: ProviderIdentity) {
     document.body.innerHTML = '';
     document.body.innerHTML += `${action} hit <br></br>`;
     document.body.innerHTML += 'PAYLOAD <br></br>';

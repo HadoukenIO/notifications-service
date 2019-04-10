@@ -1,5 +1,4 @@
 import {Entity} from './Entity';
-import {NotificationTypes} from './NotificationTypes';
 import {OptionButton} from './OptionButton';
 import {OptionInput} from './OptionInput';
 
@@ -8,6 +7,12 @@ import {OptionInput} from './OptionInput';
  */
 export type NotificationContext = any;  // tslint:disable-line:no-any
 
+export enum NotificationTypes {
+    DEFAULT = 'DEFAULT',
+    BUTTON = 'BUTTON',
+    INLINE = 'INLINE',
+    INLINEBUTTON = 'INLINEBUTTON'
+}
 /**
  * @description Interface for notification options
  */

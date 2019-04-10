@@ -3,7 +3,7 @@ import {render} from 'react-dom';
 import {ISenderInfo} from '../models/ISenderInfo';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {CHANNEL_NAME} from '../../shared/config';
-import {Notification} from '../../shared/models/Notification';
+import {Notification} from '../../client/models/Notification';
 import {WindowManager} from './openfin';
 import {INotification} from './models/INotification';
 import {NotificationCenterAPI, NotificationCenterEventMap} from './NotificationCenterAPI';

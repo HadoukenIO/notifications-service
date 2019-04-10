@@ -1,4 +1,4 @@
-﻿import {Entity} from '../../../shared/models/Entity';
+﻿import {Entity} from '../../../client/models/Entity';
 import {ITable} from '../models/ITable';
 import {PageInfo} from '../models/PageInfo';
 import {Sorts} from '../models/Sort';

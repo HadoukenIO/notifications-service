@@ -1,6 +1,6 @@
 import {ISenderInfo} from '../../../../provider/models/ISenderInfo';
-import {Notification} from '../../../../shared/models/Notification';
-import {ReturnResult, VoidResult} from '../../../../shared/models/Result';
+import {Notification} from '../../../../client/models/Notification';
+import {ReturnResult, VoidResult} from '../../../models/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
 
