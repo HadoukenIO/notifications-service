@@ -1,7 +1,7 @@
-import {Notification} from '../../../../client/models/Notification';
-import {ISenderInfo} from '../../../models/ISenderInfo';
+import {Notification, SenderInfo} from '../../../../client/models/Notification';
+
 
 export interface IToast {
     note: fin.OpenFinNotification;
-    meta: Notification&ISenderInfo;
+    meta: Notification & SenderInfo;
 }

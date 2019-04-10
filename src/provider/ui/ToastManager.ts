@@ -1,5 +1,4 @@
-import {ISenderInfo} from '../models/ISenderInfo';
-import {Notification} from '../../client/models/Notification';
+import {Notification, SenderInfo} from '../../client/models/Notification';
 import {IToast} from './models/toast/IToast';
 
 import {WindowInfo} from './WindowInfo';
@@ -27,7 +26,7 @@ export class ToastManager {
      * @param {INotification} meta Notification Information
      * @param {boolean} force Force show a notification, regardless of window showing or not
      */
-    public create(meta: Notification&ISenderInfo, force: boolean = false) {
+    public create(meta: Notification & SenderInfo, force: boolean = false) {
         if (!force) {
             if (this.windowInfo.getShowingStatus()) {
                 return;

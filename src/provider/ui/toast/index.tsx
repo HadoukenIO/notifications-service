@@ -2,11 +2,11 @@ import {render} from 'react-dom';
 import * as React from 'react';
 import {App} from './container/App';
 import { INotification } from '../models/INotification';
-import { ISenderInfo } from '../../models/ISenderInfo';
-import { CHANNEL_NAME } from '../../../shared/config';
+
+import { CHANNEL_NAME } from '../../../client/models/config';
 import { NotificationCenterAPI, NotificationCenterEventMap } from '../NotificationCenterAPI';
 import { ProviderIdentity } from 'openfin/_v2/api/interappbus/channel/channel';
-import { Notification } from '../../../client/models/Notification';
+import { Notification, SenderInfo } from '../../../client/models/Notification';
 
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
@@ -14,7 +14,7 @@ fin.desktop.main(async () => {
     const opts = {payload: {version: 'center'}};
     const pluginP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts);
 
-    function notificationCreated(payload: INotification&ISenderInfo, sender: ProviderIdentity) {
+    function notificationCreated(payload: INotification&SenderInfo, sender: ProviderIdentity) {
         // For testing/display purposes
         console.log('notificationCreated hit');
         console.log('payload', payload);
@@ -22,7 +22,7 @@ fin.desktop.main(async () => {
         return 'notificationCreated success';
     }
 
-    function notificationCleared(payload: INotification&ISenderInfo, sender: ProviderIdentity) {
+    function notificationCleared(payload: INotification&SenderInfo, sender: ProviderIdentity) {
         // For testing/display purposes
         console.log('notificationCleared hit');
         console.log('payload', payload);
@@ -30,7 +30,7 @@ fin.desktop.main(async () => {
         return 'notificationCleared success';
     }
 
-    function appNotificationsCleared(payload: ISenderInfo, sender: ProviderIdentity) {
+    function appNotificationsCleared(payload: SenderInfo, sender: ProviderIdentity) {
         // For testing/display purposes
         console.log('appNotificationsCleared hit');
         console.log('payload', payload);
@@ -66,7 +66,7 @@ fin.desktop.main(async () => {
                 // Fetch all notifications for the center
                 const plugin = await pluginP;
                 const payload = {uuid};
-                const appNotifications = await plugin.dispatch('fetch-app-notifications', payload) as (Notification&ISenderInfo)[];
+                const appNotifications = await plugin.dispatch('fetch-app-notifications', payload) as (Notification&SenderInfo)[];
                 appNotifications.forEach(n => {
                     n.date = new Date(n.date);
                 });
@@ -75,7 +75,7 @@ fin.desktop.main(async () => {
             fetchAllNotifications: async () => {
                 // Fetch all notifications for the center
                 const plugin = await pluginP;
-                const allNotifications = await plugin.dispatch('fetch-all-notifications', {}) as (Notification&ISenderInfo)[];
+                const allNotifications = await plugin.dispatch('fetch-all-notifications', {}) as (Notification&SenderInfo)[];
                 allNotifications.forEach(n => {
                     n.date = new Date(n.date);
                 });
@@ -107,9 +107,9 @@ fin.desktop.main(async () => {
     };
 
     const plugin = await pluginP;
-    plugin.register('notification-created', (payload: INotification&ISenderInfo, sender: ProviderIdentity) => callbacks.notificationCreated(payload, sender));
-    plugin.register('notification-cleared', (payload: INotification&ISenderInfo, sender: ProviderIdentity) => callbacks.notificationCleared(payload, sender));
-    plugin.register('app-notifications-cleared', (payload: ISenderInfo, sender: ProviderIdentity) => callbacks.appNotificationsCleared(payload, sender));
+    plugin.register('notification-created', (payload: INotification&SenderInfo, sender: ProviderIdentity) => callbacks.notificationCreated(payload, sender));
+    plugin.register('notification-cleared', (payload: INotification&SenderInfo, sender: ProviderIdentity) => callbacks.notificationCleared(payload, sender));
+    plugin.register('app-notifications-cleared', (payload: SenderInfo, sender: ProviderIdentity) => callbacks.appNotificationsCleared(payload, sender));
 });
 
 render(<App />, document.getElementById('toast-app'));

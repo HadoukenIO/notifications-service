@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { NotificationTime } from './NotificationTime/NotificationTime';
-import { INotificationProps } from '../../models/INotificationProps';
+import {NotificationTime} from './NotificationTime/NotificationTime';
+import {INotificationProps} from '../../models/INotificationProps';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
 import {Button} from '../Button/Button';
-import { NotificationTypes } from '../../../../shared/models/NotificationTypes';
-declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
+import {NotificationTypes} from '../../../../client/models/Notification';
+declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 /**
  * Displays a single notification within the UI
@@ -59,7 +59,7 @@ export function Notification(props: INotificationProps) {
                 <div className="notification-body-text">
                     {props.meta.body}
                 </div>
-                { buttons ? ( <div id="notification-body-buttons">{buttons}</div> ) : null }
+                {buttons ? (<div id="notification-body-buttons">{buttons}</div>) : null}
             </div>
         </li>
     );

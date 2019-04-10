@@ -1,11 +1,9 @@
 console.log('Client index.js loaded');
 
-import {CHANNEL_NAME} from '../shared/config';
+import {CHANNEL_NAME} from './models/config';
 
-import {Notification} from './models/Notification';
-import {ISenderInfo} from '../provider/models/ISenderInfo';
-import {NotificationEvent} from './models/NotificationEvent';
-import {NotificationOptions} from './models/NotificationOptions';
+import {Notification, NotificationEvent} from './models/Notification';
+import {ISenderInfo} from './models/ISenderInfo';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
 /**
@@ -30,7 +28,7 @@ const notificationClicked = (payload: NotificationEvent, sender: ProviderIdentit
 };
 
 // For testing/display purposes
-const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) => {
+const notificationButtonClicked = (payload: NotificationEvent & ISenderInfo & {buttonIndex: number}, sender: ProviderIdentity) => {
     console.log('notificationButtonClicked hit');
     console.log('payload', payload);
     console.log('sender', sender);
@@ -38,7 +36,7 @@ const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{butto
 };
 
 // For testing/display purposes
-const notificationClosed = (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
+const notificationClosed = (payload: NotificationEvent & ISenderInfo, sender: ProviderIdentity) => {
     console.log('notificationClosed hit');
     console.log('payload', payload);
     console.log('sender', sender);
@@ -64,13 +62,13 @@ async function createClientPromise() {
         const clientP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts).then((client) => {
             // tslint:disable-next-line:no-any
             client.register('WARN', (payload: any) => console.warn(payload));
-            client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
+            client.register('notification-clicked', (payload: NotificationEvent & ISenderInfo, sender: ProviderIdentity) => {
                 callbacks.notificationClicked(payload, sender);
             });
-            client.register('notification-button-clicked', (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) => {
+            client.register('notification-button-clicked', (payload: NotificationEvent & ISenderInfo & {buttonIndex: number}, sender: ProviderIdentity) => {
                 callbacks.notificationButtonClicked(payload, sender);
             });
-            client.register('notification-closed', (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
+            client.register('notification-closed', (payload: NotificationEvent & ISenderInfo, sender: ProviderIdentity) => {
                 callbacks.notificationClosed(payload, sender);
             });
             return client;
@@ -91,7 +89,7 @@ const clientP = createClientPromise();
  */
 export async function create(id: string, options: NotificationOptions) {
     const plugin = await clientP;
-    const payload: Notification = Object.assign({}, {id}, options);
+    const payload: Notification = Object.assign({}, {id}, options) as Notification;
     const notification = await plugin.dispatch('create-notification', payload);
     return notification;
 }

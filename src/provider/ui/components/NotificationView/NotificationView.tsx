@@ -1,14 +1,14 @@
 import * as React from 'react';
 
 import * as moment from 'moment';
-import { NotificationGroup } from '../NotificationGroup/NotificationGroup';
-import { INotification } from '../../models/INotification';
-import { ISenderInfo } from '../../../models/ISenderInfo';
-import { eGroupMethod } from '../../container/App';
-import { ToastManager } from '../../ToastManager';
+import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
+import {INotification} from '../../models/INotification';
+import {eGroupMethod} from '../../container/App';
+import {ToastManager} from '../../ToastManager';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
+import {SenderInfo} from '../../../../client/models/Notification';
 
-declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
+declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 interface INotificationProps {
     groupBy?: eGroupMethod;
@@ -58,17 +58,17 @@ export class NotificationView extends React.Component<INotificationProps, INotif
 
     constructor(props: INotificationProps) {
         super(props);
-        this.state = { notifications: [] };
+        this.state = {notifications: []};
     }
 
     public componentDidMount(): void {
         fin.desktop.main(async () => {
             const allNotifications = await window.openfin.notifications.fetchAllNotifications();
-            this.setState({ notifications: allNotifications });
+            this.setState({notifications: allNotifications});
 
             window.openfin.notifications.addEventListener(
                 'notificationCreated',
-                (payload: INotification & ISenderInfo):string => {
+                (payload: INotification & SenderInfo): string => {
                     const notifications: INotification[] = this.state.notifications.slice(),
                         index: number = notifications.findIndex(
                             (notification: INotification) =>
@@ -82,7 +82,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
                                 date: new Date(payload.date)
                             })
                         );
-                        this.setState({ notifications });
+                        this.setState({notifications});
                     } else {
                         // TODO: Harden messaging within provider so that this can't
                         // happen. To reproduce issue, hit 'create' button twice in
@@ -99,7 +99,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
 
             window.openfin.notifications.addEventListener(
                 'notificationCleared',
-                (payload: { id: string } & ISenderInfo):string => {
+                (payload: {id: string} & SenderInfo): string => {
                     const notifications: INotification[] = this.state.notifications.slice();
                     const index: number = notifications.findIndex(
                         (notification: INotification) =>
@@ -109,7 +109,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
 
                     if (index >= 0) {
                         notifications.splice(index, 1);
-                        this.setState({ notifications });
+                        this.setState({notifications});
                     } else {
                         console.warn(
                             "A notification was cleared, but couldn't find it within the list of active notifications"
@@ -121,11 +121,11 @@ export class NotificationView extends React.Component<INotificationProps, INotif
 
             window.openfin.notifications.addEventListener(
                 'appNotificationsCleared',
-                (payload: { uuid: string }): string => {
+                (payload: {uuid: string}): string => {
                     const newNotifications: INotification[] = this.state.notifications.filter(
                         notification => notification.uuid !== payload.uuid
                     );
-                    this.setState({ notifications: newNotifications });
+                    this.setState({notifications: newNotifications});
                     return '';
                 }
             );
@@ -152,8 +152,8 @@ export class NotificationView extends React.Component<INotificationProps, INotif
      * @private
      * @returns Array<NotificationGroup>
      */
-    private formatNotificationsAppSorted( notifications: INotification[] ): INotificationGroup[] {
-        const groupLookup: { [groupKey: string]: INotificationGroup } = {};
+    private formatNotificationsAppSorted(notifications: INotification[]): INotificationGroup[] {
+        const groupLookup: {[groupKey: string]: INotificationGroup} = {};
         const groups: INotificationGroup[] = [];
         const groupMethod: eGroupMethod = this.props.groupBy || eGroupMethod.APPLICATION;
 

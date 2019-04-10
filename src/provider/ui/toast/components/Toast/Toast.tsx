@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { ISenderInfo } from '../../../../models/ISenderInfo';
+
 import {INotification} from '../../../models/INotification';
 import {NotificationCenterAPI} from '../../../NotificationCenterAPI';
+import {SenderInfo} from '../../../../../client/models/Notification';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 interface IToastProps {
-    meta: INotification & ISenderInfo;
+    meta: INotification & SenderInfo;
 }
 
 const enum ClickEvents {
