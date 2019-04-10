@@ -1,7 +1,11 @@
 import {Notification, SenderInfo} from '../../client/models/Notification';
-import {IToast} from './models/toast/IToast';
-
 import {WindowInfo} from './WindowInfo';
+
+interface Toast {
+    note: fin.OpenFinNotification;
+    meta: Notification & SenderInfo;
+}
+
 
 /**
  * @class ToastManager Handles all toasts
@@ -9,7 +13,7 @@ import {WindowInfo} from './WindowInfo';
 export class ToastManager {
     private static singleton: ToastManager;
 
-    private toasts: IToast[] = [];
+    private toasts: Toast[] = [];
     private windowInfo: WindowInfo = WindowInfo.instance;
 
     constructor() {
@@ -35,7 +39,7 @@ export class ToastManager {
 
         const note: fin.OpenFinNotification = new fin.desktop.Notification({url: 'Toast.html', message: meta});
 
-        const toast: IToast = {note, meta};
+        const toast: Toast = {note, meta};
         this.toasts.push(toast);
     }
 
