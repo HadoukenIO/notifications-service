@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Toast } from './Toast';
+import { Toast } from '../components/Toast/Toast';
 import { ISenderInfo } from '../../../models/ISenderInfo';
 import {INotification} from '../../models/INotification';
 
