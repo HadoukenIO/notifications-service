@@ -6,14 +6,14 @@
   "types": "dist/client/index.d.ts",
   "scripts": {
     "test": "jest",
-    "check": "gts check",
-    "fix": "gts fix",
-    "clean": "gts clean",
+    "check": "svc-tools check",
+    "fix": "svc-tools fix",
+    "clean": "rimraf gen dist",
     "docs": "typedoc --name \"OpenFin Notifications\" --out ./dist/docs --excludeNotExported --excludePrivate --excludeProtected --hideGenerator --tsconfig src/client/tsconfig.json --readme none",
     "posttest": "npm run check",
-    "build": "webpack --mode production",
-    "build:dev": "webpack --mode development",
-    "start": "node server.js"
+    "build": "svc-tools build --mode production",
+    "build:dev": "svc-tools build --mode development",
+    "start": "svc-tools start"
   },
   "repository": {
     "type": "git",
@@ -42,8 +42,10 @@
     "jest": "^22.4.2",
     "jest-util": "^23.4.0",
     "moment": "^2.22.1",
+    "openfin-service-tooling": "^1.0.4",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
+    "rimraf": "^2.6.3",
     "style-loader": "^0.21.0",
     "ts-jest": "^23.10.4",
     "ts-loader": "^4.4.2",
