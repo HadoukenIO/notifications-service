@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { eGroupMethod } from '../../container/App';
+import {GroupByType} from '../../NotificationCenterApp';
 
-interface IHeaderProps {
-    groupBy: eGroupMethod;
-    handleGroupBy: (groupBy: eGroupMethod) => void;
+interface HeaderProps {
+    groupBy: GroupByType;
+    handleGroupBy: (groupBy: GroupByType) => void;
 }
 
-export function Header(props: IHeaderProps) {
+export function Header(props: HeaderProps) {
     return (
         <div id="header">
             <div className="sort-buttons">
@@ -14,7 +14,7 @@ export function Header(props: IHeaderProps) {
                 <div
                     className="sort-button"
                     onClick={() =>
-                        props.handleGroupBy(eGroupMethod.APPLICATION)
+                        props.handleGroupBy(GroupByType.APPLICATION)
                     }
                 >
                     APPLICATION
@@ -22,7 +22,7 @@ export function Header(props: IHeaderProps) {
                 <div
                     className="sort-button"
                     onClick={() =>
-                        props.handleGroupBy(eGroupMethod.DATE)
+                        props.handleGroupBy(GroupByType.DATE)
                     }
                 >
                     DATE

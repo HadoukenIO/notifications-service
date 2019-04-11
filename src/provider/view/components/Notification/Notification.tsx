@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {NotificationTime} from './NotificationTime/NotificationTime';
+import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {NotificationCenterAPI} from '../../../models/NotificationCenterAPI';
 import {Button} from '../Button/Button';
 import {NotificationTypes} from '../../../../client/models/Notification';

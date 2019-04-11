@@ -1,9 +1,9 @@
-import {WindowManager} from '../view/openfin';
+import {WindowManager} from './WindowManager';
 import {WindowInfo} from './WindowInfo';
 
-declare var window: Window&{createWindow: () => fin.OpenFinWindow};
+declare var window: Window & {createWindow: () => fin.OpenFinWindow};
 
-interface IClickInfo {
+interface ClickInfo {
     button: number;
     x: number;
     y: number;
@@ -53,7 +53,7 @@ export class TrayMenu {
      * @returns void
      * @param clickInfo
      */
-    public clickHandler(clickInfo: IClickInfo): void {
+    public clickHandler(clickInfo: ClickInfo): void {
         if (clickInfo.button === 0) {
             // left click
             if (WindowInfo.instance.getShowingStatus()) {

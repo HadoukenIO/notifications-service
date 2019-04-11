@@ -1,5 +1,5 @@
-import {TrayMenu} from '../controller/TrayMenu';
-import {WindowInfo} from '../controller/WindowInfo';
+import {TrayMenu} from './TrayMenu';
+import {WindowInfo} from './WindowInfo';
 
 declare var window: Window&{WindowManager: WindowManager};
 

@@ -2,10 +2,11 @@ import {CHANNEL_NAME} from '../../client/models/config';
 import {INotification, SenderInfo} from '../../client/models/Notification';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {NotificationCenterEventMap, NotificationCenterAPI} from '../models/NotificationCenterAPI';
+import {WindowManager} from '../controller/WindowManager';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
-export function setup(){
+export function setup(isNotificationCenter?: boolean) {
   fin.desktop.main(async () => {
     const opts = {payload: {version: 'center'}};
     const pluginP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts);
@@ -62,7 +63,7 @@ export function setup(){
           // Fetch all notifications for the center
           const plugin = await pluginP;
           const payload = {uuid};
-          const appNotifications = await plugin.dispatch('fetch-app-notifications', payload) as (Notification & SenderInfo)[];
+          const appNotifications = await plugin.dispatch('fetch-app-notifications', payload) as (INotification & SenderInfo)[];
           appNotifications.forEach(n => {
             n.date = new Date(n.date);
           });
@@ -71,7 +72,7 @@ export function setup(){
         fetchAllNotifications: async () => {
           // Fetch all notifications for the center
           const plugin = await pluginP;
-          const allNotifications = await plugin.dispatch('fetch-all-notifications', {}) as (Notification & SenderInfo)[];
+          const allNotifications = await plugin.dispatch('fetch-all-notifications', {}) as (INotification & SenderInfo)[];
           allNotifications.forEach(n => {
             n.date = new Date(n.date);
           });
@@ -106,5 +107,25 @@ export function setup(){
     plugin.register('notification-created', (payload: INotification & SenderInfo, sender: ProviderIdentity) => callbacks.notificationCreated(payload, sender));
     plugin.register('notification-cleared', (payload: INotification & SenderInfo, sender: ProviderIdentity) => callbacks.notificationCleared(payload, sender));
     plugin.register('app-notifications-cleared', (payload: SenderInfo, sender: ProviderIdentity) => callbacks.appNotificationsCleared(payload, sender));
+
+    if (isNotificationCenter) {
+      plugin.register('all-notifications-cleared', allNotificationsCleared);
+      plugin.register('toggle-notification-center', toggleNotificationCenter);
+    }
   });
+
+
+  function allNotificationsCleared(payload: SenderInfo, sender: ProviderIdentity) {
+    // For testing/display purposes
+    console.log('allNotificationsCleared hit');
+    console.log('payload', payload);
+    console.log('sender', sender);
+    return 'allNotificationsCleared success';
+  }
+
+  function toggleNotificationCenter() {
+    WindowManager.instance.toggleWindow();
+    return 'toggleNotificationCenter success';
+  }
+
 }

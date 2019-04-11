@@ -1,8 +1,10 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 
 import {Header} from './components/Header/Header';
 import {NotificationView} from './components/NotificationView/NotificationView';
 import {Footer} from './components/Footer/Footer';
+import {setup} from './setup';
 
 interface AppState {
     groupBy: GroupByType;
@@ -24,6 +26,10 @@ export class NotificationCenterApp extends React.Component<{}, AppState> {
         };
     }
 
+    public componentWillMount() {
+        setup(true);
+    }
+
     public render(): JSX.Element {
         return (
             <div>
@@ -41,3 +47,6 @@ export class NotificationCenterApp extends React.Component<{}, AppState> {
         this.setState(Object.assign({}, this.state, {groupBy}));
     }
 }
+
+
+ReactDOM.render(<NotificationCenterApp />, document.getElementById('react-app'));

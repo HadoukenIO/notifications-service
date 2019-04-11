@@ -45,8 +45,8 @@ function createConfig(outPath, entryPoint, options, ...plugins) {
                     test: /\.css$/,
                     loader: 'css-loader',
                     query: {
-                      modules: true,
-                      localIdentName: '[name]__[local]___[hash:base64:5]'
+                        modules: true,
+                        localIdentName: '[name]__[local]___[hash:base64:5]'
                     }
                 },
                 {
@@ -112,16 +112,16 @@ const manifestPlugin = new CopyWebpackPlugin([{
  * 
  * This embeds the package version into the source file as a string constant.
  */
-const versionPlugin = new webpack.DefinePlugin({PACKAGE_VERSION: `'${version}'`});
+const versionPlugin = new webpack.DefinePlugin({ PACKAGE_VERSION: `'${version}'` });
 
 module.exports = [
     createConfig(`${outputDir}/client`, './src/client/index.ts', undefined, versionPlugin),
-    createConfig(`${outputDir}/client`, './src/client/index.ts', {minify: true, isLibrary: true, libraryName: 'OpenFinNotifications', outputFilename: "openfin-notifications"}, versionPlugin),
+    createConfig(`${outputDir}/client`, './src/client/index.ts', { minify: true, isLibrary: true, libraryName: 'OpenFinNotifications', outputFilename: "openfin-notifications" }, versionPlugin),
     createConfig(`${outputDir}/provider`, './src/provider/index.ts', undefined, manifestPlugin),
     createConfig(`${outputDir}/provider/ui`, {
-        serviceui: './src/provider/ui/index.tsx',
-        openfin: './src/provider/ui/openfin.ts',
-        toast: './src/provider/ui/toast/index.tsx'
+        serviceui: './src/provider/view/NotificationCenterApp.tsx',
+        openfin: './src/provider/controller/WindowManager.ts',
+        toast: './src/provider/view/ToastApp.tsx'
     }),
     createConfig(`${outputDir}/demo`, {
         app: './src/demo/app.ts',
