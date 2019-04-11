@@ -25,7 +25,8 @@
     "url": "https://github.com/openfin/Notification-Service/issues"
   },
   "homepage": "https://github.com/openfin/Notification-Service#readme",
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "@types/jest": "^22.2.0",
     "@types/moment": "^2.13.0",

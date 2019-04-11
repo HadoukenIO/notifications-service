@@ -2,7 +2,7 @@ import {CHANNEL_NAME} from '../../client/models/config';
 import {INotification, SenderInfo} from '../../client/models/Notification';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {NotificationCenterEventMap, NotificationCenterAPI} from '../models/NotificationCenterAPI';
-import {WindowManager} from '../controller/WindowManager';
+import {NotificationCenter} from '../controller/NotificationCenter';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
@@ -124,7 +124,7 @@ export function setup(isNotificationCenter?: boolean) {
   }
 
   function toggleNotificationCenter() {
-    WindowManager.instance.toggleWindow();
+    NotificationCenter.instance.toggleWindow();
     return 'toggleNotificationCenter success';
   }
 

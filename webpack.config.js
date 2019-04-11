@@ -120,7 +120,7 @@ module.exports = [
     createConfig(`${outputDir}/provider`, './src/provider/index.ts', undefined, manifestPlugin),
     createConfig(`${outputDir}/provider/ui`, {
         serviceui: './src/provider/view/NotificationCenterApp.tsx',
-        openfin: './src/provider/controller/WindowManager.ts',
+        openfin: './src/provider/controller/NotificationCenter.ts',
         toast: './src/provider/view/ToastApp.tsx'
     }),
     createConfig(`${outputDir}/demo`, {

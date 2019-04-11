@@ -11,11 +11,11 @@ import {GroupByType} from '../../NotificationCenterApp';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
-interface INotificationProps {
+interface NotificationViewProps {
     groupBy?: GroupByType;
 }
 
-interface INotificationState {
+interface NotificationViewState {
     notifications: INotification[];
 }
 
@@ -26,7 +26,7 @@ interface INotificationState {
  * Grouping method can vary, but all grouping methods will produce a set of
  * these groups.
  */
-interface INotificationGroup {
+interface NotificationGroup {
     /**
      * Unique identifier for this group.
      */
@@ -53,11 +53,8 @@ interface INotificationGroup {
  * component's props. The grouping is managed entirely within the component -
  * the only input is a flat list of all notifications.
  */
-export class NotificationView extends React.Component<INotificationProps, INotificationState> {
-
-    private toastManager: ToastManager = new ToastManager();
-
-    constructor(props: INotificationProps) {
+export class NotificationView extends React.Component<NotificationViewProps, NotificationViewState> {
+    private constructor(props: NotificationViewProps) {
         super(props);
         this.state = {notifications: []};
     }
@@ -93,7 +90,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
                         );
                     }
 
-                    this.toastManager.create(payload);
+                    ToastManager.instance.create(payload);
                     return '';
                 }
             );
@@ -139,7 +136,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
     }
 
     public render(): React.ReactNode {
-        const groups: INotificationGroup[] = this.formatNotificationsAppSorted(
+        const groups: NotificationGroup[] = this.formatNotificationsAppSorted(
             this.state.notifications
         );
         const components: JSX.Element[] = this.createComponents(groups);
@@ -153,16 +150,16 @@ export class NotificationView extends React.Component<INotificationProps, INotif
      * @private
      * @returns Array<NotificationGroup>
      */
-    private formatNotificationsAppSorted(notifications: INotification[]): INotificationGroup[] {
-        const groupLookup: {[groupKey: string]: INotificationGroup} = {};
-        const groups: INotificationGroup[] = [];
+    private formatNotificationsAppSorted(notifications: INotification[]): NotificationGroup[] {
+        const groupLookup: {[groupKey: string]: NotificationGroup} = {};
+        const groups: NotificationGroup[] = [];
         const groupMethod: GroupByType = this.props.groupBy || GroupByType.APPLICATION;
 
         function getOrCreateGroup(
             groupName: string,
             notification: INotification
-        ): INotificationGroup {
-            let group: INotificationGroup = groupLookup[groupName];
+        ): NotificationGroup {
+            let group: NotificationGroup = groupLookup[groupName];
 
             if (!group) {
                 // Create new group
@@ -232,9 +229,9 @@ export class NotificationView extends React.Component<INotificationProps, INotif
      * @returns JSX.Element[] Array of NotificationGroup components, one per each
      * INotificationGroup in input
      */
-    private createComponents(groups: INotificationGroup[]): JSX.Element[] {
+    private createComponents(groups: NotificationGroup[]): JSX.Element[] {
         return groups.map(
-            (group: INotificationGroup): JSX.Element => (
+            (group: NotificationGroup): JSX.Element => (
                 <NotificationGroup
                     key={group.key}
                     name={group.title}

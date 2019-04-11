@@ -5,6 +5,7 @@ import {Header} from './components/Header/Header';
 import {NotificationView} from './components/NotificationView/NotificationView';
 import {Footer} from './components/Footer/Footer';
 import {setup} from './setup';
+import {NotificationCenter} from '../controller/NotificationCenter';
 
 interface AppState {
     groupBy: GroupByType;
@@ -36,6 +37,7 @@ export class NotificationCenterApp extends React.Component<{}, AppState> {
                 <Header
                     groupBy={this.state.groupBy}
                     handleGroupBy={this.state.handleGroupBy}
+                    handleHideWindow={NotificationCenter.instance.hideWindow}
                 />
                 <NotificationView groupBy={this.state.groupBy} />
                 <Footer />
@@ -48,5 +50,6 @@ export class NotificationCenterApp extends React.Component<{}, AppState> {
     }
 }
 
+NotificationCenter.instance.showWindow();
 
 ReactDOM.render(<NotificationCenterApp />, document.getElementById('react-app'));

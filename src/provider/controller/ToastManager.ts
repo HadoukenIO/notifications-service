@@ -14,7 +14,6 @@ export class ToastManager {
     private static singleton: ToastManager;
 
     private toasts: Toast[] = [];
-    private windowInfo: WindowInfo = WindowInfo.instance;
 
     constructor() {
         if (ToastManager.singleton) {
@@ -32,7 +31,7 @@ export class ToastManager {
      */
     public create(meta: Notification & SenderInfo, force: boolean = false) {
         if (!force) {
-            if (this.windowInfo.getShowingStatus()) {
+            if (WindowInfo.instance.getShowingStatus()) {
                 return;
             }
         }

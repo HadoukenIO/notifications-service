@@ -4,9 +4,11 @@ import {GroupByType} from '../../NotificationCenterApp';
 interface HeaderProps {
     groupBy: GroupByType;
     handleGroupBy: (groupBy: GroupByType) => void;
+    handleHideWindow: (value?: boolean) => void;
 }
 
-export function Header(props: HeaderProps) {
+export function Header(props: HeaderProps): React.ReactElement {
+    const {groupBy, handleGroupBy, handleHideWindow} = props;
     return (
         <div id="header">
             <div className="sort-buttons">
@@ -14,7 +16,7 @@ export function Header(props: HeaderProps) {
                 <div
                     className="sort-button"
                     onClick={() =>
-                        props.handleGroupBy(GroupByType.APPLICATION)
+                        handleGroupBy(GroupByType.APPLICATION)
                     }
                 >
                     APPLICATION
@@ -22,14 +24,14 @@ export function Header(props: HeaderProps) {
                 <div
                     className="sort-button"
                     onClick={() =>
-                        props.handleGroupBy(GroupByType.DATE)
+                        handleGroupBy(GroupByType.DATE)
                     }
                 >
                     DATE
                 </div>
             </div>
 
-            <img id="exitLink" src="image/shapes/arrowsv2.svg" alt="" />
+            <img id="exitLink" onClick={() => handleHideWindow} src="image/shapes/arrowsv2.svg" alt="" />
         </div>
     );
 }

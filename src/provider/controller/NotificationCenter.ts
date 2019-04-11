@@ -1,21 +1,18 @@
-import {TrayMenu} from './TrayMenu';
 import {WindowInfo} from './WindowInfo';
 
-declare var window: Window&{WindowManager: WindowManager};
+declare var window: Window & {WindowManager: NotificationCenter};
 
-export class WindowManager {
+export class NotificationCenter {
     private windowInfo: WindowInfo = new WindowInfo();
-    private trayMenu!: TrayMenu;
-    private static singleton: WindowManager;
+    private static singleton: NotificationCenter;
 
     constructor() {
-        if (WindowManager.singleton) {
-            return WindowManager.singleton;
+        if (NotificationCenter.singleton) {
+            return NotificationCenter.singleton;
         }
         this.setEventListeners();
-        this.trayMenu = new TrayMenu('https://openfin.co/favicon-32x32.png', this);
-
-        WindowManager.singleton = this;
+        NotificationCenter.singleton = this;
+        this.setupTrayIcon();
     }
 
     /**
@@ -31,6 +28,23 @@ export class WindowManager {
 
         // On monitor dimension change
         fin.desktop.System.addEventListener('monitor-info-changed', this.onMonitorInfoChanged.bind(this));
+    }
+
+
+    private setupTrayIcon() {
+        enum MouseButton {
+            LEFT = 0,
+            RIGHT = 2
+        }
+        type ClickEvent = {button: MouseButton};
+        const application = fin.Application.getCurrentSync();
+        const icon = 'https://openfin.co/favicon-32x32.png';
+        application.addListener('tray-icon-clicked', (event: ClickEvent) => {
+            if (event.button === MouseButton.LEFT) {
+                this.toggleWindow();
+            }
+        });
+        application.setTrayIcon(icon);
     }
 
     /**
@@ -116,11 +130,11 @@ export class WindowManager {
      * @method instance Gets this WindowManager instance on the window.
      * @returns WindowManager
      */
-    public static get instance(): WindowManager {
-        if (WindowManager.singleton) {
-            return WindowManager.singleton;
+    public static get instance(): NotificationCenter {
+        if (NotificationCenter.singleton) {
+            return NotificationCenter.singleton;
         } else {
-            return new WindowManager();
+            return new NotificationCenter();
         }
     }
 
@@ -130,4 +144,4 @@ export class WindowManager {
 }
 
 // Run the window manager right away
-new WindowManager();  // tslint:disable-line:no-unused-expression
+new NotificationCenter();  // tslint:disable-line:no-unused-expression
