@@ -1,0 +1,5 @@
+{
+    "PORT": 3922,
+    "SERVICE_NAME": "notifications",
+    "CDN_LOCATION": "https://cdn.openfin.co/services/openfin/notifications"
+ }
