@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Notification } from '../Notification/Notification';
 import { INotification } from '../../models/INotification';
 import { INotificationGroupProps } from '../../models/INotificationGroupProps';
-import { eGroupMethod } from '../../container/App';
+import { eGroupMethod } from '../App/App';
 
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
