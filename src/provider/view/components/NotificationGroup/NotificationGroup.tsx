@@ -1,16 +1,24 @@
 import * as React from 'react';
 
-import { Notification } from '../Notification/Notification';
-import { INotification } from '../../models/INotification';
-import { INotificationGroupProps } from '../../models/INotificationGroupProps';
-import { eGroupMethod } from '../App/App';
+import {Notification} from '../Notification/Notification';
+import {INotification} from '../../../models/INotification';
 
-import {NotificationCenterAPI} from '../../NotificationCenterAPI';
-declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
+import {NotificationCenterAPI} from '../../../models/NotificationCenterAPI';
+import {GroupByType} from '../../NotificationCenterApp';
+declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
-export function NotificationGroup(props: INotificationGroupProps) {
+
+
+export interface NotificationGroupProps {
+    name: string;
+    notifications: INotification[];
+    groupBy?: GroupByType;
+    id?: number;
+}
+
+export function NotificationGroup(props: NotificationGroupProps) {
     function handleClearAll() {
-        if (props.groupBy === eGroupMethod.APPLICATION) {
+        if (props.groupBy === GroupByType.APPLICATION) {
             window.openfin.notifications.clearAppNotifications(props.name);
         } else {
             props.notifications.forEach(notification => {

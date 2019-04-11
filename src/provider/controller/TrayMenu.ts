@@ -1,4 +1,4 @@
-import {WindowManager} from './openfin';
+import {WindowManager} from '../view/openfin';
 import {WindowInfo} from './WindowInfo';
 
 declare var window: Window&{createWindow: () => fin.OpenFinWindow};

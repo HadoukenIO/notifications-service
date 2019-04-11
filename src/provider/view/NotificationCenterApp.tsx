@@ -1,25 +1,25 @@
 import * as React from 'react';
 
-import { Header } from '../Header/Header';
-import { NotificationView } from '../NotificationView/NotificationView';
-import { Footer } from '../Footer/Footer';
+import {Header} from './components/Header/Header';
+import {NotificationView} from './components/NotificationView/NotificationView';
+import {Footer} from './components/Footer/Footer';
 
-interface IAppState {
-    groupBy: eGroupMethod;
-    handleGroupBy: (groupBy: eGroupMethod) => void;
+interface AppState {
+    groupBy: GroupByType;
+    handleGroupBy: (groupBy: GroupByType) => void;
 }
 
-export enum eGroupMethod {
+export enum GroupByType {
     APPLICATION,
     DATE
 }
 
-export class App extends React.Component<{}, IAppState> {
+export class NotificationCenterApp extends React.Component<{}, AppState> {
     constructor(props: {}) {
         super(props);
 
         this.state = {
-            groupBy: eGroupMethod.APPLICATION,
+            groupBy: GroupByType.APPLICATION,
             handleGroupBy: this.handleGroupBy.bind(this)
         };
     }
@@ -37,7 +37,7 @@ export class App extends React.Component<{}, IAppState> {
         );
     }
 
-    private handleGroupBy(groupBy: eGroupMethod): void {
-        this.setState(Object.assign({}, this.state, { groupBy }));
+    private handleGroupBy(groupBy: GroupByType): void {
+        this.setState(Object.assign({}, this.state, {groupBy}));
     }
 }

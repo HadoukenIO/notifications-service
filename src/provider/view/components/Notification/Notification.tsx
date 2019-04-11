@@ -1,15 +1,20 @@
 import * as React from 'react';
 import {NotificationTime} from './NotificationTime/NotificationTime';
-import {INotificationProps} from '../../models/INotificationProps';
-import {NotificationCenterAPI} from '../../NotificationCenterAPI';
+import {NotificationCenterAPI} from '../../../models/NotificationCenterAPI';
 import {Button} from '../Button/Button';
 import {NotificationTypes} from '../../../../client/models/Notification';
+import {INotification} from '../../../models/INotification';
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
+
+
+interface NotificationProps {
+    meta: INotification;
+}
 
 /**
  * Displays a single notification within the UI
  */
-export function Notification(props: INotificationProps) {
+export function Notification(props: NotificationProps) {
     function handleNotificationClose(e: React.MouseEvent<HTMLElement>) {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();

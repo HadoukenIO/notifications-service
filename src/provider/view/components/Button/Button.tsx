@@ -1,17 +1,22 @@
 import * as React from 'react';
 
-import { INotificationButtonProps} from '../../models/INotificationButton';
-import {NotificationCenterAPI} from '../../NotificationCenterAPI';
+import {NotificationCenterAPI} from '../../../models/NotificationCenterAPI';
+import {INotification} from '../../../models/INotification';
 
-declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
+declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
-export function Button(props: INotificationButtonProps) {
+export interface NotificationButtonProps {
+    meta: INotification;
+    buttonIndex: number;
+}
+
+export function Button(props: NotificationButtonProps) {
     const button = props.meta.buttons[props.buttonIndex];
 
     function handleButtonClick(e: React.MouseEvent<HTMLElement>) {
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-    
+
         window.openfin.notifications.buttonClickHandler(
             props.meta,
             props.buttonIndex

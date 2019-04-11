@@ -1,9 +1,12 @@
 import * as React from 'react';
 import * as moment from 'moment';
-import { INotificationTimeProps } from '../../../models/INotificationTime';
+
+export interface NotificationTimeProps {
+    date: Date;
+}
 
 
-export function NotificationTime(props: INotificationTimeProps) {
+export function NotificationTime(props: NotificationTimeProps) {
     return (
         <div className="time-div">
             <span className="time">

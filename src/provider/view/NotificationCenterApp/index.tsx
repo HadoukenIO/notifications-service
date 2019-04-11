@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {render} from 'react-dom';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
-import {CHANNEL_NAME} from '../../client/models/config';
-import {Notification, SenderInfo} from '../../client/models/Notification';
-import {WindowManager} from './openfin';
-import {INotification} from './models/INotification';
-import {NotificationCenterAPI, NotificationCenterEventMap} from './NotificationCenterAPI';
+import {CHANNEL_NAME} from '../../../client/models/config';
+import {Notification, SenderInfo} from '../../../client/models/Notification';
+import {WindowManager} from '../openfin';
+import {INotification} from '../../models/INotification';
+import {NotificationCenterAPI, NotificationCenterEventMap} from '../../models/NotificationCenterAPI';
 import {App} from './container/App';
 
 import '../../../res/provider/ui/css/launch-bar.css';

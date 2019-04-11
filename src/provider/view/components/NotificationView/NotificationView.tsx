@@ -1,17 +1,18 @@
 import * as React from 'react';
 
 import * as moment from 'moment';
+
+import {ToastManager} from '../../../controller/ToastManager';
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
-import {INotification} from '../../models/INotification';
-import {eGroupMethod} from '../App/App';
-import {ToastManager} from '../../ToastManager';
-import {NotificationCenterAPI} from '../../NotificationCenterAPI';
+import {INotification} from '../../../models/INotification';
+import {NotificationCenterAPI} from '../../../models/NotificationCenterAPI';
 import {SenderInfo} from '../../../../client/models/Notification';
+import {GroupByType} from '../../NotificationCenterApp';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 interface INotificationProps {
-    groupBy?: eGroupMethod;
+    groupBy?: GroupByType;
 }
 
 interface INotificationState {
@@ -155,7 +156,7 @@ export class NotificationView extends React.Component<INotificationProps, INotif
     private formatNotificationsAppSorted(notifications: INotification[]): INotificationGroup[] {
         const groupLookup: {[groupKey: string]: INotificationGroup} = {};
         const groups: INotificationGroup[] = [];
-        const groupMethod: eGroupMethod = this.props.groupBy || eGroupMethod.APPLICATION;
+        const groupMethod: GroupByType = this.props.groupBy || GroupByType.APPLICATION;
 
         function getOrCreateGroup(
             groupName: string,
@@ -181,9 +182,9 @@ export class NotificationView extends React.Component<INotificationProps, INotif
         function getGroupTitle(notification: INotification): string {
             // When creating a new notification group, this function determines the
             // user-visible title for the group
-            if (groupMethod === eGroupMethod.APPLICATION) {
+            if (groupMethod === GroupByType.APPLICATION) {
                 return notification.name;
-            } else if (groupMethod === eGroupMethod.DATE) {
+            } else if (groupMethod === GroupByType.DATE) {
                 return moment(notification.date).calendar(undefined, {
                     sameDay: '[Today]',
                     nextDay: '[Tomorrow]',
@@ -201,14 +202,14 @@ export class NotificationView extends React.Component<INotificationProps, INotif
             (a: INotification, b: INotification) => b.date.getUTCMilliseconds() - a.date.getUTCMilliseconds()
         );
 
-        if (groupMethod === eGroupMethod.APPLICATION) {
+        if (groupMethod === GroupByType.APPLICATION) {
             notifications.forEach((notification: INotification) => {
                 getOrCreateGroup(
                     notification.uuid,
                     notification
                 ).notifications.push(notification);
             });
-        } else if (groupMethod === eGroupMethod.DATE) {
+        } else if (groupMethod === GroupByType.DATE) {
             notifications.forEach(notification => {
                 const date: Date = new Date(notification.date);
                 const dateStr: string = [

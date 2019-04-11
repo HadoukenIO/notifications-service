@@ -1,11 +1,10 @@
 import * as React from 'react';
-
 import {INotification} from '../../../models/INotification';
-import {NotificationCenterAPI} from '../../../NotificationCenterAPI';
-import {SenderInfo} from '../../../../../client/models/Notification';
-declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
+import {NotificationCenterAPI} from '../../../models/NotificationCenterAPI';
+import {SenderInfo} from '../../../../client/models/Notification';
+declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
-interface IToastProps {
+interface ToastProps {
     meta: INotification & SenderInfo;
 }
 
@@ -14,7 +13,7 @@ const enum ClickEvents {
     Closed
 }
 
-export function Toast(props: IToastProps){
+export function Toast(props: ToastProps) {
     function clickHandler(clickEventName: ClickEvents): void {
         switch (clickEventName) {
             case ClickEvents.BodyClick: {

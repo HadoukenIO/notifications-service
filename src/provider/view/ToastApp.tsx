@@ -1,18 +1,21 @@
 import * as React from 'react';
-import {Toast} from '../components/Toast/Toast';
+import * as ReactDOM from 'react-dom';
+import {Toast} from './components/Toast/Toast';
 
-import {INotification} from '../../models/INotification';
-import {SenderInfo} from '../../../../client/models/Notification';
+import {INotification} from '../models/INotification';
+import {SenderInfo} from '../../client/models/Notification';
+import {setup} from './setup';
+
 
 declare var window: Window & {
     onNotificationMessage: (message: INotification & SenderInfo) => void;
 };
 
-interface IToastAppState {
+interface ToastAppState {
     meta: (INotification & SenderInfo) | null;
 }
 
-export class App extends React.Component<{}, IToastAppState> {
+export class ToastApp extends React.Component<{}, ToastAppState> {
     constructor(props: {}) {
         super(props);
         this.state = {meta: null};
@@ -22,6 +25,10 @@ export class App extends React.Component<{}, IToastAppState> {
             {opacity: {opacity: 1, duration: 200}},
             {interrupt: false}
         );
+    }
+
+    public componentWillMount() {
+        setup();
     }
 
     public render() {
@@ -37,3 +44,6 @@ export class App extends React.Component<{}, IToastAppState> {
         this.setState({meta: message});
     }
 }
+
+
+ReactDOM.render(<ToastApp />, document.getElementById('toast-app'));
