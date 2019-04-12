@@ -14,8 +14,8 @@
 import {EventEmitter} from 'events';
 import { ChannelClient } from 'openfin/_v2/api/interappbus/channel/client';
 
-import {APITopic, SERVICE_CHANNEL, TopicPayloadMap, TopicResponseMap} from './internal';
-import { NotificationEvent } from './index';
+import {APITopic, SERVICE_CHANNEL, API} from './internal';
+import { NotificationEvent } from './models/NotificationEvent';
 
 /**
  * The version of the NPM package.
@@ -57,7 +57,7 @@ export const channelPromise: Promise<ChannelClient> = typeof fin === 'undefined'
 /**
  * Wrapper around service.dispatch to help with type checking
  */
-export async function tryServiceDispatch<T extends APITopic>(action: T, payload: TopicPayloadMap[T]): Promise<TopicResponseMap[T]> {
+export async function tryServiceDispatch<T extends APITopic>(action: T, payload: API[T][0]): Promise<API[T][1]> {
     const channel: ChannelClient = await channelPromise;
-    return channel.dispatch(action, payload) as Promise<TopicResponseMap[T]>;
+    return channel.dispatch(action, payload) as Promise<API[T][1]>;
 }

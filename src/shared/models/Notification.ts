@@ -1,12 +1,6 @@
 import {Entity} from './Entity';
-import {NotificationTypes} from './NotificationTypes';
-import {OptionButton} from './OptionButton';
-import {OptionInput} from './OptionInput';
-
-/**
- * User-defined context data that can be attached to notifications
- */
-export type NotificationContext = any;  // tslint:disable-line:no-any
+import {NotificationType} from './NotificationTypes';
+import { NotificationContext, OptionButton, OptionInput } from '../../client/models/NotificationOptions';
 
 /**
  * @description Interface for notification options
@@ -20,5 +14,5 @@ export interface Notification extends Entity {
     date: Date;
     buttons: OptionButton[];
     inputs: OptionInput[];
-    type?: NotificationTypes;
+    type?: NotificationType;
 }

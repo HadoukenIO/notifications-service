@@ -1,25 +1,26 @@
 import {ISenderInfo} from '../../provider/models/ISenderInfo';
 import {Notification} from './Notification';
+import { CreatePayload } from '../../client/internal';
 
-export enum NotificationTypes {
+export enum NotificationType {
     DEFAULT = 'DEFAULT',
     BUTTON = 'BUTTON',
     INLINE = 'INLINE',
     INLINEBUTTON = 'INLINEBUTTON'
 }
 
-export function TypeResolver(payload: Notification|Notification&ISenderInfo): NotificationTypes {
+export function resolveType(payload: CreatePayload): NotificationType {
     const button: boolean = typeof payload.buttons === 'object' && payload.buttons.length > 0 ? true : false;
     const inline: boolean = typeof payload.inputs === 'object' && payload.inputs.length > 0 ? true : false;
 
-    let type: NotificationTypes = NotificationTypes.DEFAULT;
+    let type: NotificationType = NotificationType.DEFAULT;
 
     if (button && !inline) {
-        type = NotificationTypes.BUTTON;
+        type = NotificationType.BUTTON;
     } else if (!button && inline) {
-        type = NotificationTypes.INLINE;
+        type = NotificationType.INLINE;
     } else if (button && inline) {
-        type = NotificationTypes.INLINEBUTTON;
+        type = NotificationType.INLINEBUTTON;
     }
 
     return type;

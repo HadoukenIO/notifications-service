@@ -3,7 +3,7 @@ import { NotificationTime } from './NotificationTime/NotificationTime';
 import { INotificationProps } from '../../models/INotificationProps';
 import {NotificationCenterAPI} from '../../NotificationCenterAPI';
 import {Button} from '../Button/Button';
-import { NotificationTypes } from '../../../../shared/models/NotificationTypes';
+import { NotificationType } from '../../../../shared/models/NotificationTypes';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 /**
@@ -17,7 +17,7 @@ export function Notification(props: INotificationProps) {
     }
 
     let buttons = null;
-    if (props.meta.type === NotificationTypes.BUTTON) {
+    if (props.meta.type === NotificationType.BUTTON) {
         buttons = props.meta.buttons.map((button, idx) => {
             return (
                 <Button

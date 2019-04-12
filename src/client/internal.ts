@@ -8,7 +8,7 @@
  * These types are a part of the client, but are not required by applications wishing to interact with the service.
  * This file is excluded from the public-facing TypeScript documentation.
  */
-import {NotificationOptions} from './index';
+import {NotificationOptions} from './models/NotificationOptions';
 import {VoidResult, ReturnResult} from '../shared/models/Result';
 import {Notification} from '../shared/models/Notification';
 import {ISenderInfo} from '../provider/models/ISenderInfo';
@@ -27,28 +27,25 @@ export const SERVICE_IDENTITY = {
 export const SERVICE_CHANNEL = 'of-notifications-service-v1';
 
 export const enum APITopic {
-    CREATE = 'create-notification',
-    CLEAR = 'clear-notification',
-    GET_ALL = 'fetch-app-notifications',
-    CLEAR_ALL = 'clear-app-notifications'
+    CREATE_NOTIFICATION = 'create-notification',
+    CLEAR_NOTIFICATION = 'clear-notification',
+    GET_APP_NOTIFICATIONS = 'fetch-app-notifications',
+    CLEAR_APP_NOTIFICATIONS = 'clear-app-notifications',
+    TOGGLE_NOTIFICATION_CENTER = 'toggle-notification-center'
 }
 
-export type CreatePayload = {id: string;} & NotificationOptions;
+export type API = {
+    [APITopic.CREATE_NOTIFICATION]: [CreatePayload, Notification];
+    [APITopic.CLEAR_NOTIFICATION]: [ClearPayload, void];
+    [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, void];
+    [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
+    [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
+};
 
-export interface ClearPayload {
+export interface CreatePayload extends NotificationOptions {
     id: string;
 }
 
-export interface TopicPayloadMap {
-    [APITopic.CREATE]: CreatePayload;
-    [APITopic.CLEAR]: ClearPayload;
-    [APITopic.CLEAR_ALL]: undefined;
-    [APITopic.GET_ALL]: undefined;
-}
-
-export interface TopicResponseMap {
-    [APITopic.CREATE]: ReturnResult<Notification&ISenderInfo>;
-    [APITopic.CLEAR]: VoidResult;
-    [APITopic.CLEAR_ALL]: string;
-    [APITopic.GET_ALL]: ReturnResult<(Notification&ISenderInfo)[]>;
+export interface ClearPayload {
+    id: string;
 }
