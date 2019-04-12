@@ -1,5 +1,5 @@
-import {CHANNEL_NAME} from '../../client/model/config';
-import {INotification, SenderInfo} from '../../client/model/Notification';
+import {CHANNEL_NAME} from '../../client/config';
+import {INotification, SenderInfo} from '../../client/Notification';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {NotificationCenterEventMap, NotificationCenterAPI} from '../model/NotificationCenterAPI';
 import {NotificationCenter} from '../controller/NotificationCenter';

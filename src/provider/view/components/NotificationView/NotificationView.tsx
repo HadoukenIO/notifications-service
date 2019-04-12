@@ -6,7 +6,7 @@ import {ToastManager} from '../../../controller/ToastManager';
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
 import {INotification} from '../../../model/INotification';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {SenderInfo} from '../../../../client/model/Notification';
+import {SenderInfo} from '../../../../client/Notification';
 import {GroupByType} from '../../NotificationCenterApp';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};

@@ -1,7 +1,7 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
 import * as ofnotes from '../client/index';
-import {NotificationEvent, NotificationOptions} from '../client/models/Notification';
+import {NotificationEvent, NotificationOptions} from '../client/Notification';
 
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(id, Object.assign(opts, {date: Date.now()}));

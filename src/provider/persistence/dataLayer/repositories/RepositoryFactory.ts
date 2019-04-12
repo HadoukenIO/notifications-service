@@ -1,6 +1,6 @@
-import {Entity} from '../../../../client/models/Entity';
-import {Notification, SenderInfo} from '../../../../client/models/Notification';
-import {Settings} from '../../../models/Settings';
+import {Entity} from '../../../../client/Entity';
+import {Notification, SenderInfo} from '../../../../client/Notification';
+import {Settings} from '../../../model/Settings';
 import {IDatastore} from '../IDatastore';
 import {IndexedDb} from '../IndexedDb';
 

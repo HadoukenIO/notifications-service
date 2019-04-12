@@ -1,5 +1,5 @@
-import {Entity} from '../../../../client/models/Entity';
-import {ReturnResult, VoidResult} from '../../../models/Result';
+import {Entity} from '../../../../client/Entity';
+import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
 

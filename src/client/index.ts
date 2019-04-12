@@ -1,8 +1,8 @@
 console.log('Client index.js loaded');
 
-import {CHANNEL_NAME} from './models/config';
+import {CHANNEL_NAME} from './config';
 
-import {Notification, NotificationEvent, SenderInfo} from './models/Notification';
+import {Notification, NotificationEvent, SenderInfo} from './Notification';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
 /**

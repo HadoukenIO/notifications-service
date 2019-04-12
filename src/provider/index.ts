@@ -1,8 +1,8 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
-import {CHANNEL_NAME} from '../client/models/config';
-import {Notification, NotificationTypes, NotificationEvent, TypeResolver, SenderInfo} from '../client/models/Notification';
+import {CHANNEL_NAME} from '../client/config';
+import {Notification, NotificationTypes, NotificationEvent, TypeResolver, SenderInfo} from '../client/Notification';
 
 import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';
 import {Repositories} from './persistence/dataLayer/repositories/RepositoryEnum';

@@ -1,4 +1,4 @@
-import {Notification, SenderInfo} from '../../client/model/Notification';
+import {Notification, SenderInfo} from '../../client/Notification';
 import {WindowInfo} from './WindowInfo';
 
 interface Toast {
