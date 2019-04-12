@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import {NotificationCenterAPI} from '../../../models/NotificationCenterAPI';
-import {INotification} from '../../../models/INotification';
+import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
+import {INotification} from '../../../model/INotification';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 

@@ -1,7 +1,7 @@
-import {CHANNEL_NAME} from '../../client/models/config';
-import {INotification, SenderInfo} from '../../client/models/Notification';
+import {CHANNEL_NAME} from '../../client/model/config';
+import {INotification, SenderInfo} from '../../client/model/Notification';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
-import {NotificationCenterEventMap, NotificationCenterAPI} from '../models/NotificationCenterAPI';
+import {NotificationCenterEventMap, NotificationCenterAPI} from '../model/NotificationCenterAPI';
 import {NotificationCenter} from '../controller/NotificationCenter';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
