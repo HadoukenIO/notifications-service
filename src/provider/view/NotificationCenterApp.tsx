@@ -29,6 +29,7 @@ export class NotificationCenterApp extends React.Component<{}, AppState> {
 
     public componentWillMount() {
         setup(true);
+        NotificationCenter.instance.hideWindow();
     }
 
     public render(): JSX.Element {
@@ -50,6 +51,5 @@ export class NotificationCenterApp extends React.Component<{}, AppState> {
     }
 }
 
-NotificationCenter.instance.showWindow();
 
 ReactDOM.render(<NotificationCenterApp />, document.getElementById('react-app'));

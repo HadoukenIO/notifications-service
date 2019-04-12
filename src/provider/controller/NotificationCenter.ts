@@ -1,6 +1,7 @@
 import {WindowInfo} from './WindowInfo';
-
+import {TrayIconClicked} from 'openfin/_v2/api/events/application';
 declare var window: Window & {WindowManager: NotificationCenter};
+
 
 export class NotificationCenter {
     private windowInfo: WindowInfo = new WindowInfo();
@@ -32,18 +33,16 @@ export class NotificationCenter {
 
 
     private setupTrayIcon() {
-        enum MouseButton {
-            LEFT = 0,
-            RIGHT = 2
-        }
-        type ClickEvent = {button: MouseButton};
         const application = fin.Application.getCurrentSync();
         const icon = 'https://openfin.co/favicon-32x32.png';
-        application.addListener('tray-icon-clicked', (event: ClickEvent) => {
-            if (event.button === MouseButton.LEFT) {
+
+        application.addListener('tray-icon-clicked', (event: TrayIconClicked<string, string>) => {
+            console.log(event);
+            if (event.button === 0) {
                 this.toggleWindow();
             }
         });
+
         application.setTrayIcon(icon);
     }
 
@@ -142,6 +141,3 @@ export class NotificationCenter {
         this.sizeToFit();
     }
 }
-
-// Run the window manager right away
-new NotificationCenter();  // tslint:disable-line:no-unused-expression
