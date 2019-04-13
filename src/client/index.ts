@@ -2,7 +2,7 @@ console.log('Client index.js loaded');
 
 import {CHANNEL_NAME} from './config';
 
-import {Notification, NotificationEvent, SenderInfo} from './Notification';
+import {Notification, NotificationEvent, NotificationOptions, SenderInfo} from './Notification';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
 /**
@@ -88,7 +88,7 @@ const clientP = createClientPromise();
  */
 export async function create(id: string, options: NotificationOptions) {
     const plugin = await clientP;
-    const payload: Notification = Object.assign({}, {id}, options) as Notification;
+    const payload: Notification = Object.assign({}, {id}, options);
     const notification = await plugin.dispatch('create-notification', payload);
     return notification;
 }
