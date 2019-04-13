@@ -4,9 +4,8 @@ import * as moment from 'moment';
 
 import {ToastManager} from '../../../controller/ToastManager';
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
-import {INotification} from '../../../model/INotification';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {SenderInfo} from '../../../../client/Notification';
+import {SenderInfo, INotification} from '../../../../client/Notification';
 import {GroupByType} from '../../NotificationCenterApp';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};

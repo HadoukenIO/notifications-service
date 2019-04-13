@@ -2,8 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {Toast} from './components/Toast/Toast';
 
-import {INotification} from '../model/INotification';
-import {SenderInfo} from '../../client/Notification';
+import {SenderInfo, INotification} from '../../client/Notification';
 import {setup} from './setup';
 
 

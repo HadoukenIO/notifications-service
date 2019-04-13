@@ -1,6 +1,5 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
-import {INotification} from './INotification';
-import {SenderInfo} from '../../client/Notification';
+import {SenderInfo, INotification} from '../../client/Notification';
 
 export interface NotificationCenterEventMap {
     'notificationCreated': INotification & SenderInfo;

@@ -1,7 +1,6 @@
 import * as React from 'react';
-import {INotification} from '../../../model/INotification';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {SenderInfo} from '../../../../client/Notification';
+import {SenderInfo, INotification} from '../../../../client/Notification';
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 interface ToastProps {
