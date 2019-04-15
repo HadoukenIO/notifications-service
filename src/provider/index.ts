@@ -336,11 +336,6 @@ async function fetchAllNotifications(payload: undefined, sender: ProviderIdentit
 
     if (result.success) {
         const allNotifications = result.value as (Notification & ISenderInfo)[];
-
-        allNotifications.forEach((notification) => {
-            notification.id = decodeID(notification);
-        });
-
         return allNotifications;
     }
 
