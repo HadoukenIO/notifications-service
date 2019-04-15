@@ -13,9 +13,9 @@ module.exports = [
     }, webpackTools.versionPlugin),
     webpackTools.createConfig(`${outputDir}/provider`, './src/provider/index.ts', undefined, webpackTools.manifestPlugin),
     webpackTools.createConfig(`${outputDir}/provider/ui`, {
-        serviceui: './src/provider/ui/index.tsx',
-        openfin: './src/provider/ui/openfin.ts',
-        toast: './src/provider/ui/toast/index.tsx'
+        serviceui: './src/provider/view/NotificationCenterApp.tsx',
+        openfin: './src/provider/controller/NotificationCenter.ts',
+        toast: './src/provider/view/ToastApp.tsx'
     }),
     webpackTools.createConfig(`${outputDir}/demo`, {
         app: './src/demo/app.ts',
