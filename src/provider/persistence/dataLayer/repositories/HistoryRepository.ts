@@ -1,13 +1,12 @@
-import {ISenderInfo} from '../../../../provider/models/ISenderInfo';
-import {Notification} from '../../../../shared/models/Notification';
-import {ReturnResult, VoidResult} from '../../../../shared/models/Result';
+import {Notification, SenderInfo,} from '../../../../client/Notification';
+import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
 
 import {Repository} from './Repository';
 
 // Shorthand for the intersection-type stored in the repositry
-type DataType = Notification&ISenderInfo;
+type DataType = Notification&SenderInfo;
 
 /**
  * @class Repository for history of notification
@@ -36,7 +35,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async create(notification: Notification&ISenderInfo): Promise<ReturnResult<DataType>> {
+    public async create(notification: Notification&SenderInfo): Promise<ReturnResult<DataType>> {
         return await super.genericCreate(notification);
     }
 
@@ -121,7 +120,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async update(updatedNotification: Notification&ISenderInfo): Promise<ReturnResult<DataType>> {
+    public async update(updatedNotification: Notification&SenderInfo): Promise<ReturnResult<DataType>> {
         return await super.genericUpdate(updatedNotification);
     }
 

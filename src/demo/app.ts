@@ -1,8 +1,7 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
 import * as ofnotes from '../client/index';
-import {NotificationOptions} from '../client/models/NotificationOptions';
-import {NotificationEvent} from '../shared/models/NotificationEvent';
+import {NotificationEvent, NotificationOptions} from '../client/Notification';
 
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(id, Object.assign(opts, {date: Date.now()}));
@@ -45,45 +44,6 @@ function makeNoteOfType(index: number) {
         return makeNote(`1q2w3e4r${index}`, buttonNote);
     }
 }
-
-// document.addEventListener("DOMContentLoaded", function (event) {
-//     for (let index = 1; index < 7; index++) {
-//         document.getElementById(`button${index}`).addEventListener('click',
-//         () => {
-//             makeNoteOfType(index)
-//                 .then((notification) => {
-//                     if (!notification.success) {
-//                         //
-//                         document.getElementById('clientResponse').innerHTML =
-//                         `
-//                         //             Notification ids must be unique! This
-//                         id already exists!
-//                         //         `
-//                         logit(`Notification ids must be unique! This id
-//                         already exists!`);
-//                     }
-//                 })
-//         });
-
-//         document.getElementById(`clearbutton${index}`).addEventListener('click',
-//         () => {
-//             clearNote(`1q2w3e4r${index}`)
-//         });
-//     }
-
-//     document.getElementById(`fetchAppNotifications`).addEventListener('click',
-//     () => {
-//         getNotes()
-//             .then((notifications) => {
-//                 // document.getElementById('clientResponse').innerHTML = `
-//                 //     ${notifications.value.length} notifications received
-//                 from the Notification Center!
-//                 // `
-//                 logit(`${notifications.value.length} notifications received
-//                 from the Notification Center`);
-//             })
-//     });
-// });
 
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
