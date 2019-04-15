@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {Notification} from '../Notification/Notification';
+import {Notification} from '../NotificationCard/NotificationCard';
 
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {GroupingType} from '../../NotificationCenterApp';
