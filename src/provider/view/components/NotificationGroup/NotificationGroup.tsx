@@ -3,7 +3,7 @@ import * as React from 'react';
 import {Notification} from '../Notification/Notification';
 
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {GroupByType} from '../../NotificationCenterApp';
+import {GroupingType} from '../../NotificationCenterApp';
 import {INotification} from '../../../../client/Notification';
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
@@ -12,13 +12,13 @@ declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 export interface NotificationGroupProps {
     name: string;
     notifications: INotification[];
-    groupBy?: GroupByType;
+    groupBy?: GroupingType;
     id?: number;
 }
 
 export function NotificationGroup(props: NotificationGroupProps) {
     function handleClearAll() {
-        if (props.groupBy === GroupByType.APPLICATION) {
+        if (props.groupBy === GroupingType.APPLICATION) {
             window.openfin.notifications.clearAppNotifications(props.name);
         } else {
             props.notifications.forEach(notification => {

@@ -6,12 +6,12 @@ import {ToastManager} from '../../../controller/ToastManager';
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {SenderInfo, INotification} from '../../../../client/Notification';
-import {GroupByType} from '../../NotificationCenterApp';
+import {GroupingType as GroupingType} from '../../NotificationCenterApp';
 
 declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 interface NotificationViewProps {
-    groupBy?: GroupByType;
+    groupBy?: GroupingType;
 }
 
 interface NotificationViewState {
@@ -152,7 +152,7 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
     private formatNotificationsAppSorted(notifications: INotification[]): NotificationGroup[] {
         const groupLookup: {[groupKey: string]: NotificationGroup} = {};
         const groups: NotificationGroup[] = [];
-        const groupMethod: GroupByType = this.props.groupBy || GroupByType.APPLICATION;
+        const groupMethod: GroupingType = this.props.groupBy || GroupingType.APPLICATION;
 
         function getOrCreateGroup(
             groupName: string,
@@ -178,9 +178,9 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
         function getGroupTitle(notification: INotification): string {
             // When creating a new notification group, this function determines the
             // user-visible title for the group
-            if (groupMethod === GroupByType.APPLICATION) {
+            if (groupMethod === GroupingType.APPLICATION) {
                 return notification.name;
-            } else if (groupMethod === GroupByType.DATE) {
+            } else if (groupMethod === GroupingType.DATE) {
                 return moment(notification.date).calendar(undefined, {
                     sameDay: '[Today]',
                     nextDay: '[Tomorrow]',
@@ -198,14 +198,14 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
             (a: INotification, b: INotification) => b.date.getUTCMilliseconds() - a.date.getUTCMilliseconds()
         );
 
-        if (groupMethod === GroupByType.APPLICATION) {
+        if (groupMethod === GroupingType.APPLICATION) {
             notifications.forEach((notification: INotification) => {
                 getOrCreateGroup(
                     notification.uuid,
                     notification
                 ).notifications.push(notification);
             });
-        } else if (groupMethod === GroupByType.DATE) {
+        } else if (groupMethod === GroupingType.DATE) {
             notifications.forEach(notification => {
                 const date: Date = new Date(notification.date);
                 const dateStr: string = [

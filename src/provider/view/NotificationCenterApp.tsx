@@ -8,11 +8,11 @@ import {setup} from './setup';
 import {NotificationCenter} from '../controller/NotificationCenter';
 
 interface AppState {
-    groupBy: GroupByType;
-    handleGroupBy: (groupBy: GroupByType) => void;
+    groupBy: GroupingType;
+    handleGroupBy: (groupBy: GroupingType) => void;
 }
 
-export enum GroupByType {
+export enum GroupingType {
     APPLICATION,
     DATE
 }
@@ -22,7 +22,7 @@ export class NotificationCenterApp extends React.Component<{}, AppState> {
         super(props);
 
         this.state = {
-            groupBy: GroupByType.APPLICATION,
+            groupBy: GroupingType.APPLICATION,
             handleGroupBy: this.handleGroupBy.bind(this)
         };
     }
@@ -46,7 +46,7 @@ export class NotificationCenterApp extends React.Component<{}, AppState> {
         );
     }
 
-    private handleGroupBy(groupBy: GroupByType): void {
+    private handleGroupBy(groupBy: GroupingType): void {
         this.setState(Object.assign({}, this.state, {groupBy}));
     }
 }

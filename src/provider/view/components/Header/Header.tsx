@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {GroupByType} from '../../NotificationCenterApp';
+import {GroupingType} from '../../NotificationCenterApp';
 
 interface HeaderProps {
-    groupBy: GroupByType;
-    handleGroupBy: (groupBy: GroupByType) => void;
+    groupBy: GroupingType;
+    handleGroupBy: (groupBy: GroupingType) => void;
     handleHideWindow: (value?: boolean) => void;
 }
 
@@ -16,7 +16,7 @@ export function Header(props: HeaderProps): React.ReactElement {
                 <div
                     className="sort-button"
                     onClick={() =>
-                        handleGroupBy(GroupByType.APPLICATION)
+                        handleGroupBy(GroupingType.APPLICATION)
                     }
                 >
                     APPLICATION
@@ -24,7 +24,7 @@ export function Header(props: HeaderProps): React.ReactElement {
                 <div
                     className="sort-button"
                     onClick={() =>
-                        handleGroupBy(GroupByType.DATE)
+                        handleGroupBy(GroupingType.DATE)
                     }
                 >
                     DATE
