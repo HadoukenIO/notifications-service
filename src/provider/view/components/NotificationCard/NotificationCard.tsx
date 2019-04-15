@@ -21,7 +21,7 @@ export function Notification(props: NotificationProps) {
     }
 
     let buttons = null;
-    if (props.meta.type === NotificationType.BUTTON) {
+    if (props.meta.type === NotificationTypes.BUTTON) {
         buttons = props.meta.buttons.map((button, idx) => {
             return (
                 <Button

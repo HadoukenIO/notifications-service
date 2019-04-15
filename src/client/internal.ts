@@ -8,8 +8,8 @@
  * These types are a part of the client, but are not required by applications wishing to interact with the service.
  * This file is excluded from the public-facing TypeScript documentation.
  */
-import {NotificationOptions} from './models/NotificationOptions';
-import {Notification} from '../shared/models/Notification';
+import {NotificationOptions} from './Notification';
+import {Notification} from './Notification';
 
 /**
  * The identity of the main application window of the service provider

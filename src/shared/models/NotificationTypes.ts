@@ -1,5 +1,3 @@
-import {ISenderInfo} from '../../provider/models/ISenderInfo';
-import {Notification} from './Notification';
 import { CreatePayload } from '../../client/internal';
 
 export enum NotificationType {

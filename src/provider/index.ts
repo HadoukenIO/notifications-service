@@ -2,7 +2,7 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
 import {CHANNEL_NAME} from '../client/config';
-import {Notification, NotificationTypes, NotificationEvent, TypeResolver, SenderInfo} from '../client/Notification';
+import {Notification, NotificationTypes, resolveType, SenderInfo, OptionButton, OptionInput} from '../client/Notification';
 
 import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';
 import {Repositories} from './persistence/dataLayer/repositories/RepositoryEnum';
@@ -10,9 +10,8 @@ import {RepositoryFactory} from './persistence/dataLayer/repositories/Repository
 import {SettingsRepository} from './persistence/dataLayer/repositories/SettingsRepository';
 import { APIHandler } from './APIHandler';
 import { APITopic, API, CreatePayload, ClearPayload } from '../client/internal';
-import { OptionButton, OptionInput } from '../client/models/NotificationOptions';
 import { Identity } from 'openfin/_v2/main';
-import { NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent } from '../client/models/NotificationEvent';
+import { NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent, NotificationEvent } from '../client/models/NotificationEvent';
 
 const repositoryFactory = RepositoryFactory.Instance;
 const historyRepository = repositoryFactory.getRepository(Repositories.history) as HistoryRepository;

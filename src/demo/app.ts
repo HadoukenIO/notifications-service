@@ -1,5 +1,5 @@
 import * as ofnotes from '../client/index';
-import {NotificationOptions} from '../client/models/NotificationOptions';
+import {NotificationOptions} from '../client/Notification';
 import { NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/models/NotificationEvent';
 
 function makeNote(id: string, opts: NotificationOptions) {
@@ -32,7 +32,7 @@ const buttonNote: NotificationOptions = {
     icon: 'favicon.ico',
     context: {testContext: 'testContext'},
     date: new Date(),
-    buttons: [{title: 'test1', iconUrl: 'favicon.ico'}, {title: 'test2', iconUrl: 'favicon.ico'}],
+    buttons: [{title: 'test1', icon: 'favicon.ico'}, {title: 'test2', icon: 'favicon.ico'}],
     inputs: []
 };
 

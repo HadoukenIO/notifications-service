@@ -1,4 +1,4 @@
-import {Entity} from './Entity';
+import {Entity} from '../../client/Entity';
 import {NotificationType} from './NotificationTypes';
 import { NotificationContext, OptionButton, OptionInput } from '../../client/models/NotificationOptions';
 
