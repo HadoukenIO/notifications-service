@@ -1,5 +1,3 @@
-declare var console: Console;
-
 const numApps: number = 3;
 
 const baseUrl: string = window.location.href.split('/').slice(0, -1).join('/');

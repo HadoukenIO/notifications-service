@@ -63,7 +63,7 @@ fin.desktop.main(async () => {
                     //             Notification ids must be unique! This id already
                     //             exists!
                     //         `
-                    logit(`Notification ids must be unique! This id already exists!`);
+                    logit('Notification ids must be unique! This id already exists!');
                 }
             });
         });
@@ -73,7 +73,7 @@ fin.desktop.main(async () => {
         });
     }
 
-    document.getElementById(`fetchAppNotifications`)!.addEventListener('click', () => {
+    document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
         getNotes().then((notifications) => {
             // document.getElementById('clientResponse').innerHTML = `
             //     ${notifications.value.length} notifications received from the

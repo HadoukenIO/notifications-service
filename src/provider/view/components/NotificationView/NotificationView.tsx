@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import moment from 'moment';
 
 import {ToastManager} from '../../../controller/ToastManager';
@@ -8,7 +7,7 @@ import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {SenderInfo, INotification} from '../../../../client/Notification';
 import {GroupingType as GroupingType} from '../../NotificationCenterApp';
 
-declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
+declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 interface NotificationViewProps {
     groupBy?: GroupingType;
@@ -67,26 +66,20 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
                 'notificationCreated',
                 (payload: INotification & SenderInfo): string => {
                     const notifications: INotification[] = this.state.notifications.slice(),
-                        index: number = notifications.findIndex(
-                            (notification: INotification) =>
-                                notification.id === payload.id &&
-                                notification.uuid === payload.uuid
-                        );
+                        index: number = notifications.findIndex((notification: INotification) =>
+                            notification.id === payload.id &&
+                                notification.uuid === payload.uuid);
 
                     if (index === -1) {
-                        notifications.push(
-                            Object.assign(payload, {
-                                date: new Date(payload.date)
-                            })
-                        );
+                        notifications.push(Object.assign(payload, {
+                            date: new Date(payload.date)
+                        }));
                         this.setState({notifications});
                     } else {
                         // TODO: Harden messaging within provider so that this can't
                         // happen. To reproduce issue, hit 'create' button twice in
                         // succession.
-                        console.warn(
-                            'A notification was added, but notification already exists - ignoring new notification'
-                        );
+                        console.warn('A notification was added, but notification already exists - ignoring new notification');
                     }
 
                     ToastManager.instance.create(payload);
@@ -98,19 +91,15 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
                 'notificationCleared',
                 (payload: {id: string} & SenderInfo): string => {
                     const notifications: INotification[] = this.state.notifications.slice();
-                    const index: number = notifications.findIndex(
-                        (notification: INotification) =>
-                            notification.id === payload.id &&
-                            notification.uuid === payload.uuid
-                    );
+                    const index: number = notifications.findIndex((notification: INotification) =>
+                        notification.id === payload.id &&
+                            notification.uuid === payload.uuid);
 
                     if (index >= 0) {
                         notifications.splice(index, 1);
                         this.setState({notifications});
                     } else {
-                        console.warn(
-                            "A notification was cleared, but couldn't find it within the list of active notifications"
-                        );
+                        console.warn('A notification was cleared, but couldn\'t find it within the list of active notifications');
                     }
                     return '';
                 }
@@ -119,9 +108,7 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
             window.openfin.notifications.addEventListener(
                 'appNotificationsCleared',
                 (payload: {uuid: string}): string => {
-                    const newNotifications: INotification[] = this.state.notifications.filter(
-                        notification => notification.uuid !== payload.uuid
-                    );
+                    const newNotifications: INotification[] = this.state.notifications.filter(notification => notification.uuid !== payload.uuid);
                     this.setState({notifications: newNotifications});
                     return '';
                 }
@@ -135,16 +122,14 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
     }
 
     public render(): React.ReactNode {
-        const groups: NotificationGroup[] = this.formatNotificationsAppSorted(
-            this.state.notifications
-        );
+        const groups: NotificationGroup[] = this.formatNotificationsAppSorted(this.state.notifications);
         const components: JSX.Element[] = this.createComponents(groups);
 
         return <div className="notification-container">{components}</div>;
     }
 
     /**
-     * @method formatNotificationsAppSorted Formats Notification state object for
+     * @function formatNotificationsAppSorted Formats Notification state object for
      * app sorted option
      * @private
      * @returns Array<NotificationGroup>
@@ -190,13 +175,11 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
                     sameElse: 'DD/MM/YYYY'
                 });
             }
-            throw new Error(`invalid groupMethod : $ { groupMethod }`);
+            throw new Error('invalid groupMethod : $ { groupMethod }');
         }
 
         // Pre-sort notifications by date (groups will then also be sorted by date)
-        notifications.sort(
-            (a: INotification, b: INotification) => b.date.getUTCMilliseconds() - a.date.getUTCMilliseconds()
-        );
+        notifications.sort((a: INotification, b: INotification) => b.date.getUTCMilliseconds() - a.date.getUTCMilliseconds());
 
         if (groupMethod === GroupingType.APPLICATION) {
             notifications.forEach((notification: INotification) => {
@@ -214,9 +197,7 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
                     date.getDate()
                 ].join('-');
 
-                getOrCreateGroup(dateStr, notification).notifications.push(
-                    notification
-                );
+                getOrCreateGroup(dateStr, notification).notifications.push(notification);
             });
         }
 
@@ -224,20 +205,18 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
     }
 
     /**
-     * @method createComponents Converts model objects into react components
+     * @function createComponents Converts model objects into react components
      * @returns JSX.Element[] Array of NotificationGroup components, one per each
      * INotificationGroup in input
      */
     private createComponents(groups: NotificationGroup[]): JSX.Element[] {
-        return groups.map(
-            (group: NotificationGroup): JSX.Element => (
-                <NotificationGroup
-                    key={group.key}
-                    name={group.title}
-                    notifications={group.notifications}
-                    groupBy={this.props.groupBy}
-                />
-            )
-        );
+        return groups.map((group: NotificationGroup): JSX.Element => (
+            <NotificationGroup
+                key={group.key}
+                name={group.title}
+                notifications={group.notifications}
+                groupBy={this.props.groupBy}
+            />
+        ));
     }
 }
