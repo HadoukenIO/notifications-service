@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import {ToastManager} from '../../../controller/ToastManager';
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
