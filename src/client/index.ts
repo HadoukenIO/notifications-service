@@ -1,11 +1,8 @@
 console.log('Client index.js loaded');
 
-import {CHANNEL_NAME} from '../shared/config';
+import {CHANNEL_NAME} from './config';
 
-import {Notification} from '../shared/models/Notification';
-import {ISenderInfo} from '../provider/models/ISenderInfo';
-import {NotificationEvent} from '../shared/models/NotificationEvent';
-import {NotificationOptions} from './models/NotificationOptions';
+import {Notification, NotificationEvent, NotificationOptions, SenderInfo} from './Notification';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
 /**
@@ -30,7 +27,7 @@ const notificationClicked = (payload: NotificationEvent, sender: ProviderIdentit
 };
 
 // For testing/display purposes
-const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) => {
+const notificationButtonClicked = (payload: NotificationEvent & SenderInfo & {buttonIndex: number}, sender: ProviderIdentity) => {
     console.log('notificationButtonClicked hit');
     console.log('payload', payload);
     console.log('sender', sender);
@@ -38,7 +35,7 @@ const notificationButtonClicked = (payload: NotificationEvent&ISenderInfo&{butto
 };
 
 // For testing/display purposes
-const notificationClosed = (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
+const notificationClosed = (payload: NotificationEvent & SenderInfo, sender: ProviderIdentity) => {
     console.log('notificationClosed hit');
     console.log('payload', payload);
     console.log('sender', sender);
@@ -64,13 +61,13 @@ async function createClientPromise() {
         const clientP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts).then((client) => {
             // tslint:disable-next-line:no-any
             client.register('WARN', (payload: any) => console.warn(payload));
-            client.register('notification-clicked', (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
+            client.register('notification-clicked', (payload: NotificationEvent & SenderInfo, sender: ProviderIdentity) => {
                 callbacks.notificationClicked(payload, sender);
             });
-            client.register('notification-button-clicked', (payload: NotificationEvent&ISenderInfo&{buttonIndex: number}, sender: ProviderIdentity) => {
+            client.register('notification-button-clicked', (payload: NotificationEvent & SenderInfo & {buttonIndex: number}, sender: ProviderIdentity) => {
                 callbacks.notificationButtonClicked(payload, sender);
             });
-            client.register('notification-closed', (payload: NotificationEvent&ISenderInfo, sender: ProviderIdentity) => {
+            client.register('notification-closed', (payload: NotificationEvent & SenderInfo, sender: ProviderIdentity) => {
                 callbacks.notificationClosed(payload, sender);
             });
             return client;
@@ -128,7 +125,7 @@ export async function clearAll() {
 /**
  * @method clearAll clears all notifications for an app
  * @param {string} evt the event name
- * @param {(payload: NotificationEvent, sender: ISenderInfo) => string)} cb event handler callback
+ * @param {(payload: NotificationEvent, sender: SenderInfo) => string)} cb event handler callback
  */
 export async function addEventListener(evt: string, cb: (payload: NotificationEvent, sender: ProviderIdentity) => string) {
     if (evt === 'click') {

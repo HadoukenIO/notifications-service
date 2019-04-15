@@ -30,7 +30,7 @@
     "@types/jest": "^22.2.0",
     "@types/moment": "^2.13.0",
     "@types/node": "^9.4.6",
-    "@types/openfin": "^37.0.4",
+    "@types/openfin": "^39.0.1",
     "@types/react": "^16.8.6",
     "@types/react-dom": "^16.8.2",
     "express": "^4.16.2",

@@ -1,5 +1,5 @@
-import {ReturnResult, VoidResult} from '../../../../shared/models/Result';
-import {Settings} from '../../../../shared/models/Settings';
+import {ReturnResult, VoidResult} from '../../../model/Result';
+import {Settings} from '../../../model/Settings';
 import {IDatastore} from '../IDatastore';
 
 import {Repository} from './Repository';

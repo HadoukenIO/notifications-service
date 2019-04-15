@@ -1,5 +1,5 @@
-import {Entity} from '../../../../shared/models/Entity';
-import {ReturnResult, VoidResult} from '../../../../shared/models/Result';
+import {Entity} from '../../../../client/Entity';
+import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
 
