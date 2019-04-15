@@ -9,9 +9,7 @@
  * This file is excluded from the public-facing TypeScript documentation.
  */
 import {NotificationOptions} from './models/NotificationOptions';
-import {VoidResult, ReturnResult} from '../shared/models/Result';
 import {Notification} from '../shared/models/Notification';
-import {ISenderInfo} from '../provider/models/ISenderInfo';
 
 /**
  * The identity of the main application window of the service provider
