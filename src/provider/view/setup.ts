@@ -1,4 +1,5 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
+import {Identity} from 'openfin/_v2/main';
 
 import {APITopicExtension, APIExtension} from '../model/APIExtension';
 import {INotification, SenderInfo} from '../../client/Notification';
@@ -6,7 +7,6 @@ import {NotificationCenterEventMap, NotificationCenterAPI} from '../model/Notifi
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {SERVICE_CHANNEL, APITopic} from '../../client/internal';
 import {StoredNotification} from '../model/StoredNotification';
-import { Identity } from 'openfin/_v2/main';
 
 declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
