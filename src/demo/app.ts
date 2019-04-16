@@ -3,7 +3,7 @@ import {NotificationOptions} from '../client/Notification';
 import {NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/models/NotificationEvent';
 
 function makeNote(id: string, opts: NotificationOptions) {
-    return ofnotes.create(id, Object.assign(opts, {date: Date.now()}));
+    return ofnotes.create(Object.assign(opts, {date: Date.now(), notificationId: id}));
 }
 
 function clearNote(id: string) {
@@ -79,19 +79,19 @@ fin.desktop.main(async () => {
     ofnotes.addEventListener<NotificationClickedEvent>('notification-clicked', (event: NotificationClickedEvent) => {
         // document.getElementById('clientResponse').innerHTML = `CLICK action
         // received from notification ${payload.id}`
-        logit(`CLICK action received from notification ${event.id}`);
+        logit(`CLICK action received from notification ${event.notification.notificationId}`);
     });
 
     ofnotes.addEventListener('notification-closed', (event: NotificationClosedEvent) => {
         // document.getElementById('clientResponse').innerHTML = `CLOSE action
         // received from notification ${payload.id}`
-        logit(`CLOSE action received from notification ${event.id}`);
+        logit(`CLOSE action received from notification ${event.notification.notificationId}`);
     });
     ofnotes.addEventListener('notification-button-clicked', (event: NotificationButtonClickedEvent) => {
-        const buttonIndex = event.button;
+        const {buttonIndex, notification} = event;
         console.log(buttonIndex);
         // document.getElementById('clientResponse').innerHTML = `Button Click
         // on ${buttonTitle} action received from notification ${payload.id}`
-        logit(`BUTTON CLICK on button ${buttonIndex} on notification ${event.id}`);
+        logit(`BUTTON CLICK on button ${buttonIndex} on notification ${notification.notificationId}`);
     });
 });
