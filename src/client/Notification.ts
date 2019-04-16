@@ -79,7 +79,7 @@ export interface INotification extends Notification {
     uuid: string;
 }
 
-export function TypeResolver(payload: Notification | Notification & SenderInfo): NotificationTypes {
+export function resolveType(payload: Notification | Notification & SenderInfo): NotificationTypes {
     const button: boolean = typeof payload.buttons === 'object' && payload.buttons.length > 0 ? true : false;
     const inline: boolean = typeof payload.inputs === 'object' && payload.inputs.length > 0 ? true : false;
 
