@@ -5,7 +5,7 @@ import { NotificationEvent } from "./models/NotificationEvent";
 
 export function addEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
-        throw new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.');
+        throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
     eventEmitter.addListener(eventType, listener);
@@ -13,7 +13,7 @@ export function addEventListener<E extends NotificationEvent>(eventType: E['type
 
 export function removeEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
-        throw new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.');
+        throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
     eventEmitter.removeListener(eventType, listener);
