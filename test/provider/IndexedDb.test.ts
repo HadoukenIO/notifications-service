@@ -22,7 +22,7 @@ describe('Initialise the database', () => {
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
-    });    
+    });
 });
 
 describe('Create table in the database', () => {
@@ -48,7 +48,7 @@ describe('Create entry in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.create(null, {id:'asdf'});
+        indexedDb.create(null, {id: 'asdf'});
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -119,7 +119,7 @@ describe('update an entry in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.update(null, {id:'asdf'});
+        indexedDb.update(null, {id: 'asdf'});
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);

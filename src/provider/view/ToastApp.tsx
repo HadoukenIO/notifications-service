@@ -1,12 +1,13 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Toast} from './components/Toast/Toast';
 
 import {SenderInfo, INotification} from '../../client/Notification';
+
+import {Toast} from './components/Toast/Toast';
 import {setup} from './setup';
 
 
-declare var window: Window & {
+declare const window: Window & {
     onNotificationMessage: (message: INotification & SenderInfo) => void;
 };
 

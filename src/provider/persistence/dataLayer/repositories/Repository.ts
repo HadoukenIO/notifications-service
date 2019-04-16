@@ -23,7 +23,7 @@ export abstract class Repository<T extends Entity> {
     protected readonly TABLENAME: string;
 
     /**
-     * @constructor Constructor
+     * @class Constructor
      * @param {IDatastore} datastore The low level database layer
      * @param {string} tableName The name of the table the repository will be responsible for
      */
@@ -33,7 +33,7 @@ export abstract class Repository<T extends Entity> {
     }
 
     /**
-     * @method getTableName return the table name
+     * @function getTableName return the table name
      * @returns {string} The name of the table
      * @public
      */
@@ -42,7 +42,7 @@ export abstract class Repository<T extends Entity> {
     }
 
     /**
-     * @method genericCreate Creates a entity in the database
+     * @function genericCreate Creates a entity in the database
      * @param {T} entity The entity to be saved into the database
      * @protected
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
@@ -62,14 +62,14 @@ export abstract class Repository<T extends Entity> {
     }
 
     /**
-     * @method genericGetAll Gets all entities in the database from the table
+     * @function genericGetAll Gets all entities in the database from the table
      * @protected
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     protected async genericGetAll(): Promise<ReturnResult<T[]>> {
         const result = await this.mDataStore.readAll(this.TABLENAME);
 
-        if (result == null) {
+        if (result === null) {
             return {success: false, errorMsg: `Could not retrieve all entities from the table ${this.TABLENAME}`, value: null};
         }
 
@@ -77,7 +77,7 @@ export abstract class Repository<T extends Entity> {
     }
 
     /**
-     * @method genericGetById Retrieves the entity corresponding to that Id
+     * @function genericGetById Retrieves the entity corresponding to that Id
      * @param {T} id The id of the entity
      * @protected
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
@@ -97,7 +97,7 @@ export abstract class Repository<T extends Entity> {
     }
 
     /**
-     * @method genericRemove Deletes an entry in the database based on the entity
+     * @function genericRemove Deletes an entry in the database based on the entity
      * ID
      * @param {tring|number} id The id of the entry we want to remove
      * @protected
@@ -118,7 +118,7 @@ export abstract class Repository<T extends Entity> {
     }
 
     /**
-     * @method genericRemoveAll Removes all notifications fomr the history store
+     * @function genericRemoveAll Removes all notifications fomr the history store
      * @protected
      * @returns {Promise<VoidResult>} Success message and value return back to calling client
      */
@@ -133,7 +133,7 @@ export abstract class Repository<T extends Entity> {
     }
 
     /**
-     * @method update Updates a notification in the history store
+     * @function update Updates a notification in the history store
      * @param {T} entity The updated notification
      * @protected
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
@@ -159,7 +159,7 @@ export abstract class Repository<T extends Entity> {
     }
 
     /**
-     * @method genericGetByPage Gets the results depending on the page
+     * @function genericGetByPage Gets the results depending on the page
      * @param {PageInfo} pageInfo Metadata around the number of items on a page and the page number
      * @protected
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
@@ -171,7 +171,7 @@ export abstract class Repository<T extends Entity> {
 
         const result = await this.mDataStore.readByPage(this.TABLENAME, pageInfo);
 
-        if (result == null) {
+        if (result === null) {
             return {success: false, errorMsg: 'Could not retrieve the page requested', value: null};
         }
 

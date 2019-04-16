@@ -9,7 +9,7 @@ import {Repository} from './Repository';
  */
 export class SettingsRepository extends Repository<Settings> {
     /**
-     * @constructor Constructor
+     * @class Constructor
      * @param {IDatastore} datastore The low leve database layer
      */
     constructor(datastore: IDatastore<Settings>) {
@@ -17,7 +17,7 @@ export class SettingsRepository extends Repository<Settings> {
     }
 
     /**
-     * @method getTableName return the table name
+     * @function getTableName return the table name
      * @returns {string} The name of the table
      * @public
      */
@@ -26,7 +26,7 @@ export class SettingsRepository extends Repository<Settings> {
     }
 
     /**
-     * @method create Creates the settings in the database
+     * @function create Creates the settings in the database
      * @param {Settings} setting The settings to be saved
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
@@ -42,11 +42,11 @@ export class SettingsRepository extends Repository<Settings> {
             return {success: false, errorMsg: 'There are already settings saved', value: null};
         }
 
-        return await super.genericCreate(setting);
+        return super.genericCreate(setting);
     }
 
     /**
-     * @method getAll Gets the settings in the database
+     * @function getAll Gets the settings in the database
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
@@ -61,26 +61,26 @@ export class SettingsRepository extends Repository<Settings> {
     }
 
     /**
-     * @method remove Removes settings from the settings store
+     * @function remove Removes settings from the settings store
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async remove(): Promise<VoidResult> {
-        return await super.genericRemoveAll();
+        return super.genericRemoveAll();
     }
 
     /**
-     * @method update Updates the settings in the settings store
+     * @function update Updates the settings in the settings store
      * @param updatedSettings The updated settings
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async update(updatedSettings: Settings): Promise<ReturnResult<Settings>> {
-        return await super.genericUpdate(updatedSettings);
+        return super.genericUpdate(updatedSettings);
     }
 
     /**
-     * @method instanceOf This is used as a user defined type guard
+     * @function instanceOf This is used as a user defined type guard
      * @param {any} object The object we are checking
      * @returns {}
      */

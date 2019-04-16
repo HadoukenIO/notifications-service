@@ -1,4 +1,4 @@
-declare var window: Window&fin.OpenFinWindow&{WindowInfo: WindowInfo};
+declare const window: Window&fin.OpenFinWindow&{WindowInfo: WindowInfo};
 
 export class WindowInfo {
     private height: number = 0;
@@ -38,7 +38,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method getHeight Gets Attached Windows Height
+     * @function getHeight Gets Attached Windows Height
      * @returns number
      */
     public getHeight(): number {
@@ -46,7 +46,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method getWidth Gets Attached Windows Width
+     * @function getWidth Gets Attached Windows Width
      * @returns number
      */
     public getWidth(): number {
@@ -54,7 +54,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method getWindow Gets Attached Window
+     * @function getWindow Gets Attached Window
      * @returns fin.desktop.Window
      */
     public getWindow(): fin.OpenFinWindow {
@@ -62,7 +62,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method getIdealHeight Gets the "ideal Height" for the window
+     * @function getIdealHeight Gets the "ideal Height" for the window
      * @returns number
      */
     public getIdealHeight(): number {
@@ -70,7 +70,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method getIdealWidth Gets the "ideal Width" for the window
+     * @function getIdealWidth Gets the "ideal Width" for the window
      * @returns number
      */
     public getIdealWidth(): number {
@@ -78,7 +78,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method recalibrate Recalibrates the window, height, and width
+     * @function recalibrate Recalibrates the window, height, and width
      * @returns void
      */
     public recalibrate(): void {
@@ -88,7 +88,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method setShowing set if the window is showing
+     * @function setShowing set if the window is showing
      * @param showing boolean
      */
     public setShowing(showing: boolean): void {
@@ -98,7 +98,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method getShowingStatus Gets the showing status of the window
+     * @function getShowingStatus Gets the showing status of the window
      * @returns boolean
      */
     public getShowingStatus(): boolean {
@@ -106,7 +106,7 @@ export class WindowInfo {
     }
 
     /**
-     * @method instance Gets this WindowInfo instance on the window.
+     * @function instance Gets this WindowInfo instance on the window.
      * @returns WindowInfo
      */
     public static get instance(): WindowInfo {

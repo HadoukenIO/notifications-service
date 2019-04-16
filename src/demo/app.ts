@@ -1,6 +1,6 @@
 import * as ofnotes from '../client/index';
 import {NotificationOptions} from '../client/Notification';
-import { NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/models/NotificationEvent';
+import {NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/models/NotificationEvent';
 
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(id, Object.assign(opts, {date: Date.now()}));
@@ -66,7 +66,7 @@ fin.desktop.main(async () => {
         });
     }
 
-    document.getElementById(`fetchAppNotifications`)!.addEventListener('click', () => {
+    document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
         getNotes().then((notifications) => {
             // document.getElementById('clientResponse').innerHTML = `
             //     ${notifications.value.length} notifications received from the

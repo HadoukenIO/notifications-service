@@ -1,4 +1,4 @@
-import {Notification, SenderInfo,} from '../../../../client/Notification';
+import {Notification, SenderInfo} from '../../../../client/Notification';
 import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
@@ -13,7 +13,7 @@ type DataType = Notification&SenderInfo;
  */
 export class HistoryRepository extends Repository<DataType> {
     /**
-     * @constructor Constructor
+     * @class Constructor
      * @param {IDatastore} datastore The low level database layer
      */
     constructor(datastore: IDatastore<DataType>) {
@@ -21,7 +21,7 @@ export class HistoryRepository extends Repository<DataType> {
     }
 
     /**
-     * @method getTableName return the table name
+     * @function getTableName return the table name
      * @returns {string} The name of the table
      * @public
      */
@@ -30,36 +30,36 @@ export class HistoryRepository extends Repository<DataType> {
     }
 
     /**
-     * @method create Creates a notification in the database
+     * @function create Creates a notification in the database
      * @param {INotificationEvent} notification The notification to be saved
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async create(notification: Notification&SenderInfo): Promise<ReturnResult<DataType>> {
-        return await super.genericCreate(notification);
+        return super.genericCreate(notification);
     }
 
     /**
-     * @method getAll Gets all notifications in the database
+     * @function getAll Gets all notifications in the database
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async getAll(): Promise<ReturnResult<DataType[]>> {
-        return await super.genericGetAll();
+        return super.genericGetAll();
     }
 
     /**
-     * @method getById Retrieves the notification corresponding to that Id
+     * @function getById Retrieves the notification corresponding to that Id
      * @param id The id of the notification
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async getById(id: string): Promise<ReturnResult<DataType>> {
-        return await super.genericGetById(id);
+        return super.genericGetById(id);
     }
 
     /**
-     * @method getByUuid Retrieves all notifications given a uuid
+     * @function getByUuid Retrieves all notifications given a uuid
      * @param uuid THe uuid of the app
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
@@ -67,7 +67,7 @@ export class HistoryRepository extends Repository<DataType> {
     public async getByUuid(uuid: string): Promise<ReturnResult<DataType[]>> {
         const result = await this.mDataStore.readByUuid(this.TABLENAME, uuid);
 
-        if (result == null) {
+        if (result === null) {
             return {success: false, errorMsg: 'Could not retrieve by uuid: ' + uuid, value: null};
         }
 
@@ -75,26 +75,26 @@ export class HistoryRepository extends Repository<DataType> {
     }
 
     /**
-     * @method remove Remove a notification from the history store
+     * @function remove Remove a notification from the history store
      * @param {string} id The id of the notification
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async remove(id: string): Promise<VoidResult> {
-        return await super.genericRemove(id);
+        return super.genericRemove(id);
     }
 
     /**
-     * @method removeAll Removes all notifications fomr the history store
+     * @function removeAll Removes all notifications fomr the history store
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async removeAll(): Promise<VoidResult> {
-        return await super.genericRemoveAll();
+        return super.genericRemoveAll();
     }
 
     /**
-     * @method removeByUuid Removes all notification related to a specific
+     * @function removeByUuid Removes all notification related to a specific
      * application
      * @param {string} uuid The uuid of the application
      * @public
@@ -115,22 +115,22 @@ export class HistoryRepository extends Repository<DataType> {
     }
 
     /**
-     * @method update Updates a notification in the history store
+     * @function update Updates a notification in the history store
      * @param updatedNotification The updated notification
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async update(updatedNotification: Notification&SenderInfo): Promise<ReturnResult<DataType>> {
-        return await super.genericUpdate(updatedNotification);
+        return super.genericUpdate(updatedNotification);
     }
 
     /**
-     * @method getByPage Gets the results depending on the page
+     * @function getByPage Gets the results depending on the page
      * @param {PageInfo} pageInfo Metadata around the number of items on a page and the page number
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
     public async getByPage(pageInfo: PageInfo): Promise<ReturnResult<DataType[]>> {
-        return await super.genericGetByPage(pageInfo);
+        return super.genericGetByPage(pageInfo);
     }
 }

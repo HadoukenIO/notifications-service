@@ -1,7 +1,7 @@
-import { tryServiceDispatch, eventEmitter } from "./connection";
-import { APITopic } from "./internal";
-import { NotificationOptions, Notification} from './Notification';
-import { NotificationEvent } from "./models/NotificationEvent";
+import {tryServiceDispatch, eventEmitter} from './connection';
+import {APITopic} from './internal';
+import {NotificationOptions, Notification} from './Notification';
+import {NotificationEvent} from './models/NotificationEvent';
 
 export function addEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {

@@ -6,7 +6,7 @@ import {SERVICE_CHANNEL} from '../client/internal';
 
 /**
  * Semantic type definition.
- * 
+ *
  * Whilst not enforceable via TypeScript, wherever this type is used it is expected that a string-based enum will be
  * used as the source of that string.
  */
@@ -14,10 +14,10 @@ type Enum = string;
 
 /**
  * Defines a tuple that stores the payload and return type of an API method.
- * 
- * The first element will be an interface containing the "payload" of the API - an object containing any parameters 
+ *
+ * The first element will be an interface containing the "payload" of the API - an object containing any parameters
  * that need to be passed from client to provider.
- * 
+ *
  * The second element is the return type of the API - the type (possibly `void`) that is passed from the provider back
  * to the client.
  */
@@ -25,7 +25,7 @@ export type APIDefinition = [unknown, unknown];
 
 /**
  * Defines the external API of the service. This is a mapping of method identifiers to `APIDefinition` tuples.
- * 
+ *
  * The keys of this mapping are the string 'topic' values that are used to communicate via the IAB Channel.
  */
 export type APISpecification<T extends Enum> = {
@@ -40,7 +40,7 @@ export type APIAction<T extends APIDefinition> = (payload: T[0], source: Provide
 
 /**
  * Defines an object that contains a callback for each API method.
- * 
+ *
  * The signature of each method must match the payload and return type defined in the `T` API specification.
  */
 export type APIImplementation<T extends Enum, S extends APISpecification<T>> = {
@@ -49,7 +49,7 @@ export type APIImplementation<T extends Enum, S extends APISpecification<T>> = {
 
 /**
  * Generic client/provider interaction handler.
- * 
+ *
  * Type args:
  *   T: Defines API topics. An enum that defines each available function call.
  */

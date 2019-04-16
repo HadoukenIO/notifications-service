@@ -1,6 +1,7 @@
-import {WindowInfo} from './WindowInfo';
 import {TrayIconClicked} from 'openfin/_v2/api/events/application';
-declare var window: Window & {WindowManager: NotificationCenter};
+
+import {WindowInfo} from './WindowInfo';
+declare const window: Window & {WindowManager: NotificationCenter};
 
 
 export class NotificationCenter {
@@ -17,7 +18,7 @@ export class NotificationCenter {
     }
 
     /**
-     * @method setEventListeners Initalizes event listeners for the window
+     * @function setEventListeners Initalizes event listeners for the window
      * @returns void
      */
     public setEventListeners(): void {
@@ -47,7 +48,7 @@ export class NotificationCenter {
     }
 
     /**
-     * @method onWindowLoad Fired when the window DOM is loaded
+     * @function onWindowLoad Fired when the window DOM is loaded
      * @returns void
      */
     public onWindowLoad(): void {
@@ -57,7 +58,7 @@ export class NotificationCenter {
     }
 
     /**
-     * @method sizeToFit Sets the window dimensions in shape of a side bar
+     * @function sizeToFit Sets the window dimensions in shape of a side bar
      * @returns void
      */
     public sizeToFit(forceShow: boolean = false): void {
@@ -74,12 +75,13 @@ export class NotificationCenter {
                 },
                 (reason: string) => {
                     console.warn('MOVED FAILED', reason);
-                });
+                }
+            );
         });
     }
 
     /**
-     * @method showWindow Shows the Window with Fade()
+     * @function showWindow Shows the Window with Fade()
      * @returns void
      */
     public showWindow(): void {
@@ -90,7 +92,7 @@ export class NotificationCenter {
     }
 
     /**
-     * @method hideWindow Hides the window with Fade()
+     * @function hideWindow Hides the window with Fade()
      * @returns void
      */
     public hideWindow(): void {
@@ -99,7 +101,7 @@ export class NotificationCenter {
     }
 
     /**
-     * @method toggleWindow Hides or shows the center.
+     * @function toggleWindow Hides or shows the center.
      * @returns void
      */
     public toggleWindow(): void {
@@ -111,7 +113,7 @@ export class NotificationCenter {
     }
 
     /**
-     * @method fade Fades the window in or out
+     * @function fade Fades the window in or out
      * @param fadeOut
      * @param timeout
      */
@@ -126,7 +128,7 @@ export class NotificationCenter {
     }
 
     /**
-     * @method instance Gets this WindowManager instance on the window.
+     * @function instance Gets this WindowManager instance on the window.
      * @returns WindowManager
      */
     public static get instance(): NotificationCenter {

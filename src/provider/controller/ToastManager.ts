@@ -1,4 +1,5 @@
 import {Notification, SenderInfo} from '../../client/Notification';
+
 import {WindowInfo} from './WindowInfo';
 
 interface Toast {
@@ -25,7 +26,7 @@ export class ToastManager {
     }
 
     /**
-     * @method create Creates a Fin Notification
+     * @function create Creates a Fin Notification
      * @param {INotification} meta Notification Information
      * @param {boolean} force Force show a notification, regardless of window showing or not
      */
@@ -43,7 +44,7 @@ export class ToastManager {
     }
 
     /**
-     * @method closeAll Closes all Toasts
+     * @function closeAll Closes all Toasts
      * @returns void
      */
     public closeAll(): void {
@@ -53,7 +54,7 @@ export class ToastManager {
     }
 
     /**
-     * @method windowShowingEventHandler Handler for the WindowShowingUpdate Event
+     * @function windowShowingEventHandler Handler for the WindowShowingUpdate Event
      * @param {CustomEvent} e
      */
     private windowShowingEventHandler(e: CustomEvent<{showing: boolean}>): void {
@@ -63,7 +64,7 @@ export class ToastManager {
     }
 
     /**
-     * @method instance Returns the Toast Manager Instance
+     * @function instance Returns the Toast Manager Instance
      * @returns {ToastManager}
      * @static
      */

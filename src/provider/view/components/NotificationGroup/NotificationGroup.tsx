@@ -1,11 +1,10 @@
 import * as React from 'react';
 
 import {Notification} from '../NotificationCard/NotificationCard';
-
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {GroupingType} from '../../NotificationCenterApp';
 import {INotification} from '../../../../client/Notification';
-declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
+declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 
 
@@ -28,16 +27,12 @@ export function NotificationGroup(props: NotificationGroupProps) {
     }
 
     if (props.notifications.length > 0) {
-        const sortedNotifications = props.notifications.sort(
-            (a: INotification, b: INotification) => {
-                return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
-            }
-        );
-        const notificationArray: React.ReactNode[] = sortedNotifications.map(
-            note => (
-                <Notification key={[note.uuid, note.id].join(':')} meta={note} />
-            )
-        );
+        const sortedNotifications = props.notifications.sort((a: INotification, b: INotification) => {
+            return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
+        });
+        const notificationArray: React.ReactNode[] = sortedNotifications.map(note => (
+            <Notification key={[note.uuid, note.id].join(':')} meta={note} />
+        ));
 
         return (
             <div className="notification-group-wrap">

@@ -12,10 +12,11 @@
  * This file is excluded from the public-facing TypeScript documentation.
  */
 import {EventEmitter} from 'events';
-import { ChannelClient } from 'openfin/_v2/api/interappbus/channel/client';
+
+import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
 import {APITopic, SERVICE_CHANNEL, API} from './internal';
-import { NotificationEvent } from './models/NotificationEvent';
+import {NotificationEvent} from './models/NotificationEvent';
 
 /**
  * The version of the NPM package.
@@ -25,9 +26,9 @@ import { NotificationEvent } from './models/NotificationEvent';
 declare const PACKAGE_VERSION: string;
 
 /**
- * Defines all events that are fired by the service. 
- * 
- * Currently only one type, but leaving this here to match the service pattern and 
+ * Defines all events that are fired by the service.
+ *
+ * Currently only one type, but leaving this here to match the service pattern and
  * in case others are needed in future.
  */
 export type NotificationsEvent = NotificationEvent;
@@ -41,7 +42,7 @@ export const eventEmitter = new EventEmitter();
  * Promise to the channel object that allows us to connect to the client
  */
 export const channelPromise: Promise<ChannelClient> = typeof fin === 'undefined' ?
-    Promise.reject('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.') :
+    Promise.reject(new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.')) :
     fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
         // Register service listeners
         channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
