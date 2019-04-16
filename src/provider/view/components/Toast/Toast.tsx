@@ -1,7 +1,8 @@
 import * as React from 'react';
+
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {SenderInfo, INotification} from '../../../../client/Notification';
-declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
+declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 interface ToastProps {
     meta: INotification & SenderInfo;

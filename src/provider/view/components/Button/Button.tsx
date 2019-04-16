@@ -3,7 +3,7 @@ import * as React from 'react';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {INotification} from '../../../../client/Notification';
 
-declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
+declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 export interface NotificationButtonProps {
     meta: INotification;

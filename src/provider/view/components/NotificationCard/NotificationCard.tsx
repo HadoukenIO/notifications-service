@@ -1,9 +1,10 @@
 import * as React from 'react';
+
 import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {Button} from '../Button/Button';
 import {NotificationTypes, INotification} from '../../../../client/Notification';
-declare var window: Window & {openfin: {notifications: NotificationCenterAPI}};
+declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 
 interface NotificationProps {

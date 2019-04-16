@@ -1,11 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
+import {NotificationCenter} from '../controller/NotificationCenter';
+
 import {Header} from './components/Header/Header';
 import {NotificationView} from './components/NotificationView/NotificationView';
 import {Footer} from './components/Footer/Footer';
 import {setup} from './setup';
-import {NotificationCenter} from '../controller/NotificationCenter';
 
 interface AppState {
     groupBy: GroupingType;

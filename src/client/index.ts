@@ -1,9 +1,9 @@
 console.log('Client index.js loaded');
 
-import {CHANNEL_NAME} from './config';
-
-import {Notification, NotificationEvent, NotificationOptions, SenderInfo} from './Notification';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
+
+import {CHANNEL_NAME} from './config';
+import {Notification, NotificationEvent, NotificationOptions, SenderInfo} from './Notification';
 
 /**
  * The version of the NPM package.
@@ -51,7 +51,7 @@ const callbacks = {
 async function createClientPromise() {
     await new Promise((resolve, reject) => {
         if (!fin) {
-            reject('fin is not defined, This module is only intended for use in an OpenFin application.');
+            reject(new Error('fin is not defined, This module is only intended for use in an OpenFin application.'));
         }
         fin.desktop.main(() => resolve());
     });
@@ -82,7 +82,7 @@ async function createClientPromise() {
 const clientP = createClientPromise();
 
 /**
- * @method create Creates a new notification
+ * @function create Creates a new notification
  * @param {string} id The id of the notification
  * @param {NotificationOptions} options notification options
  */
@@ -94,7 +94,7 @@ export async function create(id: string, options: NotificationOptions) {
 }
 
 /**
- * @method getAll get all notifications for this app
+ * @function getAll get all notifications for this app
  */
 export async function getAll() {
     const plugin = await clientP;
@@ -103,7 +103,7 @@ export async function getAll() {
 }
 
 /**
- * @method clear clears a notification by it's ID
+ * @function clear clears a notification by it's ID
  * @param {string} id The id of the notification
  */
 export async function clear(id: string) {
@@ -114,7 +114,7 @@ export async function clear(id: string) {
 }
 
 /**
- * @method clearAll clears all notifications for an app
+ * @function clearAll clears all notifications for an app
  */
 export async function clearAll() {
     const plugin = await clientP;
@@ -123,7 +123,7 @@ export async function clearAll() {
 }
 
 /**
- * @method clearAll clears all notifications for an app
+ * @function clearAll clears all notifications for an app
  * @param {string} evt the event name
  * @param {(payload: NotificationEvent, sender: SenderInfo) => string)} cb event handler callback
  */

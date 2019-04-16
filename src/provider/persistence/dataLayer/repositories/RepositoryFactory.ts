@@ -35,7 +35,7 @@ export class RepositoryFactory {
     private mRepositoryStore: IRepositories;
 
     /**
-     * @constructor Constructor Initialises member variables and sets up the
+     * @class Constructor Initialises member variables and sets up the
      * database
      * @param datastore The low level database layer
      */
@@ -61,7 +61,7 @@ export class RepositoryFactory {
     }
 
     /**
-     * @method Returns the singleton instance of itself
+     * @function Returns the singleton instance of itself
      * @returns {RepositoryFactory} Returns an instance of itself
      */
     public static get Instance() {
@@ -69,7 +69,7 @@ export class RepositoryFactory {
     }
 
     /**
-     * @method Returns the selected repository
+     * @function Returns the selected repository
      * @param repositoryName The name of the repository you want to retrieve
      * @returns {Repository} The repository selected
      */
