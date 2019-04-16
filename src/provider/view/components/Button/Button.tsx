@@ -1,17 +1,17 @@
 import * as React from 'react';
 
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {INotification} from '../../../../client/Notification';
+import {StoredNotification} from '../../../model/StoredNotification';
 
 declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 export interface NotificationButtonProps {
-    meta: INotification;
+    meta: StoredNotification;
     buttonIndex: number;
 }
 
 export function Button(props: NotificationButtonProps) {
-    const button = props.meta.buttons[props.buttonIndex];
+    const button = props.meta.notification.buttons[props.buttonIndex];
 
     function handleButtonClick(e: React.MouseEvent<HTMLElement>) {
         e.stopPropagation();

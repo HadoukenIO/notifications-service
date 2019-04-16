@@ -8,6 +8,8 @@
  * These types are a part of the client, but are not required by applications wishing to interact with the service.
  * This file is excluded from the public-facing TypeScript documentation.
  */
+import {Identity} from 'openfin/_v2/main';
+
 import {NotificationOptions, Notification} from './models/NotificationOptions';
 import {Entity} from './Entity';
 
@@ -35,7 +37,7 @@ export const enum APITopic {
 export type API = {
     [APITopic.CREATE_NOTIFICATION]: [NotificationOptions, Notification];
     [APITopic.CLEAR_NOTIFICATION]: [Entity, boolean];
-    [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
+    [APITopic.CLEAR_APP_NOTIFICATIONS]: [Identity | undefined, number];
     [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
 };

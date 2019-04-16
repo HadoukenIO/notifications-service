@@ -2,12 +2,12 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
 
-import {resolveType, SenderInfo, OptionButton, OptionInput} from '../client/Notification';
-import {APITopic, API, ClearPayload} from '../client/internal';
+import {APITopic} from '../client/internal';
 import {NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent, NotificationEvent} from '../client/models/NotificationEvent';
-import {NotificationOptions, Notification} from '../client/models/NotificationOptions';
+import {NotificationOptions, Notification, OptionButton} from '../client/models/NotificationOptions';
 import {Entity} from '../client/Entity';
 
+import {APIExtension, APITopicExtension} from './model/APIExtension';
 import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';
 import {Repositories} from './persistence/dataLayer/repositories/RepositoryEnum';
 import {RepositoryFactory} from './persistence/dataLayer/repositories/RepositoryFactory';
@@ -58,24 +58,6 @@ fin.desktop.main(() => {
     );
 });
 
-// These define the hidden extensions to the api
-// that are used for comms with the center
-enum APITopicExtension {
-    NOTIFICATION_CLICKED = 'notification-clicked',
-    NOTIFICATION_BUTTON_CLICKED = 'notification-button-clicked',
-    NOTIFICATION_CLOSED = 'notification-closed',
-    FETCH_ALL_NOTIFICATIONS = 'fetch-all-notifications',
-    CLEAR_ALL_NOTIFICATIONS = 'clear-all-notifications'
-}
-
-interface APIExtension extends API {
-    [APITopicExtension.NOTIFICATION_CLICKED]: [StoredNotification, void];
-    [APITopicExtension.NOTIFICATION_BUTTON_CLICKED]: [StoredNotification & {buttonIndex: number}, void];
-    [APITopicExtension.NOTIFICATION_CLOSED]: [StoredNotification, void];
-    [APITopicExtension.FETCH_ALL_NOTIFICATIONS]: [undefined, StoredNotification[]];
-    [APITopicExtension.CLEAR_ALL_NOTIFICATIONS]: [undefined, boolean];
-}
-
 /**
  * @function registerService Registers the service and any functions that can be
  * consumed
@@ -109,13 +91,6 @@ async function registerService() {
             console.log(`connection from client: ${app.name}, unable to determine version`);
         }
     });
-
-    // Functions called by the Notification Center
-    apiHandler.channel.register('notification-clicked', notificationClicked);
-    apiHandler.channel.register('notification-button-clicked', notificationButtonClicked);
-    apiHandler.channel.register('notification-closed', notificationClosed);
-    apiHandler.channel.register('fetch-all-notifications', fetchAllNotifications);
-    apiHandler.channel.register('clear-all-notifications', clearAllNotifications);
 }
 
 async function dispatchClientEvent(target: Identity, payload: NotificationEvent): Promise<void> {
@@ -126,7 +101,7 @@ async function dispatchClientEvent(target: Identity, payload: NotificationEvent)
  * Maps action to expected parameter type for actions registered
  * to the channel in the notification center
  */
-interface NotificationCenterAPI {
+interface NotificationCenterEventMap {
     'notification-created': StoredNotification;
     'notification-cleared': StoredNotification;
     'app-notifications-cleared': {uuid: string};
@@ -138,7 +113,7 @@ interface NotificationCenterAPI {
  * Sends a channel message to the notification center.
  * Action and payload type must match according to the NotificationCenterAPI interface mappings
  */
-async function sendCenterMessage<A extends keyof NotificationCenterAPI>(action: A, payload: NotificationCenterAPI[A]): Promise<void> {
+async function sendCenterMessage<A extends keyof NotificationCenterEventMap>(action: A, payload: NotificationCenterEventMap[A]): Promise<void> {
     await providerChannel.dispatch(centerIdentity, action, payload);
 }
 
@@ -352,7 +327,7 @@ async function fetchAllNotifications(payload: undefined, sender: ProviderIdentit
  * @param {undefined} payload The payload can contain the uuid
  * @param {SenderInfo} sender The sender info contains the uuid of the sender
  */
-async function fetchAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<Notification[]> {
+async function fetchAppNotifications(payload: Identity | undefined, sender: ProviderIdentity): Promise<Notification[]> {
     // For testing/display purposes
     console.log('fetchAppNotifications hit');
 
@@ -397,21 +372,26 @@ async function clearAllNotifications(payload: undefined, sender: ProviderIdentit
     }
 }
 
-async function clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
+async function clearAppNotifications(payload: Identity | undefined, sender: ProviderIdentity): Promise<number> {
     console.log('clearAppNotifications hit');
 
     console.log('payload', payload);
     console.log('sender', sender);
 
+    if (payload === undefined) {
+        console.log('payload undefined, assigning sender as payload');
+        payload = sender;
+    }
+
     testDisplay('clearAppNotifications', payload, sender);
 
     // Delete app notifications from indexeddb
-    const result = await historyRepository.removeByUuid(sender.uuid);
+    const result = await historyRepository.removeByUuid(payload.uuid);
 
     if (result.success) {
         // Delete the notifications/toasts in UI (TODO: NEED TO REGISTER
         // APP-NOTIFICATIONS-CLEARED IN UI)
-        await sendCenterMessage('app-notifications-cleared', sender);
+        await sendCenterMessage('app-notifications-cleared', payload);
         return result.value;
     } else {
         throw new Error(result.errorMsg);

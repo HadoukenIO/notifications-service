@@ -1,10 +1,11 @@
 import {Notification, SenderInfo} from '../../client/Notification';
+import {StoredNotification} from '../model/StoredNotification';
 
 import {WindowInfo} from './WindowInfo';
 
 interface Toast {
     note: fin.OpenFinNotification;
-    meta: Notification & SenderInfo;
+    meta: StoredNotification
 }
 
 
@@ -30,7 +31,7 @@ export class ToastManager {
      * @param {INotification} meta Notification Information
      * @param {boolean} force Force show a notification, regardless of window showing or not
      */
-    public create(meta: Notification & SenderInfo, force: boolean = false) {
+    public create(meta: StoredNotification, force: boolean = false) {
         if (!force) {
             if (WindowInfo.instance.getShowingStatus()) {
                 return;

@@ -1,11 +1,11 @@
 import * as React from 'react';
 
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {SenderInfo, INotification} from '../../../../client/Notification';
+import {StoredNotification} from '../../../model/StoredNotification';
 declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 interface ToastProps {
-    meta: INotification & SenderInfo;
+    meta: StoredNotification
 }
 
 const enum ClickEvents {
@@ -53,18 +53,18 @@ export function Toast(props: ToastProps) {
                         >
                             <div className="notification-source">
                                 <img
-                                    src={props.meta.icon}
+                                    src={props.meta.notification.icon}
                                     className="notification-small-img"
                                 />
                                 <span className="notification-source-text">
-                                    {props.meta.name}
+                                    {props.meta.source.name}
                                 </span>
                             </div>
                             <div className="notification-body-title">
-                                {props.meta.title}
+                                {props.meta.notification.title}
                             </div>
                             <div className="notification-body-text">
-                                {props.meta.body}
+                                {props.meta.notification.body}
                             </div>
                         </div>
                     </li>

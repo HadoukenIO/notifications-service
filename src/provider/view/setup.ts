@@ -1,16 +1,24 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
-import {CHANNEL_NAME} from '../../client/config';
+import {APITopicExtension, APIExtension} from '../model/APIExtension';
 import {INotification, SenderInfo} from '../../client/Notification';
 import {NotificationCenterEventMap, NotificationCenterAPI} from '../model/NotificationCenterAPI';
 import {NotificationCenter} from '../controller/NotificationCenter';
+import {SERVICE_CHANNEL, APITopic} from '../../client/internal';
+import {StoredNotification} from '../model/StoredNotification';
+import { Identity } from 'openfin/_v2/main';
 
 declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 export function setup(isNotificationCenter?: boolean) {
     fin.desktop.main(async () => {
         const opts = {payload: {version: 'center'}};
-        const pluginP = fin.InterApplicationBus.Channel.connect(CHANNEL_NAME, opts);
+        const pluginP = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, opts);
+
+        async function sendCenterMessage<T extends APITopicExtension | APITopic>(action: T, payload: APIExtension[T][0]): Promise<APIExtension[T][1]> {
+            const channelClient = await pluginP;
+            return channelClient.dispatch(action, payload);
+        }
 
         function notificationCreated(payload: INotification & SenderInfo, sender: ProviderIdentity) {
             // For testing/display purposes
@@ -41,56 +49,34 @@ export function setup(isNotificationCenter?: boolean) {
 
         window.openfin = {
             notifications: {
-                clickHandler: async (payload: INotification) => {
+                clickHandler: async (payload: StoredNotification): Promise<void> => {
                     // Handle a click on a notification
-                    const plugin = await pluginP;
-                    const success = await plugin.dispatch('notification-clicked', payload);
-                    console.log('success', success);
+                    return sendCenterMessage(APITopicExtension.NOTIFICATION_CLICKED, payload);
                 },
-                buttonClickHandler: async (payload: INotification, buttonIndex: number) => {
+                buttonClickHandler: async (payload: StoredNotification, buttonIndex: number): Promise<void> => {
                     // Handle a click on a notification
-                    const plugin = await pluginP;
-                    const fullPayload = Object.assign({}, payload, {buttonIndex});
-                    const success = await plugin.dispatch('notification-button-clicked', fullPayload);
-                    console.log('success', success);
+                    return sendCenterMessage(APITopicExtension.NOTIFICATION_BUTTON_CLICKED, {...payload, buttonIndex});
                 },
-                closeHandler: async (payload: INotification) => {
+                closeHandler: async (payload: StoredNotification): Promise<void> => {
                     // Handle a close on a notification
-                    const plugin = await pluginP;
-                    const success = await plugin.dispatch('notification-closed', payload);
-                    console.log('success', success);
+                    return sendCenterMessage(APITopicExtension.NOTIFICATION_CLOSED, payload);
                 },
-                fetchAppNotifications: async (uuid: string) => {
+                fetchAllNotifications: async (): Promise<StoredNotification[]> => {
                     // Fetch all notifications for the center
-                    const plugin = await pluginP;
-                    const payload = {uuid};
-                    const appNotifications = await plugin.dispatch('fetch-app-notifications', payload) as (INotification & SenderInfo)[];
-                    appNotifications.forEach(n => {
-                        n.date = new Date(n.date);
-                    });
-                    console.log('appNotifications', appNotifications);
-                },
-                fetchAllNotifications: async () => {
-                    // Fetch all notifications for the center
-                    const plugin = await pluginP;
-                    const allNotifications = await plugin.dispatch('fetch-all-notifications', {}) as (INotification & SenderInfo)[];
+                    const allNotifications = await sendCenterMessage(APITopicExtension.FETCH_ALL_NOTIFICATIONS, undefined);
                     allNotifications.forEach(n => {
-                        n.date = new Date(n.date);
+                        n.notification.date = new Date(n.notification.date);
                     });
                     return allNotifications;
                 },
-                clearAllNotifications: async (payload: INotification[]) => {
+                clearAllNotifications: async (): Promise<boolean> => {
                     // Clear all notifications
-                    const plugin = await pluginP;
-                    const success = await plugin.dispatch('clear-all-notifications', payload);
-                    console.log('success', success);
+                    return sendCenterMessage(APITopicExtension.CLEAR_ALL_NOTIFICATIONS, undefined);
                 },
-                clearAppNotifications: async (uuid: string) => {
+                clearAppNotifications: async (uuid: string): Promise<number> => {
                     // Clear all notifications
-                    const plugin = await pluginP;
                     const payload = {uuid};
-                    const success = await plugin.dispatch('clear-app-notifications', payload);
-                    console.log('success', success);
+                    return sendCenterMessage(APITopic.CLEAR_APP_NOTIFICATIONS, payload);
                 },
                 addEventListener<K extends keyof NotificationCenterEventMap>(
                     event: K,
@@ -117,7 +103,7 @@ export function setup(isNotificationCenter?: boolean) {
             payload: INotification & SenderInfo,
             sender: ProviderIdentity
         ) => callbacks.notificationCleared(payload, sender));
-        plugin.register('app-notifications-cleared', (payload: SenderInfo, sender: ProviderIdentity) => callbacks.appNotificationsCleared(payload, sender));
+        plugin.register('app-notifications-cleared', (payload: Identity, sender: ProviderIdentity) => callbacks.appNotificationsCleared(payload, sender));
 
         if (isNotificationCenter) {
             plugin.register('all-notifications-cleared', allNotificationsCleared);

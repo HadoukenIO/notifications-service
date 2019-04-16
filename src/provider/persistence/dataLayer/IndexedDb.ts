@@ -307,7 +307,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
             cursorRequest.onsuccess = (event: Event) => {
                 const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
                 if (cursor) {
-                    if (cursor.value.uuid === uuid) {
+                    if (cursor.value.source.uuid === uuid) {
                         result.push(cursor.value);
                     }
                     cursor.continue();

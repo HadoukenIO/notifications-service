@@ -3,12 +3,12 @@ import * as React from 'react';
 import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {Button} from '../Button/Button';
-import {NotificationTypes, INotification} from '../../../../client/Notification';
+import {StoredNotification} from '../../../model/StoredNotification';
 declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
 
 interface NotificationProps {
-    meta: INotification;
+    meta: StoredNotification;
 }
 
 /**
@@ -22,8 +22,8 @@ export function Notification(props: NotificationProps) {
     }
 
     let buttons = null;
-    if (props.meta.type === NotificationTypes.BUTTON) {
-        buttons = props.meta.buttons.map((button, idx) => {
+    if (props.meta.notification.buttons.length > 0) {
+        buttons = props.meta.notification.buttons.map((button, idx) => {
             return (
                 <Button
                     key={idx}
@@ -46,23 +46,23 @@ export function Notification(props: NotificationProps) {
                 onClick={e => handleNotificationClose(e)}
             />
 
-            <NotificationTime date={props.meta.date} />
+            <NotificationTime date={props.meta.notification.date} />
 
             <div className="notification-body">
                 <div className="notification-source">
                     <img
-                        src={props.meta.icon}
+                        src={props.meta.notification.icon}
                         className="notification-small-img"
                     />
                     <span className="notification-source-text">
-                        {props.meta.name}
+                        {props.meta.source.name}
                     </span>
                 </div>
                 <div className="notification-body-title">
-                    {props.meta.title}
+                    {props.meta.notification.title}
                 </div>
                 <div className="notification-body-text">
-                    {props.meta.body}
+                    {props.meta.notification.body}
                 </div>
                 {buttons ? (<div id="notification-body-buttons">{buttons}</div>) : null}
             </div>
