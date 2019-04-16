@@ -8,8 +8,8 @@
  * These types are a part of the client, but are not required by applications wishing to interact with the service.
  * This file is excluded from the public-facing TypeScript documentation.
  */
-import {NotificationOptions} from './Notification';
-import {Notification} from './Notification';
+import {NotificationOptions, Notification} from './models/NotificationOptions';
+import {Entity} from './Entity';
 
 /**
  * The identity of the main application window of the service provider
@@ -33,9 +33,9 @@ export const enum APITopic {
 }
 
 export type API = {
-    [APITopic.CREATE_NOTIFICATION]: [CreatePayload, Notification];
-    [APITopic.CLEAR_NOTIFICATION]: [ClearPayload, void];
-    [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, void];
+    [APITopic.CREATE_NOTIFICATION]: [NotificationOptions, Notification];
+    [APITopic.CLEAR_NOTIFICATION]: [Entity, boolean];
+    [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
     [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
 };

@@ -1,15 +1,17 @@
+import {Notification} from './NotificationOptions';
+
 export interface NotificationClickedEvent {
     type: 'notification-clicked';
-    id: string;
+    notification: Notification;
 }
 export interface NotificationClosedEvent {
     type: 'notification-closed';
-    id: string;
+    notification: Notification;
 }
 export interface NotificationButtonClickedEvent {
     type: 'notification-button-clicked';
-    id: string;
-    button: number;
+    notification: Notification;
+    buttonIndex: number;
 }
 
 export type NotificationEvent = NotificationClickedEvent | NotificationClosedEvent | NotificationButtonClickedEvent;

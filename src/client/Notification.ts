@@ -1,5 +1,3 @@
-import {Entity} from './Entity';
-
 /**
  * User-defined context data that can be attached to notifications
  */
@@ -15,7 +13,8 @@ export enum NotificationTypes {
 /**
  * @description Interface for notification options
  */
-export interface Notification extends Entity, NotificationOptions {
+export interface Notification extends NotificationOptions {
+    id: string;
     type?: NotificationTypes;
 }
 
