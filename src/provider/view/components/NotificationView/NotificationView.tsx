@@ -175,7 +175,7 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
                     sameElse: 'DD/MM/YYYY'
                 });
             }
-            throw new Error('invalid groupMethod : $ { groupMethod }');
+            throw new Error(`invalid groupMethod : ${ groupMethod }`);
         }
 
         // Pre-sort notifications by date (groups will then also be sorted by date)
