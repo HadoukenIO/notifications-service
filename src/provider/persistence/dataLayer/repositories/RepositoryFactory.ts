@@ -1,8 +1,8 @@
 import {Entity} from '../../../../client/Entity';
-import {Notification, SenderInfo} from '../../../../client/Notification';
 import {Settings} from '../../../model/Settings';
 import {IDatastore} from '../IDatastore';
 import {IndexedDb} from '../IndexedDb';
+import {StoredNotification} from '../../../model/StoredNotification';
 
 import {HistoryRepository} from './HistoryRepository';
 import {IRepositories} from './IRepositories';
@@ -42,7 +42,7 @@ export class RepositoryFactory {
     private constructor(datastore: IDatastore<Entity>) {
         this.mDatastore = datastore;
 
-        const historyRepository = new HistoryRepository(this.mDatastore as IDatastore<Notification & SenderInfo>);
+        const historyRepository = new HistoryRepository(this.mDatastore as IDatastore<StoredNotification>);
         const settingsRepository = new SettingsRepository(this.mDatastore as IDatastore<Settings>);
 
         this.mRepositoryStore = {history: historyRepository, settings: settingsRepository};

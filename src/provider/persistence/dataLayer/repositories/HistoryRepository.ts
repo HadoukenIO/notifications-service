@@ -2,11 +2,12 @@ import {Notification, SenderInfo} from '../../../../client/Notification';
 import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
+import {StoredNotification} from '../../../model/StoredNotification';
 
 import {Repository} from './Repository';
 
 // Shorthand for the intersection-type stored in the repositry
-type DataType = Notification&SenderInfo;
+type DataType = StoredNotification;
 
 /**
  * @class Repository for history of notification
@@ -35,7 +36,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async create(notification: Notification&SenderInfo): Promise<ReturnResult<DataType>> {
+    public async create(notification: DataType): Promise<ReturnResult<DataType>> {
         return super.genericCreate(notification);
     }
 
@@ -100,7 +101,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async removeByUuid(uuid: string): Promise<VoidResult> {
+    public async removeByUuid(uuid: string): Promise<ReturnResult<number>> {
         if (!uuid) {
             throw new Error('No uuid was supplied');
         }
@@ -108,10 +109,10 @@ export class HistoryRepository extends Repository<DataType> {
         const result = await this.mDataStore.removeByUuid(this.TABLENAME, uuid);
 
         if (!result) {
-            return {success: result, errorMsg: 'Could not remove all entries in the database with the given uuid: ' + uuid};
+            return {success: false, errorMsg: 'Could not remove all entries in the database with the given uuid: ' + uuid, value: null};
         }
 
-        return {success: result};
+        return {success: true, value: result};
     }
 
     /**
@@ -120,7 +121,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async update(updatedNotification: Notification&SenderInfo): Promise<ReturnResult<DataType>> {
+    public async update(updatedNotification: StoredNotification): Promise<ReturnResult<DataType>> {
         return super.genericUpdate(updatedNotification);
     }
 
