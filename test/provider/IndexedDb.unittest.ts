@@ -18,7 +18,7 @@ describe('Initialise the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.initialise(null, null);
+        indexedDb.initialise(null!, null!);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -33,7 +33,7 @@ describe('Create table in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.create(null, null);
+        indexedDb.create(null!, null!);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -48,7 +48,7 @@ describe('Create entry in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.create(null, {id: 'asdf'});
+        indexedDb.create(null!, {id: 'asdf'});
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -61,7 +61,7 @@ describe('Create entry in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.create('sometable', null);
+        indexedDb.create('sometable', null!);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -76,7 +76,7 @@ describe('Create table in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.create(null, null);
+        indexedDb.create(null!, null!);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -91,7 +91,7 @@ describe('Remove entry from the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.remove(null, 2);
+        indexedDb.remove(null!, 2);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -104,7 +104,7 @@ describe('Remove entry from the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.remove('sometable', null);
+        indexedDb.remove('sometable', null!);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -119,7 +119,7 @@ describe('update an entry in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.update(null, {id: 'asdf'});
+        indexedDb.update(null!, {id: 'asdf'});
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
@@ -132,7 +132,7 @@ describe('update an entry in the database', () => {
         jest.spyOn(global.console, 'error');
 
         // Act
-        indexedDb.update('sometable', null);
+        indexedDb.update('sometable', null!);
 
         // Assert
         expect(console.error).toBeCalledWith(errorMessage);
