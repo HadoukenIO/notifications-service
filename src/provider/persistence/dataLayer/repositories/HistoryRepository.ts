@@ -1,9 +1,8 @@
-import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
 import {StoredNotification} from '../../../model/StoredNotification';
 
-import {Repository} from './Repository';
+import {Repository, ReturnResult, VoidResult} from './Repository';
 
 // Shorthand for the intersection-type stored in the repositry
 type DataType = StoredNotification;

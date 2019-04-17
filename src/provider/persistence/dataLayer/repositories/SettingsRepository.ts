@@ -1,8 +1,7 @@
-import {ReturnResult, VoidResult} from '../../../model/Result';
 import {Settings} from '../../../model/Settings';
 import {IDatastore} from '../IDatastore';
 
-import {Repository} from './Repository';
+import {Repository, ReturnResult, VoidResult} from './Repository';
 
 /**
  * @class A class that represents the settings table in the datastore
