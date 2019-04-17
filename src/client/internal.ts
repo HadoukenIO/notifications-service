@@ -10,8 +10,7 @@
  */
 import {Identity} from 'openfin/_v2/main';
 
-import {NotificationOptions, Notification} from './models/NotificationOptions';
-import {Entity} from './Entity';
+import {NotificationOptions, Notification} from './Notification';
 
 /**
  * The identity of the main application window of the service provider
@@ -36,7 +35,7 @@ export const enum APITopic {
 
 export type API = {
     [APITopic.CREATE_NOTIFICATION]: [NotificationOptions, Notification];
-    [APITopic.CLEAR_NOTIFICATION]: [Entity, boolean];
+    [APITopic.CLEAR_NOTIFICATION]: [ClearPayload, boolean];
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [Identity | undefined, number];
     [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];

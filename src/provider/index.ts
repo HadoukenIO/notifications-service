@@ -3,9 +3,8 @@ import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
 
 import {APITopic} from '../client/internal';
-import {NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent, NotificationEvent} from '../client/models/NotificationEvent';
-import {NotificationOptions, Notification, OptionButton} from '../client/models/NotificationOptions';
-import {Entity} from '../client/Entity';
+import {NotificationOptions, Notification, OptionButton, NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent, NotificationEvent} from '../client/Notification';
+import {Entity} from './model/Entity';
 
 import {APIExtension, APITopicExtension} from './model/APIExtension';
 import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';

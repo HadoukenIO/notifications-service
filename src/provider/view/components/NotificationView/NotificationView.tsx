@@ -4,7 +4,6 @@ import moment from 'moment';
 import {ToastManager} from '../../../controller/ToastManager';
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {SenderInfo, INotification} from '../../../../client/Notification';
 import {GroupingType as GroupingType} from '../../NotificationCenterApp';
 import {StoredNotification} from '../../../model/StoredNotification';
 

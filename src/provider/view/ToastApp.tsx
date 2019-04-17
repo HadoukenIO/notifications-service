@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import {SenderInfo, INotification} from '../../client/Notification';
 import {StoredNotification} from '../model/StoredNotification';
 
 import {Toast} from './components/Toast/Toast';

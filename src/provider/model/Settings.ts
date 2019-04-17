@@ -1,5 +1,5 @@
 
-import {Entity} from '../../client/Entity';
+import {Entity} from './Entity';
 
 /**
  * @description Model for the settings

@@ -1,4 +1,3 @@
-import {Notification, SenderInfo} from '../../client/Notification';
 import {StoredNotification} from '../model/StoredNotification';
 
 import {WindowInfo} from './WindowInfo';

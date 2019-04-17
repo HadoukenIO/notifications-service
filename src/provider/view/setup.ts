@@ -2,7 +2,6 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
 
 import {APITopicExtension, APIExtension} from '../model/APIExtension';
-import {INotification, SenderInfo} from '../../client/Notification';
 import {NotificationCenterEventMap, NotificationCenterAPI} from '../model/NotificationCenterAPI';
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {SERVICE_CHANNEL, APITopic} from '../../client/internal';
@@ -20,7 +19,7 @@ export function setup(isNotificationCenter?: boolean) {
             return channelClient.dispatch(action, payload);
         }
 
-        function notificationCreated(payload: INotification & SenderInfo, sender: ProviderIdentity) {
+        function notificationCreated(payload: StoredNotification, sender: ProviderIdentity) {
             // For testing/display purposes
             console.log('notificationCreated hit');
             console.log('payload', payload);
@@ -28,7 +27,7 @@ export function setup(isNotificationCenter?: boolean) {
             return 'notificationCreated success';
         }
 
-        function notificationCleared(payload: INotification & SenderInfo, sender: ProviderIdentity) {
+        function notificationCleared(payload: StoredNotification, sender: ProviderIdentity) {
             // For testing/display purposes
             console.log('notificationCleared hit');
             console.log('payload', payload);
@@ -36,7 +35,7 @@ export function setup(isNotificationCenter?: boolean) {
             return 'notificationCleared success';
         }
 
-        function appNotificationsCleared(payload: SenderInfo, sender: ProviderIdentity) {
+        function appNotificationsCleared(payload: Identity, sender: ProviderIdentity) {
             // For testing/display purposes
             console.log('appNotificationsCleared hit');
             console.log('payload', payload);
@@ -96,11 +95,11 @@ export function setup(isNotificationCenter?: boolean) {
 
         const plugin = await pluginP;
         plugin.register('notification-created', (
-            payload: INotification & SenderInfo,
+            payload: StoredNotification,
             sender: ProviderIdentity
         ) => callbacks.notificationCreated(payload, sender));
         plugin.register('notification-cleared', (
-            payload: INotification & SenderInfo,
+            payload: StoredNotification,
             sender: ProviderIdentity
         ) => callbacks.notificationCleared(payload, sender));
         plugin.register('app-notifications-cleared', (payload: Identity, sender: ProviderIdentity) => callbacks.appNotificationsCleared(payload, sender));
@@ -112,7 +111,7 @@ export function setup(isNotificationCenter?: boolean) {
     });
 
 
-    function allNotificationsCleared(payload: SenderInfo, sender: ProviderIdentity) {
+    function allNotificationsCleared(payload: undefined, sender: ProviderIdentity) {
     // For testing/display purposes
         console.log('allNotificationsCleared hit');
         console.log('payload', payload);

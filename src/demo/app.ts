@@ -1,6 +1,5 @@
 import * as ofnotes from '../client/index';
-import {NotificationOptions} from '../client/Notification';
-import {NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/models/NotificationEvent';
+import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/Notification';
 
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(Object.assign(opts, {date: Date.now(), notificationId: id}));
@@ -21,8 +20,7 @@ const normalNote: NotificationOptions = {
     icon: 'favicon.ico',
     context: {testContext: 'testContext'},
     date: new Date(),
-    buttons: [],
-    inputs: []
+    buttons: []
 };
 
 const buttonNote: NotificationOptions = {
@@ -32,8 +30,7 @@ const buttonNote: NotificationOptions = {
     icon: 'favicon.ico',
     context: {testContext: 'testContext'},
     date: new Date(),
-    buttons: [{title: 'test1', icon: 'favicon.ico'}, {title: 'test2', icon: 'favicon.ico'}],
-    inputs: []
+    buttons: [{title: 'test1', iconUrl: 'favicon.ico'}, {title: 'test2', iconUrl: 'favicon.ico'}]
 };
 
 function makeNoteOfType(index: number) {

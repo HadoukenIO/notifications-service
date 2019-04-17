@@ -1,4 +1,4 @@
-import {Entity} from '../../../client/Entity';
+import {Entity} from '../../model/Entity';
 import {ITable} from '../models/ITable';
 import {PageInfo} from '../models/PageInfo';
 

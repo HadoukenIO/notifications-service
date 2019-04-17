@@ -1,4 +1,4 @@
-import {Entity} from '../../../../client/Entity';
+import {Entity} from '../../../model/Entity';
 
 import {HistoryRepository} from './HistoryRepository';
 import {Repository} from './Repository';

@@ -1,4 +1,4 @@
-import {Entity} from '../../../../client/Entity';
+import {Entity} from '../../../model/Entity';
 import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';

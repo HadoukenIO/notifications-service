@@ -1,4 +1,3 @@
-import {Notification, SenderInfo} from '../../../../client/Notification';
 import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
