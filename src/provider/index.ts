@@ -156,6 +156,10 @@ async function createNotification(payload: NotificationOptions, sender: Provider
         notification
     };
 
+    // Creating a notification with an in-use ID will clear the existing notification
+    // and then create the new one
+    await clearNotification({id: notification.notificationId}, sender);
+
     // Manipulate notification data store
     const result = await historyRepository.create(internalNotification);
 
