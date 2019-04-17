@@ -4,8 +4,8 @@ import {Identity} from 'openfin/_v2/main';
 
 import {APITopic} from '../client/internal';
 import {NotificationOptions, Notification, OptionButton, NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent, NotificationEvent} from '../client/Notification';
-import {Entity} from './model/Entity';
 
+import {Entity} from './model/Entity';
 import {APIExtension, APITopicExtension} from './model/APIExtension';
 import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';
 import {Repositories} from './persistence/dataLayer/repositories/RepositoryEnum';
