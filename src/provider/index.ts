@@ -305,6 +305,10 @@ async function notificationClosed(payload: StoredNotification, sender: ProviderI
  * @param {Object} sender Not important.
  */
 async function fetchAllNotifications(payload: undefined, sender: ProviderIdentity): Promise<StoredNotification[]> {
+    // Check and only allow this method to be called from the notifications centre
+    if (sender.uuid !== centerIdentity.uuid || sender.name !== centerIdentity.name) {
+        return [];
+    }
     // For testing/display purposes
     console.log('fetchAllNotifications hit');
 
@@ -337,11 +341,16 @@ async function fetchAppNotifications(payload: Identity | undefined, sender: Prov
     console.log('payload', payload);
     console.log('sender', sender);
 
+    // Only the notification center is allowed to get other apps' notifications
+    if (payload === undefined || sender.uuid !== centerIdentity.uuid || sender.name !== centerIdentity.name) {
+        payload = sender;
+    }
+
     testDisplay('fetchAppNotifications', payload, sender);
 
     // Grab an app's notifications from indexeddb
     // Send those notifications to the requesting app.
-    const result = await historyRepository.getByUuid(sender.uuid);
+    const result = await historyRepository.getByUuid(payload.uuid);
 
     if (result.success) {
         return result.value.map(storedNotification => storedNotification.notification);
@@ -356,6 +365,10 @@ async function fetchAppNotifications(payload: Identity | undefined, sender: Prov
  * @param {SenderInfo} sender Not important
  */
 async function clearAllNotifications(payload: undefined, sender: ProviderIdentity): Promise<boolean> {
+    // Check and only allow this method to be called from the notifications centre
+    if (sender.uuid !== centerIdentity.uuid || sender.name !== centerIdentity.name) {
+        return false;
+    }
     console.log('clearAllNotifications hit');
 
     console.log('payload', payload);
@@ -381,8 +394,8 @@ async function clearAppNotifications(payload: Identity | undefined, sender: Prov
     console.log('payload', payload);
     console.log('sender', sender);
 
-    if (payload === undefined) {
-        console.log('payload undefined, assigning sender as payload');
+    // Only the notification center is allowed to clear other apps' notifications
+    if (payload === undefined || sender.uuid !== centerIdentity.uuid || sender.name !== centerIdentity.name) {
         payload = sender;
     }
 
