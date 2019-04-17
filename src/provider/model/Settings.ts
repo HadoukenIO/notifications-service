@@ -1,5 +1,5 @@
 
-import {Entity} from './Entity';
+import {Entity} from '../persistence/dataLayer/repositories/Repository';
 
 /**
  * @description Model for the settings

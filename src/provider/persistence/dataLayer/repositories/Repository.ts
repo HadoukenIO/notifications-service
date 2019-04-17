@@ -1,6 +1,12 @@
-import {Entity} from '../../../model/Entity';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
+
+/**
+ * @description Base model for any stored items
+ */
+export interface Entity {
+    id: string;
+}
 
 /**
  * Object that returns the status of a database operation.

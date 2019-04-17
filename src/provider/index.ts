@@ -2,10 +2,9 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
 
-import {APITopic} from '../client/internal';
+import {APITopic, ClearPayload} from '../client/internal';
 import {NotificationOptions, Notification, OptionButton, NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent, NotificationEvent} from '../client/Notification';
 
-import {Entity} from './model/Entity';
 import {APIExtension, APITopicExtension} from './model/APIExtension';
 import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';
 import {Repositories} from './persistence/dataLayer/repositories/RepositoryEnum';
@@ -194,7 +193,7 @@ async function toggleNotificationCenter(payload: undefined, sender: ProviderIden
  * @param {Object} sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
  * @returns {ReturnResult} Whether or not the removal of the notifications was successful.
  */
-async function clearNotification(payload: Entity, sender: ProviderIdentity): Promise<boolean> {
+async function clearNotification(payload: ClearPayload, sender: ProviderIdentity): Promise<boolean> {
     // For testing/display purposes
     console.log('clearNotification hit');
 

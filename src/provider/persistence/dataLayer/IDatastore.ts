@@ -1,6 +1,7 @@
-import {Entity} from '../../model/Entity';
 import {ITable} from '../models/ITable';
 import {PageInfo} from '../models/PageInfo';
+
+import {Entity} from './repositories/Repository';
 
 /**
  *  @description Interface for low level database access layer

@@ -1,8 +1,8 @@
-﻿import {Entity} from '../../model/Entity';
-import {ITable} from '../models/ITable';
+﻿import {ITable} from '../models/ITable';
 import {PageInfo} from '../models/PageInfo';
 import {Sorts} from '../models/Sort';
 
+import {Entity} from './repositories/Repository';
 import {IDatastore} from './IDatastore';
 
 /**

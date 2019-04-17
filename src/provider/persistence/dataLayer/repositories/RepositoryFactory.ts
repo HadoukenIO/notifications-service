@@ -1,9 +1,9 @@
-import {Entity} from '../../../model/Entity';
 import {Settings} from '../../../model/Settings';
 import {IDatastore} from '../IDatastore';
 import {IndexedDb} from '../IndexedDb';
 import {StoredNotification} from '../../../model/StoredNotification';
 
+import {Entity} from './Repository';
 import {HistoryRepository} from './HistoryRepository';
 import {IRepositories} from './IRepositories';
 import {Repository} from './Repository';
