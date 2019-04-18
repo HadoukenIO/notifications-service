@@ -42,7 +42,7 @@ export async function getAll(): Promise<Notification[]>{
 }
 
 /**
- * Returned boolean signifies what happend on the provider side
+ * Returned number signifies what happend on the provider side
  *  - >0: That number of notifications were found and succesfully deleted
  *  - =0: No notifications were found, but otherwise things worked fine
  *  - throws Error: some other unspecified error occured when retrieving or

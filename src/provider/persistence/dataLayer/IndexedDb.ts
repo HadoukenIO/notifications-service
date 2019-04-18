@@ -168,7 +168,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
      * @param {string} tableName The name of the table to perform
      * @param {string} uuid The uuid of the app
      * @public
-     * @returns {Promise<number>} A value of whether it was successfully created or not
+     * @returns {Promise<number>} The count of removed entries
      */
     public removeByUuid(tableName: string, uuid: string): Promise<number> {
         return new Promise((resolve, reject) => {

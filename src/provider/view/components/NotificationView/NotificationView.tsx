@@ -111,8 +111,6 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
             window.openfin.notifications.addEventListener(
                 'appNotificationsCleared',
                 (payload: {uuid: string}): string => {
-                    console.log('appNotificationsCleared triggered', payload);
-                    console.log('current notifications', JSON.stringify(this.state.notifications));
                     const newNotifications: StoredNotification[] = this.state.notifications.filter(notification => notification.source.uuid !== payload.uuid);
                     this.setState({notifications: newNotifications});
                     return '';

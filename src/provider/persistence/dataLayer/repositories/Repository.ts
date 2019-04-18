@@ -38,7 +38,7 @@ export interface ReturnResultFailure<T> extends VoidResultFailure {
 }
 
 /**
- * Object that reutrns the status of a database operation.
+ * Object that returns the status of a database operation.
  *
  * This interface is used for operations that do not return any data. If an
  * operation returns data, it will use ReturnResult<T> instead.
