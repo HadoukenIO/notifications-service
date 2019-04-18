@@ -24,13 +24,6 @@ export async function create(options: NotificationOptions): Promise<Notification
     return tryServiceDispatch(APITopic.CREATE_NOTIFICATION, options);
 }
 
-/**
- * Returned boolean signifies what happend on the provider side
- *  - true: Notifcation was found with that ID and succesfully deleted
- *  - false: No notification was found with that ID, but otherwise things worked fine
- *  - throws Error: some other unspecified error occured when retrieving or
- *      deleting the notification
- */
 export async function clear(id: string): Promise<boolean> {
     // Should have some sort of input validation here...
     return tryServiceDispatch(APITopic.CLEAR_NOTIFICATION, {id});
@@ -41,13 +34,6 @@ export async function getAll(): Promise<Notification[]>{
     return tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
 }
 
-/**
- * Returned number signifies what happend on the provider side
- *  - >0: That number of notifications were found and succesfully deleted
- *  - =0: No notifications were found, but otherwise things worked fine
- *  - throws Error: some other unspecified error occured when retrieving or
- *      deleting the notification
- */
 export async function clearAll(): Promise<number> {
     // Should have some sort of input validation here...
     return tryServiceDispatch(APITopic.CLEAR_APP_NOTIFICATIONS, undefined);

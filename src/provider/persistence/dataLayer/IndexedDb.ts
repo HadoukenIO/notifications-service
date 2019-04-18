@@ -180,7 +180,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
                     resolve(result.length);
                 })
                 .catch((err) => {
-                    resolve(err);
+                    reject(err);
                 });
         });
     }

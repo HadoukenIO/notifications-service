@@ -101,13 +101,12 @@ export class HistoryRepository extends Repository<StoredNotification> {
             throw new Error('No uuid was supplied');
         }
 
-        const result = await this.mDataStore.removeByUuid(this.TABLENAME, uuid);
-
-        if (!result) {
+        try {
+            const result = await this.mDataStore.removeByUuid(this.TABLENAME, uuid);
+            return {success: true, value: result};
+        } catch (err) {
             return {success: false, errorMsg: 'Could not remove all entries in the database with the given uuid: ' + uuid, value: null};
         }
-
-        return {success: true, value: result};
     }
 
     /**

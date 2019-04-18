@@ -1,11 +1,11 @@
 
 export interface NotificationOptions {
-    notificationId?: string;
+    id?: string;
     body: string;
     title: string;
     subtitle?: string;
     icon?: string;
-    context?: NotificationContext;
+    customData?: CustomData;
     date?: Date;
     buttons?: OptionButton[];
 }
@@ -18,7 +18,7 @@ export interface OptionButton {
 /**
  * User-defined context data that can be attached to notifications
  */
-export type NotificationContext = any;  // tslint:disable-line:no-any
+export type CustomData = any;
 
 export type Notification = Required<NotificationOptions>;
 

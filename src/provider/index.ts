@@ -137,12 +137,12 @@ async function createNotification(payload: NotificationOptions, sender: Provider
 
     // Hydrate the provided options with default values to make a valid notification object
     const notification: Notification = {
-        notificationId: payload.notificationId || generateId(),
+        id: payload.id || generateId(),
         body: payload.body,
         title: payload.title,
         subtitle: payload.subtitle || '',
         icon: payload.icon || '',
-        context: payload.context,
+        customData: payload.customData,
         date: payload.date || new Date(),
         buttons: payload.buttons || [] as OptionButton[]
     };
@@ -150,14 +150,14 @@ async function createNotification(payload: NotificationOptions, sender: Provider
     testDisplay('createNotification', payload, sender);
 
     const internalNotification: StoredNotification = {
-        id: encodeID(notification.notificationId, sender),
+        id: encodeID(notification.id, sender),
         source: sender,
         notification
     };
 
     // Creating a notification with an in-use ID will clear the existing notification
     // and then create the new one
-    await clearNotification({id: notification.notificationId}, sender);
+    await clearNotification({id: notification.id}, sender);
 
     // Manipulate notification data store
     const result = await historyRepository.create(internalNotification);
@@ -202,7 +202,7 @@ async function clearNotification(payload: ClearPayload, sender: ProviderIdentity
 
     testDisplay('clearNotification', payload, sender);
 
-    // Grab notificationID from payload. If not present, return error?
+    // Grab id from payload. If not present, return error?
     if (!payload.id) {
         throw new Error('Must supply a notification ID to clear!');
     }
