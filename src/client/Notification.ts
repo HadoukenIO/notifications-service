@@ -1,97 +1,39 @@
-import {Entity} from './Entity';
+
+export interface NotificationOptions {
+    id?: string;
+    body: string;
+    title: string;
+    subtitle?: string;
+    icon?: string;
+    customData?: CustomData;
+    date?: Date;
+    buttons?: OptionButton[];
+}
+
+export interface OptionButton {
+    title: string;
+    iconUrl?: string;
+}
 
 /**
  * User-defined context data that can be attached to notifications
  */
-export type NotificationContext = any;  // tslint:disable-line:no-any
+export type CustomData = any;
 
-export enum NotificationTypes {
-    DEFAULT = 'DEFAULT',
-    BUTTON = 'BUTTON',
-    INLINE = 'INLINE',
-    INLINEBUTTON = 'INLINEBUTTON'
+export type Notification = Required<NotificationOptions>;
+
+export interface NotificationClickedEvent {
+    type: 'notification-clicked';
+    notification: Notification;
 }
-
-/**
- * @description Interface for notification options
- */
-export interface Notification extends Entity, NotificationOptions {
-    type?: NotificationTypes;
+export interface NotificationClosedEvent {
+    type: 'notification-closed';
+    notification: Notification;
 }
-
-/**
- * @description Options for notifications
- */
-export interface NotificationOptions {
-    body: string;
-    title: string;
-    subtitle: string;
-    icon: string;
-    context: NotificationContext;
-    date: Date;
-    buttons: OptionButton[];
-    inputs: OptionInput[];
-}
-
-/**
- * @description interface for notification event
- */
-export interface NotificationEvent {
-    name: string;
-    uuid: string;
-    id: string;
-    context: NotificationContext;
-    buttons: OptionButton[];
+export interface NotificationButtonClickedEvent {
+    type: 'notification-button-clicked';
+    notification: Notification;
     buttonIndex: number;
 }
 
-/**
- * @description Interface for buttons
- */
-export interface OptionButton {
-    title: string;
-    icon: string;
-}
-
-/**
- * @description Interface for inputs
- */
-export interface OptionInput {
-    name: string;
-    placeholder: string;
-}
-
-/**
- * @description This gets sent on every request the client makes to the service.
- */
-export interface SenderInfo {
-    entityType: string;
-    name: string;
-    parentFrame: string;
-    uuid: string;
-    channelId: string;
-    channelName: string;
-}
-
-
-export interface INotification extends Notification {
-    name: string;
-    uuid: string;
-}
-
-export function resolveType(payload: Notification | Notification & SenderInfo): NotificationTypes {
-    const button: boolean = typeof payload.buttons === 'object' && payload.buttons.length > 0 ? true : false;
-    const inline: boolean = typeof payload.inputs === 'object' && payload.inputs.length > 0 ? true : false;
-
-    let type: NotificationTypes = NotificationTypes.DEFAULT;
-
-    if (button && !inline) {
-        type = NotificationTypes.BUTTON;
-    } else if (!button && inline) {
-        type = NotificationTypes.INLINE;
-    } else if (button && inline) {
-        type = NotificationTypes.INLINEBUTTON;
-    }
-
-    return type;
-}
+export type NotificationEvent = NotificationClickedEvent | NotificationClosedEvent | NotificationButtonClickedEvent;

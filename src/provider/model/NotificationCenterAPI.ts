@@ -1,21 +1,20 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 
-import {SenderInfo, INotification} from '../../client/Notification';
+import {StoredNotification} from './StoredNotification';
 
 export interface NotificationCenterEventMap {
-    'notificationCreated': INotification & SenderInfo;
-    'notificationCleared': INotification & SenderInfo;
-    'appNotificationsCleared': SenderInfo;
+    'notificationCreated': StoredNotification;
+    'notificationCleared': StoredNotification;
+    'appNotificationsCleared': {uuid: string};
 }
 
 export interface NotificationCenterAPI {
-    clickHandler: (payload: INotification) => {};
-    buttonClickHandler: (payload: INotification, buttonIndex: number) => {};
-    closeHandler: (payload: INotification) => {};
-    fetchAppNotifications(uuid: string): void;
-    fetchAllNotifications(): Promise<INotification[]>;
-    clearAppNotifications(uuid: string): void;
-    clearAllNotifications(payload: INotification[]): void;
+    clickHandler: (payload: StoredNotification) => {};
+    buttonClickHandler: (payload: StoredNotification, buttonIndex: number) => {};
+    closeHandler: (payload: StoredNotification) => {};
+    fetchAllNotifications(): Promise<StoredNotification[]>;
+    clearAppNotifications(uuid: string): Promise<number>;
+    clearAllNotifications(): Promise<boolean>;
     addEventListener<K extends keyof NotificationCenterEventMap>(event: K, handler: (payload: NotificationCenterEventMap[K], sender: ProviderIdentity) => void):
         void;
 }

@@ -16,7 +16,7 @@ import {EventEmitter} from 'events';
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
 import {APITopic, SERVICE_CHANNEL, API} from './internal';
-import {NotificationEvent} from './models/NotificationEvent';
+import {NotificationEvent} from './Notification';
 
 /**
  * The version of the NPM package.

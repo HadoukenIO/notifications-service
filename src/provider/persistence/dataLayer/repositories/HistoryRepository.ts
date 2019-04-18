@@ -1,22 +1,18 @@
-import {Notification, SenderInfo} from '../../../../client/Notification';
-import {ReturnResult, VoidResult} from '../../../model/Result';
 import {PageInfo} from '../../models/PageInfo';
 import {IDatastore} from '../IDatastore';
+import {StoredNotification} from '../../../model/StoredNotification';
 
-import {Repository} from './Repository';
-
-// Shorthand for the intersection-type stored in the repositry
-type DataType = Notification&SenderInfo;
+import {Repository, ReturnResult, VoidResult} from './Repository';
 
 /**
  * @class Repository for history of notification
  */
-export class HistoryRepository extends Repository<DataType> {
+export class HistoryRepository extends Repository<StoredNotification> {
     /**
      * @class Constructor
      * @param {IDatastore} datastore The low level database layer
      */
-    constructor(datastore: IDatastore<DataType>) {
+    constructor(datastore: IDatastore<StoredNotification>) {
         super(datastore, 'history');
     }
 
@@ -35,7 +31,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async create(notification: Notification&SenderInfo): Promise<ReturnResult<DataType>> {
+    public async create(notification: StoredNotification): Promise<ReturnResult<StoredNotification>> {
         return super.genericCreate(notification);
     }
 
@@ -44,7 +40,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async getAll(): Promise<ReturnResult<DataType[]>> {
+    public async getAll(): Promise<ReturnResult<StoredNotification[]>> {
         return super.genericGetAll();
     }
 
@@ -54,7 +50,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async getById(id: string): Promise<ReturnResult<DataType>> {
+    public async getById(id: string): Promise<ReturnResult<StoredNotification>> {
         return super.genericGetById(id);
     }
 
@@ -64,7 +60,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async getByUuid(uuid: string): Promise<ReturnResult<DataType[]>> {
+    public async getByUuid(uuid: string): Promise<ReturnResult<StoredNotification[]>> {
         const result = await this.mDataStore.readByUuid(this.TABLENAME, uuid);
 
         if (result === null) {
@@ -100,18 +96,17 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async removeByUuid(uuid: string): Promise<VoidResult> {
+    public async removeByUuid(uuid: string): Promise<ReturnResult<number>> {
         if (!uuid) {
             throw new Error('No uuid was supplied');
         }
 
-        const result = await this.mDataStore.removeByUuid(this.TABLENAME, uuid);
-
-        if (!result) {
-            return {success: result, errorMsg: 'Could not remove all entries in the database with the given uuid: ' + uuid};
+        try {
+            const result = await this.mDataStore.removeByUuid(this.TABLENAME, uuid);
+            return {success: true, value: result};
+        } catch (err) {
+            return {success: false, errorMsg: 'Could not remove all entries in the database with the given uuid: ' + uuid, value: null};
         }
-
-        return {success: result};
     }
 
     /**
@@ -120,7 +115,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async update(updatedNotification: Notification&SenderInfo): Promise<ReturnResult<DataType>> {
+    public async update(updatedNotification: StoredNotification): Promise<ReturnResult<StoredNotification>> {
         return super.genericUpdate(updatedNotification);
     }
 
@@ -130,7 +125,7 @@ export class HistoryRepository extends Repository<DataType> {
      * @public
      * @returns {Promise<ReturnResult>} Success message and value return back to calling client
      */
-    public async getByPage(pageInfo: PageInfo): Promise<ReturnResult<DataType[]>> {
+    public async getByPage(pageInfo: PageInfo): Promise<ReturnResult<StoredNotification[]>> {
         return super.genericGetByPage(pageInfo);
     }
 }

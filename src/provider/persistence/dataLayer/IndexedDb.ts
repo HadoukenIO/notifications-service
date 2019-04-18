@@ -1,8 +1,8 @@
-﻿import {Entity} from '../../../client/Entity';
-import {ITable} from '../models/ITable';
+﻿import {ITable} from '../models/ITable';
 import {PageInfo} from '../models/PageInfo';
 import {Sorts} from '../models/Sort';
 
+import {Entity} from './repositories/Repository';
 import {IDatastore} from './IDatastore';
 
 /**
@@ -168,19 +168,19 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
      * @param {string} tableName The name of the table to perform
      * @param {string} uuid The uuid of the app
      * @public
-     * @returns {Promise<boolean>} A value of whether it was successfully created or not
+     * @returns {Promise<number>} The count of removed entries
      */
-    public removeByUuid(tableName: string, uuid: string): Promise<boolean> {
+    public removeByUuid(tableName: string, uuid: string): Promise<number> {
         return new Promise((resolve, reject) => {
             this.readByUuid(tableName, uuid)
                 .then((result: T[]) => {
                     result.forEach((notification: T) => {
                         this.remove(tableName, notification.id);
                     });
-                    resolve(true);
+                    resolve(result.length);
                 })
                 .catch((err) => {
-                    resolve(false);
+                    reject(err);
                 });
         });
     }
@@ -307,7 +307,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
             cursorRequest.onsuccess = (event: Event) => {
                 const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
                 if (cursor) {
-                    if (cursor.value.uuid === uuid) {
+                    if (cursor.value.source.uuid === uuid) {
                         result.push(cursor.value);
                     }
                     cursor.continue();

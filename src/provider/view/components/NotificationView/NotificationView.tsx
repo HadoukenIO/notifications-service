@@ -4,8 +4,8 @@ import moment from 'moment';
 import {ToastManager} from '../../../controller/ToastManager';
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
 import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {SenderInfo, INotification} from '../../../../client/Notification';
 import {GroupingType as GroupingType} from '../../NotificationCenterApp';
+import {StoredNotification} from '../../../model/StoredNotification';
 
 declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
 
@@ -14,7 +14,7 @@ interface NotificationViewProps {
 }
 
 interface NotificationViewState {
-    notifications: INotification[];
+    notifications: StoredNotification[];
 }
 
 /**
@@ -41,7 +41,7 @@ interface NotificationGroup {
      * This array should always contain at least one notification. If there are no
      * notifications that fit within this category then the group should be deleted.
      */
-    notifications: INotification[];
+    notifications: StoredNotification[];
 }
 
 /**
@@ -60,19 +60,22 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
     public componentDidMount(): void {
         fin.desktop.main(async () => {
             const allNotifications = await window.openfin.notifications.fetchAllNotifications();
+            allNotifications.forEach(notif => {
+                notif.notification.date = new Date(notif.notification.date);
+            });
             this.setState({notifications: allNotifications});
 
             window.openfin.notifications.addEventListener(
                 'notificationCreated',
-                (payload: INotification & SenderInfo): string => {
-                    const notifications: INotification[] = this.state.notifications.slice(),
-                        index: number = notifications.findIndex((notification: INotification) =>
+                (payload: StoredNotification): string => {
+                    const notifications: StoredNotification[] = this.state.notifications.slice(),
+                        index: number = notifications.findIndex((notification: StoredNotification) =>
                             notification.id === payload.id &&
-                                notification.uuid === payload.uuid);
+                                notification.source.uuid === payload.source.uuid);
 
                     if (index === -1) {
                         notifications.push(Object.assign(payload, {
-                            date: new Date(payload.date)
+                            date: new Date(payload.notification.date)
                         }));
                         this.setState({notifications});
                     } else {
@@ -89,11 +92,11 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
 
             window.openfin.notifications.addEventListener(
                 'notificationCleared',
-                (payload: {id: string} & SenderInfo): string => {
-                    const notifications: INotification[] = this.state.notifications.slice();
-                    const index: number = notifications.findIndex((notification: INotification) =>
+                (payload: StoredNotification): string => {
+                    const notifications: StoredNotification[] = this.state.notifications.slice();
+                    const index: number = notifications.findIndex((notification: StoredNotification) =>
                         notification.id === payload.id &&
-                            notification.uuid === payload.uuid);
+                            notification.source.uuid === payload.source.uuid);
 
                     if (index >= 0) {
                         notifications.splice(index, 1);
@@ -108,7 +111,7 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
             window.openfin.notifications.addEventListener(
                 'appNotificationsCleared',
                 (payload: {uuid: string}): string => {
-                    const newNotifications: INotification[] = this.state.notifications.filter(notification => notification.uuid !== payload.uuid);
+                    const newNotifications: StoredNotification[] = this.state.notifications.filter(notification => notification.source.uuid !== payload.uuid);
                     this.setState({notifications: newNotifications});
                     return '';
                 }
@@ -134,14 +137,14 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
      * @private
      * @returns Array<NotificationGroup>
      */
-    private formatNotificationsAppSorted(notifications: INotification[]): NotificationGroup[] {
+    private formatNotificationsAppSorted(notifications: StoredNotification[]): NotificationGroup[] {
         const groupLookup: {[groupKey: string]: NotificationGroup} = {};
         const groups: NotificationGroup[] = [];
         const groupMethod: GroupingType = this.props.groupBy || GroupingType.APPLICATION;
 
         function getOrCreateGroup(
             groupName: string,
-            notification: INotification
+            notification: StoredNotification
         ): NotificationGroup {
             let group: NotificationGroup = groupLookup[groupName];
 
@@ -160,13 +163,13 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
 
             return group;
         }
-        function getGroupTitle(notification: INotification): string {
+        function getGroupTitle(notification: StoredNotification): string {
             // When creating a new notification group, this function determines the
             // user-visible title for the group
             if (groupMethod === GroupingType.APPLICATION) {
-                return notification.name;
+                return notification.source.name || notification.source.uuid;
             } else if (groupMethod === GroupingType.DATE) {
-                return moment(notification.date).calendar(undefined, {
+                return moment(notification.notification.date).calendar(undefined, {
                     sameDay: '[Today]',
                     nextDay: '[Tomorrow]',
                     nextWeek: 'dddd',
@@ -179,18 +182,19 @@ export class NotificationView extends React.Component<NotificationViewProps, Not
         }
 
         // Pre-sort notifications by date (groups will then also be sorted by date)
-        notifications.sort((a: INotification, b: INotification) => b.date.getUTCMilliseconds() - a.date.getUTCMilliseconds());
+        notifications.sort((a: StoredNotification, b: StoredNotification) =>
+            b.notification.date.valueOf() - a.notification.date.valueOf());
 
         if (groupMethod === GroupingType.APPLICATION) {
-            notifications.forEach((notification: INotification) => {
+            notifications.forEach((notification: StoredNotification) => {
                 getOrCreateGroup(
-                    notification.uuid,
+                    notification.source.uuid,
                     notification
                 ).notifications.push(notification);
             });
         } else if (groupMethod === GroupingType.DATE) {
             notifications.forEach(notification => {
-                const date: Date = new Date(notification.date);
+                const date: Date = new Date(notification.notification.date);
                 const dateStr: string = [
                     date.getFullYear(),
                     date.getMonth(),

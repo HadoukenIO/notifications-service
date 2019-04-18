@@ -1,18 +1,18 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import {SenderInfo, INotification} from '../../client/Notification';
+import {StoredNotification} from '../model/StoredNotification';
 
 import {Toast} from './components/Toast/Toast';
 import {setup} from './setup';
 
 
 declare const window: Window & {
-    onNotificationMessage: (message: INotification & SenderInfo) => void;
+    onNotificationMessage: (message: StoredNotification) => void;
 };
 
 interface ToastAppState {
-    meta: (INotification & SenderInfo) | null;
+    meta: StoredNotification | null;
 }
 
 export class ToastApp extends React.Component<{}, ToastAppState> {
@@ -39,7 +39,7 @@ export class ToastApp extends React.Component<{}, ToastAppState> {
         return null;
     }
 
-    private onNotificationMessage(message: INotification & SenderInfo): void {
+    private onNotificationMessage(message: StoredNotification): void {
         console.log(message);
         this.setState({meta: message});
     }
