@@ -1,5 +1,5 @@
 import * as ofnotes from '../client/index';
-import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/Notification';
+import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/index';
 
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(Object.assign(opts, {date: Date.now(), id}));

@@ -1,6 +1,6 @@
 import {Identity} from 'openfin/_v2/main';
 
-import {Notification} from '../../client/Notification';
+import {Notification} from '../../client/index';
 
 /**
  * Shape of the data that will be used internally by the service.

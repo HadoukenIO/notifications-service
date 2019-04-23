@@ -4,8 +4,9 @@
 
 import {tryServiceDispatch, eventEmitter} from './connection';
 import {APITopic} from './internal';
-import {NotificationOptions, Notification, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from './Notification';
-import {NotificationEvent} from './Notification';
+
+import {NotificationOptions, Notification, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from './index';
+import {NotificationEvent} from './index';
 
 export interface NotificationOptions {
     id?: string;
