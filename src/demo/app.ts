@@ -73,7 +73,7 @@ fin.desktop.main(async () => {
         });
     });
 
-    ofnotes.addEventListener<NotificationClickedEvent>('notification-clicked', (event: NotificationClickedEvent) => {
+    ofnotes.addEventListener('notification-clicked', (event: NotificationClickedEvent) => {
         // document.getElementById('clientResponse').innerHTML = `CLICK action
         // received from notification ${payload.id}`
         logit(`CLICK action received from notification ${event.notification.id}`);
