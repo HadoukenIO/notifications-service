@@ -7,6 +7,70 @@ import {APITopic} from './internal';
 import {NotificationOptions, Notification, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from './Notification';
 import {NotificationEvent} from './Notification';
 
+export interface NotificationOptions {
+    id?: string;
+    body: string;
+    title: string;
+    subtitle?: string;
+    icon?: string;
+    customData?: CustomData;
+    date?: Date;
+    buttons?: OptionButton[];
+}
+
+export interface OptionButton {
+    title: string;
+    iconUrl?: string;
+}
+
+/**
+ * User-defined context data that can be attached to notifications
+ */
+export type CustomData = any;
+
+export type Notification = Required<NotificationOptions>;
+
+/**
+ * Event fired whenever the Notification has been clicked on.
+ *
+ * This will not fire in cases of Notification Buttons being clicked.  See {@link NotificationButtonClickedEvent}.
+ *
+ * @event
+ */
+export interface NotificationClickedEvent {
+    type: 'notification-clicked';
+    notification: Notification;
+}
+
+/**
+ * Event fired whenever the Notification has been closed.
+ *
+ * @event
+ */
+export interface NotificationClosedEvent {
+    type: 'notification-closed';
+    notification: Notification;
+}
+
+/**
+ * Event fired whenever a Notification has been clicked.
+ *
+ * This will not fire in cases of non-buttons being clicked.  See {@link NotificationClickedEvent}.
+ *
+ * @event
+ */
+export interface NotificationButtonClickedEvent {
+    type: 'notification-button-clicked';
+    notification: Notification;
+    buttonIndex: number;
+}
+
+/**
+ * @hidden
+ */
+export type NotificationEvent = NotificationClickedEvent | NotificationClosedEvent | NotificationButtonClickedEvent;
+
+
 export function addEventListener(eventType: 'notification-clicked', listener: (event: NotificationClickedEvent) => void): void;
 export function addEventListener(eventType: 'notification-closed', listener: (event: NotificationClosedEvent) => void): void;
 export function addEventListener(eventType: 'notification-button-clicked', listener: (event: NotificationButtonClickedEvent) => void): void;
