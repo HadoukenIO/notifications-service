@@ -8,6 +8,9 @@ import {APITopic} from './internal';
 import {NotificationOptions, Notification, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from './index';
 import {NotificationEvent} from './index';
 
+/**
+ * Configuration options for constructing a Notifications object.
+ */
 export interface NotificationOptions {
     id?: string;
     body: string;
@@ -19,6 +22,9 @@ export interface NotificationOptions {
     buttons?: OptionButton[];
 }
 
+/**
+ * Configuration options for constructing a Button within a Notification.
+ */
 export interface OptionButton {
     title: string;
     iconUrl?: string;
@@ -29,6 +35,9 @@ export interface OptionButton {
  */
 export type CustomData = any;
 
+/**
+ * A fully hydrated form of the {@link NotificationOptions}.
+ */
 export type Notification = Required<NotificationOptions>;
 
 /**
