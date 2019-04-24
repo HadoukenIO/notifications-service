@@ -10,7 +10,7 @@
  */
 import {Identity} from 'openfin/_v2/main';
 
-import {NotificationOptions, Notification} from './Notification';
+import {NotificationOptions, Notification} from './index';
 
 /**
  * The identity of the main application window of the service provider

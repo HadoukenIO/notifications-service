@@ -15,8 +15,9 @@ import {EventEmitter} from 'events';
 
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
-import {APITopic, SERVICE_CHANNEL, API} from './internal';
-import {NotificationEvent} from './Notification';
+import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY} from './internal';
+
+import {NotificationEvent} from './index';
 
 /**
  * The version of the NPM package.
@@ -41,19 +42,23 @@ export const eventEmitter = new EventEmitter();
 /**
  * Promise to the channel object that allows us to connect to the client
  */
-export const channelPromise: Promise<ChannelClient> = typeof fin === 'undefined' ?
-    Promise.reject(new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.')) :
-    fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
-        // Register service listeners
-        channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
-        channel.register('event', (event: NotificationsEvent) => {
-            eventEmitter.emit(event.type, event);
-        });
-        // Any unregistered action will simply return false
-        channel.setDefaultAction(() => false);
+export let channelPromise: Promise<ChannelClient>;
 
-        return channel;
-    });
+if (fin.Window.me.uuid !== SERVICE_IDENTITY.uuid || fin.Window.me.name !== SERVICE_IDENTITY.name) {
+    channelPromise = typeof fin === 'undefined' ?
+        Promise.reject(new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.')) :
+        fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
+            // Register service listeners
+            channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
+            channel.register('event', (event: NotificationsEvent) => {
+                eventEmitter.emit(event.type, event);
+            });
+            // Any unregistered action will simply return false
+            channel.setDefaultAction(() => false);
+
+            return channel;
+        });
+}
 
 /**
  * Wrapper around service.dispatch to help with type checking
