@@ -1,23 +1,23 @@
-import {deregister} from 'openfin-layouts';
+import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
+import {Identity} from 'openfin/_v2/main';
 
-import {CHANNEL_NAME} from '../Shared/config';
-import {Notification} from '../Shared/Models/Notification';
-import {NotificationEvent} from '../Shared/Models/NotificationEvent';
-import {NotificationTypes, TypeResolver} from '../Shared/Models/NotificationTypes';
+import {APITopic, ClearPayload} from '../client/internal';
+import {NotificationOptions, Notification, OptionButton, NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent, NotificationEvent} from '../client/index';
 
-import {ISenderInfo} from './Models/ISenderInfo';
-import {HistoryRepository} from './Persistence/DataLayer/Repositories/HistoryRepository';
-import {Repositories} from './Persistence/DataLayer/Repositories/RepositoryEnum';
-import {RepositoryFactory} from './Persistence/DataLayer/Repositories/RepositoryFactory';
-import {SettingsRepository} from './Persistence/DataLayer/Repositories/SettingsRepository';
+import {APIExtension, APITopicExtension} from './model/APIExtension';
+import {HistoryRepository} from './persistence/dataLayer/repositories/HistoryRepository';
+import {Repositories} from './persistence/dataLayer/repositories/RepositoryEnum';
+import {RepositoryFactory} from './persistence/dataLayer/repositories/RepositoryFactory';
+import {SettingsRepository} from './persistence/dataLayer/repositories/SettingsRepository';
+import {APIHandler} from './APIHandler';
+import {StoredNotification} from './model/StoredNotification';
 
 const repositoryFactory = RepositoryFactory.Instance;
 const historyRepository = repositoryFactory.getRepository(Repositories.history) as HistoryRepository;
 const settingsRepository = repositoryFactory.getRepository(Repositories.settings) as SettingsRepository;
 
 let providerChannel: ChannelProvider;
-let serviceUUID: string;
 const centerIdentity = {
     name: 'Notification-Center',
     uuid: '',
@@ -29,7 +29,6 @@ const centerIdentity = {
  * @description Main entry point to the service
  */
 fin.desktop.main(() => {
-    deregister();
     registerService();
 
     const winConfig = {
@@ -53,19 +52,34 @@ fin.desktop.main(() => {
         },
         (error: string) => {
             console.log('Error creating Notification Center:', error);
-        });
+        }
+    );
 });
 
 /**
- * @method registerService Registers the service and any functions that can be
+ * @function registerService Registers the service and any functions that can be
  * consumed
  */
 async function registerService() {
     // Register the service
+    const apiHandler: APIHandler<APITopic | APITopicExtension> = new APIHandler();
+
+    await apiHandler.registerListeners<APIExtension>({
+        [APITopic.CREATE_NOTIFICATION]: createNotification,
+        [APITopic.CLEAR_NOTIFICATION]: clearNotification,
+        [APITopic.GET_APP_NOTIFICATIONS]: fetchAppNotifications,
+        [APITopic.CLEAR_APP_NOTIFICATIONS]: clearAppNotifications,
+        [APITopic.TOGGLE_NOTIFICATION_CENTER]: toggleNotificationCenter,
+        [APITopicExtension.NOTIFICATION_CLICKED]: notificationClicked,
+        [APITopicExtension.NOTIFICATION_BUTTON_CLICKED]: notificationButtonClicked,
+        [APITopicExtension.NOTIFICATION_CLOSED]: notificationClosed,
+        [APITopicExtension.FETCH_ALL_NOTIFICATIONS]: fetchAllNotifications,
+        [APITopicExtension.CLEAR_ALL_NOTIFICATIONS]: clearAllNotifications
+    });
+
     const serviceId = fin.desktop.Application.getCurrent().uuid;
-    // @ts-ignore v36 types not yet available. This is the new syntax.
-    providerChannel = await fin.InterApplicationBus.Channel.create(CHANNEL_NAME);
-    centerIdentity.uuid = serviceUUID = serviceId;
+    providerChannel = apiHandler.channel; // Temporary while I clean out all of the other references to this
+    centerIdentity.uuid = serviceId;
 
     // handle client connections
     providerChannel.onConnection((app, payload) => {
@@ -75,136 +89,94 @@ async function registerService() {
             console.log(`connection from client: ${app.name}, unable to determine version`);
         }
     });
-
-    // Functions called by the client
-    providerChannel.register('create-notification', createNotification);
-    providerChannel.register('toggle-notification-center', toggleNotificationCenter);
-
-    // Functions called either by the client or the Notification Center
-    providerChannel.register('clear-notification', clearNotification);
-    providerChannel.register('fetch-app-notifications', fetchAppNotifications);
-    providerChannel.register('clear-app-notifications', clearAppNotifications);
-
-    // Functions called by the Notification Center
-    providerChannel.register('notification-clicked', notificationClicked);
-    providerChannel.register('notification-button-clicked', notificationButtonClicked);
-    providerChannel.register('notification-closed', notificationClosed);
-    providerChannel.register('fetch-all-notifications', fetchAllNotifications);
-    providerChannel.register('clear-all-notifications', clearAllNotifications);
 }
 
-// Send notification created to the UI
-const dispatchNotificationCreated = async (payload: Notification&ISenderInfo) => {
-    const providerChannelPlugin = await providerChannel;
-    const success = await providerChannelPlugin.dispatch(centerIdentity, 'notification-created', payload);
-    console.log('success', success);
-};
+async function dispatchClientEvent(target: Identity, payload: NotificationEvent): Promise<void> {
+    return providerChannel.dispatch(target, 'event', payload);
+}
 
-// Send notification cleared to the UI
-const dispatchNotificationCleared = async (payload: Notification&ISenderInfo) => {
-    const providerChannelPlugin = await providerChannel;
-    const success = await providerChannelPlugin.dispatch(centerIdentity, 'notification-cleared', payload);
-    console.log('success', success);
-};
+/**
+ * Maps action to expected parameter type for actions registered
+ * to the channel in the notification center
+ */
+interface NotificationCenterEventMap {
+    'notification-created': StoredNotification;
+    'notification-cleared': StoredNotification;
+    'app-notifications-cleared': {uuid: string};
+    'all-notifications-cleared': undefined;
+    'toggle-notification-center': undefined;
+}
 
-// Send app notifications cleared to the UI
-const dispatchAppNotificationsCleared = async (payload: {uuid: string}) => {
-    const providerChannelPlugin = await providerChannel;
-    const success = await providerChannelPlugin.dispatch(centerIdentity, 'app-notifications-cleared', payload);
-    console.log('success', success);
-};
-
-// Send notification clicked to the Client
-const dispatchNotificationClicked = async (payload: NotificationEvent) => {
-    const providerChannelPlugin = await providerChannel;
-    const clientIdentity = {name: payload.name, uuid: payload.uuid, channelId: '', channelName: ''};
-    const success = await providerChannelPlugin.dispatch(clientIdentity, 'notification-clicked', payload);
-    console.log('success', success);
-};
-
-// Send notification clicked to the Client
-const dispatchNotificationButtonClicked = async (payload: Notification&ISenderInfo&{buttonIndex: number}) => {
-    const providerChannelPlugin = await providerChannel;
-    const clientIdentity = {name: payload.name, uuid: payload.uuid, channelId: '', channelName: ''};
-    const success = await providerChannelPlugin.dispatch(clientIdentity, 'notification-button-clicked', payload);
-    console.log('success', success);
-};
-
-// Send notification closed to the Client
-const dispatchNotificationClosed = async (payload: NotificationEvent) => {
-    const providerChannelPlugin = await providerChannel;
-    const clientIdentity = {name: payload.name, uuid: payload.uuid, channelId: '', channelName: ''};
-    const success = await providerChannelPlugin.dispatch(clientIdentity, 'notification-closed', payload);
-    console.log('success', success);
-};
-
-const dispatchAllNotificationsCleared = async (payload: Notification) => {
-    const providerChannelPlugin = await providerChannel;
-    const success = await providerChannelPlugin.dispatch(centerIdentity, 'all-notifications-cleared', payload);
-    console.log('success', success);
-};
-
-const dispatchToggleNotificationCenter = async (payload: undefined) => {
-    const providerChannelPlugin = await providerChannel;
-    const success = await providerChannelPlugin.dispatch(centerIdentity, 'toggle-notification-center', payload);
-    console.log('success', success);
-};
-
+/**
+ * Sends a channel message to the notification center.
+ * Action and payload type must match according to the NotificationCenterAPI interface mappings
+ */
+async function sendCenterMessage<A extends keyof NotificationCenterEventMap>(action: A, payload: NotificationCenterEventMap[A]): Promise<void> {
+    await providerChannel.dispatch(centerIdentity, action, payload);
+}
 
 /**
  * Encodes the Id which currently is the uuid:id
  * @param payload The notification object
  */
-function encodeID(payload: Notification&ISenderInfo|NotificationEvent|{id: string}&ISenderInfo): string {
-    return `${payload.uuid}:${payload.id}`;
+function encodeID(id: string, source: Identity): string {
+    return `${source.uuid}:${id}`;
 }
 
 /**
- * @method decodeID This function retrieves the notification Id
- * @param payload The notification object
+ * @function createNotification Create the notification and dispatch it to the UI
+ * @param {Object} payload The contents to be dispatched to the UI
+ * @param {Object} sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
  */
-function decodeID(payload: Notification&ISenderInfo|NotificationEvent|{id: string}&ISenderInfo): string {
-    return payload.id.slice(payload.uuid.length + 1);
-}
-
-/**
- * @method createNotification Create the notification and dispatch it to the UI
- * @param {object} payload The contents to be dispatched to the UI
- * @param {object} sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
- */
-async function createNotification(payload: Notification, sender: ISenderInfo) {
+async function createNotification(payload: NotificationOptions, sender: ProviderIdentity): Promise<Notification> {
     // For testing/display purposes
     console.log('createNotification hit');
 
     console.log('payload', payload);
     console.log('sender', sender);
 
+    // Hydrate the provided options with default values to make a valid notification object
+    const notification: Notification = {
+        id: payload.id || generateId(),
+        body: payload.body,
+        title: payload.title,
+        subtitle: payload.subtitle || '',
+        icon: payload.icon || '',
+        customData: payload.customData,
+        date: payload.date || new Date(),
+        buttons: payload.buttons || [] as OptionButton[]
+    };
+
     testDisplay('createNotification', payload, sender);
 
-    const noteType: NotificationTypes = TypeResolver(payload);
-    const fullPayload: Notification&ISenderInfo = Object.assign({}, payload, sender, {type: noteType});
-    const encodedID: string = encodeID(fullPayload);
+    const internalNotification: StoredNotification = {
+        id: encodeID(notification.id, sender),
+        source: sender,
+        notification
+    };
 
-    const fullPayloadEncoded: Notification&ISenderInfo = Object.assign({}, fullPayload, {id: encodedID});
+    // Creating a notification with an in-use ID will clear the existing notification
+    // and then create the new one
+    await clearNotification({id: notification.id}, sender);
 
     // Manipulate notification data store
-    const result = await historyRepository.create(fullPayloadEncoded);
+    const result = await historyRepository.create(internalNotification);
 
-    // Create the notification/toast in the UI
     if (result.success) {
-        dispatchNotificationCreated(fullPayload);
+        // Inform the center that the notif has been created
+        await sendCenterMessage('notification-created', internalNotification);
+        // Return the full notifiation to the client
+        return notification;
+    } else {
+        throw new Error(result.errorMsg);
     }
-
-    // Return a notification event with the notification context/id to the client
-    // that created the notification Or return the payload?
-    return result;
 }
 
 /**
- * @method toggleNotificationCenter Dispatch the notification center toggle action to the UI
- * @param {object} sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
+ * @function toggleNotificationCenter Dispatch the notification center toggle action to the UI
+ * @param {Object} sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
  */
-async function toggleNotificationCenter(payload: undefined, sender: ISenderInfo) {
+async function toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
     // For testing/display purposes
     console.log('toggleNotificationCenter hit');
 
@@ -212,18 +184,16 @@ async function toggleNotificationCenter(payload: undefined, sender: ISenderInfo)
     console.log('sender', sender);
 
     // Toggle the notification center
-    dispatchToggleNotificationCenter(undefined);
-
-    return '';
+    return sendCenterMessage('toggle-notification-center', undefined);
 }
 
 /**
- * @method clearNotification Tell the UI to delete a specific notification
- * @param {object} payload Should contain the id of the notification we want to delete. Maybe should just be a string
- * @param {object} sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
+ * @function clearNotification Tell the UI to delete a specific notification
+ * @param {Object} payload Should contain the id of the notification we want to delete. Maybe should just be a string
+ * @param {Object} sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
  * @returns {ReturnResult} Whether or not the removal of the notifications was successful.
  */
-async function clearNotification(payload: Notification, sender: ISenderInfo) {
+async function clearNotification(payload: ClearPayload, sender: ProviderIdentity): Promise<boolean> {
     // For testing/display purposes
     console.log('clearNotification hit');
 
@@ -232,31 +202,42 @@ async function clearNotification(payload: Notification, sender: ISenderInfo) {
 
     testDisplay('clearNotification', payload, sender);
 
-    // Grab notificationID from payload. If not present, return error?
+    // Grab id from payload. If not present, return error?
     if (!payload.id) {
-        return 'ERROR: Must supply a notification ID to clear!';
+        throw new Error('Must supply a notification ID to clear!');
     }
 
-    const fullPayload: Notification&ISenderInfo = Object.assign({}, payload, sender);
-    const encodedID: string = encodeID(fullPayload);
+    const encodedID: string = encodeID(payload.id, sender);
+    const retrievalResult = await historyRepository.getById(encodedID);
+    if (retrievalResult.success) {
+        const storedNotification: StoredNotification = retrievalResult.value;
 
-    // Delete notification from indexeddb
-    const result = await historyRepository.remove(encodedID);
+        // Delete notification from indexeddb
+        const result = await historyRepository.remove(encodedID);
 
-    // Delete the notification/toast in UI
-    if (result.success) {
-        dispatchNotificationCleared(fullPayload);
+        if (result.success) {
+            // Inform the Center that the notification has been deleted
+            await sendCenterMessage('notification-cleared', storedNotification);
+            return true;
+        } else {
+            // We've already checked for the existence of the notification, so an error here would be the result
+            // of some other unhandled failure, which should be reported back to the client
+            // (TODO: should we return the message or just do like a "internal error" type thing?)
+            throw new Error(result.errorMsg);
+        }
+    } else if (retrievalResult.errorMsg === `Notification with the id ${encodedID} was not found`) {
+        return false;
+    } else {
+        throw new Error(retrievalResult.errorMsg);
     }
-
-    return result;
 }
 
 /**
- * @method notificationClicked Tell the Client that a notification was clicked
- * @param {object} payload Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
- * @param {object} sender UI Window info. Not important.
+ * @function notificationClicked Tell the Client that a notification was clicked
+ * @param {Object} payload Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
+ * @param {Object} sender UI Window info. Not important.
  */
-function notificationClicked(payload: NotificationEvent&ISenderInfo, sender: ISenderInfo) {
+async function notificationClicked(payload: StoredNotification, sender: ProviderIdentity): Promise<void> {
     // For testing/display purposes
     console.log('notificationClicked hit');
 
@@ -265,15 +246,13 @@ function notificationClicked(payload: NotificationEvent&ISenderInfo, sender: ISe
 
     testDisplay('notificationClicked', payload, sender);
 
+    const event: NotificationClickedEvent = {type: 'notification-clicked', notification: payload.notification};
     // Send notification clicked event to uuid with the context.
-    dispatchNotificationClicked(payload);
-
-    // TODO: What should we return?
-    return 'notificationClicked returned';
+    dispatchClientEvent(payload.source, event);
 }
 
 
-function notificationButtonClicked(payload: Notification&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) {
+async function notificationButtonClicked(payload: StoredNotification & {buttonIndex: number}, sender: ProviderIdentity): Promise<void> {
     // For testing/display purposes
     console.log('notificationButtonClicked hit');
 
@@ -282,20 +261,19 @@ function notificationButtonClicked(payload: Notification&ISenderInfo&{buttonInde
 
     testDisplay('notificationButtonClicked', payload, sender);
 
-    // Send notification clicked event to uuid with the context.
-    dispatchNotificationButtonClicked(payload);
+    const target: Identity = payload.source;
+    const event: NotificationButtonClickedEvent = {type: 'notification-button-clicked', notification: payload.notification, buttonIndex: payload.buttonIndex};
 
-    // TODO: What should we return?
-    return 'notificationButtonClicked returned';
+    dispatchClientEvent(target, event);
 }
 
 /**
- * @method notificationClosed Tell the Client that a notification was closed,
+ * @function notificationClosed Tell the Client that a notification was closed,
  * and delete it from indexeddb
- * @param {object} payload Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
- * @param {object} sender UI Window info. Not important.
+ * @param {Object} payload Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
+ * @param {Object} sender UI Window info. Not important.
  */
-async function notificationClosed(payload: Notification&ISenderInfo&{buttonIndex: number}, sender: ISenderInfo) {
+async function notificationClosed(payload: StoredNotification, sender: ProviderIdentity): Promise<void> {
     // For testing/display purposes
     console.log('notificationClosed hit');
 
@@ -304,46 +282,46 @@ async function notificationClosed(payload: Notification&ISenderInfo&{buttonIndex
 
     testDisplay('notificationClosed', payload, sender);
 
-    const encodedID: string = encodeID(payload);
-
     // Delete notification from indexeddb
-    const result = await historyRepository.remove(encodedID);
+    const result = await historyRepository.remove(payload.id);
 
     // Send notification closed event to uuid with the context.
     if (result.success) {
-        dispatchNotificationCleared(payload);
-        dispatchNotificationClosed(payload);
-    }
+        const target: Identity = payload.source;
+        const event: NotificationClosedEvent = {type: 'notification-closed', notification: payload.notification};
 
-    // TODO: What should we return?
-    return result;
+        sendCenterMessage('notification-cleared', payload);
+        dispatchClientEvent(target, event);
+    } else {
+        throw new Error(result.errorMsg);
+    }
 }
 
 /**
- * @method fetchAllNotifications Grab all notifications from the Service and
+ * @function fetchAllNotifications Grab all notifications from the Service and
  * return it to the UI.
- * @param {object} payload Not important
- * @param {object} sender Not important.
+ * @param {Object} payload Not important
+ * @param {Object} sender Not important.
  */
-async function fetchAllNotifications(payload: undefined, sender: ISenderInfo) {
+async function fetchAllNotifications(payload: undefined, sender: ProviderIdentity): Promise<StoredNotification[]> {
+    // Check and only allow this method to be called from the notifications centre
+    if (sender.uuid !== centerIdentity.uuid || sender.name !== centerIdentity.name) {
+        return [];
+    }
     // For testing/display purposes
     console.log('fetchAllNotifications hit');
 
     console.log('payload', payload);
     console.log('sender', sender);
 
-    testDisplay('fetchAllNotifications', payload, sender);
+    // tslint:disable-next-line:no-any
+    testDisplay('fetchAllNotifications', payload as any, sender);
 
     // Grab all notifications from indexeddb.
     const result = await historyRepository.getAll();
 
     if (result.success) {
-        const allNotifications = result.value as Array<Notification&ISenderInfo>;
-
-        allNotifications.forEach((notification) => {
-            notification.id = decodeID(notification);
-        });
-
+        const allNotifications = result.value;
         return allNotifications;
     }
 
@@ -351,50 +329,45 @@ async function fetchAllNotifications(payload: undefined, sender: ISenderInfo) {
 }
 
 /**
- * @method fetchAppNotifications This allows you to fetch apps via your uuid
+ * @function fetchAppNotifications This allows you to fetch apps via your uuid
  * @param {undefined} payload The payload can contain the uuid
- * @param {ISenderInfo} sender The sender info contains the uuid of the sender
+ * @param {SenderInfo} sender The sender info contains the uuid of the sender
  */
-async function fetchAppNotifications(payload: NotificationEvent, sender: ISenderInfo) {
+async function fetchAppNotifications(payload: Identity | undefined, sender: ProviderIdentity): Promise<Notification[]> {
     // For testing/display purposes
     console.log('fetchAppNotifications hit');
 
     console.log('payload', payload);
     console.log('sender', sender);
 
-    testDisplay('fetchAppNotifications', payload, sender);
-
-    // If no uuid supplied in the payload, set to the sender's uuid. This is so
-    // you can request another app's notification (such as for the Notification
-    // Center)
-    if (!payload.uuid) {
-        payload.uuid = sender.uuid;
+    // Only the notification center is allowed to get other apps' notifications
+    if (payload === undefined || sender.uuid !== centerIdentity.uuid || sender.name !== centerIdentity.name) {
+        payload = sender;
     }
+
+    testDisplay('fetchAppNotifications', payload, sender);
 
     // Grab an app's notifications from indexeddb
     // Send those notifications to the requesting app.
     const result = await historyRepository.getByUuid(payload.uuid);
 
     if (result.success) {
-        const appNotifications = result.value as Array<Notification&ISenderInfo>;
-
-        appNotifications.forEach((notification) => {
-            console.log('notification', notification);
-            notification.id = decodeID(notification);
-        });
-
-        result.value = appNotifications;
+        return result.value.map(storedNotification => storedNotification.notification);
+    } else {
+        throw new Error(result.errorMsg);
     }
-
-    return result;
 }
 
 /**
- * @method clearAllNotifications Clears all notifications in the database
+ * @function clearAllNotifications Clears all notifications in the database
  * @param {undefined} payload Not important
- * @param {ISenderInfo} sender Not important
+ * @param {SenderInfo} sender Not important
  */
-async function clearAllNotifications(payload: Notification, sender: ISenderInfo) {
+async function clearAllNotifications(payload: undefined, sender: ProviderIdentity): Promise<boolean> {
+    // Check and only allow this method to be called from the notifications centre
+    if (sender.uuid !== centerIdentity.uuid || sender.name !== centerIdentity.name) {
+        return false;
+    }
     console.log('clearAllNotifications hit');
 
     console.log('payload', payload);
@@ -407,40 +380,46 @@ async function clearAllNotifications(payload: Notification, sender: ISenderInfo)
     const result = await historyRepository.removeAll();
 
     if (result.success) {
-        dispatchAllNotificationsCleared(payload);
+        await sendCenterMessage('all-notifications-cleared', undefined);
+        return true;
+    } else {
+        return false;
     }
-
-    // TODO: What should we return?
-    return 'clearAllNotifications returned';
 }
 
-function clearAppNotifications(payload: {uuid: string}, sender: ISenderInfo) {
+async function clearAppNotifications(payload: Identity | undefined, sender: ProviderIdentity): Promise<number> {
     console.log('clearAppNotifications hit');
 
     console.log('payload', payload);
     console.log('sender', sender);
 
+    // Only the notification center is allowed to clear other apps' notifications
+    if (payload === undefined || sender.uuid !== centerIdentity.uuid || sender.name !== centerIdentity.name) {
+        payload = sender;
+    }
+
     testDisplay('clearAppNotifications', payload, sender);
 
     // Delete app notifications from indexeddb
-    historyRepository.removeByUuid(payload.uuid);
+    const result = await historyRepository.removeByUuid(payload.uuid);
 
-    // Delete the notifications/toasts in UI (TODO: NEED TO REGISTER
-    // APP-NOTIFICATIONS-CLEARED IN UI)
-    dispatchAppNotificationsCleared(payload);
-
-
-    // TODO: What should we return?
-    return 'clearAppNotifications returned';
+    if (result.success) {
+        // Delete the notifications/toasts in UI (TODO: NEED TO REGISTER
+        // APP-NOTIFICATIONS-CLEARED IN UI)
+        await sendCenterMessage('app-notifications-cleared', payload);
+        return result.value;
+    } else {
+        throw new Error(result.errorMsg);
+    }
 }
 
 /**
- * @method testDisplay Displays test html on the service
+ * @function testDisplay Displays test html on the service
  * @param {string} action The action that was hit
  * @param {Notification} payload The notification payload
- * @param {ISenderInfo} sender The sender info
+ * @param {SenderInfo} sender The sender info
  */
-function testDisplay(action: string, payload: Notification|NotificationEvent|{uuid: string}, sender: ISenderInfo) {
+function testDisplay(action: string, payload: any, sender: ProviderIdentity) {
     document.body.innerHTML = '';
     document.body.innerHTML += `${action} hit <br></br>`;
     document.body.innerHTML += 'PAYLOAD <br></br>';
@@ -451,4 +430,14 @@ function testDisplay(action: string, payload: Notification|NotificationEvent|{uu
     const preTagSender = document.createElement('PRE');
     preTagSender.textContent = JSON.stringify(sender, null, 4);
     document.body.appendChild(preTagSender);
+}
+
+/**
+ * Generates a random string of digits to act as a notificationId
+ *
+ * TODO: Revisit this and decide what we want the actual generated
+ * IDs to be.
+ */
+function generateId(): string {
+    return Math.floor((Math.random()*9000000)+1).toString();
 }

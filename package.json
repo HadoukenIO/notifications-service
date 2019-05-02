@@ -1,26 +1,27 @@
 {
   "name": "openfin-notifications",
-  "version": "0.9.6",
-  "description": "",
-  "main": "dist/client/index.js",
+  "version": "0.10.0",
+  "description": "Client library for the Openfin Notifications service",
+  "main": "dist/client/main-bundle.js",
   "types": "dist/client/index.d.ts",
+  "files": [
+    "dist/client"
+  ],
   "scripts": {
-    "test": "jest",
-    "check": "gts check",
-    "fix": "gts fix",
-    "clean": "gts clean && rimraf dist staging",
-    "compile": "npm run compile:client && npm run compile:provider",
-    "compile:client": "genversion --es6 --semi src/client/version.ts && tsc -p tsconfig.client.json",
-    "compile:provider": "tsc -p tsconfig.provider.json",
-    "docs": "typedoc --name \"OpenFin Notifications\" --out ./build/docs --excludeNotExported --excludePrivate --excludeProtected --hideGenerator --tsconfig tsconfig.client.json --readme none",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
+    "build": "svc-tools build --mode production",
+    "build:dev": "svc-tools build --mode development",
+    "channels": "svc-tools channels",
+    "check": "svc-tools check",
+    "clean": "rimraf gen dist",
+    "docs": "svc-tools docs",
+    "fix": "svc-tools fix",
     "posttest": "npm run check",
-    "package": "webpack --mode production",
-    "package:dev": "webpack --mode development",
-    "build": "npm run compile && npm run package",
-    "build:dev": "npm run compile && npm run package:dev",
-    "start": "node server.js"
+    "prepack": "npm run clean && npm run build && tsc -p src/client/tsconfig.types.json",
+    "test": "npm run test:unit && npm run test:int",
+    "test:int": "echo 'Integration tests not available yet'",
+    "test:unit": "jest --config jest-unit.config.json",
+    "zip": "svc-tools zip",
+    "start": "svc-tools start"
   },
   "repository": {
     "type": "git",
@@ -32,54 +33,26 @@
     "url": "https://github.com/openfin/Notification-Service/issues"
   },
   "homepage": "https://github.com/openfin/Notification-Service#readme",
-  "dependencies": {
-    "openfin-layouts": "0.9.3"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/cucumber": "^4.0.1",
     "@types/jest": "^22.2.0",
     "@types/moment": "^2.13.0",
     "@types/node": "^9.4.6",
-    "@types/openfin": "^34.0.0",
-    "@types/react": "^16.3.12",
-    "@types/react-dom": "^16.0.5",
-    "copy-webpack-plugin": "^4.5.1",
-    "css-loader": "^1.0.0",
-    "cucumber": "^4.0.0",
+    "@types/openfin": "^39.0.1",
+    "@types/react": "^16.8.6",
+    "@types/react-dom": "^16.8.2",
     "express": "^4.16.2",
-    "file-loader": "^1.1.11",
-    "fs": "0.0.1-security",
-    "genversion": "^2.1.0",
-    "gts": "^0.8.0",
     "hadouken-js-adapter": "^0.36.1-alpha.1",
-    "jest": "^22.4.2",
+    "jest": "^24.5.0",
+    "jest-cli": "^24.5.0",
+    "jest-environment-node": "^24.5.0",
+    "jest-junit": "^6.3.0",
     "jest-util": "^23.4.0",
-    "mini-css-extract-plugin": "^0.4.1",
     "moment": "^2.22.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "rimraf": "^2.6.2",
-    "source-map-loader": "^0.2.3",
-    "style-loader": "^0.21.0",
+    "openfin-service-tooling": "^1.0.7",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
     "ts-jest": "^23.10.4",
-    "ts-loader": "^4.4.2",
-    "typescript": "^3.1.1",
-    "url-loader": "^1.0.1",
-    "webpack": "^4.16.1",
-    "webpack-cli": "^3.0.8"
-  },
-  "jest": {
-    "verbose": true,
-    "testURL": "http://localhost",
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": "ts-jest"
-    },
-    "testMatch": [
-      "**/__tests__/**/*.(ts|tsx)"
-    ]
+    "typescript": "~3.3.4000"
   }
 }

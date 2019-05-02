@@ -1,0 +1,22 @@
+{
+    "devtools_port": 9090,
+    "licenseKey": "64605fac-add3-48a0-8710-64b38e96a2dd",
+    "startup_app": {
+        "name": "Notifications Demo",
+        "description": "Demo of Openfin Notifications",
+        "url": "http://localhost:3922/demo/launcher.html",
+        "uuid": "notifications-demo",
+        "autoShow": true
+    },
+    "services": [
+        {
+            "name": "notifications",
+            "manifestUrl": "http://localhost:3922/provider/app.json"
+        }
+    ],
+    "runtime": {
+        "arguments": "--v=1 --enable-crash-reporting",
+        "version": "10.66.39.43"
+    },
+    "shortcut": {}
+}
