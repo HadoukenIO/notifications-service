@@ -7,7 +7,7 @@ OpenFin Notifications provide developers with a uniform way to create, display a
 
 Notifications will be displayed as toasts as well as being listed and organized in a notification center. The Notification Center can be accessed by clicking on the system tray notification icon.
 
-This project consist of 2 parts:
+This project consist of 3 parts:
 1. The Notifications Service, displaying and managing notifications and owning the Notification Center UI
 2. The Notifications Client, exposing API's for applications to create and manage notifications
 3. The Notifications Demo App, demonstrating the different features of OpenFin Notifications
