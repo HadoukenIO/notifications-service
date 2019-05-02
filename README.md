@@ -7,61 +7,21 @@ OpenFin Notifications provide developers with a uniform way to create, display a
 
 Notifications will be displayed as toasts as well as being listed and organized in a notification center. The Notification Center can be accessed by clicking on the system tray notification icon.
 
-OpenFin Notifications uses the new Services framework to expose its API to consuming applications.  You can see the documentation for these APIs here:  http://cdn.openfin.co/jsdocs/alpha/fin.desktop.Service.html.
-
-This project consist of 2 parts:
-1. The Notification Service, displaying and managing notifications and owning the Notification Center UI
-2. The Notification Client, exposing API's for applications to create and manage notifications
+This project consist of 3 parts:
+1. The Notifications Service, displaying and managing notifications and owning the Notification Center UI
+2. The Notifications Client, exposing API's for applications to create and manage notifications
+3. The Notifications Demo App, demonstrating the different features of OpenFin Notifications
 
 ### Dependencies
-- OpenFin version >= 8.56.30.42 
-- RVM >= 4.2.0.33 
+- OpenFin version for applications using Notifications = 9.61.38.41
+- OpenFin version used in the Notifications Service = 10.66.39.43
+- RVM >= 4.7
 
 ### Features
 * Create notifications
 * Clear/dismiss notifications
 * Attach handlers for click/close events
 * Persist notifications in the Notification Center
-
-### API Documentation
-- `create(id: String, options: NotificationOptions)`
-Creates a notification and sends it to the Notifications manager
-Promise resolves to ID of notification created.
-- `getAll()`
-Promise resolves to all notifications sent by the App to Notification manager that are still active (not cleared)
-- `clear(id: String)`
-Clears the notification from the Notification Center UI  
-- `clearAll()`
-Clears all notifications sent from the application
--  `addEventListener(eventName: String, handler: Function)`
-Application global event listener invoked when the use clicks the event, or button on the event
-
-#### Notification Config Options
-
-```javascript
-NotificationOptions {
-    body: string; 
-    title: string;
-    subtitle: string;
-    icon: string;
-    context: NotificationContext;
-    date: Date;
-    buttons: OptionButton[];
-    inputs: OptionInput[];
-}
-```
-
-## Roadmap
-Items on our immediate roadmap include:
-- Support for buttons/links
-- Inline reply
-- Configuration
-- Support for Types/templates
-- Remote notifications
-
-## Known Issues
-
-If notifications are persisted and the source application is restarted, all events will still be sent to the source application for handling along with the original context.  It is up to these applications to handle these events as they see fit.
 
 ## Getting Started
 
@@ -97,11 +57,11 @@ npm install openfin-notifications
 
 The client library is also available as a resource which can be included via `<script>` tag:
 ```
-   <script src="https://cdn.openfin/services/openfin/notifications/<VERSION>/openfin-notifications.js"></script>
+<script src="https://cdn.openfin.co/services/openfin/notifications/<VERSION>/openfin-notifications.js"></script>
 ```
-This will expose the global variable `OpenFinNotifications` with the API methods documented in the link below.  Example:
+This will expose the global variable `notifications` with the API methods documented in the link below.  Example:
 ```
-   const notifications = await OpenFinNotifications.getAll();
+const notifications = await notifications.getAll();
 ```
 
 The client module exports a set of functions - [API docs available here](https://cdn.openfin.co/docs/services/notifications/stable/api/).
@@ -139,21 +99,21 @@ npm test
 This will run unit tests followed by the integration tests. These steps can also be ran individually via `npm run test:unit` and `npm run test:int`. When running the tests separately in this way, both test runners support some optional arguments. Append `--help` to either of the above `npm run` commands to see the available options.
 
 ### Deployment
-Staging and production builds are managed via the Jenkinsfile build script. This will build the project as usual (except with the `--production` argument) and then deploy the client and provider to their respective locations. The demo application exists only within this repo and is not deployed.
+Staging and production builds are managed via the Jenkinsfile build script. This will build the project as usual (except with the `--mode production` argument) and then deploy the client and provider to their respective locations. The demo application exists only within this repo and is not deployed.
 
 The service client is deployed as an NPM module, so that it can be included as a dependency in any application that wishes to integrate with the service.
 
 The service provider is a standard OpenFin application, only its lifecycle is controlled by the RVM (based upon the requirements of user-launched applications) rather than being launched by users. The provider is deployed to the OpenFin CDN; a zip file is also provided to assist with re-deploying the provider to an alternate location. Direct links to each build are listed in the release notes, available on the [services versions page](https://developer.openfin.co/versions/?product=Services).
 
 ## Known Issues
-A list of known issues can be found on our [Versions page.]https://developer.openfin.co/versions/?product=Services
+A list of known issues can be found on our [versions page](https://developer.openfin.co/versions/?product=Services).
 
 ## License
 This project uses the [Apache2 license](https://www.apache.org/licenses/LICENSE-2.0)
 
 However, if you run this code, it may call on the OpenFin RVM or OpenFin Runtime, which are covered by OpenFin's Developer, Community, and Enterprise licenses. You can learn more about OpenFin licensing at the links listed below or just email us at support@openfin.co with questions.
 
-https://openfin.co/developer-agreement/
+https://openfin.co/developer-agreement/  
 https://openfin.co/licensing/
 
 ## Support
