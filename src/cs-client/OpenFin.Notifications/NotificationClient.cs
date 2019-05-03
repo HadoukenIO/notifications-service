@@ -31,7 +31,19 @@ namespace OpenFin.Notifications
         public static void Initialize(Uri manifestUri)
         {
             var runtimeOptions = Fin.RuntimeOptions.LoadManifest(manifestUri);
-            runtimeOptions.Version = "stable";
+
+            var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
+            var productAttributes = entryAssembly.GetCustomAttributes(typeof(System.Reflection.AssemblyProductAttribute), true);
+
+            if(productAttributes.Length > 0)
+            {
+                runtimeOptions.UUID = ((System.Reflection.AssemblyProductAttribute)productAttributes[0]).Product;
+            }
+            else
+            {
+                runtimeOptions.UUID = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+            }
+
 
             RuntimeInstance = Fin.Runtime.GetRuntimeInstance(runtimeOptions);
             RuntimeInstance.Connect(() =>
@@ -106,10 +118,12 @@ namespace OpenFin.Notifications
         public string Title { get; set; }
         [JsonProperty("subtitle")]
         public string Subtitle { get; set; }
-        [JsonProperty("date")]
-        public DateTime Date { get; set; } = DateTime.Now;
+        [JsonProperty("icon")]
+        public string Icon { get; set; }
         [JsonProperty("context")]
         public object Context { get; set; }
+        [JsonProperty("date")]
+        public DateTime Date { get; set; } = DateTime.Now;
         [JsonProperty("buttons")]
         public IEnumerable<NotificationButton> Buttons { get; set; }
 

@@ -1,11 +1,7 @@
 import * as React from 'react';
 import { ISenderInfo } from '../../../../models/ISenderInfo';
-import { INotification } from '../../../models/INotification';
-import { NotificationCenterAPI } from '../../../NotificationCenterAPI';
-import { Button } from '../../../components/Button/Button';
-import { NotificationTypes } from '../../../../../shared/models/NotificationTypes';
-
-
+import {INotification} from '../../../models/INotification';
+import {NotificationCenterAPI} from '../../../NotificationCenterAPI';
 declare var window: Window&{openfin: {notifications: NotificationCenterAPI}};
 
 interface IToastProps {
@@ -36,19 +32,6 @@ export function Toast(props: IToastProps){
         }
     }
 
-    let buttons = null;
-    if (props.meta.type === NotificationTypes.BUTTON) {
-        buttons = props.meta.buttons.map((button, idx) => {
-            return (
-                <Button
-                    key={idx}
-                    buttonIndex={idx}
-                    meta={props.meta}
-                />
-            );
-        });
-    }
-
     return (
         <div className="notification-container">
             <div className="notification-inbox" id="notification-inbox">
@@ -77,15 +60,12 @@ export function Toast(props: IToastProps){
                                     {props.meta.name}
                                 </span>
                             </div>
-                            <div>
-                            <span className="notification-body-title">
+                            <div className="notification-body-title">
                                 {props.meta.title}
-                            </span>
-                            <span className="notification-body-text">
-                                {props.meta.body}
-                            </span>
                             </div>
-                            { buttons ? ( <div id="notification-body-buttons">{buttons}</div> ) : null }
+                            <div className="notification-body-text">
+                                {props.meta.body}
+                            </div>
                         </div>
                     </li>
                 </ul>

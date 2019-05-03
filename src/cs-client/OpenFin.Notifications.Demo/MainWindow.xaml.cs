@@ -66,9 +66,10 @@ namespace OpenFin.Notifications.Demo
                 Title = $"WPF Alert {id}",
                 Body = "Notification Body",
                 Subtitle = "Subtitle",
+                Icon = "https://openfin.co/favicon-32x32.png",
                 Buttons = new[]
                 {
-                    new NotificationButton() { Title = "Button1" },
+                    new NotificationButton() { Title = "Button1", Icon = "https://openfin.co/favicon-32x32.png"},
                     new NotificationButton() { Title = "Button2" }
                 }
             });

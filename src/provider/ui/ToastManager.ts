@@ -34,7 +34,7 @@ export class ToastManager {
             }
         }
 
-        const note: fin.OpenFinNotification = new fin.desktop.Notification({url: 'Toast.html', message: meta, timeout: 'never'});
+        const note: fin.OpenFinNotification = new fin.desktop.Notification({url: 'Toast.html', message: meta});
 
         const toast: IToast = {note, meta};
         this.toasts.push(toast);
