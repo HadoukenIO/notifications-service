@@ -1,5 +1,6 @@
 {
     "devtools_port": 9090,
+    "licenseKey": "64605fac-add3-48a0-8710-64b38e96a2dd",
     "startup_app": {
         "name": "Notifications-Service",
         "description": "OpenFin Notifications Desktop Service",
@@ -16,6 +17,6 @@
     },
     "runtime": {
         "arguments": "--enable-aggressive-domstorage-flushing",
-        "version": "9.61.38.40"
+        "version": "10.66.39.43"
     }
 }

@@ -1,19 +1,27 @@
 {
   "name": "openfin-notifications",
-  "version": "0.9.6",
-  "description": "",
-  "main": "dist/client/index.js",
+  "version": "0.10.1",
+  "description": "Client library for the Openfin Notifications service",
+  "main": "dist/client/main-bundle.js",
   "types": "dist/client/index.d.ts",
+  "files": [
+    "dist/client"
+  ],
   "scripts": {
-    "test": "jest",
-    "check": "gts check",
-    "fix": "gts fix",
-    "clean": "gts clean",
-    "docs": "typedoc --name \"OpenFin Notifications\" --out ./dist/docs --excludeNotExported --excludePrivate --excludeProtected --hideGenerator --tsconfig src/client/tsconfig.json --readme none",
+    "build": "svc-tools build --mode production",
+    "build:dev": "svc-tools build --mode development",
+    "channels": "svc-tools channels",
+    "check": "svc-tools check",
+    "clean": "rimraf gen dist",
+    "docs": "svc-tools docs",
+    "fix": "svc-tools fix",
     "posttest": "npm run check",
-    "build": "webpack --mode production",
-    "build:dev": "webpack --mode development",
-    "start": "node server.js"
+    "prepack": "npm run clean && npm run build && tsc -p src/client/tsconfig.types.json",
+    "test": "npm run test:unit && npm run test:int",
+    "test:int": "echo 'Integration tests not available yet'",
+    "test:unit": "jest --config jest-unit.config.json",
+    "zip": "svc-tools zip",
+    "start": "svc-tools start"
   },
   "repository": {
     "type": "git",
@@ -30,42 +38,21 @@
     "@types/jest": "^22.2.0",
     "@types/moment": "^2.13.0",
     "@types/node": "^9.4.6",
-    "@types/openfin": "^37.0.4",
+    "@types/openfin": "^39.0.1",
     "@types/react": "^16.8.6",
     "@types/react-dom": "^16.8.2",
-    "copy-webpack-plugin": "^4.5.1",
-    "css-loader": "^1.0.0",
     "express": "^4.16.2",
-    "file-loader": "^3.0.1",
-    "gts": "^0.8.0",
     "hadouken-js-adapter": "^0.36.1-alpha.1",
-    "jest": "^22.4.2",
+    "jest": "^24.5.0",
+    "jest-cli": "^24.5.0",
+    "jest-environment-node": "^24.5.0",
+    "jest-junit": "^6.3.0",
     "jest-util": "^23.4.0",
     "moment": "^2.22.1",
+    "openfin-service-tooling": "^1.0.7",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
-    "style-loader": "^0.21.0",
     "ts-jest": "^23.10.4",
-    "ts-loader": "^4.4.2",
-    "typedoc": "^0.14.2",
-    "typescript": "^3.1.1",
-    "url-loader": "^1.0.1",
-    "webpack": "^4.16.1",
-    "webpack-cli": "^3.0.8",
-    "webpack-dev-middleware": "^3.6.0"
-  },
-  "jest": {
-    "verbose": true,
-    "testURL": "http://localhost",
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": "ts-jest"
-    },
-    "testMatch": [
-      "**/test/provider/**/*.(ts|tsx)"
-    ]
+    "typescript": "~3.3.4000"
   }
 }

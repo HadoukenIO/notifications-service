@@ -1,6 +1,7 @@
-import {Entity} from '../../../shared/models/Entity';
 import {ITable} from '../models/ITable';
 import {PageInfo} from '../models/PageInfo';
+
+import {Entity} from './repositories/Repository';
 
 /**
  *  @description Interface for low level database access layer
@@ -41,9 +42,9 @@ export interface IDatastore<T extends Entity> {
      * @method remove Deletes all entries corresponding to the uuid passed in
      * @param {string} tableName The name of the table to perform
      * @param {string} uuid The uuid of the app
-     * @returns {Promise<boolean>} A value of whether it was able to successfully remove by uuid or not
+     * @returns {Promise<number>} The count of removed entries
      */
-    removeByUuid(tableName: string, uuid: string): Promise<boolean>;
+    removeByUuid(tableName: string, uuid: string): Promise<number>;
 
     /**
      * @method update Update an entry into the database based on the table name

@@ -1,10 +1,9 @@
-import {Entity} from '../../../../shared/models/Entity';
-import {Notification} from '../../../../shared/models/Notification';
-import {Settings} from '../../../../shared/models/Settings';
-import {ISenderInfo} from '../../../models/ISenderInfo';
+import {Settings} from '../../../model/Settings';
 import {IDatastore} from '../IDatastore';
 import {IndexedDb} from '../IndexedDb';
+import {StoredNotification} from '../../../model/StoredNotification';
 
+import {Entity} from './Repository';
 import {HistoryRepository} from './HistoryRepository';
 import {IRepositories} from './IRepositories';
 import {Repository} from './Repository';
@@ -36,14 +35,14 @@ export class RepositoryFactory {
     private mRepositoryStore: IRepositories;
 
     /**
-     * @constructor Constructor Initialises member variables and sets up the
+     * @class Constructor Initialises member variables and sets up the
      * database
      * @param datastore The low level database layer
      */
     private constructor(datastore: IDatastore<Entity>) {
         this.mDatastore = datastore;
 
-        const historyRepository = new HistoryRepository(this.mDatastore as IDatastore<Notification&ISenderInfo>);
+        const historyRepository = new HistoryRepository(this.mDatastore as IDatastore<StoredNotification>);
         const settingsRepository = new SettingsRepository(this.mDatastore as IDatastore<Settings>);
 
         this.mRepositoryStore = {history: historyRepository, settings: settingsRepository};
@@ -62,7 +61,7 @@ export class RepositoryFactory {
     }
 
     /**
-     * @method Returns the singleton instance of itself
+     * @function Returns the singleton instance of itself
      * @returns {RepositoryFactory} Returns an instance of itself
      */
     public static get Instance() {
@@ -70,7 +69,7 @@ export class RepositoryFactory {
     }
 
     /**
-     * @method Returns the selected repository
+     * @function Returns the selected repository
      * @param repositoryName The name of the repository you want to retrieve
      * @returns {Repository} The repository selected
      */

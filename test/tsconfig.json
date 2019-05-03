@@ -1,0 +1,18 @@
+{
+    "extends": "../node_modules/openfin-service-tooling/tsconfig-services.json",
+    "compilerOptions": {
+      "rootDir": "..",
+      "outDir": "../dist/test",
+      "target": "es2017",
+      "module": "commonjs",
+      "lib": [
+        "dom",
+        "es7"
+      ],
+      "esModuleInterop": false,
+    },
+    "exclude": [
+      "../node_modules",
+    ]
+  }
+  

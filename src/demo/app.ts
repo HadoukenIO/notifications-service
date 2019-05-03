@@ -1,11 +1,8 @@
-import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
-
 import * as ofnotes from '../client/index';
-import {NotificationOptions} from '../client/models/NotificationOptions';
-import {NotificationEvent} from '../shared/models/NotificationEvent';
+import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/index';
 
 function makeNote(id: string, opts: NotificationOptions) {
-    return ofnotes.create(id, Object.assign(opts, {date: Date.now()}));
+    return ofnotes.create(Object.assign(opts, {date: Date.now(), id}));
 }
 
 function clearNote(id: string) {
@@ -21,10 +18,9 @@ const normalNote: NotificationOptions = {
     title: 'Notification Title ',
     subtitle: 'testSubtitle',
     icon: 'favicon.ico',
-    context: {testContext: 'testContext'},
+    customData: {testContext: 'testContext'},
     date: new Date(),
-    buttons: [],
-    inputs: []
+    buttons: []
 };
 
 const buttonNote: NotificationOptions = {
@@ -32,10 +28,9 @@ const buttonNote: NotificationOptions = {
     title: 'Notification Title ',
     subtitle: 'testSubtitle',
     icon: 'favicon.ico',
-    context: {testContext: 'testContext'},
+    customData: {testContext: 'testContext'},
     date: new Date(),
-    buttons: [{title: 'test1', icon: 'favicon.ico'}, {title: 'test2', icon: 'favicon.ico'}],
-    inputs: []
+    buttons: [{title: 'test1', iconUrl: 'favicon.ico'}, {title: 'test2', iconUrl: 'favicon.ico'}]
 };
 
 function makeNoteOfType(index: number) {
@@ -45,45 +40,6 @@ function makeNoteOfType(index: number) {
         return makeNote(`1q2w3e4r${index}`, buttonNote);
     }
 }
-
-// document.addEventListener("DOMContentLoaded", function (event) {
-//     for (let index = 1; index < 7; index++) {
-//         document.getElementById(`button${index}`).addEventListener('click',
-//         () => {
-//             makeNoteOfType(index)
-//                 .then((notification) => {
-//                     if (!notification.success) {
-//                         //
-//                         document.getElementById('clientResponse').innerHTML =
-//                         `
-//                         //             Notification ids must be unique! This
-//                         id already exists!
-//                         //         `
-//                         logit(`Notification ids must be unique! This id
-//                         already exists!`);
-//                     }
-//                 })
-//         });
-
-//         document.getElementById(`clearbutton${index}`).addEventListener('click',
-//         () => {
-//             clearNote(`1q2w3e4r${index}`)
-//         });
-//     }
-
-//     document.getElementById(`fetchAppNotifications`).addEventListener('click',
-//     () => {
-//         getNotes()
-//             .then((notifications) => {
-//                 // document.getElementById('clientResponse').innerHTML = `
-//                 //     ${notifications.value.length} notifications received
-//                 from the Notification Center!
-//                 // `
-//                 logit(`${notifications.value.length} notifications received
-//                 from the Notification Center`);
-//             })
-//     });
-// });
 
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
@@ -97,14 +53,8 @@ fin.desktop.main(async () => {
 
     for (let index = 1; index < 7; index++) {
         document.getElementById(`button${index}`)!.addEventListener('click', () => {
-            makeNoteOfType(index).then((notification) => {
-                if (!notification.success) {
-                    // document.getElementById('clientResponse').innerHTML = `
-                    //             Notification ids must be unique! This id already
-                    //             exists!
-                    //         `
-                    logit(`Notification ids must be unique! This id already exists!`);
-                }
+            makeNoteOfType(index).catch((err) => {
+                logit(`Error creating notification: ${err}`);
             });
         });
 
@@ -113,36 +63,32 @@ fin.desktop.main(async () => {
         });
     }
 
-    document.getElementById(`fetchAppNotifications`)!.addEventListener('click', () => {
+    document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
         getNotes().then((notifications) => {
             // document.getElementById('clientResponse').innerHTML = `
             //     ${notifications.value.length} notifications received from the
             //     Notification Center!
             // `
-            logit(`${notifications.value.length} notifications received from the Notification Center`);
+            logit(`${notifications.length} notifications received from the Notification Center`);
         });
     });
 
-    ofnotes.addEventListener('click', (payload: NotificationEvent, sender: ProviderIdentity) => {
+    ofnotes.addEventListener('notification-clicked', (event: NotificationClickedEvent) => {
         // document.getElementById('clientResponse').innerHTML = `CLICK action
         // received from notification ${payload.id}`
-        logit(`CLICK action received from notification ${payload.id}`);
-        return '';
+        logit(`CLICK action received from notification ${event.notification.id}`);
     });
 
-    ofnotes.addEventListener('close', (payload: NotificationEvent, sender: ProviderIdentity) => {
+    ofnotes.addEventListener('notification-closed', (event: NotificationClosedEvent) => {
         // document.getElementById('clientResponse').innerHTML = `CLOSE action
         // received from notification ${payload.id}`
-        logit(`CLOSE action received from notification ${payload.id}`);
-        return '';
+        logit(`CLOSE action received from notification ${event.notification.id}`);
     });
-    ofnotes.addEventListener('button-click', (payload: NotificationEvent, sender: ProviderIdentity) => {
-        const buttonClicked = payload.buttons[payload.buttonIndex];
-        console.log(buttonClicked);
-        const buttonTitle = buttonClicked.title;
+    ofnotes.addEventListener('notification-button-clicked', (event: NotificationButtonClickedEvent) => {
+        const {buttonIndex, notification} = event;
+        console.log(buttonIndex);
         // document.getElementById('clientResponse').innerHTML = `Button Click
         // on ${buttonTitle} action received from notification ${payload.id}`
-        logit(`BUTTON CLICK on ${buttonTitle} from notification ${payload.id}`);
-        return '';
+        logit(`BUTTON CLICK on button ${buttonIndex} on notification ${notification.id}`);
     });
 });

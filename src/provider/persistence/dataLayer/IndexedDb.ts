@@ -1,8 +1,8 @@
-﻿import {Entity} from '../../../shared/models/Entity';
-import {ITable} from '../models/ITable';
+﻿import {ITable} from '../models/ITable';
 import {PageInfo} from '../models/PageInfo';
 import {Sorts} from '../models/Sort';
 
+import {Entity} from './repositories/Repository';
 import {IDatastore} from './IDatastore';
 
 /**
@@ -21,14 +21,14 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     private mDbOpenRequest!: IDBOpenDBRequest;
 
     /**
-     * @constructor Constructor for IndexedDb
+     * @class Constructor for IndexedDb
      */
     constructor(db: IDBFactory) {
         this.mIndexedDb = db;
     }
 
     /**
-     * @method initialise Initialises the database and does all setup
+     * @function initialise Initialises the database and does all setup
      * @param {number} dbVersion The version of the database
      * @param {ITable[]} tablesToCreate These are needed in order to recreate the table names should the version be upgraded
      * @public
@@ -60,7 +60,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method create Add an entry into the database based on the table name
+     * @function create Add an entry into the database based on the table name
      * @param {string} tableName The name of the table to perform
      * @param {T} entry Object to insert into the database
      * @public
@@ -69,12 +69,12 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public create<T extends Entity>(tableName: string, entry: T): Promise<boolean> {
         if (!tableName) {
             console.error('No table name has been passed');
-            return Promise.reject('No table name has been passed');
+            return Promise.reject(new Error('No table name has been passed'));
         }
 
         if (!entry) {
             console.error('No entry has been passed');
-            return Promise.reject('No entry has been passed');
+            return Promise.reject(new Error('No entry has been passed'));
         }
 
         return new Promise((resolve, reject) => {
@@ -96,7 +96,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method remove Deletes an entry in the database based on the table name
+     * @function remove Deletes an entry in the database based on the table name
      * @param {string} tableName The name of the table to perform
      * @param {T} id The id of the entry we want to remove
      * @public
@@ -105,12 +105,12 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public remove<T extends string|number>(tableName: string, id: T): Promise<boolean> {
         if (!tableName) {
             console.error('No table name has been passed');
-            return Promise.reject('No table name has been passed');
+            return Promise.reject(new Error('No table name has been passed'));
         }
 
         if (!id) {
             console.error('No id has been passed');
-            return Promise.reject('No id has been passed');
+            return Promise.reject(new Error('No id has been passed'));
         }
 
         return new Promise((resolve, reject) => {
@@ -132,7 +132,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method removeAll Deletes all entries in the database based on the table
+     * @function removeAll Deletes all entries in the database based on the table
      * name
      * @param {string} tableName The name of the table to perform
      * @public
@@ -141,7 +141,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public removeAll(tableName: string): Promise<boolean> {
         if (!tableName) {
             console.error('No table name has been passed');
-            return Promise.reject('No table name has been passed');
+            return Promise.reject(new Error('No table name has been passed'));
         }
 
         return new Promise((resolve, reject) => {
@@ -163,30 +163,30 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method removeByUuid Deletes all entries corresponding to the uuid passed
+     * @function removeByUuid Deletes all entries corresponding to the uuid passed
      * in
      * @param {string} tableName The name of the table to perform
      * @param {string} uuid The uuid of the app
      * @public
-     * @returns {Promise<boolean>} A value of whether it was successfully created or not
+     * @returns {Promise<number>} The count of removed entries
      */
-    public removeByUuid(tableName: string, uuid: string): Promise<boolean> {
+    public removeByUuid(tableName: string, uuid: string): Promise<number> {
         return new Promise((resolve, reject) => {
             this.readByUuid(tableName, uuid)
                 .then((result: T[]) => {
                     result.forEach((notification: T) => {
                         this.remove(tableName, notification.id);
                     });
-                    resolve(true);
+                    resolve(result.length);
                 })
                 .catch((err) => {
-                    resolve(false);
+                    reject(err);
                 });
         });
     }
 
     /**
-     * @method update Update an entry into the database based on the table name
+     * @function update Update an entry into the database based on the table name
      * @param {string} tableName The name of the table to perform
      * @param {T} entry Object to update in the database
      * @public
@@ -195,12 +195,12 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public update<T extends Entity>(tableName: string, entry: T): Promise<boolean> {
         if (!tableName) {
             console.error('No table name has been passed');
-            return Promise.reject('No table name has been passed');
+            return Promise.reject(new Error('No table name has been passed'));
         }
 
         if (!entry) {
             console.error('No entry has been passed');
-            return Promise.reject('No entry has been passed');
+            return Promise.reject(new Error('No entry has been passed'));
         }
 
         return new Promise((resolve, reject) => {
@@ -222,7 +222,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method read Reads an entry in the database based on the table name
+     * @function read Reads an entry in the database based on the table name
      * @param {string} tableName The name of the table to perform
      * @param {string} id The id of the entry we want to remove
      * @public
@@ -231,11 +231,11 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     public read(tableName: string, id: string): Promise<T> {
         return new Promise((resolve, reject) => {
             if (!tableName) {
-                reject('No table name has been passed');
+                reject(new Error('No table name has been passed'));
             }
 
             if (!id) {
-                reject('No id has been passed in');
+                reject(new Error('No id has been passed in'));
             }
 
             const db = this.mDbOpenRequest.result as IDBDatabase;
@@ -256,7 +256,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method readAll Reads all rows from the table specified
+     * @function readAll Reads all rows from the table specified
      * @param {string} tableName The table to be read form
      * @public
      * @returns {Promise<T>} Returns a promise to retrieve the data requested
@@ -288,7 +288,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method readByUuid Gets all entries from the database corresponding to the
+     * @function readByUuid Gets all entries from the database corresponding to the
      * Uuid
      * @param tableName The name of the table to perform actions on
      * @param uuid The uuid to query by
@@ -307,7 +307,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
             cursorRequest.onsuccess = (event: Event) => {
                 const cursor = (event.target as IDBRequest).result as IDBCursorWithValue;
                 if (cursor) {
-                    if (cursor.value.uuid === uuid) {
+                    if (cursor.value.source.uuid === uuid) {
                         result.push(cursor.value);
                     }
                     cursor.continue();
@@ -324,7 +324,7 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
     }
 
     /**
-     * @method readByPage Gets the result on the page specified
+     * @function readByPage Gets the result on the page specified
      * @param tableName The table to be read from
      * @param pageInfo The requested page and the number of items to be returned
      * from the apge
@@ -344,14 +344,14 @@ export class IndexedDb<T extends Entity> implements IDatastore<T> {
                     // Depending on which sorting is applied we will
                     if (pageInfo.sort === Sorts.ascending) {
                         for (let i = offset; i < offset + pageInfo.numberOfItems; i++) {
-                            if (notifications[i] != null) {
+                            if (notifications[i] !== null) {
                                 result.push(notifications[i]);
                             }
                         }
                     } else {
                         const reverseLoopOffset = (notifications.length - offset) - 1;
                         for (let i = reverseLoopOffset; i > reverseLoopOffset - pageInfo.numberOfItems; i--) {
-                            if (notifications[i] != null) {
+                            if (notifications[i] !== null) {
                                 result.push(notifications[i]);
                             }
                         }
