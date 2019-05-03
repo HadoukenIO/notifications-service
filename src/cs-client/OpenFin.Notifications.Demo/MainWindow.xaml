@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenFin.Notifications.Demo"
         mc:Ignorable="d"
-        Title="WPF Notifications Demo" Height="460" Width="340" Style="{DynamicResource defaultWindowStyle}">
+        Title="WPF Notifications Demo" Height="496.753" Width="340" Style="{DynamicResource defaultWindowStyle}">
     <Window.Resources>
         <ResourceDictionary Source="Styles.xaml">
         </ResourceDictionary>
@@ -41,6 +41,7 @@
 
         </Grid>
         <Button Click="FetchButton_Click">Fetch Notifications</Button>
+        <Button Click="ToggleButton_Click" Margin="10,3" Width="Auto">Toggle Notification Center</Button>
         <Border Style="{DynamicResource textBlockBorder}">
             <TextBlock x:Name="messageBox" MouseDown="messageBox_MouseDown"/>
         </Border>

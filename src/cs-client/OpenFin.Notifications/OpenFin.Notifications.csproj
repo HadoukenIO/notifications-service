@@ -60,7 +60,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\NotificationConstants.cs" />
+    <Compile Include="Constants\NotificationTopicConstants.cs" />
+    <Compile Include="NotificationButton.cs" />
     <Compile Include="NotificationClient.cs" />
+    <Compile Include="NotificationOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

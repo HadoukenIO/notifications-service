@@ -57,11 +57,11 @@ namespace OpenFin.Notifications.Demo
             });
         }
 
-        private void CreateButton_Click(object sender, RoutedEventArgs e)
+        private async void CreateButton_Click(object sender, RoutedEventArgs e)
         {
             var id = (sender as FrameworkElement).Name.Substring("create".Length);
-
-            NotificationClient.Create($"wpf/{id}", new NotificationOptions
+            
+            await NotificationClient.Create($"wpf/{id}", new NotificationOptions
             {
                 Title = $"WPF Alert {id}",
                 Body = "Notification Body",
@@ -69,33 +69,36 @@ namespace OpenFin.Notifications.Demo
                 Icon = "https://openfin.co/favicon-32x32.png",
                 Buttons = new[]
                 {
-                    new NotificationButton() { Title = "Button1", Icon = "https://openfin.co/favicon-32x32.png"},
-                    new NotificationButton() { Title = "Button2" }
+                    new OptionButton() { Title = "Button1", Icon = "https://openfin.co/favicon-32x32.png"},
+                    new OptionButton() { Title = "Button2" }
                 }
             });
         }
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        private async void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             var id = (sender as FrameworkElement).Name.Substring("close".Length);
-            NotificationClient.Clear($"wpf/{id}");
+            await NotificationClient.Clear($"wpf/{id}");
         }
 
-        private void FetchButton_Click(object sender, RoutedEventArgs e)
+        private async void FetchButton_Click(object sender, RoutedEventArgs e)
         {
-            var fetchResult = NotificationClient.GetAll().Result as JObject;
-
-            var notificationArray = fetchResult["value"] as JArray;
+            var fetchResult = await NotificationClient.GetAll();
 
             Dispatcher.Invoke(() =>
             {
-                messageBox.Text += $"Got Notifications: {notificationArray.Count}\n";
+                messageBox.Text += $"Got Notifications: {fetchResult.Length}\n";
             });
         }
 
         private void messageBox_MouseDown(object sender, MouseButtonEventArgs e)
         {
             messageBox.Text = "";
+        }
+
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            NotificationClient.ToggleNotificationCenter();
         }
     }
 }
