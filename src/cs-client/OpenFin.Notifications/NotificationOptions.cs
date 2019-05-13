@@ -22,7 +22,7 @@ namespace OpenFin.Notifications
         [JsonProperty("date")]
         public DateTime Date { get; set; } = DateTime.Now;
         [JsonProperty("buttons")]
-        public IEnumerable<OptionButton> Buttons { get; set; }
+        public IEnumerable<NotificationButton> Buttons { get; set; }
 
         public NotificationOptions()
         {

@@ -3,7 +3,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace OpenFin.Notifications
 {
-    public class OptionButton
+    public class NotificationButton
     {
         [JsonProperty("title")]
         public string Title { get; set; }

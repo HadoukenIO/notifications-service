@@ -69,8 +69,8 @@ namespace OpenFin.Notifications.Demo
                 Icon = "https://openfin.co/favicon-32x32.png",
                 Buttons = new[]
                 {
-                    new OptionButton() { Title = "Button1", Icon = "https://openfin.co/favicon-32x32.png"},
-                    new OptionButton() { Title = "Button2" }
+                    new NotificationButton() { Title = "Button1", Icon = "https://openfin.co/favicon-32x32.png"},
+                    new NotificationButton() { Title = "Button2" }
                 }
             });
         }
