@@ -18,7 +18,7 @@ namespace OpenFin.Notifications
         [JsonProperty("icon")]
         public string Icon { get; set; }
         [JsonProperty("customData")]
-        public object Context { get; set; }
+        public object CustomData { get; set; }
         [JsonProperty("date")]
         public DateTime Date { get; set; } = DateTime.Now;
         [JsonProperty("buttons")]
@@ -26,7 +26,7 @@ namespace OpenFin.Notifications
 
         public NotificationOptions()
         {
-            this.Context = new object();
+            this.CustomData = new object();
         }
     }
 }
