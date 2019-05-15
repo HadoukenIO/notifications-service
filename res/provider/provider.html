@@ -1,17 +1,32 @@
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <script src="main-bundle.js"></script>
-  <title>Notifications Service</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <script src="main-bundle.js"></script>
+        <title>Notifications Service</title>
+    </head>
 
-<body>
-  <h3>Notifications Service Provider</h3>
+    <body>
+        <h3>Notifications Service Provider</h3>
+        <button onclick="fin.System.showDeveloperTools({uuid: 'notifications-service', name: 'notifications-service'})">
+            Show Debugger
+        </button>
+        <br />
+        <button onclick="closeChildWindows()">
+            Close Child Windows
+        </button>
+    </body>
+    <script>
+        async function closeChildWindows() {
+            const children = await fin.Application.getCurrentSync().getChildWindows();
 
-  <button onclick="fin.System.showDeveloperTools({uuid: 'notifications-service', name: 'notifications-service'})">Show Debugger</button>
-</body>
+            children.forEach(async (x) => await x.close());
+
+            console.log('Children closed');
+        }
+
+    </script>
 
 </html>

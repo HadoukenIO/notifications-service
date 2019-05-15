@@ -1,71 +1,63 @@
 import * as React from 'react';
 
 import {NotificationTime} from '../NotificationTime/NotificationTime';
-import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {Button} from '../Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
-declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
+import {CloseButton} from '../CloseButton/CloseButton';
+import {UIHandlers} from '../../../model/UIHandlers';
 
-
-interface NotificationProps {
+interface NotificationCardProps extends UIHandlers {
     meta: StoredNotification;
 }
 
-/**
- * Displays a single notification within the UI
- */
-export function Notification(props: NotificationProps) {
-    function handleNotificationClose(e: React.MouseEvent<HTMLElement>) {
-        e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation();
-        window.openfin.notifications.closeHandler(props.meta);
-    }
+export function NotificationCard(props: NotificationCardProps) {
+    const {meta, onRemoveNotifications, onClickButton, onClickNotification} = props;
+    const {notification} = meta;
 
-    let buttons = null;
-    if (props.meta.notification.buttons.length > 0) {
-        buttons = props.meta.notification.buttons.map((button, idx) => {
-            return (
-                <Button
-                    key={idx}
-                    buttonIndex={idx}
-                    meta={props.meta}
-                />
-            );
-        });
-    }
+    const handleNotificationClose = () => {
+        onRemoveNotifications(meta);
+    };
+
+    const handleButtonClick = (buttonIndex: number) => {
+        onClickButton(meta, buttonIndex);
+    };
+
+    const handleNotificationClick = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        onClickNotification(meta);
+    };
 
     return (
-        <li
-            className="notification-item"
-            onClick={() => window.openfin.notifications.clickHandler(props.meta)}
-        >
-            <img
-                className="notification-close-x"
-                src="image/shapes/notifications-x.png"
-                alt=""
-                onClick={e => handleNotificationClose(e)}
-            />
-
-            <NotificationTime date={props.meta.notification.date} />
-
-            <div className="notification-body">
-                <div className="notification-source">
+        <div className="notification" onClick={handleNotificationClick}>
+            <CloseButton onClick={handleNotificationClose} />
+            <NotificationTime date={notification.date} />
+            <div className="body">
+                <div className="source">
                     <img
-                        src={props.meta.notification.icon}
-                        className="notification-small-img"
+                        src={notification.icon}
                     />
-                    <span className="notification-source-text">
-                        {props.meta.source.name}
+                    <span className="app-name">
+                        {meta.source.name}
                     </span>
                 </div>
-                <div className="notification-body-title">
-                    {props.meta.notification.title}
+                <div className="title">
+                    {meta.notification.title}
                 </div>
-                <div className="notification-body-text">
-                    {props.meta.notification.body}
+                <div className="text">
+                    {meta.notification.body}
                 </div>
-                {buttons ? (<div id="notification-body-buttons">{buttons}</div>) : null}
+
+                {notification.buttons.length > 0 &&
+                    <div className="buttons">
+                        {notification.buttons.map((btn, i) => {
+                            return (
+                                <Button key={btn.title + i} onClick={handleButtonClick} buttonIndex={i} text={btn.title} icon={btn.iconUrl} />
+                            );
+                        })}
+                    </div>
+                }
             </div>
-        </li>
+        </div >
     );
 }

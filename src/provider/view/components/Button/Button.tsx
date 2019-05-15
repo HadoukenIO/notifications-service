@@ -1,34 +1,27 @@
 import * as React from 'react';
 
-import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {StoredNotification} from '../../../model/StoredNotification';
-
-declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
-
 export interface NotificationButtonProps {
-    meta: StoredNotification;
+    /** Button text */
+    text: string;
+    /** Icon URL */
+    icon?: string;
     buttonIndex: number;
+    onClick: (index: number) => void;
 }
 
 export function Button(props: NotificationButtonProps) {
-    const button = props.meta.notification.buttons[props.buttonIndex];
+    const {onClick, text, icon, buttonIndex} = props;
 
-    function handleButtonClick(e: React.MouseEvent<HTMLElement>) {
-        e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation();
-
-        window.openfin.notifications.buttonClickHandler(
-            props.meta,
-            props.buttonIndex
-        );
+    function handleButtonClick(event: React.MouseEvent<HTMLElement>) {
+        event.stopPropagation();
+        event.preventDefault();
+        onClick(buttonIndex);
     }
 
     return (
-        <div
-            className="notification-button"
-            onClick={e => handleButtonClick(e)}
-        >
-            {button.title}
+        <div className="button" onClick={handleButtonClick}>
+            <img className="" src={icon} />
+            <span className={text}>{text}</span>
         </div>
     );
 }

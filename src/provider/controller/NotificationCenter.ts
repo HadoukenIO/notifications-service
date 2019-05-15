@@ -1,145 +1,220 @@
-import {TrayIconClicked} from 'openfin/_v2/api/events/application';
+import {WindowOption} from 'openfin/_v2/api/window/windowOption';
+import {Store} from 'redux';
+import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
-import {WindowInfo} from './WindowInfo';
-declare const window: Window & {WindowManager: NotificationCenter};
+import {WebWindow, createWebWindow} from '../model/WebWindow';
+import {renderApp} from '../view/containers/NotificationCenterApp';
+import {TrayIcon} from '../common/TrayIcon';
+import {watchForChange} from '../store/utils/watch';
+import {getNotificationCenterVisibility} from '../store/ui/selectors';
+import {toggleCenterWindowVisibility, changeBannerDirection} from '../store/ui/actions';
+import {RootState} from '../store/typings';
+import {ContextMenu, MenuItem} from '../common/ContextMenu';
 
+const windowOptions: WindowOption = {
+    name: 'Notification-Center',
+    url: 'ui/index.html',
+    autoShow: true,
+    defaultHeight: 400,
+    defaultWidth: 500,
+    resizable: false,
+    saveWindowState: false,
+    defaultTop: 0,
+    contextMenu: !(process.env.NODE_ENV === 'production'),
+    frame: false,
+    alwaysOnTop: true,
+    icon: 'ui/favicon.ico',
+    showTaskbarIcon: false,
+    opacity: 0
+};
+
+interface Options {
+    /** Blur event causes window to hide */
+    hideOnBlur?: boolean;
+}
 
 export class NotificationCenter {
-    private windowInfo: WindowInfo = new WindowInfo();
-    private static singleton: NotificationCenter;
+    private _webWindow: Promise<WebWindow>;
+    private _trayIcon!: TrayIcon;
+    private _options: Options;
+    private _store: Store;
 
-    constructor() {
-        if (NotificationCenter.singleton) {
-            return NotificationCenter.singleton;
-        }
-        this.setEventListeners();
-        NotificationCenter.singleton = this;
-        this.setupTrayIcon();
+    public constructor(store: Store<RootState>, options: Options) {
+        this._store = store;
+        this._options = options;
+        // Create notification center app window
+        this._webWindow = createWebWindow(windowOptions).then((webWindow) => {
+            this.sizeToFit();
+            this.setupTrayIcon();
+            this.addListeners();
+            // Set window initial state
+            const visible = store.getState().ui.windowVisible;
+            if (visible) {
+                this.showWindow();
+            }
+            renderApp(webWindow.document, store);
+            return webWindow;
+        });
+        this.subscribe();
     }
-
-    /**
-     * @function setEventListeners Initalizes event listeners for the window
-     * @returns void
-     */
-    public setEventListeners(): void {
-        // When window is ready
-        window.addEventListener('DOMContentLoaded', this.onWindowLoad.bind(this));
-
-        // On window close requested
-        this.windowInfo.getWindow().addEventListener('close-requested', () => this.hideWindow());
-
-        // On monitor dimension change
-        fin.desktop.System.addEventListener('monitor-info-changed', this.onMonitorInfoChanged.bind(this));
-    }
-
 
     private setupTrayIcon() {
-        const application = fin.Application.getCurrentSync();
-        const icon = 'https://openfin.co/favicon-32x32.png';
+        this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png')
+            .addLeftClickHandler((event) => {
+                this._store.dispatch(toggleCenterWindowVisibility());
+            })
+            .addRightClickHandler(async (event) => {
+                const menuItems: MenuItem[] = [
+                    {
+                        text: 'Top Left',
+                        onClick: () => {
+                            this._store.dispatch(changeBannerDirection([1, 1]));
+                        }
+                    },
+                    {
+                        text: 'Bottom Left',
+                        onClick: () => {
+                            this._store.dispatch(changeBannerDirection([1, -1]));
+                        }
+                    },
+                    {
+                        text: 'Top Right',
+                        onClick: () => {
+                            this._store.dispatch(changeBannerDirection([-1, 1]));
+                        }
+                    },
+                    {
+                        text: 'Bottom Right',
+                        onClick: () => {
+                            this._store.dispatch(changeBannerDirection([-1, -1]));
+                        }
+                    }
+                ];
 
-        application.addListener('tray-icon-clicked', (event: TrayIconClicked<string, string>) => {
-            console.log(event);
-            if (event.button === 0) {
-                this.toggleWindow();
-            }
-        });
-
-        application.setTrayIcon(icon);
+                ContextMenu.show({top: event.y + event.bounds.height, left: event.x}, menuItems);
+            });
     }
 
     /**
-     * @function onWindowLoad Fired when the window DOM is loaded
-     * @returns void
+     * Subscribe to the store.
+     * Perform all watching for state change in here.
      */
-    public onWindowLoad(): void {
-        this.sizeToFit(false);
+    private async subscribe() {
+        // Window visibility
+        watchForChange(
+            this._store,
+            getNotificationCenterVisibility,
+            (_, value) => this.toggleWindow(value)
+        );
+    }
 
-        document.getElementById('exitLink')!.addEventListener('click', () => this.hideWindow());
+    /**
+     * The window visibility state.
+     */
+    public get visible() {
+        return getNotificationCenterVisibility(this._store.getState());
+    }
+
+    /**
+     * Add listeners to the window.
+     */
+    private async addListeners() {
+        const {window, document} = await this._webWindow;
+        const {hideOnBlur = false} = this._options;
+        if (hideOnBlur) {
+            window.addListener('blurred', async () => {
+                const contextMenuIsShowing = await ContextMenu.instance.isShowing();
+                if (!contextMenuIsShowing && this.visible) {
+                    this._store.dispatch(toggleCenterWindowVisibility(false));
+                }
+            });
+        }
+        fin.System.addListener('monitor-info-changed', ((event: MonitorEvent<string, string>) => {
+            this.sizeToFit();
+        }));
+    }
+
+    /**
+     * Toggle window visibility.
+     * @param forceVisibility Force the window to be shown or hidden. True = show, false = hide.
+     */
+    public async toggleWindow(forceVisibility?: boolean) {
+        const visible = forceVisibility || this.visible;
+        if (visible) {
+            this.showWindow();
+        } else {
+            this.hideWindow();
+        }
+    }
+
+    /**
+     * Show the window.
+     */
+    public async showWindow() {
+        const {window} = await this._webWindow;
+        window.bringToFront();
+        window.show();
+        this.animateIn();
+        window.setAsForeground();
+    }
+
+    /**
+     * Hide the window.
+     * @param force Force the window to hide without animating out.
+     */
+    public async hideWindow(force?: boolean) {
+        const duration = force ? 0 : 300;
+        this.animateOut(duration);
     }
 
     /**
      * @function sizeToFit Sets the window dimensions in shape of a side bar
-     * @returns void
      */
-    public sizeToFit(forceShow: boolean = false): void {
-        fin.desktop.System.getMonitorInfo((monitorInfo: fin.MonitorInfo) => {
-            this.windowInfo.getWindow().setBounds(
-                monitorInfo.primaryMonitor.availableRect.right - this.windowInfo.getIdealWidth(),
-                0,
-                this.windowInfo.getIdealWidth(),
-                monitorInfo.primaryMonitor.availableRect.bottom,
-                () => {
-                    if (forceShow) {
-                        this.showWindow();
-                    }
-                },
-                (reason: string) => {
-                    console.warn('MOVED FAILED', reason);
+    public async sizeToFit(): Promise<void> {
+        const {window} = await this._webWindow;
+        await this.hideWindow(true);
+        const monitorInfo = await fin.System.getMonitorInfo();
+        const idealWidth = 388;
+        window.setBounds({
+            left: monitorInfo.primaryMonitor.availableRect.right - idealWidth,
+            top: 0,
+            width: idealWidth,
+            height: monitorInfo.primaryMonitor.availableRect.bottom
+        });
+    }
+
+
+    private async animateIn(duration: number = 300) {
+        const {window} = await this._webWindow;
+
+        window.animate(
+            {
+                opacity: {
+                    opacity: 1,
+                    duration
                 }
-            );
-        });
+            },
+            {
+                interrupt: true,
+                tween: 'ease-in-out'
+            }
+        );
     }
 
-    /**
-     * @function showWindow Shows the Window with Fade()
-     * @returns void
-     */
-    public showWindow(): void {
-        this.fade(true, 450);
-        this.windowInfo.getWindow().resizeBy(1, 0, 'top-left');
-        this.windowInfo.getWindow().resizeBy(-1, 0, 'top-left');
-        this.windowInfo.setShowing(true);
-    }
+    private async animateOut(duration: number = 400) {
+        const {window} = await this._webWindow;
 
-    /**
-     * @function hideWindow Hides the window with Fade()
-     * @returns void
-     */
-    public hideWindow(): void {
-        this.fade(false, 450);
-        this.windowInfo.setShowing(false);
-    }
-
-    /**
-     * @function toggleWindow Hides or shows the center.
-     * @returns void
-     */
-    public toggleWindow(): void {
-        if (this.windowInfo.getShowingStatus()) {
-            this.hideWindow();
-        } else {
-            this.showWindow();
-        }
-    }
-
-    /**
-     * @function fade Fades the window in or out
-     * @param fadeOut
-     * @param timeout
-     */
-    public fade(fadeOut: boolean, timeout: number): void {
-        if (fadeOut) {
-            this.windowInfo.getWindow().show();
-        }
-
-        this.windowInfo.getWindow().animate({opacity: {opacity: fadeOut ? 1 : 0, duration: timeout}}, {interrupt: false}, () => {
-            !fadeOut ? this.windowInfo.getWindow().hide() : this.windowInfo.getWindow().focus();
-        });
-    }
-
-    /**
-     * @function instance Gets this WindowManager instance on the window.
-     * @returns WindowManager
-     */
-    public static get instance(): NotificationCenter {
-        if (NotificationCenter.singleton) {
-            return NotificationCenter.singleton;
-        } else {
-            return new NotificationCenter();
-        }
-    }
-
-    private onMonitorInfoChanged(): void {
-        this.sizeToFit();
+        window.animate(
+            {
+                opacity: {
+                    opacity: 0,
+                    duration
+                }
+            },
+            {
+                interrupt: true,
+                tween: 'ease-in-out'
+            }
+        );
     }
 }

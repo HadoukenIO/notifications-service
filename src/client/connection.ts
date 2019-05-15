@@ -62,6 +62,8 @@ if (fin.Window.me.uuid !== SERVICE_IDENTITY.uuid || fin.Window.me.name !== SERVI
 
 /**
  * Wrapper around service.dispatch to help with type checking
+ * @param action Action type.
+ * @param payload Data payload to send to the provider.
  */
 export async function tryServiceDispatch<T extends APITopic>(action: T, payload: API[T][0]): Promise<API[T][1]> {
     const channel: ChannelClient = await channelPromise;

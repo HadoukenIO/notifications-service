@@ -1,10 +1,7 @@
-
-import {Entity} from '../persistence/dataLayer/repositories/Repository';
-
 /**
  * @description Model for the settings
  */
-export interface Settings extends Entity {
+export interface Settings {
     centre: Centre;
     apps: {[key: string]: Application};
 }

@@ -1,38 +1,41 @@
 import * as React from 'react';
 
-import {GroupingType} from '../../NotificationCenterApp';
+import {GroupingType} from '../../containers/NotificationCenterApp';
 
 interface HeaderProps {
     groupBy: GroupingType;
     handleGroupBy: (groupBy: GroupingType) => void;
-    handleHideWindow: (value?: boolean) => void;
+    onHideWindow: () => void;
 }
 
 export function Header(props: HeaderProps): React.ReactElement {
-    const {groupBy, handleGroupBy, handleHideWindow} = props;
+    const {groupBy, handleGroupBy, onHideWindow} = props;
+
+    const handleHideWindow = () => {
+        onHideWindow();
+    };
+
     return (
-        <div id="header">
+        <div className='header'>
             <div className="sort-buttons">
                 <div className="sort-title">Sort By : </div>
-                <div
-                    className="sort-button"
-                    onClick={() =>
-                        handleGroupBy(GroupingType.APPLICATION)
-                    }
-                >
-                    APPLICATION
-                </div>
-                <div
-                    className="sort-button"
-                    onClick={() =>
-                        handleGroupBy(GroupingType.DATE)
-                    }
-                >
-                    DATE
-                </div>
+                {
+                    Object.values(GroupingType).map((name, i) => {
+                        const selected = name === groupBy ? 'selected' : null;
+                        return (
+                            <div
+                                key={i}
+                                className={`sort-button ${selected}`}
+                                onClick={() => handleGroupBy(name)}
+                            >
+                                {name}
+                            </div>
+                        );
+                    })
+                }
             </div>
 
-            <img id="exitLink" onClick={() => handleHideWindow} src="image/shapes/arrowsv2.svg" alt="" />
+            <img id="exit-link" onClick={handleHideWindow} src="image/shapes/arrowsv2.svg" alt="" />
         </div>
     );
 }

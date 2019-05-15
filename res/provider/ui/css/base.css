@@ -1,0 +1,259 @@
+/* Base CSS for all components */
+
+@font-face {
+    font-family: AkkuratPro;
+    font-weight: normal;
+    font-style: normal;
+    src: url('./AkkuratPro/AkkRg_Pro_1.otf') format('opentype');
+}
+
+@font-face {
+    font-family: AkkuratProBold;
+    font-weight: bold;
+    font-style: normal;
+    src: url('./AkkuratPro/AkkBd_Pro_1.otf') format('opentype');
+}
+
+@font-face {
+    font-family: AkkuratProLight;
+    font-weight: lighter;
+    font-style: normal;
+    src: url('./AkkuratPro/AkkLg_Pro_1.otf') format('opentype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background-color: #1F1E24;
+}
+
+body {
+    padding: 18px 16px 0 20px;
+    background-color: #1F1E24;
+    font-family: 'AkkuratPro', arial, sans-serif;
+    margin: 0;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+    text-rendering: optimizeLegibility !important;
+}
+
+ul, li {
+    text-decoration: none;
+}
+
+/* Notification Center Panel */
+
+.panel {
+    margin-top: 30px;
+    height: 95vh;
+    width: 90.7vw;
+    overflow: scroll;
+}
+
+.group {
+    /* background: magenta; */
+}
+
+.close {
+    border-radius: 18px;
+    height: 18px;
+    width: 18px;
+    line-height: 18px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.close img {
+    cursor: pointer;
+}
+
+.group .close {
+    right: 4px;
+    text-align: center;
+    border-radius: 18px;
+    font-size: 10px;
+    background-color: #1F1F26;
+}
+
+.close:hover {
+    background-color: #2A2A30;
+}
+
+.group .title {
+    opacity: 0.5;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 18px;
+    letter-spacing: 1px;
+}
+
+.group ul {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.group ul li {
+    height: 100%;
+    display: block;
+}
+
+.group .header {
+    width: 345px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100000;
+    color: #AEAEAE;
+    margin-bottom: 12px;
+}
+
+/* Notification */
+
+.notification {
+    width: 320px;
+    max-height: 160px;
+    border: 1px solid #404048;
+    padding: 15px;
+    display: flex;
+    position: relative;
+    background-color: #2A2A30;
+    box-shadow: 0 2px 14px 0 rgba(24, 24, 42, 0.3);
+    margin-bottom: 12px;
+}
+
+.notification-center .notification:hover {
+    border: 1px solid #4e4e57;
+    transform: translate(0px, -1px);
+}
+
+.notification-center .notification:active {
+    border: 1px solid #AEAEAE;
+    transform: translate(0px, 0px);
+}
+
+.notification .close {
+    display: none;
+    position: absolute;
+    right: 5px;
+    background: none;
+    top: 5.25px;
+    cursor: pointer;
+}
+
+.notification:hover>.close {
+    display: block;
+}
+
+.notification:hover>.time {
+    display: none;
+}
+
+.notification .time {
+    z-index: 99998;
+    position: absolute;
+    right: 5px;
+    top: 7.25px;
+    padding: 5px;
+    font-size: 10px;
+    color: #C7C7C7;
+    font-weight: normal;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+    line-height: 12px;
+}
+
+.source {
+    font-size: 10px;
+    color: #C7C7C7;
+    font-weight: normal;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.source .app-name {
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.source img {
+    width: 17px;
+    height: 17px;
+    margin-right: 7px;
+}
+
+.notification .body {
+    overflow: hidden;
+}
+
+.notification .title {
+    color: #FFFFFF;
+    font-size: 14px;
+    margin-bottom: 3px;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.notification .text {
+    color: #C7C7C7;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 19px;
+}
+
+.notification .buttons {
+    display: flex;
+    margin-top: 7px;
+    width: 320px;
+    border-top: #404048 solid 1px;
+    justify-content: space-around;
+}
+
+.notification .button {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    font-size: 13px;
+    color: #FFFFFF;
+    text-align: center;
+    line-height: 16px;
+    width: 100%;
+    text-transform: capitalize;
+    vertical-align: middle;
+    cursor: pointer;
+    border-right: #404048 1px solid;
+}
+
+.notification .button span {
+    vertical-align: middle;
+}
+
+.notification .button img {
+    width: 17px;
+    height: 17px;
+    display: inline-block;
+    vertical-align: middle;
+    padding-right: 10px;
+}
+
+.notification .button:last-of-type {
+    border-right: none;
+}
+
+.notification .button:hover {
+    background-color: #404048;
+}
+
+.notification .button:active {
+    background-color: #4e4e57;
+}

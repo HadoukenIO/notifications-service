@@ -1,64 +1,41 @@
 import * as React from 'react';
 
-import {Notification} from '../NotificationCard/NotificationCard';
-import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
-import {GroupingType} from '../../NotificationCenterApp';
+import {NotificationCard} from '../NotificationCard/NotificationCard';
+import {UIHandlers} from '../../../model/UIHandlers';
 import {StoredNotification} from '../../../model/StoredNotification';
-declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
+import {CloseButton} from '../CloseButton/CloseButton';
 
-
-
-export interface NotificationGroupProps {
+export interface NotificationGroupProps extends UIHandlers {
+    /** Group name */
     name: string;
+    /** Notifications in this group */
     notifications: StoredNotification[];
-    groupBy?: GroupingType;
-    id?: number;
 }
 
 export function NotificationGroup(props: NotificationGroupProps) {
-    function handleClearAll() {
-        if (props.groupBy === GroupingType.APPLICATION) {
-            window.openfin.notifications.clearAppNotifications(props.name);
-        } else {
-            props.notifications.forEach(notification => {
-                window.openfin.notifications.closeHandler(notification);
-            });
-        }
-    }
-
-    if (props.notifications.length > 0) {
-        const sortedNotifications = props.notifications.sort((a: StoredNotification, b: StoredNotification) => {
-            return a.notification.date > b.notification.date ? -1 : a.notification.date < b.notification.date ? 1 : 0;
-        });
-        const notificationArray: React.ReactNode[] = sortedNotifications.map(note => (
-            <Notification key={[note.source.uuid, note.id].join(':')} meta={note} />
-        ));
-
-        return (
-            <div className="notification-group-wrap">
-                <div className="notification-header">
-                    <div className="notification-day">
-                        {props.name.toUpperCase()}
-                    </div>
-                    <div
-                        className="notification-day-x"
-                        onClick={() => handleClearAll()}
-                    >
-                        <img
-                            className="notification-day-x-image"
-                            src="image/shapes/notifications-x.png"
-                            alt=""
-                        />
-                    </div>
+    const {notifications, name, ...rest} = props;
+    const handleClearAll = () => {
+        rest.onRemoveNotifications(...notifications);
+    };
+    return (
+        <div className="group">
+            <div className="header">
+                <div className="title">
+                    {props.name.toUpperCase()}
                 </div>
-                <div className="notification-inbox">
-                    <ul className="notification-inbox-list">
-                        {notificationArray}
-                    </ul>
-                </div>
+                <CloseButton onClick={handleClearAll} />
             </div>
-        );
-    } else {
-        return null;
-    }
+            <ul>
+                {
+                    notifications.map((notification, i) => {
+                        return (
+                            <li key={i + notification.id}>
+                                <NotificationCard meta={notification} {...rest} />
+                            </li>
+                        );
+                    })
+                }
+            </ul>
+        </div>
+    );
 }
