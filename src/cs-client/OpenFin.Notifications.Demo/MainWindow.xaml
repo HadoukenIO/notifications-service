@@ -1,0 +1,49 @@
+﻿<Window x:Class="OpenFin.Notifications.Demo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenFin.Notifications.Demo"
+        mc:Ignorable="d"
+        Title="WPF Notifications Demo" Height="496.753" Width="340" Style="{DynamicResource defaultWindowStyle}">
+    <Window.Resources>
+        <ResourceDictionary Source="Styles.xaml">
+        </ResourceDictionary>
+    </Window.Resources>
+    <StackPanel Margin="25,10,25,0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="create1" Grid.Row="0" Grid.Column="0" Click="CreateButton_Click">Create Notification 1</Button>
+            <Button x:Name="create2" Grid.Row="1" Grid.Column="0" Click="CreateButton_Click">Create Notification 2</Button>
+            <Button x:Name="create3" Grid.Row="2" Grid.Column="0" Click="CreateButton_Click">Create Notification 3</Button>
+            <Button x:Name="create4" Grid.Row="3" Grid.Column="0" Click="CreateButton_Click">Create Notification 4</Button>
+            <Button x:Name="create5" Grid.Row="4" Grid.Column="0" Click="CreateButton_Click">Create Notification 5</Button>
+            <Button x:Name="create6" Grid.Row="5" Grid.Column="0" Click="CreateButton_Click">Create Notification 6</Button>
+
+            <Button x:Name="close1" Grid.Row="0" Grid.Column="1" Click="CloseButton_Click">Clear Notification 1</Button>
+            <Button x:Name="close2" Grid.Row="1" Grid.Column="1" Click="CloseButton_Click">Clear Notification 2</Button>
+            <Button x:Name="close3" Grid.Row="2" Grid.Column="1" Click="CloseButton_Click">Clear Notification 3</Button>
+            <Button x:Name="close4" Grid.Row="3" Grid.Column="1" Click="CloseButton_Click">Clear Notification 4</Button>
+            <Button x:Name="close5" Grid.Row="4" Grid.Column="1" Click="CloseButton_Click">Clear Notification 5</Button>
+            <Button x:Name="close6" Grid.Row="5" Grid.Column="1" Click="CloseButton_Click">Clear Notification 6</Button>
+
+        </Grid>
+        <Button Click="FetchButton_Click">Fetch Notifications</Button>
+        <Button Click="ToggleButton_Click" Margin="10,3" Width="Auto">Toggle Notification Center</Button>
+        <Border Style="{DynamicResource textBlockBorder}">
+            <TextBlock x:Name="messageBox" MouseDown="messageBox_MouseDown"/>
+        </Border>
+    </StackPanel>
+</Window>

@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFin.Notifications", "OpenFin.Notifications\OpenFin.Notifications.csproj", "{7405181D-7790-48A0-82CF-CFBA4C54F5CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFin.Notifications.Demo", "OpenFin.Notifications.Demo\OpenFin.Notifications.Demo.csproj", "{8DA63C51-700E-44F8-9541-3B62E7D6AD2A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7405181D-7790-48A0-82CF-CFBA4C54F5CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7405181D-7790-48A0-82CF-CFBA4C54F5CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7405181D-7790-48A0-82CF-CFBA4C54F5CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7405181D-7790-48A0-82CF-CFBA4C54F5CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DA63C51-700E-44F8-9541-3B62E7D6AD2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DA63C51-700E-44F8-9541-3B62E7D6AD2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DA63C51-700E-44F8-9541-3B62E7D6AD2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DA63C51-700E-44F8-9541-3B62E7D6AD2A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
