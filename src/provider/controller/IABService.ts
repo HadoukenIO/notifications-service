@@ -3,9 +3,8 @@ import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
 import {Store} from 'redux';
 
-import {NotificationOptions, Notification, OptionButton, NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent, NotificationEvent} from '../../client';
-import {APITopic, ClearPayload} from '../../client/internal';
-import {APIExtension, APITopicExtension} from '../model/APIExtension';
+import {NotificationOptions, Notification, OptionButton, NotificationEvent} from '../../client';
+import {APITopic, ClearPayload, API} from '../../client/internal';
 import {APIHandler} from '../model/APIHandler';
 import {StoredNotification} from '../model/StoredNotification';
 import rootAction from '../store/root-action';
@@ -23,17 +22,14 @@ let providerChannel: ChannelProvider;
  */
 export async function registerService(store: Store) {
     // Register the service
-    const apiHandler: APIHandler<APITopic | APITopicExtension> = new APIHandler();
+    const apiHandler: APIHandler<APITopic> = new APIHandler();
 
-    await apiHandler.registerListeners<APIExtension>({
+    await apiHandler.registerListeners<API>({
         [APITopic.CREATE_NOTIFICATION]: createNotification,
         [APITopic.CLEAR_NOTIFICATION]: clearNotification,
         [APITopic.GET_APP_NOTIFICATIONS]: fetchAppNotifications,
         [APITopic.CLEAR_APP_NOTIFICATIONS]: clearAppNotifications,
-        [APITopic.TOGGLE_NOTIFICATION_CENTER]: toggleNotificationCenter,
-        [APITopicExtension.NOTIFICATION_CLICKED]: notificationClicked,
-        [APITopicExtension.NOTIFICATION_BUTTON_CLICKED]: notificationButtonClicked,
-        [APITopicExtension.NOTIFICATION_CLOSED]: notificationClosed
+        [APITopic.TOGGLE_NOTIFICATION_CENTER]: toggleNotificationCenter
     });
 
     providerChannel = apiHandler.channel; // Temporary while I clean out all of the other references to this
@@ -108,40 +104,6 @@ async function clearAppNotifications(payload: Identity | undefined, sender: Prov
     return storedNotifications.length;
 }
 
-/**
- * @function notificationClicked Tell the Client that a notification was clicked
- * @param storedNotification Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
- */
-export async function notificationClicked(storedNotification: StoredNotification): Promise<void> {
-    // For testing/display purposes
-    console.groupCollapsed('notificationClicked hit');
-    console.log('payload', storedNotification);
-    console.groupEnd();
-
-    const event: NotificationClickedEvent = {type: 'notification-clicked', notification: storedNotification.notification};
-    // Send notification clicked event to uuid with the context.
-    dispatchClientEvent(storedNotification.source, event);
-}
-
-export async function notificationButtonClicked(payload: StoredNotification & {buttonIndex: number}): Promise<void> {
-    const target: Identity = payload.source;
-    const event: NotificationButtonClickedEvent = {type: 'notification-button-clicked', notification: payload.notification, buttonIndex: payload.buttonIndex};
-
-    dispatchClientEvent(target, event);
-}
-
-/**
- * @function notificationClosed Tell the Client that a notification was closed,
- * and delete it from indexeddb
- * @param storedNotification Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
- */
-export async function notificationClosed(storedNotification: StoredNotification): Promise<void> {
-    // Send notification closed event to uuid with the context.
-    const target: Identity = storedNotification.source;
-    const event: NotificationClosedEvent = {type: 'notification-closed', notification: storedNotification.notification};
-
-    dispatchClientEvent(target, event);
-}
 
 /**
  * Encodes the Id which currently is the uuid:id
