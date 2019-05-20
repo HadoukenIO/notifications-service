@@ -58,40 +58,10 @@ export class NotificationCenter {
         this.subscribe();
     }
 
-    private setupTrayIcon() {
+    private setupTrayIcon(): void {
         this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png')
-            .addLeftClickHandler((event) => {
+            .addLeftClickHandler(() => {
                 this._store.dispatch(toggleCenterWindowVisibility());
-            })
-            .addRightClickHandler(async (event) => {
-                const menuItems: MenuItem[] = [
-                    {
-                        text: 'Top Left',
-                        onClick: () => {
-                            this._store.dispatch(changeBannerDirection([1, 1]));
-                        }
-                    },
-                    {
-                        text: 'Bottom Left',
-                        onClick: () => {
-                            this._store.dispatch(changeBannerDirection([1, -1]));
-                        }
-                    },
-                    {
-                        text: 'Top Right',
-                        onClick: () => {
-                            this._store.dispatch(changeBannerDirection([-1, 1]));
-                        }
-                    },
-                    {
-                        text: 'Bottom Right',
-                        onClick: () => {
-                            this._store.dispatch(changeBannerDirection([-1, -1]));
-                        }
-                    }
-                ];
-
-                ContextMenu.show({top: event.y + event.bounds.height, left: event.x}, menuItems);
             });
     }
 
