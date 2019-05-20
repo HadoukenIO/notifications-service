@@ -31,7 +31,7 @@ body {
 }
 
 .item:hover {
-    background: rgb(95, 95, 252);
+    background: #5f5ffc;
     color: white;
     cursor: pointer;
 }
