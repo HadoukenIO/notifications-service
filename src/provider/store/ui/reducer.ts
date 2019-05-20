@@ -4,7 +4,7 @@ import * as actions from './actions';
 import Types from './types';
 
 export interface UIState {
-    readonly windowVisible?: boolean;
+    readonly windowVisible: boolean;
     readonly bannerDirection: [number, number];
     readonly actionDirection: [number, number];
 }
