@@ -123,7 +123,7 @@ export class NotificationCenter {
         const {hideOnBlur = false} = this._options;
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
-                const contextMenuIsShowing = await ContextMenu.instance.isShowing();
+                const contextMenuIsShowing = await ContextMenu.isShowing();
                 if (!contextMenuIsShowing && this.visible) {
                     this._store.dispatch(toggleCenterWindowVisibility(false));
                 }

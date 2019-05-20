@@ -4,7 +4,6 @@ import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {WebWindow, createWebWindow} from '../model/WebWindow';
 import {renderApp} from '../view/containers/ContextMenu';
 
-
 const windowOptions: WindowOption = {
     name: 'Context-Menu',
     url: 'ui/context-menu.html',
@@ -31,8 +30,8 @@ export interface Menu {
 }
 
 export class ContextMenu {
-    private _webWindow: Promise<WebWindow>;
-    private static _instance: ContextMenu;
+    private readonly _webWindow: Promise<WebWindow>;
+    private static _instance: ContextMenu = new ContextMenu();
 
     private constructor() {
         this._webWindow = createWebWindow(windowOptions).then(webWindow => {
@@ -41,24 +40,13 @@ export class ContextMenu {
         });
     }
 
-    public static get instance() {
-        if (!ContextMenu._instance) {
-            ContextMenu._instance = new ContextMenu();
-        }
-        return ContextMenu._instance;
-    }
-
-    public initialize() {
-        console.log('init');
-    }
-
-    public async isShowing() {
-        const {window} = await this._webWindow;
+    public static async isShowing(): Promise<boolean> {
+        const {window} = await this._instance._webWindow;
         return window.isShowing();
     }
 
-    public static async show(position: PointTopLeft, menuItems: MenuItem[]) {
-        const {document, window} = await ContextMenu.instance._webWindow;
+    public static async show(position: PointTopLeft, menuItems: MenuItem[]): Promise<void> {
+        const {document, window} = await ContextMenu._instance._webWindow;
         const {left, top} = position;
         renderApp(document, menuItems, ContextMenu.close);
         await window.moveTo(left, top);
@@ -67,12 +55,12 @@ export class ContextMenu {
         await window.focus();
     }
 
-    public static async close() {
-        const {window} = await ContextMenu.instance._webWindow;
+    public static async close(): Promise<void> {
+        const {window} = await ContextMenu._instance._webWindow;
         window.hide();
     }
 
-    private async addListeners() {
+    private async addListeners(): Promise<void> {
         const {window} = await this._webWindow;
 
         window.addListener('blurred', () => {
