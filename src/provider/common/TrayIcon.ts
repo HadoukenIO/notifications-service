@@ -3,8 +3,7 @@ import {Application} from 'openfin/_v2/main';
 import {TrayInfo} from 'openfin/_v2/api/application/application';
 import Bounds from 'openfin/_v2/api/window/bounds';
 
-
-// Temp fix until .41 as bounds is not defined on the event.
+// TODO: Add Jira ticket - Temp fix until .41 as bounds is not defined on the event.
 interface TrayIconClickEvent extends TrayIconClicked<'application', 'tray-icon-clicked'> {
     bounds: Bounds;
 }
@@ -17,15 +16,37 @@ export class TrayIcon {
 
     constructor(icon: string) {
         this._application = fin.Application.getCurrentSync();
-        this.setIcon(icon);
-        this.setupEventListeners();
+        this.icon = icon;
+        this.addListeners();
     }
 
     public get icon(): string {
         return this._icon;
     }
 
-    private setupEventListeners() {
+    public set icon(value: string) {
+        this._application.setTrayIcon(value);
+        this._icon = value;
+    }
+
+    /**
+     * Retrieves information about the provider tray icon.
+     */
+    public async getInfo(): Promise<TrayInfo> {
+        return this._application.getTrayIconInfo();
+    }
+
+    public addLeftClickHandler(handler: (event: TrayIconClickEvent) => void): this {
+        this._leftClickHandler = handler;
+        return this;
+    }
+
+    public addRightClickHandler(handler: (event: TrayIconClickEvent) => void): this {
+        this._rightClickHandler = handler;
+        return this;
+    }
+
+    private addListeners(): void {
         this._application
             .addListener(
                 'tray-icon-clicked',
@@ -37,25 +58,5 @@ export class TrayIcon {
                     }
                 }
             );
-    }
-
-    public async getInfo(): Promise<TrayInfo> {
-        return this._application.getTrayIconInfo();
-    }
-
-    public setIcon(value: string) {
-        this._application.setTrayIcon(value);
-        this._icon = value;
-        return this;
-    }
-
-    public addLeftClickHandler(handler: (event: TrayIconClickEvent) => void) {
-        this._leftClickHandler = handler;
-        return this;
-    }
-
-    public addRightClickHandler(handler: (event: TrayIconClickEvent) => void) {
-        this._rightClickHandler = handler;
-        return this;
     }
 }
