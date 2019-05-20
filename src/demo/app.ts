@@ -30,7 +30,7 @@ const buttonNote: NotificationOptions = {
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
     date: new Date(),
-    buttons: [{title: 'test1', iconUrl: 'favicon.ico'}, {title: 'test1', iconUrl: 'favicon.ico'}]
+    buttons: [{title: 'test1', iconUrl: 'favicon.ico'}, {title: 'test2', iconUrl: 'favicon.ico'}]
 };
 
 function makeNoteOfType(index: number) {
