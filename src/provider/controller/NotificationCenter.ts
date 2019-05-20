@@ -29,7 +29,7 @@ const windowOptions: WindowOption = {
 };
 
 interface Options {
-    /** Blur event causes window to hide */
+    // Blur event causes window to hide
     hideOnBlur?: boolean;
 }
 
@@ -69,7 +69,7 @@ export class NotificationCenter {
      * Subscribe to the store.
      * Perform all watching for state change in here.
      */
-    private async subscribe() {
+    private async subscribe(): Promise<void> {
         // Window visibility
         watchForChange(
             this._store,
@@ -81,15 +81,15 @@ export class NotificationCenter {
     /**
      * The window visibility state.
      */
-    public get visible() {
+    public get visible(): boolean {
         return getNotificationCenterVisibility(this._store.getState());
     }
 
     /**
      * Add listeners to the window.
      */
-    private async addListeners() {
-        const {window, document} = await this._webWindow;
+    private async addListeners(): Promise<void> {
+        const {window} = await this._webWindow;
         const {hideOnBlur = false} = this._options;
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
@@ -108,7 +108,7 @@ export class NotificationCenter {
      * Toggle window visibility.
      * @param forceVisibility Force the window to be shown or hidden. True = show, false = hide.
      */
-    public async toggleWindow(forceVisibility?: boolean) {
+    public async toggleWindow(forceVisibility?: boolean): Promise<void> {
         const visible = forceVisibility || this.visible;
         if (visible) {
             this.showWindow();
@@ -120,7 +120,7 @@ export class NotificationCenter {
     /**
      * Show the window.
      */
-    public async showWindow() {
+    public async showWindow(): Promise<void> {
         const {window} = await this._webWindow;
         window.bringToFront();
         window.show();
@@ -132,7 +132,7 @@ export class NotificationCenter {
      * Hide the window.
      * @param force Force the window to hide without animating out.
      */
-    public async hideWindow(force?: boolean) {
+    public async hideWindow(force?: boolean): Promise<void> {
         const duration = force ? 0 : 300;
         this.animateOut(duration);
     }
@@ -154,7 +154,7 @@ export class NotificationCenter {
     }
 
 
-    private async animateIn(duration: number = 300) {
+    private async animateIn(duration: number = 300): Promise<void> {
         const {window} = await this._webWindow;
 
         window.animate(
@@ -171,7 +171,7 @@ export class NotificationCenter {
         );
     }
 
-    private async animateOut(duration: number = 400) {
+    private async animateOut(duration: number = 400): Promise<void> {
         const {window} = await this._webWindow;
 
         window.animate(
