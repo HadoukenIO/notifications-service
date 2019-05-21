@@ -28,16 +28,3 @@ export const clickNotification = (notification: StoredNotification) => action(Ty
  * @param buttonIndex The index of the clicked button.
  */
 export const clickNotificationButton = (notification: StoredNotification, buttonIndex: number) => action(Types.CLICK_BUTTON, {notification, buttonIndex});
-
-/** ASYNC THUNK ACTIONS */
-
-// export function createNotification(payload: StoredNotification, sender: ProviderIdentity) {
-//     return async function (dispatch: Dispatch, getState: () => RootState): Promise<Notification> {
-//         // If id is not given, generate 1 and pass it back to the caller
-//         payload.id = payload.id || generateId();
-//         dispatch(storeNotification(payload, sender));
-//         const newNotification = getNotifications(getState()).get(payload.id)!;
-//         return newNotification.notification;
-//     };
-// }
-

@@ -22,4 +22,3 @@ export const getNotificationsByApplication = (source: Identity, state: RootState
 export const getNotificationById = (state: RootState, id: string): StoredNotification | null => {
     return getNotifications(state)[id];
 };
-

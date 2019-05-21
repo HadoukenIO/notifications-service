@@ -17,7 +17,7 @@ const initialState: NotificationsState = {
     notifications: {}
 };
 
-const reducer = createReducer<NotificationsState, NotificationsAction>(initialState)
+export const reducer = createReducer<NotificationsState, NotificationsAction>(initialState)
     // Add a new notification to the store.
     .handleAction(
         Types.CREATE,
@@ -49,7 +49,3 @@ const reducer = createReducer<NotificationsState, NotificationsAction>(initialSt
             });
         }
     );
-
-export default reducer;
-
-

@@ -17,7 +17,7 @@ const initialState: UIState = {
     actionDirection: [1, 1]
 };
 
-const reducer = createReducer<UIState, UIAction>(initialState)
+export const reducer = createReducer<UIState, UIAction>(initialState)
     .handleAction(
         Types.TOGGLE_CENTER_WINDOW,
         (state, action) => {
@@ -49,4 +49,3 @@ const reducer = createReducer<UIState, UIAction>(initialState)
         }
     );
 
-export default reducer;

@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
 
-import notifications from './notifications/reducer';
-import ui from './ui/reducer';
+import {reducer as notifications} from './notifications/reducer';
+import {reducer as ui} from './ui/reducer';
 
 const reducers = combineReducers({
     notifications,
