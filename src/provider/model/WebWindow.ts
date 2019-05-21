@@ -3,7 +3,6 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 export interface WebWindow {
     document: Document;
-    nativeWindow: Window;
     window: _Window;
 }
 
@@ -16,8 +15,7 @@ export async function createWebWindow(options: WindowOption): Promise<WebWindow>
     const nativeWindow = windowV1.getNativeWindow();
     const document = nativeWindow.document;
     const windowV2 = fin.Window.wrapSync({name: windowV1.name, uuid: windowV1.uuid});
-
-    return {document, nativeWindow, window: windowV2};
+    return {document, window: windowV2};
 }
 
 /**
