@@ -33,7 +33,7 @@ export default function configureStore(initialState: RootState, injectables: {})
     );
     const persistor = persistStore(store);
 
-    // For testing int he console
+    // For testing in the console
     Object.defineProperty(window, 'persistor', {
         value: persistor,
         writable: false
