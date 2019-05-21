@@ -8,7 +8,7 @@ import {dispatchClientEvent} from '../../controller/IABService';
 import {NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../../client';
 import {StoredNotification} from '../../model/StoredNotification';
 
-export const ProviderMiddleware: Middleware<Dispatch<RootAction>, RootState> = (api: MiddlewareAPI) => (next: Dispatch<RootAction>) => (action: RootAction) => {
+export const providerMiddleware: Middleware<Dispatch<RootAction>, RootState> = (api: MiddlewareAPI) => (next: Dispatch<RootAction>) => (action: RootAction) => {
     if (action.type === RootTypes.notifications.CREATE) {
         ToastManager.instance.create(action.payload);
     }
@@ -43,10 +43,8 @@ export const ProviderMiddleware: Middleware<Dispatch<RootAction>, RootState> = (
     return next(action);
 };
 
-
-
 /**
- * @function notificationClosed Tell the Client that a notification was closed,
+ * notificationClosed Tell the Client that a notification was closed,
  * and delete it from indexeddb
  * @param storedNotification Should contain the id of the notification clicked. Also the uuid and name of the original Client window.
  */

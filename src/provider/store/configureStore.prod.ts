@@ -5,7 +5,7 @@ import {persistStore, persistReducer, PersistConfig, Persistor} from 'redux-pers
 import Storage from '../model/Storage';
 
 import {RootState} from './typings';
-import {ProviderMiddleware} from './middleware/ProviderMiddleware';
+import {providerMiddleware} from './middleware/providerMiddleware';
 import rootReducer from './root-reducer';
 
 
@@ -19,7 +19,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const middleware = (injectables: {}) => applyMiddleware(
     thunk.withExtraArgument<{}>(injectables),
-    ProviderMiddleware
+    providerMiddleware
 );
 
 export default function configureStore(initialState: RootState, injectables: {}): {store: Store, persistor: Persistor} {
