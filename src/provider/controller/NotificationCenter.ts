@@ -111,9 +111,9 @@ export class NotificationCenter {
     public async toggleWindow(forceVisibility?: boolean): Promise<void> {
         const visible = forceVisibility || this.visible;
         if (visible) {
-            this.showWindow();
+            return this.showWindow();
         } else {
-            this.hideWindow();
+            return this.hideWindow();
         }
     }
 
@@ -123,8 +123,8 @@ export class NotificationCenter {
     public async showWindow(): Promise<void> {
         const {window} = await this._webWindow;
         window.bringToFront();
-        window.show();
-        this.animateIn();
+        await window.show();
+        await this.animateIn();
         window.setAsForeground();
     }
 
@@ -134,7 +134,7 @@ export class NotificationCenter {
      */
     public async hideWindow(force?: boolean): Promise<void> {
         const duration = force ? 0 : 300;
-        this.animateOut(duration);
+        await this.animateOut(duration);
     }
 
     /**
