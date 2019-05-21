@@ -10,7 +10,7 @@ import rootReducer from './root-reducer';
 
 const persistConfig: PersistConfig = {
     key: 'root',
-    debug: true,
+    debug: process.env.NODE_ENV !== 'production',
     storage
 };
 
