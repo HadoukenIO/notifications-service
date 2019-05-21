@@ -7,9 +7,8 @@ import {renderApp} from '../view/containers/NotificationCenterApp';
 import {TrayIcon} from '../common/TrayIcon';
 import {watchForChange} from '../store/utils/watch';
 import {getNotificationCenterVisibility} from '../store/ui/selectors';
-import {toggleCenterWindowVisibility, changeBannerDirection} from '../store/ui/actions';
+import {toggleCenterWindowVisibility} from '../store/ui/actions';
 import {RootState} from '../store/typings';
-import {ContextMenu, MenuItem} from '../common/ContextMenu';
 
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
@@ -93,8 +92,9 @@ export class NotificationCenter {
         const {hideOnBlur = false} = this._options;
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
-                const contextMenuIsShowing = await ContextMenu.isShowing();
-                if (!contextMenuIsShowing && this.visible) {
+                // const contextMenuIsShowing = await ContextMenu.isShowing();
+                // if (!contextMenuIsShowing && this.visible) {
+                if (this.visible) {
                     this._store.dispatch(toggleCenterWindowVisibility(false));
                 }
             });
