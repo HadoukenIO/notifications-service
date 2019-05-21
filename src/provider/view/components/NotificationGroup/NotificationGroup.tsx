@@ -6,9 +6,9 @@ import {StoredNotification} from '../../../model/StoredNotification';
 import {CloseButton} from '../CloseButton/CloseButton';
 
 export interface NotificationGroupProps extends UIHandlers {
-    /** Group name */
+    // Group name
     name: string;
-    /** Notifications in this group */
+    // Notifications in this group
     notifications: StoredNotification[];
 }
 

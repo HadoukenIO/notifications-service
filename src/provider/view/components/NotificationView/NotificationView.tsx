@@ -68,8 +68,6 @@ export function NotificationView(props: NotificationViewProps) {
     );
 }
 
-/** Helper Functions */
-
 /**
  * When creating a new notification group, this function determines the
  * user-visible title for the group
