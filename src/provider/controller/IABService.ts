@@ -16,11 +16,11 @@ let providerStore: Store;
 let providerChannel: ChannelProvider;
 
 /**
- * @function registerService Registers the service and any functions that can be
+ * Registers the service and any functions that can be
  * consumed
  * @param store Store dispatch function.
  */
-export async function registerService(store: Store) {
+export async function registerService(store: Store): Promise<void> {
     // Register the service
     const apiHandler: APIHandler<APITopic> = new APIHandler();
 
@@ -62,7 +62,7 @@ async function createNotification(payload: NotificationOptions, sender: Provider
 }
 
 /**
- * @function toggleNotificationCenter Dispatch the notification center toggle action to the UI
+ * Dispatch the notification center toggle action to the UI
  * @param payload Not used.
  * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
  */
@@ -71,7 +71,7 @@ async function toggleNotificationCenter(payload: undefined, sender: ProviderIden
 }
 
 /**
- * @function clearNotification Tell the UI to delete a specific notification
+ * Tell the UI to delete a specific notification
  * @param payload Should contain the id of the notification we want to delete. Maybe should just be a string
  * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
  * @returns Whether or not the removal of the notifications was successful.
@@ -87,14 +87,14 @@ async function clearNotification(payload: ClearPayload, sender: ProviderIdentity
 }
 
 /**
- * @function fetchAppNotifications This allows you to fetch apps via your uuid
+ * This allows you to fetch apps via your uuid
  * @param payload The payload can contain the uuid
  * @param sender The sender info contains the uuid of the sender
  */
 async function fetchAppNotifications(payload: Identity | undefined, sender: ProviderIdentity): Promise<Notification[]> {
     const storedNotifications = getNotificationsByApplication(payload || sender, providerStore.getState());
 
-    return storedNotifications.map(x => x.notification);
+    return storedNotifications.map(notification => notification.notification);
 }
 
 async function clearAppNotifications(payload: Identity | undefined, sender: ProviderIdentity): Promise<number> {
@@ -103,7 +103,6 @@ async function clearAppNotifications(payload: Identity | undefined, sender: Prov
 
     return storedNotifications.length;
 }
-
 
 /**
  * Encodes the Id which currently is the uuid:id
