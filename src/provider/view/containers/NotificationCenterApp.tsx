@@ -1,16 +1,16 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Store, Dispatch, bindActionCreators} from 'redux';
+import {Dispatch, bindActionCreators} from 'redux';
 import {connect, Provider} from 'react-redux';
 
 import {toggleCenterWindowVisibility} from '../../store/ui/actions';
 import {removeNotifications, clickNotification, clickNotificationButton} from '../../store/notifications/actions';
-import {RootState} from '../../store/typings';
 import {getAllNotifications} from '../../store/notifications/selectors';
 import {Header} from '../components/Header/Header';
 import {Footer} from '../components/Footer/Footer';
 import {NotificationView} from '../components/NotificationView/NotificationView';
 import {UIHandlers} from '../../model/UIHandlers';
+import {RootState, Store} from '../../store';
 
 export enum GroupingType {
     APPLICATION = 'Application',

@@ -1,5 +1,4 @@
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
-import {Store} from 'redux';
 import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
 import {WebWindow, createWebWindow} from '../model/WebWindow';
@@ -8,7 +7,7 @@ import {TrayIcon} from '../common/TrayIcon';
 import {watchForChange} from '../store/utils/watch';
 import {getNotificationCenterVisibility} from '../store/ui/selectors';
 import {toggleCenterWindowVisibility} from '../store/ui/actions';
-import {RootState} from '../store/typings';
+import {Store} from '../store';
 
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
@@ -38,7 +37,7 @@ export class NotificationCenter {
     private _options: Options;
     private _store: Store;
 
-    public constructor(store: Store<RootState>, options: Options) {
+    public constructor(store: Store, options: Options) {
         this._store = store;
         this._options = options;
         // Create notification center app window

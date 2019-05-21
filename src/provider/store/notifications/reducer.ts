@@ -3,15 +3,17 @@ import {createReducer, ActionType} from 'typesafe-actions';
 import {StoredNotification} from '../../model/StoredNotification';
 
 import * as actions from './actions';
-import Constants from './constants';
+import {Constants} from './constants';
 
-export type NotificationMap = {[key: string]: StoredNotification};
+export type NotificationMap = {
+    readonly [key: string]: StoredNotification
+};
 
 export interface NotificationsState {
     readonly notifications: NotificationMap;
 }
 
-type NotificationsAction = ActionType<typeof actions>;
+export type NotificationsAction = ActionType<typeof actions>;
 
 const initialState: NotificationsState = {
     notifications: {}

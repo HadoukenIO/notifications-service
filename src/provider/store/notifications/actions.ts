@@ -2,7 +2,7 @@ import {action} from 'typesafe-actions';
 
 import {StoredNotification} from '../../model/StoredNotification';
 
-import Constants from './constants';
+import {Constants} from './constants';
 
 /**
  * Create & store a new notification.

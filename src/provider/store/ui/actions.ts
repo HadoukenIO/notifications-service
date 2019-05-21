@@ -1,6 +1,6 @@
 import {action} from 'typesafe-actions';
 
-import Constants from './constants';
+import {Constants} from './constants';
 
 /**
  * Toggle the Notificiation Center visibility.

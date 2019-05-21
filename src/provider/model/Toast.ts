@@ -1,11 +1,10 @@
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import Bounds from 'openfin/_v2/api/window/bounds';
-import {Store} from 'redux';
 
 import {NotificationOptions} from '../../client';
-import {RootState} from '../store/typings';
 import {renderApp} from '../view/containers/ToastApp';
+import {Store} from '../store';
 
 import {WebWindow, createWebWindow} from './WebWindow';
 import {StoredNotification} from './StoredNotification';
@@ -69,7 +68,7 @@ export class Toast {
     private _timeout!: number;
     private _dimensions!: Promise<WindowDimensions>;
 
-    public constructor(store: Store<RootState>, notification: StoredNotification, toastOptions: Options) {
+    public constructor(store: Store, notification: StoredNotification, toastOptions: Options) {
         this._options = toastOptions;
         this._type = this.getToastType(notification.notification);
         this._state = State.WAITING;

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Store, Dispatch, bindActionCreators} from 'redux';
+import {Dispatch, bindActionCreators} from 'redux';
 import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../model/StoredNotification';
@@ -9,7 +9,8 @@ import {WindowDimensions} from '../../controller/ToastManager';
 import {UIHandlers} from '../../model/UIHandlers';
 import {clickNotification, clickNotificationButton, removeNotifications} from '../../store/notifications/actions';
 import {toggleCenterWindowVisibility} from '../../store/ui/actions';
-import {RootState} from '../../store/typings';
+import {RootState, Store} from '../../store';
+
 
 interface ToastAppProps {
     meta: StoredNotification;

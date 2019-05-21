@@ -1,4 +1,5 @@
-import {Store} from 'redux';
+import {Store, AnyAction, Action} from 'redux';
+import {RootAction} from 'typesafe-actions/dist/create-reducer';
 
 /**
  * Adds ability to watch for specific changes in the state with selectors.
@@ -6,7 +7,7 @@ import {Store} from 'redux';
 
 export type StoreChangeObserver<T> = (oldValue: T, newValue: T) => void;
 
-export const watchForChange = <S, T>(store: Store<S>, getObject: (state: S) => T, observer: StoreChangeObserver<T>) => {
+export const watchForChange = <S, T>(store: Store<S, RootAction>, getObject: (state: S) => T, observer: StoreChangeObserver<T>) => {
     const watcher = watch<S, T>(store.getState, getObject);
     return store.subscribe(watcher(observer));
 };

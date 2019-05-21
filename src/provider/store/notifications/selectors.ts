@@ -1,7 +1,8 @@
 import {createSelector} from 'reselect';
 import {Identity} from 'openfin/_v2/main';
 
-import {RootState} from '../typings';
+import {RootState} from '..';
+
 import {StoredNotification} from '../../model/StoredNotification';
 
 import {NotificationMap} from './reducer';

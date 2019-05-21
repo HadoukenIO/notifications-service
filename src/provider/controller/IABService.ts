@@ -1,16 +1,16 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
-import {Store} from 'redux';
 
 import {NotificationOptions, Notification, OptionButton, NotificationEvent} from '../../client';
 import {APITopic, ClearPayload, API} from '../../client/internal';
 import {APIHandler} from '../model/APIHandler';
 import {StoredNotification} from '../model/StoredNotification';
-import rootAction from '../store/root-action';
 import {toggleCenterWindowVisibility} from '../store/ui/actions';
 import {removeNotifications} from '../store/notifications/actions';
 import {getNotificationsByApplication, getNotificationById} from '../store/notifications/selectors';
+import {Store} from '../store';
+import {createNotification as createNotificationAction} from '../store/notifications/actions';
 
 let providerStore: Store;
 let providerChannel: ChannelProvider;
@@ -56,7 +56,7 @@ export async function dispatchClientEvent(target: Identity, payload: Notificatio
  */
 async function createNotification(payload: NotificationOptions, sender: ProviderIdentity): Promise<Notification> {
     const storedNotification = hydrateNotification(payload, sender);
-    providerStore.dispatch(rootAction.notificationsActions.createNotification(storedNotification));
+    providerStore.dispatch(createNotificationAction(storedNotification));
 
     return storedNotification.notification;
 }

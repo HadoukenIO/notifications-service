@@ -1,4 +1,5 @@
-import {RootState} from '../typings';
+import {RootState} from '..';
+
 import {ToastType} from '../../model/Toast';
 
 export const getNotificationCenterVisibility = (state: RootState): boolean => state.ui.windowVisible;

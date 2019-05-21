@@ -1,4 +1,3 @@
-import {Store} from 'redux';
 import {Rect} from 'openfin/_v2/api/system/monitor';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 
@@ -7,6 +6,7 @@ import {getNotificationCenterVisibility, getToastDirection, getBannerDirection, 
 import {Toast, ToastType} from '../model/Toast';
 import {contains} from '../model/Geometry';
 import {watchForChange} from '../store/utils/watch';
+import {Store} from '../store';
 
 export type WindowDimensions = {height: number, width: number};
 

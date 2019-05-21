@@ -1,7 +1,7 @@
 import {createReducer, ActionType} from 'typesafe-actions';
 
 import * as actions from './actions';
-import Constants from './constants';
+import {Constants} from './constants';
 
 export interface UIState {
     readonly windowVisible: boolean;

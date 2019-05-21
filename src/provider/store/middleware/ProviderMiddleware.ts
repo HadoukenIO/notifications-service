@@ -1,19 +1,19 @@
 import {Middleware, MiddlewareAPI, Dispatch} from 'redux';
 import {Identity} from 'openfin/_v2/main';
 
-import {RootAction, RootState} from '../typings';
-import RootTypes from '../root-types';
 import {ToastManager} from '../../controller/ToastManager';
 import {dispatchClientEvent} from '../../controller/IABService';
 import {NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../../client';
 import {StoredNotification} from '../../model/StoredNotification';
 
+import {RootState, RootAction, RootConstants} from '..';
+
 export const providerMiddleware: Middleware<Dispatch<RootAction>, RootState> = (api: MiddlewareAPI) => (next: Dispatch<RootAction>) => (action: RootAction) => {
-    if (action.type === RootTypes.notifications.CREATE) {
+    if (action.type === RootConstants.notifications.CREATE) {
         ToastManager.instance.create(action.payload);
     }
 
-    if (action.type === RootTypes.notifications.REMOVE) {
+    if (action.type === RootConstants.notifications.REMOVE) {
         const {notifications} = action.payload;
         notifications.forEach(notification => {
             notificationClosed(notification);
@@ -21,7 +21,7 @@ export const providerMiddleware: Middleware<Dispatch<RootAction>, RootState> = (
         ToastManager.instance.removeToasts(...notifications);
     }
 
-    if (action.type === RootTypes.notifications.CLICK_BUTTON) {
+    if (action.type === RootConstants.notifications.CLICK_BUTTON) {
         const {buttonIndex} = action.payload;
         const notification = action.payload.notification.notification;
         const target: Identity = action.payload.notification.source;
@@ -29,14 +29,14 @@ export const providerMiddleware: Middleware<Dispatch<RootAction>, RootState> = (
         dispatchClientEvent(target, event);
     }
 
-    if (action.type === RootTypes.notifications.CLICK_NOTIFICATION) {
+    if (action.type === RootConstants.notifications.CLICK_NOTIFICATION) {
         const {notification, source} = action.payload;
         const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
         // Send notification clicked event to uuid with the context.
         dispatchClientEvent(source, event);
     }
 
-    if (action.type === RootTypes.ui.TOGGLE_CENTER_WINDOW) {
+    if (action.type === RootConstants.ui.TOGGLE_CENTER_WINDOW) {
         ToastManager.instance.closeAll();
     }
 
