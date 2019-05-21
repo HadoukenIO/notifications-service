@@ -3,7 +3,7 @@ import {createReducer, ActionType} from 'typesafe-actions';
 import {StoredNotification} from '../../model/StoredNotification';
 
 import * as actions from './actions';
-import Types from './types';
+import Constants from './constants';
 
 export type NotificationMap = {[key: string]: StoredNotification};
 
@@ -20,7 +20,7 @@ const initialState: NotificationsState = {
 export const reducer = createReducer<NotificationsState, NotificationsAction>(initialState)
     // Add a new notification to the store.
     .handleAction(
-        Types.CREATE,
+        Constants.CREATE,
         (state, action): NotificationsState => {
             const {id} = action.payload;
             const newState = {
@@ -35,7 +35,7 @@ export const reducer = createReducer<NotificationsState, NotificationsAction>(in
     )
     // Remove notifications from the store
     .handleAction(
-        Types.REMOVE,
+        Constants.REMOVE,
         (state, action) => {
             const removeNotifications = action.payload.notifications;
             const notifications = {...state.notifications};

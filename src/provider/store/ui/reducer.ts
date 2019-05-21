@@ -1,7 +1,7 @@
 import {createReducer, ActionType} from 'typesafe-actions';
 
 import * as actions from './actions';
-import Types from './types';
+import Constants from './constants';
 
 export interface UIState {
     readonly windowVisible: boolean;
@@ -19,7 +19,7 @@ const initialState: UIState = {
 
 export const reducer = createReducer<UIState, UIAction>(initialState)
     .handleAction(
-        Types.TOGGLE_CENTER_WINDOW,
+        Constants.TOGGLE_CENTER_WINDOW,
         (state, action) => {
             const {visibility} = action.payload;
             return ({
@@ -29,7 +29,7 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
         }
     )
     .handleAction(
-        Types.CHANGE_ACTION_DIRECTION,
+        Constants.CHANGE_ACTION_DIRECTION,
         (state, action) => {
             const {direction} = action.payload;
             return ({
@@ -39,7 +39,7 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
         }
     )
     .handleAction(
-        Types.CHANGE_BANNER_DIRECTION,
+        Constants.CHANGE_BANNER_DIRECTION,
         (state, action) => {
             const {direction} = action.payload;
             return ({

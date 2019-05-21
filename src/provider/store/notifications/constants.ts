@@ -1,4 +1,4 @@
-enum Types {
+enum Constants {
     CREATE = '@@notifications/CREATE',
     REMOVE = '@@notifications/REMOVE',
     CLEAR_APP = '@@notifications/CLEAR_APP',
@@ -6,4 +6,4 @@ enum Types {
     CLICK_BUTTON = '@@notifications/CLICK_BUTTON'
 }
 
-export default Types;
+export default Constants;
