@@ -3,7 +3,7 @@ import {Application} from 'openfin/_v2/main';
 import {TrayInfo} from 'openfin/_v2/api/application/application';
 import Bounds from 'openfin/_v2/api/window/bounds';
 
-// TODO: Add Jira ticket - Temp fix until .41 as bounds is not defined on the event.
+// TODO: SERVICE-494
 interface TrayIconClickEvent extends TrayIconClicked<'application', 'tray-icon-clicked'> {
     bounds: Bounds;
 }
