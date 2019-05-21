@@ -3,7 +3,7 @@ import {composeWithDevTools} from 'remote-redux-devtools';
 import thunk from 'redux-thunk';
 import {persistStore, persistReducer, PersistConfig, Persistor} from 'redux-persist';
 
-import Storage from '../model/Storage';
+import {storage} from '../model/Storage';
 
 import {RootState} from './typings';
 import {providerMiddleware} from './middleware/providerMiddleware';
@@ -12,7 +12,7 @@ import rootReducer from './root-reducer';
 const persistConfig: PersistConfig = {
     key: 'root',
     debug: true,
-    storage: Storage
+    storage
 };
 
 const middleware = (injectables: {}) => applyMiddleware(
