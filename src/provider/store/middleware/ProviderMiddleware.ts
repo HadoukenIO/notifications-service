@@ -2,9 +2,9 @@ import {Middleware, MiddlewareAPI, Dispatch} from 'redux';
 import {Identity} from 'openfin/_v2/main';
 
 import {ToastManager} from '../../controller/ToastManager';
-import {dispatchClientEvent} from '../../controller/IABService';
 import {NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../../client';
 import {StoredNotification} from '../../model/StoredNotification';
+import {dispatchClientEvent} from '../..';
 
 import {RootState, RootAction, RootConstants} from '..';
 
