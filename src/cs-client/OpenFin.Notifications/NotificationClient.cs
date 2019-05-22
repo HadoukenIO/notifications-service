@@ -1,18 +1,22 @@
 ﻿using Newtonsoft.Json.Linq;
+using Openfin.Desktop;
+using Openfin.Desktop.Messaging;
+using OpenFin.Notifications;
 using OpenFin.Notifications.Constants;
 using System;
 using System.Threading.Tasks;
-using Fin = Openfin.Desktop;
 
-namespace OpenFin.Notifications
+namespace OpenNotifications
 {
     public class NotificationClient
-    {   
-        private static Fin.Runtime RuntimeInstance;
-        private static Fin.ChannelClient ChannelClient;
+    {
+        private static Runtime RuntimeInstance;
+        private static ChannelClient ChannelClient;
 
         public static event EventHandler NotificationClicked;
+
         public static event EventHandler NotificationButtonClicked;
+
         public static event EventHandler NotificationClosed;
 
         public static void Initialize()
@@ -22,12 +26,12 @@ namespace OpenFin.Notifications
 
         public static void Initialize(Uri manifestUri)
         {
-            var runtimeOptions = Fin.RuntimeOptions.LoadManifest(manifestUri);
+            var runtimeOptions = RuntimeOptions.LoadManifest(manifestUri);
 
             var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
             var productAttributes = entryAssembly.GetCustomAttributes(typeof(System.Reflection.AssemblyProductAttribute), true);
 
-            if(productAttributes.Length > 0)
+            if (productAttributes.Length > 0)
             {
                 runtimeOptions.UUID = ((System.Reflection.AssemblyProductAttribute)productAttributes[0]).Product;
             }
@@ -36,7 +40,7 @@ namespace OpenFin.Notifications
                 runtimeOptions.UUID = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
             }
 
-            RuntimeInstance = Fin.Runtime.GetRuntimeInstance(runtimeOptions);
+            RuntimeInstance = Runtime.GetRuntimeInstance(runtimeOptions);
             RuntimeInstance.Connect(() =>
             {
                 var notificationsService = RuntimeInstance.CreateApplication(runtimeOptions.StartupApplicationOptions);
@@ -54,7 +58,7 @@ namespace OpenFin.Notifications
                     ChannelClient.RegisterTopic<object, object>(NotificationTopicConstants.NotifciationButtonClicked, OnNotificationButtonClicked);
                     ChannelClient.RegisterTopic<object, object>(NotificationTopicConstants.NotificationClosed, OnNotificationClosed);
 
-                    ChannelClient.Connect();
+                    ChannelClient.ConnectAsync();
                 });
             });
         }
@@ -64,11 +68,13 @@ namespace OpenFin.Notifications
             NotificationClicked?.Invoke(null, EventArgs.Empty);
             return null;
         }
+
         private static object OnNotificationButtonClicked(object state)
         {
             NotificationButtonClicked?.Invoke(null, EventArgs.Empty);
             return null;
         }
+
         private static object OnNotificationClosed(object state)
         {
             NotificationClosed?.Invoke(null, EventArgs.Empty);
@@ -79,19 +85,19 @@ namespace OpenFin.Notifications
         {
             //HACK: Change protocol flattening
             options.ID = id;
-            var result =  (await ChannelClient?.Dispatch<object>(NotificationConstants.CreateNotification, options)) as JObject;
-            return result.ToObject<NotificationOptions>();            
+            var result = (await ChannelClient?.DispatchAsync<object>(NotificationConstants.CreateNotification, options)) as JObject;
+            return result.ToObject<NotificationOptions>();
         }
 
         public async static Task<bool> Clear(string id)
         {
-            return  Convert.ToBoolean(await ChannelClient?.Dispatch<object>(NotificationConstants.ClearNotifications, new { id = id })) ;            
+            return Convert.ToBoolean(await ChannelClient?.DispatchAsync<object>(NotificationConstants.ClearNotifications, new { id = id }));
         }
 
         public async static Task<NotificationOptions[]> GetAll()
         {
-            var result = (await ChannelClient?.Dispatch<object>(NotificationConstants.GetAppNotifications, new JObject()));
-            
+            var result = (await ChannelClient?.DispatchAsync<object>(NotificationConstants.GetAppNotifications, new JObject()));
+
             if (result != null)
                 return (result as JArray).ToObject<NotificationOptions[]>();
             else
@@ -100,13 +106,13 @@ namespace OpenFin.Notifications
 
         public async static Task<int> ClearAll()
         {
-            var result =  (await ChannelClient?.Dispatch<object>(NotificationConstants.ClearAppNotifications, JValue.CreateUndefined())) as JObject;
+            var result = (await ChannelClient?.DispatchAsync<object>(NotificationConstants.ClearAppNotifications, JValue.CreateUndefined())) as JObject;
             return result.ToObject<int>();
         }
 
         public static Task ToggleNotificationCenter()
         {
-            return ChannelClient?.Dispatch<object>(NotificationConstants.ToggleNotificationCenter, JValue.CreateUndefined());
+            return ChannelClient?.DispatchAsync<object>(NotificationConstants.ToggleNotificationCenter, JValue.CreateUndefined());
         }
     }
 }

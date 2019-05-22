@@ -13,16 +13,16 @@
     <StackPanel Margin="25,10,25,0">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
             <Button x:Name="create1" Grid.Row="0" Grid.Column="0" Click="CreateButton_Click">Create Notification 1</Button>
@@ -38,12 +38,11 @@
             <Button x:Name="close4" Grid.Row="3" Grid.Column="1" Click="CloseButton_Click">Clear Notification 4</Button>
             <Button x:Name="close5" Grid.Row="4" Grid.Column="1" Click="CloseButton_Click">Clear Notification 5</Button>
             <Button x:Name="close6" Grid.Row="5" Grid.Column="1" Click="CloseButton_Click">Clear Notification 6</Button>
-
         </Grid>
         <Button Click="FetchButton_Click">Fetch Notifications</Button>
         <Button Click="ToggleButton_Click" Margin="10,3" Width="Auto">Toggle Notification Center</Button>
         <Border Style="{DynamicResource textBlockBorder}">
-            <TextBlock x:Name="messageBox" MouseDown="messageBox_MouseDown"/>
+            <TextBlock x:Name="messageBox" MouseDown="messageBox_MouseDown" />
         </Border>
     </StackPanel>
 </Window>
