@@ -43,7 +43,7 @@
     "express": "^4.16.2",
     "hadouken-js-adapter": "^0.36.1-alpha.1",
     "moment": "^2.22.1",
-    "openfin-service-tooling": "1.0.9",
+    "openfin-service-tooling": "1.0.10",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "typescript": "~3.3.4000"
