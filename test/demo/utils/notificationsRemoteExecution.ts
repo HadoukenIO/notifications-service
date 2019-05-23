@@ -34,6 +34,12 @@ export async function clearAll(executionTarget: Identity) {
     });
 }
 
+export async function toggleNotificationCenter(executionTarget: Identity) {
+    return ofBrowser.executeOnWindow(executionTarget, function() {
+        return this.notifications.toggleNotificationCenter();
+    });
+}
+
 export async function addEventListener
     <E extends NotificationEvent>(executionTarget: Identity, eventType: E['type'], listener: (event: E) => void): Promise<void> {
     const remoteFn = await ofBrowser.getOrMountRemoteFunction(executionTarget, listener);
