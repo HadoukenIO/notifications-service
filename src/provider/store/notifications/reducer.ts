@@ -1,12 +1,13 @@
 import {createReducer, ActionType} from 'typesafe-actions';
 
 import {StoredNotification} from '../../model/StoredNotification';
+import {notificationStorage} from '../../model/Storage';
 
 import * as actions from './actions';
 import {Constants} from './constants';
 
 export type NotificationMap = {
-    readonly [key: string]: StoredNotification
+    readonly [key: string]: Readonly<StoredNotification>
 };
 
 export interface NotificationsState {
@@ -32,6 +33,7 @@ export const reducer = createReducer<NotificationsState, NotificationsAction>(in
                     [id]: action.payload
                 }
             };
+            notificationStorage.setItem(id, JSON.stringify(action.payload));
             return newState;
         }
     )
@@ -41,8 +43,9 @@ export const reducer = createReducer<NotificationsState, NotificationsAction>(in
         (state, action) => {
             const removeNotifications = action.payload.notifications;
             const notifications = {...state.notifications};
-            removeNotifications.forEach(toRemove => {
-                delete notifications[toRemove.id];
+            removeNotifications.forEach(notification => {
+                delete notifications[notification.id];
+                notificationStorage.removeItem(notification.id);
             });
 
             return ({

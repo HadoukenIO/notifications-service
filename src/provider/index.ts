@@ -26,7 +26,7 @@ const initialState: RootState = {
     }
 };
 
-const {store} = configureStore(initialState);
+const store = configureStore(initialState);
 // Change to singleton?
 const notificationCenter = new NotificationCenter(store, {hideOnBlur: false});
 ToastManager.instance.initialize(store);
@@ -167,5 +167,3 @@ function hydrateNotification(payload: NotificationOptions, sender: Identity): St
 export function generateId(): string {
     return Math.floor((Math.random() * 9000000) + 1).toString();
 }
-
-

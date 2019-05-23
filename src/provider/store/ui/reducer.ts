@@ -1,5 +1,7 @@
 import {createReducer, ActionType} from 'typesafe-actions';
 
+import {uiStorage} from '../../model/Storage';
+
 import * as actions from './actions';
 import {Constants} from './constants';
 
@@ -21,10 +23,11 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
     .handleAction(
         Constants.TOGGLE_CENTER_WINDOW,
         (state, action) => {
-            const {visibility} = action.payload;
+            const value = (action.payload.visibility) ? action.payload.visibility : !state.windowVisible;
+            uiStorage.setItem('windowVisible', value);
             return ({
                 ...state,
-                windowVisible: (visibility) ? visibility : !state.windowVisible
+                windowVisible: value
             });
         }
     )
@@ -32,6 +35,7 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
         Constants.CHANGE_ACTION_DIRECTION,
         (state, action) => {
             const {direction} = action.payload;
+            uiStorage.setItem('actionDirection', direction);
             return ({
                 ...state,
                 actionDirection: direction
@@ -42,6 +46,7 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
         Constants.CHANGE_BANNER_DIRECTION,
         (state, action) => {
             const {direction} = action.payload;
+            uiStorage.setItem('bannerDirection', direction);
             return ({
                 ...state,
                 bannerDirection: direction
