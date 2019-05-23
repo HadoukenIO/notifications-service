@@ -165,5 +165,5 @@ function hydrateNotification(payload: NotificationOptions, sender: Identity): St
  * IDs to be.
  */
 export function generateId(): string {
-    return Math.floor((Math.random() * 9000000) + 1).toString();
+    return Math.floor((Math.random() * 9 + 1) * 1e8).toString();
 }
