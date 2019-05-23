@@ -3,7 +3,6 @@ import {createReducer, ActionType} from 'typesafe-actions';
 import {uiStorage} from '../../model/Storage';
 
 import * as actions from './actions';
-import {Constants} from './constants';
 
 export interface UIState {
     readonly windowVisible: boolean;
@@ -21,9 +20,9 @@ const initialState: UIState = {
 
 export const reducer = createReducer<UIState, UIAction>(initialState)
     .handleAction(
-        Constants.TOGGLE_CENTER_WINDOW,
+        actions.toggleCenterWindowVisibility,
         (state, action) => {
-            const value = (action.payload.visibility) ? action.payload.visibility : !state.windowVisible;
+            const value = (action.payload.visible) ? action.payload.visible : !state.windowVisible;
             uiStorage.setItem('windowVisible', value);
             return ({
                 ...state,
@@ -32,18 +31,7 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
         }
     )
     .handleAction(
-        Constants.CHANGE_ACTION_DIRECTION,
-        (state, action) => {
-            const {direction} = action.payload;
-            uiStorage.setItem('actionDirection', direction);
-            return ({
-                ...state,
-                actionDirection: direction
-            });
-        }
-    )
-    .handleAction(
-        Constants.CHANGE_BANNER_DIRECTION,
+        actions.changeBannerDirection,
         (state, action) => {
             const {direction} = action.payload;
             uiStorage.setItem('bannerDirection', direction);
@@ -52,5 +40,15 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
                 bannerDirection: direction
             });
         }
+    )
+    .handleAction(
+        actions.changeActionDirection,
+        (state, action) => {
+            const {direction} = action.payload;
+            uiStorage.setItem('actionDirection', direction);
+            return ({
+                ...state,
+                actionDirection: direction
+            });
+        }
     );
-

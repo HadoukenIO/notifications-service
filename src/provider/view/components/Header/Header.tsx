@@ -5,14 +5,14 @@ import {GroupingType} from '../../containers/NotificationCenterApp';
 interface HeaderProps {
     groupBy: GroupingType;
     handleGroupBy: (groupBy: GroupingType) => void;
-    onHideWindow: () => void;
+    onHideWindow: (visible?: boolean) => void;
 }
 
 export function Header(props: HeaderProps): React.ReactElement {
     const {groupBy, handleGroupBy, onHideWindow} = props;
 
     const handleHideWindow = () => {
-        onHideWindow();
+        onHideWindow(false);
     };
 
     return (

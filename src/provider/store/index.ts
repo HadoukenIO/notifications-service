@@ -7,8 +7,6 @@ import {notificationStorage, uiStorage} from '../model/Storage';
 import {UIState, UIAction, reducer as uiReducer} from './ui/reducer';
 import {NotificationsState, NotificationsAction, reducer as notificationsReducer, NotificationMap} from './notifications/reducer';
 import {providerMiddleware} from './middleware';
-import {Constants as uiConstants} from './ui/constants';
-import {Constants as notificationsConstants} from './notifications/constants';
 
 export type Store = ReduxStore<RootState, RootAction>;
 
@@ -18,11 +16,6 @@ export interface RootState {
 }
 
 export type RootAction = UIAction | NotificationsAction;
-
-export const RootConstants = {
-    ui: uiConstants,
-    notifications: notificationsConstants
-};
 
 const reducers = combineReducers({
     notifications: notificationsReducer,

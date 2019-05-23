@@ -4,7 +4,6 @@ import {StoredNotification} from '../../model/StoredNotification';
 import {notificationStorage} from '../../model/Storage';
 
 import * as actions from './actions';
-import {Constants} from './constants';
 
 export type NotificationMap = {
     readonly [key: string]: Readonly<StoredNotification>
@@ -23,10 +22,10 @@ const initialState: NotificationsState = {
 export const reducer = createReducer<NotificationsState, NotificationsAction>(initialState)
     // Add a new notification to the store.
     .handleAction(
-        Constants.CREATE,
+        actions.createNotification,
         (state, action): NotificationsState => {
             const {id} = action.payload;
-            const newState = {
+            const newState: NotificationsState = {
                 ...state,
                 notifications: {
                     ...state.notifications,
@@ -39,9 +38,9 @@ export const reducer = createReducer<NotificationsState, NotificationsAction>(in
     )
     // Remove notifications from the store
     .handleAction(
-        Constants.REMOVE,
+        actions.removeNotifications,
         (state, action) => {
-            const removeNotifications = action.payload.notifications;
+            const removeNotifications = action.payload;
             const notifications = {...state.notifications};
             removeNotifications.forEach(notification => {
                 delete notifications[notification.id];

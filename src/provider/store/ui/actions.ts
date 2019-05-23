@@ -1,13 +1,21 @@
-import {action} from 'typesafe-actions';
+import {createStandardAction, createCustomAction} from 'typesafe-actions';
 
-import {Constants} from './constants';
+// export const toggleCenterWindowVisibility = createStandardAction('@@ui/TOGGLE_WINDOW')<boolean | undefined>();
 
-/**
- * Toggle the Notificiation Center visibility.
- * @param forceVisibility force the visibility. True = visible, false = hidden.
- */
-export const toggleCenterWindowVisibility = (forceVisibility?: boolean) => action(Constants.TOGGLE_CENTER_WINDOW, {visibility: forceVisibility});
+export const toggleCenterWindowVisibility = createCustomAction(
+    '@@ui/TOGGLE_CENTER_WINDOW',
+    type => {
+        return (visible?: boolean) => ({
+            type,
+            payload: {
+                visible
+            }
+        });
+    }
+);
 
-export const changeActionDirection = (direction: [number, number]) => action(Constants.CHANGE_ACTION_DIRECTION, {direction});
+type DirectionPayload = {direction: [number, number]};
 
-export const changeBannerDirection = (direction: [number, number]) => action(Constants.CHANGE_BANNER_DIRECTION, {direction});
+export const changeActionDirection = createStandardAction('@@ui/CHANGE_ACTION_DIRECTION')<DirectionPayload>();
+
+export const changeBannerDirection = createStandardAction('@@ui/CHANGE_BANNER_DIRECTION')<DirectionPayload>();
