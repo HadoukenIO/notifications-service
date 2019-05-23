@@ -29,7 +29,7 @@ export function NotificationCard(props: NotificationCardProps) {
     };
 
     return (
-        <div className="notification" onClick={handleNotificationClick}>
+        <div className="notification" data-id={meta.id} onClick={handleNotificationClick}>
             <CloseButton onClick={handleNotificationClose} />
             <NotificationTime date={notification.date} />
             <div className="body">
