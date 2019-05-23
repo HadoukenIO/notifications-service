@@ -109,6 +109,7 @@ export type NotificationEvent = NotificationClickedEvent | NotificationClosedEve
 export function addEventListener(eventType: 'notification-clicked', listener: (event: NotificationClickedEvent) => void): void;
 export function addEventListener(eventType: 'notification-closed', listener: (event: NotificationClosedEvent) => void): void;
 export function addEventListener(eventType: 'notification-button-clicked', listener: (event: NotificationButtonClickedEvent) => void): void;
+export function addEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void;
 export function addEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
@@ -120,6 +121,7 @@ export function addEventListener<E extends NotificationEvent>(eventType: E['type
 export function removeEventListener(eventType: 'notification-clicked', listener: (event: NotificationClickedEvent) => void): void;
 export function removeEventListener(eventType: 'notification-closed', listener: (event: NotificationClosedEvent) => void): void;
 export function removeEventListener(eventType: 'notification-button-clicked', listener: (event: NotificationButtonClickedEvent) => void): void;
+export function removeEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void;
 export function removeEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
