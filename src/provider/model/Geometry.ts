@@ -1,12 +1,11 @@
 import {Rect} from 'openfin/_v2/api/system/monitor';
 
 /**
- * Check to see if box1 cotains box2.
+ * Check to see if box1 contains box2.
  * @param box1 box1 is compared to see if box2 is inside.
- * @param box2 box2 is compared to see if it inside box1.
+ * @param box2 box2 is compared to see if it is inside box1.
  */
 export function contains(box1: Rect, box2: Rect): boolean {
-    console.log('Contains', box1, box2);
     if (box1.left > box2.left) {
         return false;
     }
