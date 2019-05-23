@@ -18,7 +18,7 @@
     "posttest": "npm run check",
     "prepack": "npm run clean && npm run build && tsc -p src/client/tsconfig.types.json",
     "test": "npm run test:unit && npm run test:int",
-    "test:int": "echo 'Integration tests not available yet'",
+    "test:int": "svc-tools test int",
     "test:unit": "svc-tools test unit",
     "zip": "svc-tools zip",
     "start": "svc-tools start"
@@ -33,20 +33,23 @@
     "url": "https://github.com/openfin/Notification-Service/issues"
   },
   "homepage": "https://github.com/openfin/Notification-Service#readme",
-  "dependencies": {
-    "@types/puppeteer": "^1.3.0",
-    "puppeteer": "^1.3.0"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@types/mkdirp": "^0.5.2",
     "@types/moment": "^2.13.0",
     "@types/node": "^9.4.6",
+    "@types/node-fetch": "^2.3.4",
     "@types/openfin": "^39.0.1",
+    "@types/puppeteer": "^1.3.0",
     "@types/react": "^16.8.6",
     "@types/react-dom": "^16.8.2",
     "express": "^4.16.2",
     "hadouken-js-adapter": "^0.36.1-alpha.1",
+    "mkdirp": "^0.5.1",
     "moment": "^2.22.1",
-    "openfin-service-tooling": "1.0.9",
+    "node-fetch": "^2.6.0",
+    "openfin-service-tooling": "^1.0.10",
+    "puppeteer": "^1.3.0",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "typescript": "~3.3.4000"
