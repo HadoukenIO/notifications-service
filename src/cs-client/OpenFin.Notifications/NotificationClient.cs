@@ -19,6 +19,8 @@ namespace OpenNotifications
 
         public static event EventHandler NotificationClosed;
 
+        public static Action<Exception> InitializationComplete;
+
         public static void Initialize()
         {
             Initialize(new Uri(NotificationConstants.ServiceManifestUrl));
@@ -26,6 +28,9 @@ namespace OpenNotifications
 
         public static void Initialize(Uri manifestUri)
         {
+            if (InitializationComplete == null)
+                throw new ArgumentNullException("InitializationComplete must be handled before calling Initialize.");
+
             var runtimeOptions = RuntimeOptions.LoadManifest(manifestUri);
 
             var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
@@ -53,32 +58,29 @@ namespace OpenNotifications
                     }
 
                     ChannelClient = RuntimeInstance.InterApplicationBus.Channel.CreateClient(NotificationConstants.ServiceChannelName);
+                    
+                    ChannelClient.RegisterTopic(NotificationTopicConstants.NotificationClicked, OnNotificationClicked);
+                    ChannelClient.RegisterTopic(NotificationTopicConstants.NotifciationButtonClicked, OnNotificationButtonClicked);
+                    ChannelClient.RegisterTopic(NotificationTopicConstants.NotificationClosed, OnNotificationClosed);
 
-                    ChannelClient.RegisterTopic<object, object>(NotificationTopicConstants.NotificationClicked, OnNotificationClicked);
-                    ChannelClient.RegisterTopic<object, object>(NotificationTopicConstants.NotifciationButtonClicked, OnNotificationButtonClicked);
-                    ChannelClient.RegisterTopic<object, object>(NotificationTopicConstants.NotificationClosed, OnNotificationClosed);
-
-                    ChannelClient.ConnectAsync();
+                    ChannelClient.ConnectAsync().ContinueWith(x => InitializationComplete?.Invoke(x.Exception));
                 });
             });
         }
 
-        private static object OnNotificationClicked(object state)
+        private static void OnNotificationClicked()
         {
-            NotificationClicked?.Invoke(null, EventArgs.Empty);
-            return null;
+            NotificationClicked?.Invoke(null, EventArgs.Empty);            
         }
 
-        private static object OnNotificationButtonClicked(object state)
+        private static void OnNotificationButtonClicked()
         {
-            NotificationButtonClicked?.Invoke(null, EventArgs.Empty);
-            return null;
+            NotificationButtonClicked?.Invoke(null, EventArgs.Empty);            
         }
 
-        private static object OnNotificationClosed(object state)
+        private static void OnNotificationClosed()
         {
-            NotificationClosed?.Invoke(null, EventArgs.Empty);
-            return null;
+            NotificationClosed?.Invoke(null, EventArgs.Empty);            
         }
 
         public async static Task<NotificationOptions> Create(string id, NotificationOptions options)

@@ -1,7 +1,10 @@
 ﻿using OpenNotifications;
 using System;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace OpenFin.Notifications.Demo
 {
@@ -12,13 +15,43 @@ namespace OpenFin.Notifications.Demo
     {
         public MainWindow()
         {
-            InitializeComponent();
-
+            InitializeComponent();            
             NotificationClient.NotificationButtonClicked += NotificationClient_NotificationButtonClicked;
             NotificationClient.NotificationClicked       += NotificationClient_NotificationClicked;
             NotificationClient.NotificationClosed        += NotificationClient_NotificationClosed;
+            NotificationClient.InitializationComplete    += NotificationClient_InitializationComplete;
 
             NotificationClient.Initialize();
+            messageBox.Text = "Initializing...";
+        }
+
+        private void NotificationClient_InitializationComplete(Exception ex)
+        {
+            if (ex == null)
+            {
+                toggleButtons(true);
+                Dispatcher.Invoke(() => { messageBox.Text = "Initialization complete."; });
+            }
+            else
+            {
+                MessageBox.Show(ex.ToString());
+                Dispatcher.Invoke(() => { messageBox.Text = "Initialization failed."; });
+            }
+        }
+
+        private void toggleButtons(bool isEnabled)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(buttonGrid); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(buttonGrid, i);
+                    if (child != null && child is Button)
+                    {
+                        ((Button)child).IsEnabled = IsEnabled;
+                    }
+                }
+            });
         }
 
         private void NotificationClient_NotificationClosed(object sender, EventArgs e)
