@@ -1,4 +1,4 @@
-import {Store, AnyAction, Action} from 'redux';
+import {Store} from 'redux';
 import {RootAction} from 'typesafe-actions/dist/create-reducer';
 
 /**
