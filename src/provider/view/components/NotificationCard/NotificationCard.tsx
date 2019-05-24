@@ -38,6 +38,7 @@ export function Notification(props: NotificationProps) {
         <li
             className="notification-item"
             onClick={() => window.openfin.notifications.clickHandler(props.meta)}
+            note-id={props.meta.id}
         >
             <img
                 className="notification-close-x"
