@@ -1,16 +1,17 @@
 import 'jest';
 
 import {Application, Identity} from 'hadouken-js-adapter';
+import {ElementHandle} from 'puppeteer';
 
 import {NotificationClosedEvent, NotificationClickedEvent} from '../../src/client';
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
 import {delay} from './utils/delay';
-import { OFPuppeteerBrowser } from './utils/ofPuppeteer';
+import {OFPuppeteerBrowser} from './utils/ofPuppeteer';
 
 const mainWindowIdentity = {uuid: 'test-app', name: 'test-app'};
-const centerIdentity = {uuid: "notifications-service", name: "Notification-Center"};
+const centerIdentity = {uuid: 'notifications-service', name: 'Notification-Center'};
 
 describe('', () => {
     beforeAll(async () => {
@@ -30,16 +31,36 @@ describe('', () => {
     });
 
     test('', async () => {
-        const listener = jest.fn((event: NotificationClickedEvent) => {});
-        await notifsRemote.addEventListener(testWindowIdentity, 'notification-clicked', listener);
+        const clickListener = jest.fn((event: NotificationClickedEvent) => {});
+        const closeListener = jest.fn((event: NotificationClosedEvent) => {});
+        await notifsRemote.addEventListener(testWindowIdentity, 'notification-clicked', clickListener);
+        await notifsRemote.addEventListener(testWindowIdentity, 'notification-closed', closeListener);
+
+        // Check that returned object has the correct data
         const note = await notifsRemote.create(testWindowIdentity, {body: 'body body body body', title: 'Title title title'});
         expect(note).toHaveProperty('body', 'body body body body');
-        await delay(2000);
-        const noteCards = await getCenterNotifications();
+
+        // Get all cards for the notification we just created
+        const noteCards = await getCardsByNoteID(testWindowIdentity.uuid, note.id);
+
+        // Should only be one card per ID
+        expect(noteCards.length).toBe(1);
+
+        // Click triggers listener
         await noteCards[0].click();
-        await delay(2000);
-        expect(listener).toHaveBeenCalledTimes(1);
-        expect(await notifsRemote.clear(testWindowIdentity, note.id)).toBe(true);
+        await delay(1000);
+        expect(clickListener).toHaveBeenCalledTimes(1);
+
+        // Close triggers listener
+        const closeButtonHandle = await noteCards[0].$('.notification-close-x');
+        if (closeButtonHandle) {
+            await closeButtonHandle.click();
+        }
+        await delay(1000);
+        expect(closeListener).toHaveBeenCalledTimes(1);
+
+        // Clear after close returns false
+        expect(await notifsRemote.clear(testWindowIdentity, note.id)).toBe(false);
     });
 });
 
@@ -49,9 +70,17 @@ const nextUuid = (() => {
 })();
 
 const ofBrowser = new OFPuppeteerBrowser();
-async function getCenterNotifications() {
+async function getAllCards() {
     const centerPage = await ofBrowser.getPage(centerIdentity);
     return centerPage!.$$('.notification-item');
+}
+async function getCardsByApp(sourceUuid: string): Promise<ElementHandle[]> {
+    const centerPage = await ofBrowser.getPage(centerIdentity);
+    return centerPage!.$$(`.notification-item[note-id*="${sourceUuid}"]`);
+}
+async function getCardsByNoteID(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
+    const centerPage = await ofBrowser.getPage(centerIdentity);
+    return centerPage!.$$(`.notification-item[note-id="${sourceUuid}:${notificationId}"]`);
 }
 
 async function createTestApp():Promise<Application> {
