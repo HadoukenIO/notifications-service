@@ -1,9 +1,9 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
+import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
-import {injectable} from 'inversify';
 
 /**
  * Semantic type definition.

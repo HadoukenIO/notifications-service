@@ -15,6 +15,7 @@ import {removeNotifications, createNotification as createNotificationAction} fro
 import {StoredNotification} from './model/StoredNotification';
 import {StoreContainer} from './store';
 import {NotificationCenter} from './controller/NotificationCenter';
+import {ToastManager} from './controller/ToastManager';
 
 @injectable()
 export class Main {
@@ -28,6 +29,9 @@ export class Main {
 
     @inject(Inject.NOTIFICATION_CENTER)
     private _notificationCenter!: NotificationCenter;
+
+    @inject(Inject.TOAST_MANAGER)
+    private _toastManager!: ToastManager;
 
     public async register(): Promise<void> {
         Object.assign(window, {
@@ -61,8 +65,7 @@ export class Main {
      */
     private async createNotification(payload: NotificationOptions, sender: ProviderIdentity): Promise<Notification> {
         const storedNotification = this.hydrateNotification(payload, sender);
-        this._store.dispatch(createNotificationAction(storedNotification));
-
+        this._store.store.dispatch(createNotificationAction(storedNotification));
         return storedNotification.notification;
     }
 
@@ -108,8 +111,6 @@ export class Main {
 
         return storedNotifications.length;
     }
-
-
 
     /**
      * Encodes the Id which currently is the uuid:id

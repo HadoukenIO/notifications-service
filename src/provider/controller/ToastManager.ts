@@ -1,36 +1,42 @@
+import {injectable, inject} from 'inversify';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Rect} from 'openfin/_v2/api/system/monitor';
 
 import {StoredNotification} from '../model/StoredNotification';
 import {getNotificationCenterVisibility, getToastDirection} from '../store/ui/selectors';
+import {Inject} from '../common/Injectables';
 import {Toast, ToastEvent} from '../model/Toast';
 import {watchForChange} from '../store/utils/watch';
-import {Store} from '../store';
+import {StoreContainer} from '../store';
+
+import {AsyncInit} from './AsyncInit';
 
 export type WindowDimensions = {height: number, width: number};
 
-export class ToastManager {
-    private static _instance: ToastManager;
-    private _store!: Store;
+@injectable()
+export class ToastManager extends AsyncInit {
+    private _store: StoreContainer;
+
     private _toasts: Map<string, Toast> = new Map();
     private _stack: Toast[] = [];
-    private _bounds!: Required<Rect>;
+    private _availableRect!: Required<Rect>;
 
-    private constructor() {
-    }
-
-    public static get instance(): ToastManager {
-        if (!ToastManager._instance) {
-            ToastManager._instance = new ToastManager();
-        }
-        return ToastManager._instance;
-    }
-
-    public async initialize(store: Store): Promise<void> {
-        const monitorInfo = await fin.System.getMonitorInfo();
-        this._bounds = monitorInfo.primaryMonitor.availableRect;
+    constructor(@inject(Inject.STORE) store: StoreContainer) {
+        super();
         this._store = store;
-        this.subscribe();
+    }
+
+    protected async init(): Promise<void> {
+        setImmediate(async () => {
+            const monitorInfo = await fin.System.getMonitorInfo();
+            this._availableRect = monitorInfo.primaryMonitor.availableRect;
+            await this._store.initialized;
+            await this.subscribe();
+            this.addListeners();
+        });
+    }
+
+    private addListeners() {
         Toast.eventEmitter.addListener(ToastEvent.CLOSED, async (id: string) => {
             const toast = this._toasts.get(id);
             if (toast) {
@@ -46,7 +52,6 @@ export class ToastManager {
         });
     }
 
-
     /**
      * Close all toasts.
      */
@@ -60,8 +65,10 @@ export class ToastManager {
 
     public async create(notification: StoredNotification): Promise<void> {
         if (getNotificationCenterVisibility(this._store.getState())) {
+            console.log('IGNORE');
             return;
         }
+        console.log('MAKE TOAST');
         // Create new toast notifications
         const {id} = notification;
         if (this._toasts.has(notification.id)) {
@@ -144,7 +151,7 @@ export class ToastManager {
     private getTargetPosition(previous?: Rect): PointTopLeft {
         const [vX, vY] = getToastDirection(this._store.getState());
         const {vertical, horizontal} = Toast.margin;
-        const bounds = this._bounds;
+        const bounds = this._availableRect;
 
         let left = (vX > 0) ? bounds.left : bounds.right;
         let top: number;

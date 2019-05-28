@@ -10,7 +10,7 @@ import {injectable} from 'inversify';
  */
 @injectable()
 export abstract class AsyncInit {
-    private _initialized: Promise<this>;
+    private _initialized!: Promise<this>;
 
     constructor() {
         this._initialized = this.init().then(() => this);

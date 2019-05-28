@@ -5,11 +5,11 @@ import {injectable} from 'inversify';
 import 'reflect-metadata';
 
 import {notificationStorage, uiStorage} from '../model/Storage';
+import {AsyncInit} from '../controller/AsyncInit';
 
 import {UIState, UIAction, reducer as uiReducer} from './ui/reducer';
 import {NotificationsState, NotificationsAction, reducer as notificationsReducer, NotificationMap} from './notifications/reducer';
-import {providerMiddleware} from './middleware';
-import {AsyncInit} from '../controller/AsyncInit';
+import {StoreMiddleware} from './middleware';
 
 export type Store = ReduxStore<RootState, RootAction>;
 
@@ -32,13 +32,16 @@ export class StoreContainer extends AsyncInit implements Store {
         return this._store;
     }
 
-    public async init() {
+    public async init(): Promise<void> {
         this._store = await this.createStore();
-        this.getState = this.store.getState;
-        this.dispatch = this.store.dispatch;
-        this.subscribe = this.store.subscribe;
-        this.replaceReducer = this.store.replaceReducer;
-        console.log('STORE CREATED');
+        return new Promise((resolve) => {
+            // this.getState = this.store.getState;
+            // this.dispatch = this.store.dispatch;
+            // this.subscribe = this.store.subscribe;
+            // this.replaceReducer = this.store.replaceReducer;
+            console.log('STORE CREATED');
+            return resolve();
+        });
     }
 
 
@@ -48,7 +51,9 @@ export class StoreContainer extends AsyncInit implements Store {
             notifications: notificationsReducer,
             ui: uiReducer
         });
-        const middleware = [providerMiddleware];
+
+
+        const middleware = [new StoreMiddleware().middleware];
 
         let enhancer: StoreEnhancer = applyMiddleware(...middleware);
         if (process.env.NODE_ENV !== 'production') {
@@ -59,11 +64,16 @@ export class StoreContainer extends AsyncInit implements Store {
             enhancer = devTools(enhancer);
         }
 
-        const store: Store = await createStore<RootState, RootAction, {}, {}>(
+        const store = await createStore<RootState, RootAction, {}, {}>(
             reducers,
             initialState,
             enhancer
         );
+
+        this.getState = store.getState;
+        this.dispatch = store.dispatch;
+        this.subscribe = store.subscribe;
+        this.replaceReducer = store.replaceReducer;
 
         return store;
     }
@@ -98,4 +108,6 @@ export class StoreContainer extends AsyncInit implements Store {
 
         return state;
     }
+
+
 }

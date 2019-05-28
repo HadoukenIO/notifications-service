@@ -27,10 +27,10 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
-    [Inject.STORE]: StoreContainer,
     [Inject.API_HANDLER]: APIHandler,
+    [Inject.STORE]: StoreContainer,
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.TOAST_MANAGER]: ToastManager,
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter
 };
 
 type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);
@@ -53,13 +53,18 @@ export class Injector {
             if (typeof Bindings[key] === 'function') {
                 console.log('G', key);
                 container.bind(Inject[key]).to(Bindings[key] as any).inSingletonScope();
-
-                if ((Bindings[key] as Function).prototype.hasOwnProperty('init')) {
-                    promises.push((container.get(Inject[key]) as AsyncInit).initialized);
-                }
             } else {
                 console.log('H', key);
                 container.bind(Inject[key]).toConstantValue(Bindings[key]);
+            }
+        });
+        Object.keys(Bindings).forEach(k => {
+            const key: Keys = k as any;
+
+            if ((Bindings[key] as Function).prototype.hasOwnProperty('init')) {
+                const instance = (container.get(Inject[key]) as AsyncInit);
+                // instance['doInit']();
+                promises.push(instance.initialized);
             }
         });
         console.log('I');
