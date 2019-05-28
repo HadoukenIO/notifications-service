@@ -7,7 +7,7 @@ import {StoredNotification} from '../../model/StoredNotification';
 
 import {NotificationMap} from './reducer';
 
-export const getNotifications = (state: RootState): NotificationMap => {
+export const getNotifications = (state: Readonly<RootState>): NotificationMap => {
     return state.notifications.notifications;
 };
 
@@ -15,11 +15,11 @@ export const getAllNotifications = createSelector(getNotifications, (notificatio
     return Object.values(notificationMap);
 });
 
-export const getNotificationsByApplication = (source: Identity, state: RootState): StoredNotification[] => {
+export const getNotificationsByApplication = (source: Identity, state: Readonly<RootState>): StoredNotification[] => {
     const all = getAllNotifications(state);
     return all.filter(n => n.source.uuid === source.uuid);
 };
 
-export const getNotificationById = (state: RootState, id: string): StoredNotification | null => {
+export const getNotificationById = (state: Readonly<RootState>, id: string): StoredNotification | null => {
     return getNotifications(state)[id];
 };

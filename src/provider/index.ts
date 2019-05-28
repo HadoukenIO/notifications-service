@@ -21,8 +21,7 @@ const initialState: RootState = {
     },
     ui: {
         windowVisible: false,
-        bannerDirection: [-1, -1],
-        actionDirection: [1, 1]
+        toastDirection: [1, 1]
     }
 };
 

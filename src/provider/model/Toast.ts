@@ -1,13 +1,16 @@
+import {EventEmitter} from 'events';
+
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import Bounds from 'openfin/_v2/api/window/bounds';
+import {Rect} from 'openfin/_v2/api/system/monitor';
 
-import {NotificationOptions} from '../../client';
 import {renderApp} from '../view/containers/ToastApp';
 import {Store} from '../store';
 
 import {WebWindow, createWebWindow} from './WebWindow';
 import {StoredNotification} from './StoredNotification';
+import {contains} from './Geometry';
 
 export type WindowDimensions = {height: number, width: number};
 
@@ -18,6 +21,7 @@ const windowOptions: WindowOption = {
     defaultHeight: 135,
     defaultWidth: 300,
     resizable: false,
+    shadow: false,
     saveWindowState: false,
     contextMenu: !(process.env.NODE_ENV === 'production'),
     frame: false,
@@ -27,14 +31,6 @@ const windowOptions: WindowOption = {
     backgroundColor: '#1F1E24'
 };
 
-/** The toast type. */
-export enum ToastType {
-    /** Interactable e.g. buttons. Can only be one on the screen at time. Placed seperately to banners. Has rich information on it. */
-    ACTION = 'ACTION',
-    /** Fixed size, used to display simple information but not buttons. */
-    BANNER = 'BANNER'
-}
-
 /** Margin to other toasts and the window edge. */
 interface Margin {
     horizontal: number;
@@ -43,43 +39,70 @@ interface Margin {
 
 interface Options {
     timeout: number;
-    /** Handler for when the toast closes (timeout/user) */
-    onClose?: (toast: Toast) => void;
+    direction: readonly [number, number];
 }
 
 /** Animation state of the toast window. */
-enum State {
-    WAITING,
-    SHOWING,
-    CLOSING,
+enum AnimationState {
+    WAITING = 'WAITING',
+    SHOWING = 'SHOWING',
+    CLOSING = 'CLOSING'
 }
 
+export enum ToastEvent {
+    PAUSE = 'pause',
+    UNPAUSE = 'unpause',
+    CLOSED = 'closed'
+}
+
+
 export class Toast {
-    private _type: ToastType;
-    private _webWindow: Promise<WebWindow>;
+    public static eventEmitter: EventEmitter = new EventEmitter();
+    private _webWindow: Readonly<Promise<WebWindow>>;
     private _options: Options;
-    private _margin: Margin = {
+    private _state: AnimationState;
+    private _timeout!: number;
+    private _dimensions!: Promise<WindowDimensions>;
+    private _id: string;
+    private _position: PointTopLeft;
+
+    public static margin: Margin = {
         horizontal: 10,
         vertical: 10
     };
 
-    private _state: State;
+    public get id(): string {
+        return this._id;
+    }
 
-    private _timeout!: number;
-    private _dimensions!: Promise<WindowDimensions>;
+    public get position(): PointTopLeft {
+        return this._position;
+    }
 
-    public constructor(store: Store, notification: StoredNotification, toastOptions: Options) {
+    public set position(value: PointTopLeft) {
+        this._position = value;
+    }
+
+    public get isShowing(): boolean {
+        return this._state === AnimationState.SHOWING;
+    }
+
+    public get isClosing(): boolean {
+        return this._state === AnimationState.CLOSING;
+    }
+
+    public constructor(store: Store, notification: StoredNotification, toastOptions: Options, position: PointTopLeft) {
+        this._id = notification.id;
         this._options = toastOptions;
-        this._type = this.getToastType(notification.notification);
-        this._state = State.WAITING;
-
+        this._state = AnimationState.WAITING;
+        this._position = position;
         // Wait for the React component to render and then get the dimensions of it to resize the window.
         let dimensionResolve: (value?: WindowDimensions | PromiseLike<WindowDimensions> | undefined) => void;
         this._dimensions = new Promise<WindowDimensions>((resolve, reject) => {
             dimensionResolve = resolve;
         });
 
-        const name = `${windowOptions.name}:${Math.random()}`;
+        const name = `${windowOptions.name}:${this.id}`;
         this._webWindow = createWebWindow({...windowOptions, name}).then((webWindow) => {
             const {document} = webWindow;
             this.addListeners();
@@ -92,136 +115,61 @@ export class Toast {
                     dimensionResolve(dimensions);
                 },
             );
-
             return webWindow;
         });
     }
 
-    public get type(): ToastType {
-        return this._type;
+    /**
+     * Check if this toast can fit inside the primary monitor bounds.
+     * @param position Point to check if this toast can fit.
+     */
+    public async canFitInMonitor(position?: PointTopLeft) {
+        const toastRect = await this.calculateBounds(position) as Rect;
+        const monitorInfo = await fin.System.getMonitorInfo();
+        return contains(monitorInfo.primaryMonitor.availableRect, toastRect);
     }
 
-    /** Based on the notification options we resolve the ToastType.
-     * Example: If there is buttons on the toast, it is an ACTION
-     * In future there should be a flag to determine the type of toast
-     * For now we will just check the options for 'interactable' elements.
-     * @param notificationOptions Notification options
-    */
-    private getToastType(notificationOptions: NotificationOptions): ToastType {
-        const {buttons} = notificationOptions;
-        if (buttons && buttons.length > 0) {
-            return ToastType.ACTION;
+    public async show(position?: PointTopLeft): Promise<boolean> {
+        if (this._state === AnimationState.SHOWING) {
+            return true;
         }
-
-        return ToastType.BANNER;
-    }
-
-    /**
-     * Listeners to handle events on the toast.
-     */
-    private async addListeners() {
-        const {document} = await this._webWindow;
-
-        // Pause timeout on mouse over window
-        document.onmouseenter = () => {
-            this._state = State.SHOWING;
-            this.animateIn(200);
-            clearTimeout(this._timeout!);
-        };
-        document.onmouseleave = () => {
-            clearTimeout(this._timeout!);
-            this._timeout = window.setTimeout(() => {
-                this.close();
-            }, 3000);
-        };
-    }
-
-    /**
-     * Set toast window bounds.
-     * @param newBounds The new bounds of the window.
-     */
-    private async setBounds(newBounds: Bounds) {
-        const {window} = await this._webWindow;
-        await window.setBounds(newBounds);
-    }
-
-    public async animateIn(duration: number = 400) {
-        const {window} = await this._webWindow;
-        await window.show();
-        await window.animate(
-            {
-                opacity: {
-                    opacity: 1,
-                    duration
-                }
-            },
-            {
-                interrupt: true,
-                tween: 'ease-in-out'
+        // Await window dimensions from React component
+        // before showing the window.
+        return this._dimensions.then(async dimensions => {
+            if (position) {
+                this.position = position;
             }
-        );
-    }
-
-    public async animateOut(duration: number = 800) {
-        const {window} = await this._webWindow;
-        await window.animate(
-            {
-                opacity: {
-                    opacity: 0,
-                    duration
-                }
-            },
-            {
-                interrupt: true,
-                tween: 'ease-in-out'
+            if (!await this.canFitInMonitor(this.position)) {
+                console.log(this.id, 'Cannot fit in bounds');
+                this._state = AnimationState.WAITING;
+                return false;
             }
-        );
+            // Set the position of the window to the edge of the display
+            const newBounds = await this.calculateBounds(position, dimensions);
+            this._state = AnimationState.SHOWING;
+            const {window: toastWindow} = await this._webWindow;
+            await toastWindow.setBounds(newBounds);
+            await this.fadeIn();
+
+            // Close notification after timeout
+            this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
+            return true;
+        });
     }
 
     /**
-     * Show the window at the given position and based on the direction vector.
-     * @param position top-left position to show the window.
-     * @param direction Corner of the monitor to show this toast in.
-     */
-    public async show(position: PointTopLeft, direction: [number, number]) {
-        const dimensions = await this._dimensions;
-        // Set the position of the window to the edge of the display
-        const newBounds = await this.calculateBounds(direction, position, dimensions);
-
-        this._state = State.SHOWING;
-        await this.setBounds(newBounds);
-        await this.animateIn();
-
-        // Close notification after timeout
-        this._timeout = window.setTimeout(() => {
-            this.close();
-        }, this._options.timeout);
-    }
-
-    /**
-     * Get window bounds.
-     */
-    public async getBounds() {
-        const {window} = await this._webWindow;
-        return window.getBounds();
-    }
-
-    /**
-     * Calculate bounds for the window, or the bounds given the position and the window dimensions.
-     * @param direction Vector direction of the window.
+     * Get bounds for the window, or the possible bounds given a position and the window dimensions.
      * @param position Position of the window.
      * @param dimensions Dimension of the window.
      */
-    public async calculateBounds(direction: [number, number], position?: PointTopLeft, dimensions?: WindowDimensions): Promise<Required<Bounds>> {
-        const [x, y] = direction;
+    public async calculateBounds(position?: PointTopLeft, dimensions?: WindowDimensions): Promise<Required<Bounds>> {
+        const {direction: [vX, vY]} = this._options;
         const {width, height} = dimensions || await this._dimensions;
-        const {vertical, horizontal} = this._margin;
-        const {window} = await this._webWindow;
-        let {top, left} = position || await window.getBounds();
+        let {top, left} = position || this.position;
         // If toast is on the top ignore height
-        top = top + (height * ((y > 0) ? y - 1 : y)) + (vertical * y);
+        top = top + (height * ((vY > 0) ? vY - 1 : vY));
         // If toast is coming from the left ignore width
-        left = left + (width * ((x < 0) ? x : x - 1)) + (horizontal * x);
+        left = left + (width * ((vX < 0) ? vX : vX - 1));
         return {
             top,
             left,
@@ -232,25 +180,131 @@ export class Toast {
         };
     }
 
+    public async moveTo(position: PointTopLeft): Promise<void> {
+        const {window} = await this._webWindow;
+        const {top, left} = position;
+        return window.animate(
+            {
+                opacity: {
+                    opacity: 1,
+                    duration: 300
+                },
+                position: {
+                    top: Math.floor(top),
+                    left: Math.floor(left),
+                    duration: 500,
+                    relative: false
+                }
+            },
+            {
+                interrupt: true,
+                tween: 'linear'
+            }
+        );
+    }
+
     /**
      * Close Toast window and perform cleanup.
      * @param force Force the window to close instantly without animating out.
      */
-    public async close(force: boolean = false): Promise<void> {
-        const {window} = await this._webWindow;
-        const {onClose} = this._options;
-        this._state = State.CLOSING;
-        // Don't animate if force
-        if (!force) {
-            await this.animateOut();
-        }
-        // If mouse over window we are no longer closing.
-        if (this._state !== State.CLOSING)
-            return;
-        if (onClose) {
-            await this._options.onClose!(this);
-        }
+    public close = async (force: boolean = false): Promise<void> => {
+        this._state = AnimationState.CLOSING;
+        const {window, document} = await this._webWindow;
+
         clearTimeout(this._timeout);
-        window.close();
+        document.removeEventListener('mouseenter', this.mouseEnterHandler);
+        document.removeEventListener('mouseleave', this.mouseLeaveHandler);
+        Toast.eventEmitter.removeListener(ToastEvent.PAUSE, this.freeze);
+        Toast.eventEmitter.removeListener(ToastEvent.UNPAUSE, this.unfreeze);
+
+        if (!force) {
+            await this.fadeOut();
+        }
+
+        await window.close();
+    }
+
+    /**
+     * Listeners to handle events on the toast.
+     */
+    private async addListeners() {
+        const {document} = await this._webWindow;
+
+        // Listen for other toast events
+        // Toast.eventEmitter.addListener(ToastEvent.PAUSE, this.freeze);
+        Toast.eventEmitter.addListener(ToastEvent.UNPAUSE, this.unfreeze);
+
+        // Pause timeout on mouse over window
+        document.addEventListener('mouseenter', this.mouseEnterHandler);
+        document.addEventListener('mouseleave', this.mouseLeaveHandler);
+    }
+
+    private timeoutHandler = () => {
+        Toast.eventEmitter.emit(ToastEvent.CLOSED, this.id);
+    }
+
+    private mouseEnterHandler = async () => {
+        clearTimeout(this._timeout!);
+        Toast.eventEmitter.emit(ToastEvent.PAUSE, this.id);
+    };
+
+    private mouseLeaveHandler = async () => {
+        Toast.eventEmitter.emit(ToastEvent.UNPAUSE);
+    };
+
+    private async fadeIn(duration: number = 300) {
+        const {window} = await this._webWindow;
+        window.show();
+        await window.animate(
+            {
+                opacity: {
+                    opacity: 1,
+                    duration
+                }
+            },
+            {
+                interrupt: true,
+                tween: 'ease-in'
+            }
+        );
+    }
+
+    private async fadeOut(duration: number = 400) {
+        const {window} = await this._webWindow;
+        if (!window) {
+            return;
+        }
+        await window.animate(
+            {
+                opacity: {
+                    opacity: 0,
+                    duration
+                }
+            },
+            {
+                interrupt: false,
+                tween: 'ease-in'
+            }
+        );
+    }
+
+    public freeze = async (stopMovement: boolean = false): Promise<void> => {
+        if (!this.isShowing || this.isClosing) {
+            return;
+        }
+        clearTimeout(this._timeout!);
+        if (stopMovement) {
+            this.fadeIn(200);
+        }
+    }
+
+    public unfreeze = async (): Promise<void> => {
+        let newTimoutLength = this._timeout + 5000;
+        if (newTimoutLength > this._options.timeout) {
+            newTimoutLength = this._options.timeout;
+        }
+        this._timeout = window.setTimeout(this.timeoutHandler, newTimoutLength);
+
+        this.moveTo(this.position);
     }
 }
