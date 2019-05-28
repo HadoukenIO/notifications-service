@@ -8,7 +8,7 @@ import {NotificationClosedEvent, NotificationClickedEvent, Notification, Notific
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
 import {delay} from './utils/delay';
-import {getCardsByNotification} from './utils/notificationCenterUtils';
+import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 
 const mainWindowIdentity = {uuid: 'test-app', name: 'test-app'};
 
@@ -17,7 +17,10 @@ describe('When calling createNotification', () => {
         // Show the center to avoid dealing with toasts for the time being
         // TODO: Revisit when we have more than one file.
         // TODO: Figure out how to test toasts effectively
-        await notifsRemote.toggleNotificationCenter(mainWindowIdentity);
+        const centerShowing = await isCenterShowing();
+        if (!centerShowing) {
+            await notifsRemote.toggleNotificationCenter(mainWindowIdentity);
+        }
     });
 
     let testApp: Application;
@@ -32,7 +35,7 @@ describe('When calling createNotification', () => {
     });
 
     // TODO: Make the create call fail properly
-    describe.skip('When passing invalid options', () => {
+    describe('When passing invalid options', () => {
         let createPromise: Promise<Notification>;
         beforeEach(() => {
             // Intentionally circumventing type check with cast for testing purposes
@@ -46,7 +49,7 @@ describe('When calling createNotification', () => {
         });
 
         test('An error is thrown', async () => {
-            expect(await createPromise).toThrow();
+            expect(createPromise).rejects.toThrow();
         });
 
         test('No notification is created', async () => {
@@ -89,7 +92,7 @@ describe('When calling createNotification', () => {
         });
     });
 
-    test.skip('', async () => {
+    test.skip('legacy test', async () => {
         const clickListener = jest.fn<void, [NotificationClickedEvent]>();
         const closeListener = jest.fn<void, [NotificationClosedEvent]>();
         await notifsRemote.addEventListener(testWindowIdentity, 'notification-clicked', clickListener);

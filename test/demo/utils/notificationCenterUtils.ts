@@ -1,6 +1,7 @@
 import {ElementHandle} from 'puppeteer';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
+import {fin} from './fin';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 
@@ -16,4 +17,9 @@ export async function getCardsByApp(sourceUuid: string): Promise<ElementHandle[]
 export async function getCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
     return centerPage!.$$(`.notification-item[note-id="${sourceUuid}:${notificationId}"]`);
+}
+
+export async function isCenterShowing(): Promise<boolean> {
+    const center = fin.Window.wrapSync(CENTER_IDENTITY);
+    return center.isShowing();
 }
