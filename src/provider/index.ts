@@ -54,10 +54,6 @@ export class Main {
         console.log('Service Initialised');
     }
 
-    public async dispatchClientEvent(target: Identity, payload: NotificationEvent): Promise<void> {
-        return this._apiHandler.channel.dispatch(target, 'event', payload);
-    }
-
     /**
      * createNotification Create the notification and dispatch it to the UI
      * @param payload The contents to be dispatched to the UI

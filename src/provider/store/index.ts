@@ -1,6 +1,6 @@
 
 import {composeWithDevTools} from 'remote-redux-devtools';
-import {Store as ReduxStore, combineReducers, applyMiddleware, createStore, StoreEnhancer, Dispatch, Reducer} from 'redux';
+import {Store as ReduxStore, combineReducers, applyMiddleware, createStore, StoreEnhancer, Reducer} from 'redux';
 import {injectable} from 'inversify';
 import 'reflect-metadata';
 
@@ -34,14 +34,6 @@ export class StoreContainer extends AsyncInit implements Store {
 
     public async init(): Promise<void> {
         this._store = await this.createStore();
-        return new Promise((resolve) => {
-            // this.getState = this.store.getState;
-            // this.dispatch = this.store.dispatch;
-            // this.subscribe = this.store.subscribe;
-            // this.replaceReducer = this.store.replaceReducer;
-            console.log('STORE CREATED');
-            return resolve();
-        });
     }
 
 
@@ -69,12 +61,6 @@ export class StoreContainer extends AsyncInit implements Store {
             initialState,
             enhancer
         );
-
-        this.getState = store.getState;
-        this.dispatch = store.dispatch;
-        this.subscribe = store.subscribe;
-        this.replaceReducer = store.replaceReducer;
-
         return store;
     }
 

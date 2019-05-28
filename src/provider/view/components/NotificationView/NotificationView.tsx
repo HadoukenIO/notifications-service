@@ -49,6 +49,7 @@ interface Group {
  */
 export function NotificationView(props: NotificationViewProps) {
     const {notifications, groupBy = GroupingType.APPLICATION, ...rest} = props;
+    // TODO: Use useEffect hook
     // Sort the notification by groups
     const groups: Map<string, Group> = groupNotifications(notifications, groupBy);
 

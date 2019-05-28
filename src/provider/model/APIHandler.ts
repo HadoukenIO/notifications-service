@@ -4,6 +4,7 @@ import {Identity} from 'openfin/_v2/main';
 import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
+import {NotificationEvent} from '../../client';
 
 /**
  * Semantic type definition.
@@ -82,6 +83,10 @@ export class APIHandler<T extends Enum> {
                 this._providerChannel.register(action, actionHandlerMap[action]);
             }
         }
+    }
+
+    public async dispatchClientEvent(target: Identity, payload: NotificationEvent): Promise<void> {
+        return this.channel.dispatch(target, 'event', payload);
     }
 
     // TODO?: Remove the need for this any by defining connection payload type?

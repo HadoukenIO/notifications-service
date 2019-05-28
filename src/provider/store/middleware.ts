@@ -7,20 +7,27 @@ import {Injector} from '../common/Injector';
 import {StoredNotification} from '../model/StoredNotification';
 import {Inject} from '../common/Injectables';
 import {NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../client';
+import {APIHandler} from '../model/APIHandler';
+import {APITopic} from '../../client/internal';
 
 import {createNotification, removeNotifications, clickNotificationButton, clickNotification} from './notifications/actions';
 import {toggleCenterWindowVisibility} from './ui/actions';
 
 import {RootState, RootAction} from '.';
 
+// TODO: Rename file
 export class StoreMiddleware {
     private _toastManager!: ToastManager;
+    private _apiHandler!: APIHandler<APITopic>;
 
     public middleware: Middleware<Dispatch<RootAction>, RootState> = (api: MiddlewareAPI) => (next: Dispatch<RootAction>) => async (action: RootAction) => {
         if (!this._toastManager) {
             this._toastManager = Injector.get(Inject.TOAST_MANAGER) as ToastManager;
         }
-        // await this._toastManager.initialized;
+        if (!this._apiHandler) {
+            this._apiHandler = Injector.get(Inject.API_HANDLER) as APIHandler<APITopic>;
+        }
+
         if (isActionOf(createNotification, action)) {
             this._toastManager.create(action.payload);
         }
@@ -40,14 +47,14 @@ export class StoreMiddleware {
                 notification: action.payload.notification.notification,
                 buttonIndex
             };
-            // dispatchClientEvent(target, event);
+            this._apiHandler.dispatchClientEvent(target, event);
         }
 
         if (isActionOf(clickNotification, action)) {
             const {notification, source} = action.payload;
             const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
             // Send notification clicked event to uuid with the context.
-            // dispatchClientEvent(source, event);
+            this._apiHandler.dispatchClientEvent(source, event);
         }
 
         if (isActionOf(toggleCenterWindowVisibility, action)) {
@@ -67,6 +74,6 @@ export class StoreMiddleware {
         const target: Identity = storedNotification.source;
         const event: NotificationClosedEvent = {type: 'notification-closed', notification: storedNotification.notification};
 
-        // dispatchClientEvent(target, event);
+        this._apiHandler.dispatchClientEvent(target, event);
     }
 }
