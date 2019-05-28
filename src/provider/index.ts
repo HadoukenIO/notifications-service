@@ -135,6 +135,13 @@ async function createNotification(payload: NotificationOptions, sender: Provider
     console.log('payload', payload);
     console.log('sender', sender);
 
+    if (!payload.body) {
+        throw new Error('Invalid arguments passed to createNotification. "body" must be specified');
+    }
+    if (!payload.title) {
+        throw new Error('Invalid arguments passed to createNotification. "title" must have a value');
+    }
+
     // Hydrate the provided options with default values to make a valid notification object
     const notification: Notification = {
         id: payload.id || generateId(),
