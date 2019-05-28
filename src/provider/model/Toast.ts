@@ -181,6 +181,10 @@ export class Toast {
         };
     }
 
+    /**
+     * Move toast to postion.
+     * @param position The point to move the toast window to.
+     */
     public async moveTo(position: PointTopLeft): Promise<void> {
         const {window} = await this._webWindow;
         const {top} = position;
@@ -231,9 +235,36 @@ export class Toast {
     }
 
     /**
+     * Freeze the toast in place and remove timeouts.
+     * @param stopMovement If true the toasts movement will be stopped.
+     */
+    public freeze = async (stopMovement: boolean = false): Promise<void> => {
+        if (this.isWaiting()) {
+            return;
+        }
+        clearTimeout(this._timeout!);
+        if (stopMovement) {
+            this.fadeIn(200);
+        }
+    }
+
+    /**
+     * Unfreeze the toast. This moves & resets timeout.
+     */
+    public unfreeze = async (): Promise<void> => {
+        let newTimoutLength = this._timeout + 5000;
+        if (newTimoutLength > this._options.timeout) {
+            newTimoutLength = this._options.timeout;
+        }
+        this._timeout = window.setTimeout(this.timeoutHandler, newTimoutLength);
+
+        this.moveTo(this.position);
+    }
+
+    /**
      * Listeners to handle events on the toast.
      */
-    private async addListeners() {
+    private async addListeners(): Promise<void> {
         const {document} = await this._webWindow;
 
         // Listen for other toast events
@@ -245,20 +276,20 @@ export class Toast {
         document.addEventListener('mouseleave', this.mouseLeaveHandler);
     }
 
-    private timeoutHandler = () => {
+    private timeoutHandler = (): void => {
         Toast.eventEmitter.emit(ToastEvent.CLOSED, this.id);
     }
 
-    private mouseEnterHandler = async () => {
+    private mouseEnterHandler = async (): Promise<void> => {
         clearTimeout(this._timeout!);
         Toast.eventEmitter.emit(ToastEvent.PAUSE, this.id);
     };
 
-    private mouseLeaveHandler = async () => {
+    private mouseLeaveHandler = async (): Promise<void> => {
         Toast.eventEmitter.emit(ToastEvent.UNPAUSE);
     };
 
-    private async fadeIn(duration: number = 300) {
+    private async fadeIn(duration: number = 300): Promise<void> {
         const {window} = await this._webWindow;
         window.show();
         await window.animate(
@@ -275,7 +306,7 @@ export class Toast {
         );
     }
 
-    private async fadeOut(duration: number = 400) {
+    private async fadeOut(duration: number = 400): Promise<void> {
         const {window} = await this._webWindow;
         if (!window) {
             return;
@@ -292,25 +323,5 @@ export class Toast {
                 tween: 'ease-in'
             }
         );
-    }
-
-    public freeze = async (stopMovement: boolean = false): Promise<void> => {
-        if (this.isWaiting()) {
-            return;
-        }
-        clearTimeout(this._timeout!);
-        if (stopMovement) {
-            this.fadeIn(200);
-        }
-    }
-
-    public unfreeze = async (): Promise<void> => {
-        let newTimoutLength = this._timeout + 5000;
-        if (newTimoutLength > this._options.timeout) {
-            newTimoutLength = this._options.timeout;
-        }
-        this._timeout = window.setTimeout(this.timeoutHandler, newTimoutLength);
-
-        this.moveTo(this.position);
     }
 }

@@ -46,68 +46,6 @@ export class ToastManager {
         });
     }
 
-    private async pauseToasts(mousedToast: Toast): Promise<void> {
-        const toastIndex = this._stack.indexOf(mousedToast);
-        for (let i = 0; i < this._stack.length; i++) {
-            if (i >= toastIndex) {
-                this._stack[i].freeze(true);
-            } else {
-                this._stack[i].freeze();
-            }
-        }
-    }
-
-    private async deleteToast(toast: Toast, force: boolean = false): Promise<void> {
-        this._toasts.delete(toast.id);
-        const index = this._stack.indexOf(toast);
-        this._stack.splice(index, 1);
-        const toastWasShowing = toast.isShowing;
-        await toast.close(force);
-        if (toastWasShowing) {
-            this.updateToasts(index);
-        }
-    }
-
-    private async updateToasts(index: number = 0): Promise<void> {
-        // console.log('Updating toasts');
-        // Update toasts after the slice
-        let previousToastRect: Rect | undefined;
-        if (index > 0) {
-            previousToastRect = await this._stack[index - 1].calculateBounds();
-        }
-        const toasts: Toast[] = this._stack.slice(index);
-        for (const toast of toasts) {
-            toast.position = this.getTargetPosition(previousToastRect);
-            previousToastRect = await toast.calculateBounds(toast.position);
-            if (toast.canFitInMonitor()) {
-                if (toast.isShowing) {
-                    toast.moveTo(toast.position);
-                } else {
-                    toast.show();
-                }
-            }
-        }
-    }
-
-    public getTargetPosition(previous?: Rect): PointTopLeft {
-        const [vX, vY] = getToastDirection(this._store.getState());
-        const {vertical, horizontal} = Toast.margin;
-        const bounds = this._bounds;
-
-        let left = (vX > 0) ? bounds.left : bounds.right;
-        let top: number;
-        if (!previous) {
-            top = (vY > 0) ? bounds.top : bounds.bottom;
-        } else {
-            top = (vY < 0) ? previous.top : previous.bottom;
-        }
-
-        // Add margins
-        top += vY * vertical;
-        left += vX * horizontal;
-
-        return {top, left};
-    }
 
     /**
      * Close all toasts.
@@ -158,6 +96,69 @@ export class ToastManager {
                 this.deleteToast(toast);
             }
         });
+    }
+
+    private async updateToasts(index: number = 0): Promise<void> {
+        // console.log('Updating toasts');
+        // Update toasts after the slice
+        let previousToastRect: Rect | undefined;
+        if (index > 0) {
+            previousToastRect = await this._stack[index - 1].calculateBounds();
+        }
+        const toasts: Toast[] = this._stack.slice(index);
+        for (const toast of toasts) {
+            toast.position = this.getTargetPosition(previousToastRect);
+            previousToastRect = await toast.calculateBounds(toast.position);
+            if (toast.canFitInMonitor()) {
+                if (toast.isShowing) {
+                    toast.moveTo(toast.position);
+                } else {
+                    toast.show();
+                }
+            }
+        }
+    }
+
+    private async pauseToasts(mousedToast: Toast): Promise<void> {
+        const toastIndex = this._stack.indexOf(mousedToast);
+        for (let i = 0; i < this._stack.length; i++) {
+            if (i >= toastIndex) {
+                this._stack[i].freeze(true);
+            } else {
+                this._stack[i].freeze();
+            }
+        }
+    }
+
+    private async deleteToast(toast: Toast, force: boolean = false): Promise<void> {
+        this._toasts.delete(toast.id);
+        const index = this._stack.indexOf(toast);
+        this._stack.splice(index, 1);
+        const toastWasShowing = toast.isShowing;
+        await toast.close(force);
+        if (toastWasShowing) {
+            this.updateToasts(index);
+        }
+    }
+
+    private getTargetPosition(previous?: Rect): PointTopLeft {
+        const [vX, vY] = getToastDirection(this._store.getState());
+        const {vertical, horizontal} = Toast.margin;
+        const bounds = this._bounds;
+
+        let left = (vX > 0) ? bounds.left : bounds.right;
+        let top: number;
+        if (!previous) {
+            top = (vY > 0) ? bounds.top : bounds.bottom;
+        } else {
+            top = (vY < 0) ? previous.top : previous.bottom;
+        }
+
+        // Add margins
+        top += vY * vertical;
+        left += vX * horizontal;
+
+        return {top, left};
     }
 
     /**
