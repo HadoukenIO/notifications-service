@@ -64,11 +64,8 @@ describe('', () => {
     });
 });
 
-const nextUuid = (() => {
-    let count = 0;
-    return () => 'notifications-test-app-' + (count++);
-})();
 
+// TODO: Pull all of the notification center utils into their own file
 const ofBrowser = new OFPuppeteerBrowser();
 async function getAllCards() {
     const centerPage = await ofBrowser.getPage(centerIdentity);
@@ -82,6 +79,12 @@ async function getCardsByNoteID(sourceUuid: string, notificationId: string): Pro
     const centerPage = await ofBrowser.getPage(centerIdentity);
     return centerPage!.$$(`.notification-item[note-id="${sourceUuid}:${notificationId}"]`);
 }
+
+// TODO: Window/App creation utils
+const nextUuid = (() => {
+    let count = 0;
+    return () => 'notifications-test-app-' + (count++);
+})();
 
 async function createTestApp():Promise<Application> {
     const uuid = nextUuid();
