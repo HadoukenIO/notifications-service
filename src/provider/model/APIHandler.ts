@@ -3,6 +3,7 @@ import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
+import {injectable} from 'inversify';
 
 /**
  * Semantic type definition.
@@ -53,6 +54,7 @@ export type APIImplementation<T extends Enum, S extends APISpecification<T>> = {
  * Type args:
  *   T: Defines API topics. An enum that defines each available function call.
  */
+@injectable()
 export class APIHandler<T extends Enum> {
     private _providerChannel!: ChannelProvider;
 

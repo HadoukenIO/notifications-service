@@ -1,6 +1,7 @@
 
 import {composeWithDevTools} from 'remote-redux-devtools';
 import {Store as ReduxStore, combineReducers, applyMiddleware, createStore, StoreEnhancer} from 'redux';
+import {injectable} from 'inversify';
 
 import {notificationStorage, uiStorage} from '../model/Storage';
 
@@ -17,52 +18,76 @@ export interface RootState {
 
 export type RootAction = UIAction | NotificationsAction;
 
-const reducers = combineReducers({
-    notifications: notificationsReducer,
-    ui: uiReducer
-});
+@injectable()
+export class StoreContainer {
+    private _store!: Store;
 
-const middleware = [providerMiddleware];
+    public get store() {
+        return this._store;
+    }
 
-let enhancer: StoreEnhancer = applyMiddleware(...middleware);
-if (process.env.NODE_ENV !== 'production') {
-    const devTools = composeWithDevTools({
-        // @ts-ignore
-        realtime: true, port: 9950, suppressConnectErrors: false
-    });
-    enhancer = devTools(enhancer);
-}
+    public constructor() {
+        this._store = this.createStore();
+    }
 
-export function configureStore(initialState: RootState): Store {
-    initialState = loadState(initialState);
+    public getState = this.store.getState;
+    public dispatch = this.store.dispatch;
+    public subscribe = this.store.subscribe;
 
-    const store: Store = createStore<RootState, RootAction, {}, {}>(
-        reducers,
-        initialState,
-        enhancer
-    );
+    private createStore(): Store {
+        const initialState = this.loadState();
+        const reducers = combineReducers({
+            notifications: notificationsReducer,
+            ui: uiReducer
+        });
+        const middleware = [providerMiddleware];
 
-    return store;
-}
-
-function loadState(initialState: Readonly<RootState>): RootState {
-    const cachedNotifications: NotificationMap = {};
-    notificationStorage.iterate((value: string, key: string) => {
-        Object.assign(cachedNotifications, {[key]: JSON.parse(value)});
-    });
-
-    const cachedUI: UIState = {...initialState.ui};
-    uiStorage.iterate((value: string, key: string) => {
-        Object.assign(cachedUI, {[key]: JSON.parse(value)});
-    });
-
-    const state = {
-        ...initialState,
-        ui: cachedUI,
-        notifications: {
-            notifications: cachedNotifications
+        let enhancer: StoreEnhancer = applyMiddleware(...middleware);
+        if (process.env.NODE_ENV !== 'production') {
+            const devTools = composeWithDevTools({
+                // @ts-ignore
+                realtime: true, port: 9950, suppressConnectErrors: false
+            });
+            enhancer = devTools(enhancer);
         }
-    };
 
-    return state;
+        const store: Store = createStore<RootState, RootAction, {}, {}>(
+            reducers,
+            initialState,
+            enhancer
+        );
+
+        return store;
+    }
+
+    private loadState(): RootState {
+        const initialState: RootState = {
+            notifications: {
+                notifications: {}
+            },
+            ui: {
+                windowVisible: false,
+                toastDirection: [-1, 1]
+            }
+        };
+        const cachedNotifications: NotificationMap = {};
+        notificationStorage.iterate((value: string, key: string) => {
+            Object.assign(cachedNotifications, {[key]: JSON.parse(value)});
+        });
+
+        const cachedUI: UIState = {...initialState.ui};
+        uiStorage.iterate((value: string, key: string) => {
+            Object.assign(cachedUI, {[key]: JSON.parse(value)});
+        });
+
+        const state = {
+            ...initialState,
+            ui: cachedUI,
+            notifications: {
+                notifications: cachedNotifications
+            }
+        };
+
+        return state;
+    }
 }

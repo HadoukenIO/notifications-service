@@ -6,8 +6,6 @@ import {ToastManager} from '../controller/ToastManager';
 import {StoredNotification} from '../model/StoredNotification';
 import {NotificationClickedEvent, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../client';
 
-import {dispatchClientEvent} from '..';
-
 import {createNotification, removeNotifications, clickNotificationButton, clickNotification} from './notifications/actions';
 import {toggleCenterWindowVisibility} from './ui/actions';
 
@@ -34,14 +32,14 @@ export const providerMiddleware: Middleware<Dispatch<RootAction>, RootState> = (
             notification: action.payload.notification.notification,
             buttonIndex
         };
-        dispatchClientEvent(target, event);
+        // dispatchClientEvent(target, event);
     }
 
     if (isActionOf(clickNotification, action)) {
         const {notification, source} = action.payload;
         const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
         // Send notification clicked event to uuid with the context.
-        dispatchClientEvent(source, event);
+        // dispatchClientEvent(source, event);
     }
 
     if (isActionOf(toggleCenterWindowVisibility, action)) {
@@ -61,5 +59,5 @@ async function notificationClosed(storedNotification: StoredNotification): Promi
     const target: Identity = storedNotification.source;
     const event: NotificationClosedEvent = {type: 'notification-closed', notification: storedNotification.notification};
 
-    dispatchClientEvent(target, event);
+    // dispatchClientEvent(target, event);
 }

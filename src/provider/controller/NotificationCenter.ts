@@ -1,3 +1,4 @@
+import {injectable, inject} from 'inversify';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
@@ -8,6 +9,9 @@ import {watchForChange} from '../store/utils/watch';
 import {getNotificationCenterVisibility} from '../store/ui/selectors';
 import {toggleCenterWindowVisibility} from '../store/ui/actions';
 import {Store} from '../store';
+import {Inject} from '../common/Injectables';
+
+import {AsyncInit} from './AsyncInit';
 
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
@@ -28,31 +32,27 @@ const windowOptions: WindowOption = {
 
 interface Options {
     // Blur event causes window to hide
-    hideOnBlur?: boolean;
+    hideOnBlur: boolean;
 }
 
-export class NotificationCenter {
-    private _webWindow: Promise<WebWindow>;
+@injectable()
+export class NotificationCenter extends AsyncInit {
+    private _webWindow!: Promise<WebWindow>;
     private _trayIcon!: TrayIcon;
-    private _options: Options;
-    private _store: Store;
+    @inject(Inject.STORE)
+    private _store!: Store;
 
-    public constructor(store: Store, options: Options) {
-        this._store = store;
-        this._options = options;
+    public async init() {
         // Create notification center app window
-        this._webWindow = createWebWindow(windowOptions).then((webWindow) => {
-            this.sizeToFit();
-            this.setupTrayIcon();
-            this.addListeners();
-            // Set window initial state
-            const visible = store.getState().ui.windowVisible;
-            if (visible) {
-                this.showWindow();
-            }
-            renderApp(webWindow.document, store);
-            return webWindow;
-        });
+        try {
+            this._webWindow = createWebWindow(windowOptions);
+        } catch (error) {
+            console.error('Notification Center window could not be created!', error.message);
+        }
+        this.sizeToFit();
+        this.setupTrayIcon();
+        this.addListeners();
+        // renderApp(webWindow.document, store);
         this.subscribe();
     }
 
@@ -88,7 +88,8 @@ export class NotificationCenter {
      */
     private async addListeners(): Promise<void> {
         const {window} = await this._webWindow;
-        const {hideOnBlur = false} = this._options;
+        const hideOnBlur = process.env.NODE_ENV === 'production';
+
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
                 // const contextMenuIsShowing = await ContextMenu.isShowing();
@@ -151,7 +152,6 @@ export class NotificationCenter {
             height: monitorInfo.primaryMonitor.availableRect.bottom
         });
     }
-
 
     private async animateIn(duration: number = 300): Promise<void> {
         const {window} = await this._webWindow;
