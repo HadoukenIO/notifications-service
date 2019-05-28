@@ -182,7 +182,12 @@ export class Toast {
 
     public async moveTo(position: PointTopLeft): Promise<void> {
         const {window} = await this._webWindow;
-        const {top, left} = position;
+        const {top} = position;
+        const {width} = await this._dimensions;
+        let [vX] = this._options.direction;
+        vX = vX > 0 ? 0 : vX;
+        const left = position.left + (width * ((vX < 0) ? vX : vX - 1));
+
         return window.animate(
             {
                 opacity: {

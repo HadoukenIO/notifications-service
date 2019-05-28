@@ -21,7 +21,7 @@ const initialState: RootState = {
     },
     ui: {
         windowVisible: false,
-        toastDirection: [1, 1]
+        toastDirection: [-1, 1]
     }
 };
 
