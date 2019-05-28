@@ -27,7 +27,8 @@ const initialState: RootState = {
 
 const store = configureStore(initialState);
 // Change to singleton?
-const notificationCenter = new NotificationCenter(store, {hideOnBlur: false});
+const hideOnBlur = process.env.NODE_ENV === 'production';
+const notificationCenter = new NotificationCenter(store, {hideOnBlur});
 ToastManager.instance.initialize(store);
 
 let providerChannel: ChannelProvider;
