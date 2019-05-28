@@ -14,10 +14,10 @@ import {Inject} from './Injectables';
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
-    [Inject.API_HANDLER]: APIHandler<APITopic>,
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
-    [Inject.TOAST_MANAGER]: ToastManager,
     [Inject.STORE]: StoreContainer,
+    [Inject.API_HANDLER]: APIHandler<APITopic>,
+    [Inject.TOAST_MANAGER]: ToastManager,
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter
 };
 
 /**
@@ -27,10 +27,10 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
+    [Inject.STORE]: StoreContainer,
     [Inject.API_HANDLER]: APIHandler,
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.TOAST_MANAGER]: ToastManager,
-    [Inject.STORE]: StoreContainer
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter
 };
 
 type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);

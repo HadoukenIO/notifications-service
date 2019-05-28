@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import {inject, injectable} from 'inversify';
-import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
 
@@ -9,7 +8,6 @@ import {OptionButton, NotificationEvent, NotificationOptions, Notification} from
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
-import {ToastManager} from './controller/ToastManager';
 import {APIHandler} from './model/APIHandler';
 import {toggleCenterWindowVisibility} from './store/ui/actions';
 import {getNotificationById, getNotificationsByApplication} from './store/notifications/selectors';
@@ -22,11 +20,11 @@ import {NotificationCenter} from './controller/NotificationCenter';
 export class Main {
     private _config = null;
 
-    @inject(Inject.STORE)
-    private _store!: StoreContainer;
-
     @inject(Inject.API_HANDLER)
     private _apiHandler!: APIHandler<APITopic>;
+
+    @inject(Inject.STORE)
+    private _store!: StoreContainer;
 
     @inject(Inject.NOTIFICATION_CENTER)
     private _notificationCenter!: NotificationCenter;

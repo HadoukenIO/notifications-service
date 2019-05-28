@@ -1,13 +1,15 @@
 
 import {composeWithDevTools} from 'remote-redux-devtools';
-import {Store as ReduxStore, combineReducers, applyMiddleware, createStore, StoreEnhancer} from 'redux';
+import {Store as ReduxStore, combineReducers, applyMiddleware, createStore, StoreEnhancer, Dispatch, Reducer} from 'redux';
 import {injectable} from 'inversify';
+import 'reflect-metadata';
 
 import {notificationStorage, uiStorage} from '../model/Storage';
 
 import {UIState, UIAction, reducer as uiReducer} from './ui/reducer';
 import {NotificationsState, NotificationsAction, reducer as notificationsReducer, NotificationMap} from './notifications/reducer';
 import {providerMiddleware} from './middleware';
+import {AsyncInit} from '../controller/AsyncInit';
 
 export type Store = ReduxStore<RootState, RootAction>;
 
@@ -19,23 +21,29 @@ export interface RootState {
 export type RootAction = UIAction | NotificationsAction;
 
 @injectable()
-export class StoreContainer {
+export class StoreContainer extends AsyncInit implements Store {
     private _store!: Store;
+    public getState = (): RootState => this.store.getState();
+    public dispatch = (args: any): any => this.store.dispatch(args);
+    public subscribe = (listener: () => void) => this.store.subscribe(listener);
+    public replaceReducer = (nextReducer: Reducer<RootState, RootAction>) => this.store.replaceReducer(nextReducer);
 
     public get store() {
         return this._store;
     }
 
-    public constructor() {
-        this._store = this.createStore();
+    public async init() {
+        this._store = await this.createStore();
+        this.getState = this.store.getState;
+        this.dispatch = this.store.dispatch;
+        this.subscribe = this.store.subscribe;
+        this.replaceReducer = this.store.replaceReducer;
+        console.log('STORE CREATED');
     }
 
-    public getState = this.store.getState;
-    public dispatch = this.store.dispatch;
-    public subscribe = this.store.subscribe;
 
-    private createStore(): Store {
-        const initialState = this.loadState();
+    private async createStore(): Promise<Store> {
+        const initialState = await this.loadState();
         const reducers = combineReducers({
             notifications: notificationsReducer,
             ui: uiReducer
@@ -51,7 +59,7 @@ export class StoreContainer {
             enhancer = devTools(enhancer);
         }
 
-        const store: Store = createStore<RootState, RootAction, {}, {}>(
+        const store: Store = await createStore<RootState, RootAction, {}, {}>(
             reducers,
             initialState,
             enhancer
@@ -60,7 +68,7 @@ export class StoreContainer {
         return store;
     }
 
-    private loadState(): RootState {
+    private async loadState(): Promise<RootState> {
         const initialState: RootState = {
             notifications: {
                 notifications: {}
@@ -71,12 +79,12 @@ export class StoreContainer {
             }
         };
         const cachedNotifications: NotificationMap = {};
-        notificationStorage.iterate((value: string, key: string) => {
+        await notificationStorage.iterate((value: string, key: string) => {
             Object.assign(cachedNotifications, {[key]: JSON.parse(value)});
         });
 
         const cachedUI: UIState = {...initialState.ui};
-        uiStorage.iterate((value: string, key: string) => {
+        await uiStorage.iterate((value: string, key: string) => {
             Object.assign(cachedUI, {[key]: JSON.parse(value)});
         });
 

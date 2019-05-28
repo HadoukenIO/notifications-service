@@ -1,4 +1,5 @@
 import {injectable, inject} from 'inversify';
+import 'reflect-metadata';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
@@ -8,7 +9,7 @@ import {TrayIcon} from '../common/TrayIcon';
 import {watchForChange} from '../store/utils/watch';
 import {getNotificationCenterVisibility} from '../store/ui/selectors';
 import {toggleCenterWindowVisibility} from '../store/ui/actions';
-import {Store} from '../store';
+import {Store, StoreContainer} from '../store';
 import {Inject} from '../common/Injectables';
 
 import {AsyncInit} from './AsyncInit';
@@ -37,17 +38,18 @@ interface Options {
 
 @injectable()
 export class NotificationCenter extends AsyncInit {
-    private _webWindow!: Promise<WebWindow>;
+    private _webWindow!: WebWindow;
     private _trayIcon!: TrayIcon;
     @inject(Inject.STORE)
-    private _store!: Store;
+    private _store!: StoreContainer;
 
     public async init() {
         // Create notification center app window
         try {
-            this._webWindow = createWebWindow(windowOptions);
+            this._webWindow = await createWebWindow(windowOptions);
         } catch (error) {
             console.error('Notification Center window could not be created!', error.message);
+            throw error;
         }
         this.sizeToFit();
         this.setupTrayIcon();
@@ -70,7 +72,7 @@ export class NotificationCenter extends AsyncInit {
     private async subscribe(): Promise<void> {
         // Window visibility
         watchForChange(
-            this._store,
+            this._store.store,
             getNotificationCenterVisibility,
             (_, value) => this.toggleWindow(value)
         );
@@ -87,7 +89,7 @@ export class NotificationCenter extends AsyncInit {
      * Add listeners to the window.
      */
     private async addListeners(): Promise<void> {
-        const {window} = await this._webWindow;
+        const {window} = this._webWindow;
         const hideOnBlur = process.env.NODE_ENV === 'production';
 
         if (hideOnBlur) {
@@ -141,7 +143,7 @@ export class NotificationCenter extends AsyncInit {
      * @function sizeToFit Sets the window dimensions in shape of a side bar
      */
     public async sizeToFit(): Promise<void> {
-        const {window} = await this._webWindow;
+        const {window} = this._webWindow;
         await this.hideWindow(true);
         const monitorInfo = await fin.System.getMonitorInfo();
         const idealWidth = 388;
