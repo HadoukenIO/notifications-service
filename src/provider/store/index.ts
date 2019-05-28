@@ -28,7 +28,7 @@ let enhancer: StoreEnhancer = applyMiddleware(...middleware);
 if (process.env.NODE_ENV !== 'production') {
     const devTools = composeWithDevTools({
         // @ts-ignore
-        realtime: true, port: 9950, suppressConnectErrors: false
+        realtime: true, port: 9950, suppressConnectErrors: true, sendOnError: 2
     });
     enhancer = devTools(enhancer);
 }
