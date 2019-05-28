@@ -65,10 +65,8 @@ export class ToastManager extends AsyncInit {
 
     public async create(notification: StoredNotification): Promise<void> {
         if (getNotificationCenterVisibility(this._store.getState())) {
-            console.log('IGNORE');
             return;
         }
-        console.log('MAKE TOAST');
         // Create new toast notifications
         const {id} = notification;
         if (this._toasts.has(notification.id)) {
@@ -106,7 +104,6 @@ export class ToastManager extends AsyncInit {
     }
 
     private async updateToasts(index: number = 0): Promise<void> {
-        // console.log('Updating toasts');
         // Update toasts after the slice
         let previousToastRect: Rect | undefined;
         if (index > 0) {

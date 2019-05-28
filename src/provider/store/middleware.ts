@@ -1,7 +1,6 @@
 import {Middleware, MiddlewareAPI, Dispatch} from 'redux';
 import {Identity} from 'openfin/_v2/main';
 import {isActionOf} from 'typesafe-actions';
-import {inject} from 'inversify';
 
 import {ToastManager} from '../controller/ToastManager';
 import {Injector} from '../common/Injector';
