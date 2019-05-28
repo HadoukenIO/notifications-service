@@ -92,6 +92,10 @@ export class Toast {
         return this._state === AnimationState.CLOSING;
     }
 
+    public isWaiting(): boolean {
+        return this._state === AnimationState.WAITING;
+    }
+
     public constructor(store: Store, notification: StoredNotification, toastOptions: Options, position: PointTopLeft) {
         this._id = notification.id;
         this._options = toastOptions;
@@ -127,7 +131,7 @@ export class Toast {
     }
 
     public async show(position?: PointTopLeft): Promise<boolean> {
-        if (this._state === AnimationState.SHOWING) {
+        if (this.isShowing) {
             return true;
         }
         // Await window dimensions from React component
@@ -291,7 +295,7 @@ export class Toast {
     }
 
     public freeze = async (stopMovement: boolean = false): Promise<void> => {
-        if (!this.isShowing || this.isClosing) {
+        if (this.isWaiting()) {
             return;
         }
         clearTimeout(this._timeout!);
