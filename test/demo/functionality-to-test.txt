@@ -98,3 +98,9 @@ User Interaction:
             - All 'closed' listeners on the raising app are triggered once for each
                 notification closed
             - No other listeners are triggered
+
+Multiple Windows Per App:
+    - getAll returns notifs raised by other windows of same app
+    - clearAll removes notifs raised by other windows of same app
+    - one window can clear note created by another window
+    - one window can recreate/update note created by another window
