@@ -7,6 +7,7 @@ import {Rect} from 'openfin/_v2/api/system/monitor';
 
 import {renderApp} from '../view/containers/ToastApp';
 import {Store} from '../store';
+import {deferredPromise} from '../common/deferredPromise';
 
 import {WebWindow, createWebWindow} from './WebWindow';
 import {StoredNotification} from './StoredNotification';
@@ -97,10 +98,8 @@ export class Toast {
         this._state = AnimationState.WAITING;
         this._position = position;
         // Wait for the React component to render and then get the dimensions of it to resize the window.
-        let dimensionResolve: (value?: WindowDimensions | PromiseLike<WindowDimensions> | undefined) => void;
-        this._dimensions = new Promise<WindowDimensions>((resolve, reject) => {
-            dimensionResolve = resolve;
-        });
+        const [dimensionPromise, dimensionResolve] = deferredPromise<WindowDimensions>();
+        this._dimensions = dimensionPromise;
 
         const name = `${windowOptions.name}:${this.id}`;
         this._webWindow = createWebWindow({...windowOptions, name}).then((webWindow) => {
@@ -111,9 +110,7 @@ export class Toast {
                 notification,
                 document,
                 store,
-                (dimensions: WindowDimensions) => {
-                    dimensionResolve(dimensions);
-                },
+                dimensionResolve
             );
             return webWindow;
         });
