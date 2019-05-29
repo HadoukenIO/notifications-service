@@ -36,22 +36,6 @@ export class ToastManager extends AsyncInit {
         });
     }
 
-    private addListeners() {
-        Toast.eventEmitter.addListener(ToastEvent.CLOSED, async (id: string) => {
-            const toast = this._toasts.get(id);
-            if (toast) {
-                await this.deleteToast(toast);
-            }
-        });
-
-        Toast.eventEmitter.addListener(ToastEvent.PAUSE, async (id: string) => {
-            const toast = this._toasts.get(id);
-            if (toast) {
-                this.pauseToasts(toast);
-            }
-        });
-    }
-
     /**
      * Close all toasts.
      */
@@ -63,6 +47,10 @@ export class ToastManager extends AsyncInit {
         this._stack = [];
     }
 
+    /**
+     * Create a new toast.
+     * @param notification The notificationt to display in the created toast.
+     */
     public async create(notification: StoredNotification): Promise<void> {
         if (getNotificationCenterVisibility(this._store.getState())) {
             return;
@@ -87,12 +75,15 @@ export class ToastManager extends AsyncInit {
             direction: getToastDirection(this._store.getState())
         }, position);
 
-
         this._toasts.set(id, toast);
         this._stack.push(toast);
         toast.show();
     }
 
+    /**
+     * Remove toasts.
+     * @param notifications The toasts that match the given notifications.
+     */
     public async removeToasts(...notifications: StoredNotification[]): Promise<void> {
         notifications.forEach(async notification => {
             const {id} = notification;
@@ -103,6 +94,11 @@ export class ToastManager extends AsyncInit {
         });
     }
 
+    /**
+     * Update toast positions & visibility.
+     * @param index The index of the toast in the stack to start the update.
+     *  All indices after the index are also updated.
+    */
     private async updateToasts(index: number = 0): Promise<void> {
         // Update toasts after the slice
         let previousToastRect: Rect | undefined;
@@ -134,6 +130,11 @@ export class ToastManager extends AsyncInit {
         }
     }
 
+    /**
+     * Delete a toast.
+     * @param toast Toast to delete.
+     * @param force Force the deleted toast to close without playing animations.
+     */
     private async deleteToast(toast: Toast, force: boolean = false): Promise<void> {
         this._toasts.delete(toast.id);
         const index = this._stack.indexOf(toast);
@@ -145,6 +146,11 @@ export class ToastManager extends AsyncInit {
         }
     }
 
+    /**
+     * Get the next position to display on the screen to display a toast.
+     * @param previous Previous Toast rect.
+     * @returns The next available position to display a toast.
+     */
     private getTargetPosition(previous?: Rect): PointTopLeft {
         const [vX, vY] = getToastDirection(this._store.getState());
         const {vertical, horizontal} = Toast.margin;
@@ -180,5 +186,22 @@ export class ToastManager extends AsyncInit {
                 }
             }
         );
+    }
+
+
+    private addListeners() {
+        Toast.eventEmitter.addListener(ToastEvent.CLOSED, async (id: string) => {
+            const toast = this._toasts.get(id);
+            if (toast) {
+                await this.deleteToast(toast);
+            }
+        });
+
+        Toast.eventEmitter.addListener(ToastEvent.PAUSE, async (id: string) => {
+            const toast = this._toasts.get(id);
+            if (toast) {
+                this.pauseToasts(toast);
+            }
+        });
     }
 }
