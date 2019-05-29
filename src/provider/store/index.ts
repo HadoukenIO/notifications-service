@@ -36,14 +36,12 @@ export class StoreContainer extends AsyncInit implements Store {
         this._store = await this.createStore();
     }
 
-
     private async createStore(): Promise<Store> {
         const initialState = await this.loadState();
         const reducers = combineReducers({
             notifications: notificationsReducer,
             ui: uiReducer
         });
-
 
         const middleware = [new StoreMiddleware().middleware];
 
@@ -94,6 +92,4 @@ export class StoreContainer extends AsyncInit implements Store {
 
         return state;
     }
-
-
 }

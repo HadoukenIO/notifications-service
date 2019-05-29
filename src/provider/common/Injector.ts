@@ -30,7 +30,7 @@ const Bindings = {
     [Inject.API_HANDLER]: APIHandler,
     [Inject.STORE]: StoreContainer,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
-    [Inject.TOAST_MANAGER]: ToastManager,
+    [Inject.TOAST_MANAGER]: ToastManager
 };
 
 type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);
