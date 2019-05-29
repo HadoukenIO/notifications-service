@@ -16,7 +16,7 @@ import {AsyncInit} from './AsyncInit';
 
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
-    url: 'ui/index.html',
+    url: 'ui/notification-center.html',
     autoShow: true,
     defaultHeight: 400,
     defaultWidth: 500,
