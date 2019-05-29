@@ -1,8 +1,10 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
+import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
+import {NotificationEvent} from '../../client';
 
 /**
  * Semantic type definition.
@@ -53,6 +55,7 @@ export type APIImplementation<T extends Enum, S extends APISpecification<T>> = {
  * Type args:
  *   T: Defines API topics. An enum that defines each available function call.
  */
+@injectable()
 export class APIHandler<T extends Enum> {
     private _providerChannel!: ChannelProvider;
 
@@ -80,6 +83,10 @@ export class APIHandler<T extends Enum> {
                 this._providerChannel.register(action, actionHandlerMap[action]);
             }
         }
+    }
+
+    public async dispatchClientEvent(target: Identity, payload: NotificationEvent): Promise<void> {
+        return this.channel.dispatch(target, 'event', payload);
     }
 
     // TODO?: Remove the need for this any by defining connection payload type?

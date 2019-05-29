@@ -1,3 +1,5 @@
+import {injectable, inject} from 'inversify';
+import 'reflect-metadata';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
@@ -7,7 +9,10 @@ import {TrayIcon} from '../common/TrayIcon';
 import {watchForChange} from '../store/utils/watch';
 import {getNotificationCenterVisibility} from '../store/ui/selectors';
 import {toggleCenterWindowVisibility} from '../store/ui/actions';
-import {Store} from '../store';
+import {Store, StoreContainer} from '../store';
+import {Inject} from '../common/Injectables';
+
+import {AsyncInit} from './AsyncInit';
 
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
@@ -26,40 +31,33 @@ const windowOptions: WindowOption = {
     opacity: 0
 };
 
-interface Options {
-    // Blur event causes window to hide
-    hideOnBlur?: boolean;
-}
+@injectable()
+export class NotificationCenter extends AsyncInit {
+    @inject(Inject.STORE)
+    private _store!: StoreContainer;
 
-export class NotificationCenter {
-    private _webWindow: Promise<WebWindow>;
+    private _webWindow!: WebWindow;
     private _trayIcon!: TrayIcon;
-    private _options: Options;
-    private _store: Store;
 
-    public constructor(store: Store, options: Options) {
-        this._store = store;
-        this._options = options;
+    protected async init() {
         // Create notification center app window
-        this._webWindow = createWebWindow(windowOptions).then((webWindow) => {
-            this.sizeToFit();
-            this.setupTrayIcon();
-            this.addListeners();
-            // Set window initial state
-            const visible = store.getState().ui.windowVisible;
-            if (visible) {
-                this.showWindow();
-            }
-            renderApp(webWindow.document, store);
-            return webWindow;
-        });
-        this.subscribe();
+        try {
+            this._webWindow = await createWebWindow(windowOptions);
+        } catch (error) {
+            console.error('Notification Center window could not be created!', error.message);
+            throw error;
+        }
+        await this.sizeToFit();
+        this.setupTrayIcon();
+        await this.addListeners();
+        renderApp(this._webWindow.document, this._store);
+        await this.subscribe();
     }
 
     private setupTrayIcon(): void {
         this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png')
             .addLeftClickHandler(() => {
-                this._store.dispatch(toggleCenterWindowVisibility());
+                this._store.store.dispatch(toggleCenterWindowVisibility());
             });
     }
 
@@ -87,8 +85,9 @@ export class NotificationCenter {
      * Add listeners to the window.
      */
     private async addListeners(): Promise<void> {
-        const {window} = await this._webWindow;
-        const {hideOnBlur = false} = this._options;
+        const {window} = this._webWindow;
+        const hideOnBlur = process.env.NODE_ENV === 'production';
+
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
                 // const contextMenuIsShowing = await ContextMenu.isShowing();
@@ -140,7 +139,7 @@ export class NotificationCenter {
      * @function sizeToFit Sets the window dimensions in shape of a side bar
      */
     public async sizeToFit(): Promise<void> {
-        const {window} = await this._webWindow;
+        const {window} = this._webWindow;
         await this.hideWindow(true);
         const monitorInfo = await fin.System.getMonitorInfo();
         const idealWidth = 388;
@@ -151,7 +150,6 @@ export class NotificationCenter {
             height: monitorInfo.primaryMonitor.availableRect.bottom
         });
     }
-
 
     private async animateIn(duration: number = 300): Promise<void> {
         const {window} = await this._webWindow;

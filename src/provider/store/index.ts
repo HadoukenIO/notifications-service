@@ -1,12 +1,15 @@
 
 import {composeWithDevTools} from 'remote-redux-devtools';
-import {Store as ReduxStore, combineReducers, applyMiddleware, createStore, StoreEnhancer} from 'redux';
+import {Store as ReduxStore, combineReducers, applyMiddleware, createStore, StoreEnhancer, Reducer} from 'redux';
+import {injectable} from 'inversify';
+import 'reflect-metadata';
 
 import {notificationStorage, uiStorage} from '../model/Storage';
+import {AsyncInit} from '../controller/AsyncInit';
 
 import {UIState, UIAction, reducer as uiReducer} from './ui/reducer';
 import {NotificationsState, NotificationsAction, reducer as notificationsReducer, NotificationMap} from './notifications/reducer';
-import {providerMiddleware} from './middleware';
+import {StoreMiddleware} from './middleware';
 
 export type Store = ReduxStore<RootState, RootAction>;
 
@@ -17,52 +20,76 @@ export interface RootState {
 
 export type RootAction = UIAction | NotificationsAction;
 
-const reducers = combineReducers({
-    notifications: notificationsReducer,
-    ui: uiReducer
-});
+@injectable()
+export class StoreContainer extends AsyncInit implements Store {
+    private _store!: Store;
+    public getState = (): RootState => this.store.getState();
+    public dispatch = (args: any): any => this.store.dispatch(args);
+    public subscribe = (listener: () => void) => this.store.subscribe(listener);
+    public replaceReducer = (nextReducer: Reducer<RootState, RootAction>) => this.store.replaceReducer(nextReducer);
 
-const middleware = [providerMiddleware];
+    public get store() {
+        return this._store;
+    }
 
-let enhancer: StoreEnhancer = applyMiddleware(...middleware);
-if (process.env.NODE_ENV !== 'production') {
-    const devTools = composeWithDevTools({
-        // @ts-ignore
-        realtime: true, port: 9950, suppressConnectErrors: true, sendOnError: 2
-    });
-    enhancer = devTools(enhancer);
-}
+    public async init(): Promise<void> {
+        this._store = await this.createStore();
+    }
 
-export function configureStore(initialState: RootState): Store {
-    initialState = loadState(initialState);
+    private async createStore(): Promise<Store> {
+        const initialState = await this.loadState();
+        const reducers = combineReducers({
+            notifications: notificationsReducer,
+            ui: uiReducer
+        });
 
-    const store: Store = createStore<RootState, RootAction, {}, {}>(
-        reducers,
-        initialState,
-        enhancer
-    );
+        const middleware = [new StoreMiddleware().middleware];
 
-    return store;
-}
-
-function loadState(initialState: Readonly<RootState>): RootState {
-    const cachedNotifications: NotificationMap = {};
-    notificationStorage.iterate((value: string, key: string) => {
-        Object.assign(cachedNotifications, {[key]: JSON.parse(value)});
-    });
-
-    const cachedUI: UIState = {...initialState.ui};
-    uiStorage.iterate((value: string, key: string) => {
-        Object.assign(cachedUI, {[key]: JSON.parse(value)});
-    });
-
-    const state = {
-        ...initialState,
-        ui: cachedUI,
-        notifications: {
-            notifications: cachedNotifications
+        let enhancer: StoreEnhancer = applyMiddleware(...middleware);
+        if (process.env.NODE_ENV !== 'production') {
+            const devTools = composeWithDevTools({
+                // @ts-ignore
+                realtime: true, port: 9950, suppressConnectErrors: false
+            });
+            enhancer = devTools(enhancer);
         }
-    };
 
-    return state;
+        const store = await createStore<RootState, RootAction, {}, {}>(
+            reducers,
+            initialState,
+            enhancer
+        );
+        return store;
+    }
+
+    private async loadState(): Promise<RootState> {
+        const initialState: RootState = {
+            notifications: {
+                notifications: {}
+            },
+            ui: {
+                windowVisible: false,
+                toastDirection: [-1, 1]
+            }
+        };
+        const cachedNotifications: NotificationMap = {};
+        await notificationStorage.iterate((value: string, key: string) => {
+            Object.assign(cachedNotifications, {[key]: JSON.parse(value)});
+        });
+
+        const cachedUI: UIState = {...initialState.ui};
+        await uiStorage.iterate((value: string, key: string) => {
+            Object.assign(cachedUI, {[key]: JSON.parse(value)});
+        });
+
+        const state = {
+            ...initialState,
+            ui: cachedUI,
+            notifications: {
+                notifications: cachedNotifications
+            }
+        };
+
+        return state;
+    }
 }
