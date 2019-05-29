@@ -5,13 +5,13 @@ import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import Bounds from 'openfin/_v2/api/window/bounds';
 import {Rect} from 'openfin/_v2/api/system/monitor';
 
-import {renderApp} from '../view/containers/ToastApp';
-import {Store} from '../store';
 import {deferredPromise} from '../common/deferredPromise';
+import {renderApp} from '../view/containers/ToastApp';
+import {Store} from '../store/Store';
 
-import {WebWindow, createWebWindow} from './WebWindow';
-import {StoredNotification} from './StoredNotification';
 import {contains} from './Geometry';
+import {StoredNotification} from './StoredNotification';
+import {WebWindow, createWebWindow} from './WebWindow';
 
 export type WindowDimensions = {height: number, width: number};
 
@@ -58,7 +58,9 @@ export enum ToastEvent {
 
 
 export class Toast {
+    public static DIRECTION: Readonly<[number, number]> = [-1, 1];
     public static eventEmitter: EventEmitter = new EventEmitter();
+
     private _webWindow: Readonly<Promise<WebWindow>>;
     private _options: Options;
     private _state: AnimationState;

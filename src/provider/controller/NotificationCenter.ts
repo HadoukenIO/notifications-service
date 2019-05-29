@@ -1,23 +1,20 @@
 import {injectable, inject} from 'inversify';
-import 'reflect-metadata';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
-import {WebWindow, createWebWindow} from '../model/WebWindow';
-import {renderApp} from '../view/containers/NotificationCenterApp';
-import {TrayIcon} from '../common/TrayIcon';
-import {watchForChange} from '../store/utils/watch';
-import {getNotificationCenterVisibility} from '../store/ui/selectors';
-import {toggleCenterWindowVisibility} from '../store/ui/actions';
-import {Store, StoreContainer} from '../store';
 import {Inject} from '../common/Injectables';
+import {TrayIcon} from '../common/TrayIcon';
+import {WebWindow, createWebWindow} from '../model/WebWindow';
+import {Action} from '../store/Actions';
+import {Store} from '../store/Store';
+import {renderApp} from '../view/containers/NotificationCenterApp';
 
 import {AsyncInit} from './AsyncInit';
 
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
     url: 'ui/index.html',
-    autoShow: true,
+    autoShow: false,
     defaultHeight: 400,
     defaultWidth: 500,
     resizable: false,
@@ -34,7 +31,7 @@ const windowOptions: WindowOption = {
 @injectable()
 export class NotificationCenter extends AsyncInit {
     @inject(Inject.STORE)
-    private _store!: StoreContainer;
+    private _store!: Store;
 
     private _webWindow!: WebWindow;
     private _trayIcon!: TrayIcon;
@@ -47,18 +44,16 @@ export class NotificationCenter extends AsyncInit {
             console.error('Notification Center window could not be created!', error.message);
             throw error;
         }
+
+        this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png');
+        this._trayIcon.addLeftClickHandler(() => {
+            this._store.dispatch({type: Action.TOGGLE_VISIBILITY});
+        });
+
         await this.sizeToFit();
-        this.setupTrayIcon();
         await this.addListeners();
         renderApp(this._webWindow.document, this._store);
         await this.subscribe();
-    }
-
-    private setupTrayIcon(): void {
-        this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png')
-            .addLeftClickHandler(() => {
-                this._store.store.dispatch(toggleCenterWindowVisibility());
-            });
     }
 
     /**
@@ -67,9 +62,8 @@ export class NotificationCenter extends AsyncInit {
      */
     private async subscribe(): Promise<void> {
         // Window visibility
-        watchForChange(
-            this._store,
-            getNotificationCenterVisibility,
+        this._store.watchForChange(
+            state => state.windowVisible,
             (_, value) => this.toggleWindow(value)
         );
     }
@@ -78,7 +72,8 @@ export class NotificationCenter extends AsyncInit {
      * The window visibility state.
      */
     public get visible(): boolean {
-        return getNotificationCenterVisibility(this._store.getState());
+        const state = this._store.state;
+        return state.windowVisible;
     }
 
     /**
@@ -91,7 +86,7 @@ export class NotificationCenter extends AsyncInit {
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
                 if (this.visible) {
-                    this._store.dispatch(toggleCenterWindowVisibility(false));
+                    this._store.dispatch({type: Action.TOGGLE_VISIBILITY, visible: false});
                 }
             });
         }

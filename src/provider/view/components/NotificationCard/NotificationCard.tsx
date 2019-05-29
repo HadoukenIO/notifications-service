@@ -4,53 +4,54 @@ import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {Button} from '../Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {CloseButton} from '../CloseButton/CloseButton';
-import {UIHandlers} from '../../../model/UIHandlers';
+import {Action} from '../../../store/Actions';
+import {Actionable} from '../../containers/NotificationCenterApp';
 
-interface NotificationCardProps extends UIHandlers {
-    meta: StoredNotification;
+interface NotificationCardProps extends Actionable {
+    notification: StoredNotification;
 }
 
 export function NotificationCard(props: NotificationCardProps) {
-    const {meta, onRemoveNotifications, onClickButton, onClickNotification} = props;
-    const {notification} = meta;
+    const {notification, dispatch} = props;
+    const data = notification.notification;
 
     const handleNotificationClose = () => {
-        onRemoveNotifications(meta);
+        dispatch({type: Action.REMOVE, notifications: [notification]});
     };
 
     const handleButtonClick = (buttonIndex: number) => {
-        onClickButton(meta, buttonIndex);
+        dispatch({type: Action.CLICK_BUTTON, notification, buttonIndex});
     };
 
     const handleNotificationClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
-        onClickNotification(meta);
+        dispatch({type: Action.CLICK_NOTIFICATION, notification});
     };
 
     return (
-        <div className="notification" data-id={meta.id} onClick={handleNotificationClick}>
+        <div className="notification" data-id={notification.id} onClick={handleNotificationClick}>
             <CloseButton onClick={handleNotificationClose} />
-            <NotificationTime date={notification.date} />
+            <NotificationTime date={data.date} />
             <div className="body">
                 <div className="source">
                     <img
-                        src={notification.icon}
+                        src={data.icon}
                     />
                     <span className="app-name">
-                        {meta.source.name}
+                        {notification.source.name}
                     </span>
                 </div>
                 <div className="title">
-                    {meta.notification.title}
+                    {data.title}
                 </div>
                 <div className="text">
-                    {meta.notification.body}
+                    {data.body}
                 </div>
 
-                {notification.buttons.length > 0 &&
+                {data.buttons.length > 0 &&
                     <div className="buttons">
-                        {notification.buttons.map((btn, i) => {
+                        {data.buttons.map((btn, i) => {
                             return (
                                 <Button key={btn.title + i} onClick={handleButtonClick} buttonIndex={i} text={btn.title} icon={btn.iconUrl} />
                             );

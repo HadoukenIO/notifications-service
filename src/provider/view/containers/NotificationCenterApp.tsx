@@ -1,60 +1,52 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Dispatch, bindActionCreators} from 'redux';
 import {connect, Provider} from 'react-redux';
 
-import {toggleCenterWindowVisibility} from '../../store/ui/actions';
-import {removeNotifications, clickNotification, clickNotificationButton} from '../../store/notifications/actions';
-import {getAllNotifications} from '../../store/notifications/selectors';
 import {Header} from '../components/Header/Header';
 import {Footer} from '../components/Footer/Footer';
 import {NotificationView} from '../components/NotificationView/NotificationView';
-import {UIHandlers} from '../../model/UIHandlers';
-import {RootState, Store} from '../../store';
+import {RootState, mutable} from '../../store/State';
+import {Store} from '../../store/Store';
+import {RootAction} from '../../store/Actions';
 
 export enum GroupingType {
     APPLICATION = 'Application',
     DATE = 'Date'
 }
 
-type Props = ReturnType<typeof mapDispatchToProps> & ReturnType<typeof mapStateToProps> & UIHandlers;
+export interface Actionable {
+    dispatch: (action: RootAction)=>void;
+}
 
-const NotificationCenterApp = (props: Props) => {
+type Props = ReturnType<typeof mapStateToProps> & Actionable;
+
+export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, ...rest} = props;
+    const {notifications, dispatch} = props;
 
     return (
         <div className='notification-center'>
             <Header
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}
-                onHideWindow={rest.onToggleWindow}
+                dispatch={dispatch}
             />
             <NotificationView
-                notifications={notifications}
+                notifications={mutable(notifications)}
                 groupBy={groupBy}
-                {...rest}
+                dispatch={dispatch}
             />
             <Footer />
         </div>
     );
-};
+}
 
-const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(
-    {
-        onClickNotification: clickNotification,
-        onClickButton: clickNotificationButton,
-        onRemoveNotifications: removeNotifications,
-        onToggleWindow: toggleCenterWindowVisibility
-    },
-    dispatch
-);
-
-const mapStateToProps = (state: RootState) => ({
-    notifications: getAllNotifications(state)
+const mapStateToProps = (state: RootState, ownProps: Actionable) => ({
+    notifications: Object.values(state.notifications),
+    ...ownProps
 });
 
-const Container = connect(mapStateToProps, mapDispatchToProps)(NotificationCenterApp);
+const Container = connect(mapStateToProps)(NotificationCenterApp);
 
 /**
  * Render the Notification Center app in the given window.
@@ -63,8 +55,8 @@ const Container = connect(mapStateToProps, mapDispatchToProps)(NotificationCente
  */
 export function renderApp(document: Document, store: Store): void {
     ReactDOM.render(
-        <Provider store={store}>
-            <Container />
+        <Provider store={store['_store']}>
+            <Container dispatch={store.dispatch} />
         </Provider>,
         document.getElementById('react-app')
     );

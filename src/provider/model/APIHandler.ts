@@ -38,7 +38,7 @@ export type APISpecification<T extends Enum> = {
  * Given an entry from an APISpecification, defines the function signature of a callback that is can be registered to
  * handle that API call.
  */
-export type APIAction<T extends APIDefinition> = (payload: T[0], source: ProviderIdentity) => Promise<T[1]>;
+export type APIAction<T extends APIDefinition> = (payload: T[0], source: ProviderIdentity) => T[1]|Promise<T[1]>;
 
 /**
  * Defines an object that contains a callback for each API method.
