@@ -90,8 +90,6 @@ export class NotificationCenter extends AsyncInit {
 
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
-                // const contextMenuIsShowing = await ContextMenu.isShowing();
-                // if (!contextMenuIsShowing && this.visible) {
                 if (this.visible) {
                     this._store.dispatch(toggleCenterWindowVisibility(false));
                 }
@@ -136,14 +134,14 @@ export class NotificationCenter extends AsyncInit {
     }
 
     /**
-     * @function sizeToFit Sets the window dimensions in shape of a side bar
+     * Sets the window dimensions in shape of a side bar
      */
     public async sizeToFit(): Promise<void> {
         const {window} = this._webWindow;
         await this.hideWindow(true);
         const monitorInfo = await fin.System.getMonitorInfo();
         const idealWidth = 388;
-        window.setBounds({
+        return window.setBounds({
             left: monitorInfo.primaryMonitor.availableRect.right - idealWidth,
             top: 0,
             width: idealWidth,
@@ -151,6 +149,10 @@ export class NotificationCenter extends AsyncInit {
         });
     }
 
+    /**
+     * Animate the notification center window into view.
+     * @param duration Animation duration.
+     */
     private async animateIn(duration: number = 300): Promise<void> {
         const {window} = await this._webWindow;
 
@@ -168,6 +170,10 @@ export class NotificationCenter extends AsyncInit {
         );
     }
 
+    /**
+     * Animate the notification center window out of view.
+     * @param duration Animation duration.
+     */
     private async animateOut(duration: number = 400): Promise<void> {
         const {window} = await this._webWindow;
 

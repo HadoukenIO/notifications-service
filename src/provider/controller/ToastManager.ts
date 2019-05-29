@@ -49,7 +49,7 @@ export class ToastManager extends AsyncInit {
 
     /**
      * Create a new toast.
-     * @param notification The notificationt to display in the created toast.
+     * @param notification The notification to display in the created toast.
      */
     public async create(notification: StoredNotification): Promise<void> {
         if (getNotificationCenterVisibility(this._store.getState())) {
@@ -119,6 +119,10 @@ export class ToastManager extends AsyncInit {
         }
     }
 
+    /**
+     * Pause toasts so they do not fade away and stop moving. The toasts after the moused over toasts will continue to move to be inline with the toast.
+     * @param mousedToast The toast that was moused over.
+    */
     private async pauseToasts(mousedToast: Toast): Promise<void> {
         const toastIndex = this._stack.indexOf(mousedToast);
         for (let i = 0; i < this._stack.length; i++) {
@@ -188,7 +192,9 @@ export class ToastManager extends AsyncInit {
         );
     }
 
-
+    /**
+     * Add listeners for toast events.
+    */
     private addListeners() {
         Toast.eventEmitter.addListener(ToastEvent.CLOSED, async (id: string) => {
             const toast = this._toasts.get(id);

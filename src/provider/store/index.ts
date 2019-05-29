@@ -4,7 +4,7 @@ import {Store as ReduxStore, combineReducers, applyMiddleware, createStore, Stor
 import {injectable} from 'inversify';
 import 'reflect-metadata';
 
-import {notificationStorage, uiStorage} from '../model/Storage';
+import {notificationStorage, settingsStorage} from '../model/Storage';
 import {AsyncInit} from '../controller/AsyncInit';
 
 import {UIState, UIAction, reducer as uiReducer} from './ui/reducer';
@@ -78,7 +78,7 @@ export class StoreContainer extends AsyncInit implements Store {
         });
 
         const cachedUI: UIState = {...initialState.ui};
-        await uiStorage.iterate((value: string, key: string) => {
+        await settingsStorage.iterate((value: string, key: string) => {
             Object.assign(cachedUI, {[key]: JSON.parse(value)});
         });
 

@@ -1,6 +1,6 @@
 import {createReducer, ActionType} from 'typesafe-actions';
 
-import {uiStorage} from '../../model/Storage';
+import {settingsStorage} from '../../model/Storage';
 
 import * as actions from './actions';
 
@@ -21,7 +21,7 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
         actions.toggleCenterWindowVisibility,
         (state, action): UIState => {
             const value = (action.payload.visible) ? action.payload.visible : !state.windowVisible;
-            uiStorage.setItem('windowVisible', value);
+            settingsStorage.setItem('windowVisible', value);
             return ({
                 ...state,
                 windowVisible: value
@@ -32,7 +32,7 @@ export const reducer = createReducer<UIState, UIAction>(initialState)
         actions.changeToastDirection,
         (state, action): UIState => {
             const {direction} = action.payload;
-            uiStorage.setItem('bannerDirection', direction);
+            settingsStorage.setItem('bannerDirection', direction);
             return ({
                 ...state,
                 toastDirection: direction

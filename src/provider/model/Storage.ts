@@ -1,9 +1,9 @@
 import localforage from 'localforage';
 
-export const uiStorage = localforage.createInstance({
+export const settingsStorage = localforage.createInstance({
     driver: localforage.INDEXEDDB,
     name: 'notifications',
-    storeName: 'ui'
+    storeName: 'settings'
 });
 
 export const notificationStorage = localforage.createInstance({

@@ -72,6 +72,7 @@ export class Toast {
         vertical: 10
     };
 
+    /** Id of the notification this Toast represents. */
     public get id(): string {
         return this._id;
     }
@@ -130,6 +131,11 @@ export class Toast {
         return contains(monitorInfo.primaryMonitor.availableRect, toastRect);
     }
 
+    /**
+     * Display the toast.
+     * @param position If a position is given the toast will be shown there, otherwise its current position will be used.
+     * @returns Returns true if the toast can be show, false if it cannot fit in the monitor bounds.
+    */
     public async show(position?: PointTopLeft): Promise<boolean> {
         if (this.isShowing) {
             return true;

@@ -157,3 +157,4 @@ export class Main {
 
 // Start service provider
 Injector.getClass(Main).register();
+
