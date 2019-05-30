@@ -48,7 +48,7 @@
     "inversify": "^5.0.1",
     "localforage": "^1.7.3",
     "moment": "^2.22.1",
-    "openfin-service-tooling": "^1.0.10",
+    "openfin-service-tooling": "1.0.10",
     "react": "^16.8.6",
     "react-dom": "^16.8.3",
     "react-redux": "^7.0.2",
@@ -56,6 +56,6 @@
     "redux-devtools-cli": "0.0.1-1",
     "reflect-metadata": "^0.1.13",
     "remote-redux-devtools": "^0.5.16",
-    "typescript": "^3.4.5"
+    "typescript": "3.4.5"
   }
 }
