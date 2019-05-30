@@ -1,145 +1,188 @@
-import {TrayIconClicked} from 'openfin/_v2/api/events/application';
+import {injectable, inject} from 'inversify';
+import {WindowOption} from 'openfin/_v2/api/window/windowOption';
+import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
-import {WindowInfo} from './WindowInfo';
-declare const window: Window & {WindowManager: NotificationCenter};
+import {Inject} from '../common/Injectables';
+import {TrayIcon} from '../common/TrayIcon';
+import {WebWindow, createWebWindow} from '../model/WebWindow';
+import {Action} from '../store/Actions';
+import {Store} from '../store/Store';
+import {renderApp} from '../view/containers/NotificationCenterApp';
 
+import {AsyncInit} from './AsyncInit';
 
-export class NotificationCenter {
-    private windowInfo: WindowInfo = new WindowInfo();
-    private static singleton: NotificationCenter;
+const windowOptions: WindowOption = {
+    name: 'Notification-Center',
+    url: 'ui/notification-center.html',
+    autoShow: true,
+    defaultHeight: 400,
+    defaultWidth: 500,
+    resizable: false,
+    saveWindowState: false,
+    defaultTop: 0,
+    contextMenu: !(process.env.NODE_ENV === 'production'),
+    frame: false,
+    alwaysOnTop: true,
+    icon: 'ui/favicon.ico',
+    showTaskbarIcon: false,
+    opacity: 0
+};
 
-    constructor() {
-        if (NotificationCenter.singleton) {
-            return NotificationCenter.singleton;
+@injectable()
+export class NotificationCenter extends AsyncInit {
+    @inject(Inject.STORE)
+    private _store!: Store;
+
+    private _webWindow!: WebWindow;
+    private _trayIcon!: TrayIcon;
+
+    protected async init() {
+        // Create notification center app window
+        try {
+            this._webWindow = await createWebWindow(windowOptions);
+        } catch (error) {
+            console.error('Notification Center window could not be created!', error.message);
+            throw error;
         }
-        this.setEventListeners();
-        NotificationCenter.singleton = this;
-        this.setupTrayIcon();
-    }
 
-    /**
-     * @function setEventListeners Initalizes event listeners for the window
-     * @returns void
-     */
-    public setEventListeners(): void {
-        // When window is ready
-        window.addEventListener('DOMContentLoaded', this.onWindowLoad.bind(this));
-
-        // On window close requested
-        this.windowInfo.getWindow().addEventListener('close-requested', () => this.hideWindow());
-
-        // On monitor dimension change
-        fin.desktop.System.addEventListener('monitor-info-changed', this.onMonitorInfoChanged.bind(this));
-    }
-
-
-    private setupTrayIcon() {
-        const application = fin.Application.getCurrentSync();
-        const icon = 'https://openfin.co/favicon-32x32.png';
-
-        application.addListener('tray-icon-clicked', (event: TrayIconClicked<string, string>) => {
-            console.log(event);
-            if (event.button === 0) {
-                this.toggleWindow();
-            }
+        this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png');
+        this._trayIcon.addLeftClickHandler(() => {
+            this._store.dispatch({type: Action.TOGGLE_VISIBILITY});
         });
-
-        application.setTrayIcon(icon);
+        await this.sizeToFit();
+        await this.addListeners();
+        renderApp(this._webWindow.document, this._store);
+        await this.subscribe();
+        if (this.visible) {
+            this.toggleWindow(this.visible);
+        }
     }
 
     /**
-     * @function onWindowLoad Fired when the window DOM is loaded
-     * @returns void
+     * Subscribe to the store.
+     * Perform all watching for state change in here.
      */
-    public onWindowLoad(): void {
-        this.sizeToFit(false);
-
-        document.getElementById('exitLink')!.addEventListener('click', () => this.hideWindow());
+    private async subscribe(): Promise<void> {
+        // Window visibility
+        this._store.watchForChange(
+            state => state.windowVisible,
+            (_, value) => this.toggleWindow(value)
+        );
     }
 
     /**
-     * @function sizeToFit Sets the window dimensions in shape of a side bar
-     * @returns void
+     * The window visibility state.
      */
-    public sizeToFit(forceShow: boolean = false): void {
-        fin.desktop.System.getMonitorInfo((monitorInfo: fin.MonitorInfo) => {
-            this.windowInfo.getWindow().setBounds(
-                monitorInfo.primaryMonitor.availableRect.right - this.windowInfo.getIdealWidth(),
-                0,
-                this.windowInfo.getIdealWidth(),
-                monitorInfo.primaryMonitor.availableRect.bottom,
-                () => {
-                    if (forceShow) {
-                        this.showWindow();
-                    }
-                },
-                (reason: string) => {
-                    console.warn('MOVED FAILED', reason);
+    public get visible(): boolean {
+        const state = this._store.state;
+        return state.windowVisible;
+    }
+
+    /**
+     * Add listeners to the window.
+     */
+    private async addListeners(): Promise<void> {
+        const {window} = this._webWindow;
+        const hideOnBlur = process.env.NODE_ENV === 'production';
+
+        if (hideOnBlur) {
+            window.addListener('blurred', async () => {
+                if (this.visible) {
+                    this._store.dispatch({type: Action.TOGGLE_VISIBILITY, visible: false});
                 }
-            );
+            });
+        }
+        fin.System.addListener('monitor-info-changed', ((event: MonitorEvent<string, string>) => {
+            this.sizeToFit();
+        }));
+    }
+
+    /**
+     * Show the window.
+     */
+    public async showWindow(): Promise<void> {
+        const {window} = this._webWindow;
+        await window.show();
+        await this.animateIn();
+        await window.setAsForeground();
+    }
+
+    /**
+     * Hide the window.
+     * @param force Force the window to hide without animating out.
+     */
+    public async hideWindow(force?: boolean): Promise<void> {
+        const duration = force ? 0 : 300;
+        await this.animateOut(duration);
+    }
+
+    /**
+     * Sets the window dimensions in shape of a side bar
+     */
+    public async sizeToFit(): Promise<void> {
+        const {window} = this._webWindow;
+        await this.hideWindow(true);
+        const monitorInfo = await fin.System.getMonitorInfo();
+        const idealWidth = 388;
+        return window.setBounds({
+            left: monitorInfo.primaryMonitor.availableRect.right - idealWidth,
+            top: 0,
+            width: idealWidth,
+            height: monitorInfo.primaryMonitor.availableRect.bottom
         });
     }
 
     /**
-     * @function showWindow Shows the Window with Fade()
-     * @returns void
+     * Toggle window visibility.
+     * @param visible Force the window to be shown or hidden. True = show, false = hide.
      */
-    public showWindow(): void {
-        this.fade(true, 450);
-        this.windowInfo.getWindow().resizeBy(1, 0, 'top-left');
-        this.windowInfo.getWindow().resizeBy(-1, 0, 'top-left');
-        this.windowInfo.setShowing(true);
-    }
-
-    /**
-     * @function hideWindow Hides the window with Fade()
-     * @returns void
-     */
-    public hideWindow(): void {
-        this.fade(false, 450);
-        this.windowInfo.setShowing(false);
-    }
-
-    /**
-     * @function toggleWindow Hides or shows the center.
-     * @returns void
-     */
-    public toggleWindow(): void {
-        if (this.windowInfo.getShowingStatus()) {
-            this.hideWindow();
+    private async toggleWindow(visible: boolean): Promise<void> {
+        if (visible) {
+            return this.showWindow();
         } else {
-            this.showWindow();
+            return this.hideWindow();
         }
     }
 
     /**
-     * @function fade Fades the window in or out
-     * @param fadeOut
-     * @param timeout
+     * Animate the notification center window into view.
+     * @param duration Animation duration.
      */
-    public fade(fadeOut: boolean, timeout: number): void {
-        if (fadeOut) {
-            this.windowInfo.getWindow().show();
-        }
+    private async animateIn(duration: number = 300): Promise<void> {
+        const {window} = this._webWindow;
 
-        this.windowInfo.getWindow().animate({opacity: {opacity: fadeOut ? 1 : 0, duration: timeout}}, {interrupt: false}, () => {
-            !fadeOut ? this.windowInfo.getWindow().hide() : this.windowInfo.getWindow().focus();
-        });
+        window.animate(
+            {
+                opacity: {
+                    opacity: 1,
+                    duration
+                }
+            },
+            {
+                interrupt: true,
+                tween: 'ease-in-out'
+            }
+        );
     }
 
     /**
-     * @function instance Gets this WindowManager instance on the window.
-     * @returns WindowManager
+     * Animate the notification center window out of view.
+     * @param duration Animation duration.
      */
-    public static get instance(): NotificationCenter {
-        if (NotificationCenter.singleton) {
-            return NotificationCenter.singleton;
-        } else {
-            return new NotificationCenter();
-        }
-    }
+    private async animateOut(duration: number = 400): Promise<void> {
+        const {window} = this._webWindow;
 
-    private onMonitorInfoChanged(): void {
-        this.sizeToFit();
+        window.animate(
+            {
+                opacity: {
+                    opacity: 0,
+                    duration
+                }
+            },
+            {
+                interrupt: true,
+                tween: 'ease-in-out'
+            }
+        );
     }
 }

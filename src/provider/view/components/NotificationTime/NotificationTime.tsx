@@ -5,12 +5,26 @@ export interface NotificationTimeProps {
     date: Date;
 }
 
-
 export function NotificationTime(props: NotificationTimeProps) {
+    const {date} = props;
+
+    const [formattedDate, setFormattedDate] = React.useState<string>(moment(date).fromNow());
+
+    // Update timestamp
+    React.useEffect(() => {
+        const timer = setInterval(() => {
+            setFormattedDate(moment(date).fromNow());
+        }, 1000 * 60);
+
+        return () => {
+            clearTimeout(timer);
+        };
+    });
+
     return (
-        <div className="time-div">
-            <span className="time">
-                {moment(props.date).fromNow()}
+        <div className="time">
+            <span>
+                {formattedDate}
             </span>
         </div>
     );

@@ -6,7 +6,8 @@
         "description": "Demo of Openfin Notifications",
         "url": "http://localhost:3922/demo/launcher.html",
         "uuid": "notifications-demo",
-        "autoShow": true
+        "autoShow": true,
+        "saveWindowState": true
     },
     "services": [
         {
