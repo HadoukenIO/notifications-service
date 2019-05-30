@@ -44,7 +44,7 @@ export class NotificationCenter extends AsyncInit {
             console.error('Notification Center window could not be created!', error.message);
             throw error;
         }
-
+        await this._webWindow.window.hide();
         this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png');
         this._trayIcon.addLeftClickHandler(() => {
             this._store.dispatch({type: Action.TOGGLE_VISIBILITY});
