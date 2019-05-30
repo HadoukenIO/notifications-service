@@ -36,14 +36,12 @@ export class TrayIcon {
         return this._application.getTrayIconInfo();
     }
 
-    public addLeftClickHandler(handler: (event: TrayIconClickEvent) => void): this {
+    public addLeftClickHandler(handler: (event: TrayIconClickEvent) => void): void {
         this._leftClickHandler = handler;
-        return this;
     }
 
-    public addRightClickHandler(handler: (event: TrayIconClickEvent) => void): this {
+    public addRightClickHandler(handler: (event: TrayIconClickEvent) => void): void {
         this._rightClickHandler = handler;
-        return this;
     }
 
     private addListeners(): void {
