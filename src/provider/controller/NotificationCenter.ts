@@ -96,27 +96,13 @@ export class NotificationCenter extends AsyncInit {
     }
 
     /**
-     * Toggle window visibility.
-     * @param forceVisibility Force the window to be shown or hidden. True = show, false = hide.
-     */
-    public async toggleWindow(forceVisibility?: boolean): Promise<void> {
-        const visible = forceVisibility || this.visible;
-        if (visible) {
-            return this.showWindow();
-        } else {
-            return this.hideWindow();
-        }
-    }
-
-    /**
      * Show the window.
      */
     public async showWindow(): Promise<void> {
         const {window} = await this._webWindow;
-        window.bringToFront();
         await window.show();
         await this.animateIn();
-        window.setAsForeground();
+        await window.setAsForeground();
     }
 
     /**
@@ -142,6 +128,18 @@ export class NotificationCenter extends AsyncInit {
             width: idealWidth,
             height: monitorInfo.primaryMonitor.availableRect.bottom
         });
+    }
+
+    /**
+     * Toggle window visibility.
+     * @param visible Force the window to be shown or hidden. True = show, false = hide.
+     */
+    private async toggleWindow(visible: boolean): Promise<void> {
+        if (visible) {
+            return this.showWindow();
+        } else {
+            return this.hideWindow();
+        }
     }
 
     /**
