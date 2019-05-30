@@ -18,7 +18,7 @@ export type WindowDimensions = {height: number, width: number};
 const windowOptions: WindowOption = {
     name: 'Notification-Toast',
     url: 'ui/toast.html',
-    autoShow: false,
+    autoShow: true,
     defaultHeight: 135,
     defaultWidth: 300,
     resizable: false,
@@ -107,10 +107,10 @@ export class Toast {
         this._dimensions = dimensionPromise;
 
         const name = `${windowOptions.name}:${this.id}`;
-        this._webWindow = createWebWindow({...windowOptions, name}).then((webWindow) => {
-            const {document} = webWindow;
+        this._webWindow = createWebWindow({...windowOptions, name}).then(async (webWindow) => {
+            const {window, document} = webWindow;
             this.addListeners();
-
+            await window.hide();
             renderApp(
                 notification,
                 document,
