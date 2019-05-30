@@ -66,8 +66,7 @@ export class ToastManager {
         const position = this.getTargetPosition(previousToastBounds);
 
         const toast: Toast = new Toast(this._store, notification, {
-            timeout: 10000,
-            direction: Toast.DIRECTION
+            timeout: 10000
         }, position);
 
         this._toasts.set(id, toast);

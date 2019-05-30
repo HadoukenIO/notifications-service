@@ -40,7 +40,6 @@ interface Margin {
 
 interface Options {
     timeout: number;
-    direction: readonly [number, number];
 }
 
 /** Animation state of the toast window. */
@@ -172,7 +171,7 @@ export class Toast {
      * @param dimensions Dimension of the window.
      */
     public async calculateBounds(position?: PointTopLeft, dimensions?: WindowDimensions): Promise<Required<Bounds>> {
-        const {direction: [vX, vY]} = this._options;
+        const [vX, vY] = Toast.DIRECTION;
         const {width, height} = dimensions || await this._dimensions;
         let {top, left} = position || this.position;
         // If toast is on the top ignore height
@@ -197,7 +196,7 @@ export class Toast {
         const {window} = await this._webWindow;
         const {top} = position;
         const {width} = await this._dimensions;
-        let [vX] = this._options.direction;
+        let [vX] = Toast.DIRECTION;
         vX = vX > 0 ? 0 : vX;
         const left = position.left + (width * ((vX < 0) ? vX : vX - 1));
 
