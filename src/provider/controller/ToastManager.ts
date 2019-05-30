@@ -9,30 +9,23 @@ import {Toast, ToastEvent} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
 
-import {AsyncInit} from './AsyncInit';
-
 export type WindowDimensions = {height: number, width: number};
 
 @injectable()
-export class ToastManager extends AsyncInit {
+export class ToastManager {
     private _store!: Store;
     private _toasts: Map<string, Toast> = new Map();
     private _stack: Toast[] = [];
     private _availableRect!: Required<Rect>;
 
     constructor(@inject(Inject.STORE) store: Store) {
-        super();
         this._store = store;
         this._store.onAction.add(this.onAction, this);
-    }
-
-    protected async init(): Promise<void> {
-        setImmediate(async () => {
-            const monitorInfo = await fin.System.getMonitorInfo();
+        fin.System.getMonitorInfo().then(monitorInfo => {
             this._availableRect = monitorInfo.primaryMonitor.availableRect;
-            await this.subscribe();
-            this.addListeners();
         });
+        this.subscribe();
+        this.addListeners();
     }
 
     /**
