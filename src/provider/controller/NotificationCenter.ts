@@ -101,7 +101,7 @@ export class NotificationCenter extends AsyncInit {
      * Show the window.
      */
     public async showWindow(): Promise<void> {
-        const {window} = await this._webWindow;
+        const {window} = this._webWindow;
         await window.show();
         await this.animateIn();
         await window.setAsForeground();
@@ -149,7 +149,7 @@ export class NotificationCenter extends AsyncInit {
      * @param duration Animation duration.
      */
     private async animateIn(duration: number = 300): Promise<void> {
-        const {window} = await this._webWindow;
+        const {window} = this._webWindow;
 
         window.animate(
             {
@@ -170,7 +170,7 @@ export class NotificationCenter extends AsyncInit {
      * @param duration Animation duration.
      */
     private async animateOut(duration: number = 400): Promise<void> {
-        const {window} = await this._webWindow;
+        const {window} = this._webWindow;
 
         window.animate(
             {
