@@ -2,12 +2,11 @@ import {injectable, inject} from 'inversify';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Rect} from 'openfin/_v2/api/system/monitor';
 
-import {StoredNotification} from '../model/StoredNotification';
-import {getNotificationCenterVisibility, getToastDirection} from '../store/ui/selectors';
 import {Inject} from '../common/Injectables';
+import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastEvent} from '../model/Toast';
-import {watchForChange} from '../store/utils/watch';
-import {StoreContainer} from '../store';
+import {Action, RootAction} from '../store/Actions';
+import {Store} from '../store/Store';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -15,22 +14,21 @@ export type WindowDimensions = {height: number, width: number};
 
 @injectable()
 export class ToastManager extends AsyncInit {
-    private _store: StoreContainer;
-
+    private _store!: Store;
     private _toasts: Map<string, Toast> = new Map();
     private _stack: Toast[] = [];
     private _availableRect!: Required<Rect>;
 
-    constructor(@inject(Inject.STORE) store: StoreContainer) {
+    constructor(@inject(Inject.STORE) store: Store) {
         super();
         this._store = store;
+        this._store.onAction.add(this.onAction, this);
     }
 
     protected async init(): Promise<void> {
         setImmediate(async () => {
             const monitorInfo = await fin.System.getMonitorInfo();
             this._availableRect = monitorInfo.primaryMonitor.availableRect;
-            await this._store.initialized;
             await this.subscribe();
             this.addListeners();
         });
@@ -52,9 +50,12 @@ export class ToastManager extends AsyncInit {
      * @param notification The notification to display in the created toast.
      */
     public async create(notification: StoredNotification): Promise<void> {
-        if (getNotificationCenterVisibility(this._store.getState())) {
+        const state = this._store.state;
+
+        if (state.windowVisible) {
             return;
         }
+
         // Create new toast notifications
         const {id} = notification;
         if (this._toasts.has(notification.id)) {
@@ -72,7 +73,7 @@ export class ToastManager extends AsyncInit {
 
         const toast: Toast = new Toast(this._store, notification, {
             timeout: 10000,
-            direction: getToastDirection(this._store.getState())
+            direction: Toast.DIRECTION
         }, position);
 
         this._toasts.set(id, toast);
@@ -94,11 +95,25 @@ export class ToastManager extends AsyncInit {
         });
     }
 
+    private onAction(action: RootAction): void {
+        if (action.type === Action.CREATE) {
+            this.create(action.notification);
+        }
+
+        if (action.type === Action.REMOVE) {
+            this.removeToasts(...action.notifications);
+        }
+
+        if (action.type === Action.TOGGLE_VISIBILITY) {
+            this.closeAll();
+        }
+    }
+
     /**
      * Update toast positions & visibility.
      * @param index The index of the toast in the stack to start the update.
      *  All indices after the index are also updated.
-    */
+     */
     private async updateToasts(index: number = 0): Promise<void> {
         // Update toasts after the slice
         let previousToastRect: Rect | undefined;
@@ -156,7 +171,7 @@ export class ToastManager extends AsyncInit {
      * @returns The next available position to display a toast.
      */
     private getTargetPosition(previous?: Rect): PointTopLeft {
-        const [vX, vY] = getToastDirection(this._store.getState());
+        const [vX, vY] = Toast.DIRECTION;
         const {vertical, horizontal} = Toast.margin;
         const bounds = this._availableRect;
 
@@ -181,9 +196,8 @@ export class ToastManager extends AsyncInit {
      */
     private subscribe(): void {
         // Notification Center Window open
-        watchForChange(
-            this._store,
-            getNotificationCenterVisibility,
+        this._store.watchForChange(
+            state => state.windowVisible,
             (previous: boolean, visible: boolean) => {
                 if (visible) {
                     this.closeAll();

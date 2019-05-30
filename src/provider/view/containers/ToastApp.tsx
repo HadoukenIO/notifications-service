@@ -1,26 +1,24 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Dispatch, bindActionCreators} from 'redux';
 import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../model/StoredNotification';
 import {NotificationCard} from '../components/NotificationCard/NotificationCard';
 import {WindowDimensions} from '../../controller/ToastManager';
-import {UIHandlers} from '../../model/UIHandlers';
-import {clickNotification, clickNotificationButton, removeNotifications} from '../../store/notifications/actions';
-import {toggleCenterWindowVisibility} from '../../store/ui/actions';
-import {RootState, Store} from '../../store';
+import {RootState} from '../../store/State';
+import {Store} from '../../store/Store';
 
+import {Actionable} from './NotificationCenterApp';
 
-interface ToastAppProps {
-    meta: StoredNotification;
+interface ToastAppProps extends Actionable {
+    notification: StoredNotification;
     setWindowSize: (dimensions: WindowDimensions) => void;
 }
 
-type Props = ToastAppProps & ReturnType<typeof mapDispatchToProps> & ReturnType<typeof mapStateToProps> & UIHandlers;
+type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 
 export function ToastApp(props: Props) {
-    const {meta, setWindowSize, ...rest} = props;
+    const {notification, setWindowSize, dispatch} = props;
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     // Get the size of the container ref
@@ -42,31 +40,21 @@ export function ToastApp(props: Props) {
 
     return (
         <div id='toast-container' ref={containerRef}>
-            <NotificationCard meta={meta} {...rest} />
+            <NotificationCard notification={notification} dispatch={dispatch} />
         </div>
     );
 }
-
-const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(
-    {
-        onClickNotification: clickNotification,
-        onClickButton: clickNotificationButton,
-        onRemoveNotifications: removeNotifications,
-        onToggleWindow: toggleCenterWindowVisibility
-    },
-    dispatch
-);
 
 const mapStateToProps = (state: RootState, ownProps: ToastAppProps) => ({
     ...ownProps
 });
 
-const Container = connect(mapStateToProps, mapDispatchToProps)(ToastApp);
+const Container = connect(mapStateToProps)(ToastApp);
 
 export function renderApp(notification: StoredNotification, document: Document, store: Store, setWindowSize: (dim: WindowDimensions) => void) {
     ReactDOM.render(
-        <Provider store={store}>
-            <Container meta={notification} setWindowSize={setWindowSize} />
+        <Provider store={store['_store']}>
+            <Container dispatch={store.dispatch} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
         document.getElementById('react-app')
     );
