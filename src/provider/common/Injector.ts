@@ -1,12 +1,13 @@
 import {Container} from 'inversify';
 import {interfaces as inversify} from 'inversify/dts/interfaces/interfaces';
 
-import {APIHandler} from '../model/APIHandler';
+import {APITopic} from '../../client/internal';
 import {AsyncInit} from '../controller/AsyncInit';
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {ToastManager} from '../controller/ToastManager';
-import {APITopic} from '../../client/internal';
-import {StoreContainer} from '../store';
+import {APIHandler} from '../model/APIHandler';
+import {ActionMap, Actions} from '../store/Actions';
+import {Store} from '../store/Store';
 
 import {Inject} from './Injectables';
 
@@ -14,10 +15,11 @@ import {Inject} from './Injectables';
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
-    [Inject.STORE]: StoreContainer,
-    [Inject.API_HANDLER]: APIHandler<APITopic>,
-    [Inject.TOAST_MANAGER]: ToastManager,
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter
+    [Inject.ACTION_MAP]: ActionMap;
+    [Inject.API_HANDLER]: APIHandler<APITopic>;
+    [Inject.STORE]: Store;
+    [Inject.TOAST_MANAGER]: ToastManager;
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
 };
 
 /**
@@ -27,8 +29,9 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
+    [Inject.ACTION_MAP]: Actions,
     [Inject.API_HANDLER]: APIHandler,
-    [Inject.STORE]: StoreContainer,
+    [Inject.STORE]: Store,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.TOAST_MANAGER]: ToastManager
 };
@@ -45,32 +48,26 @@ export class Injector {
         const container = new Container();
         const promises: Promise<unknown>[] = [];
 
-        console.log('E');
         Object.keys(Bindings).forEach(k => {
             const key: Keys = k as any;
-            console.log('F', key);
 
             if (typeof Bindings[key] === 'function') {
-                console.log('G', key);
                 container.bind(Inject[key]).to(Bindings[key] as any).inSingletonScope();
             } else {
-                console.log('H', key);
                 container.bind(Inject[key]).toConstantValue(Bindings[key]);
             }
         });
         Object.keys(Bindings).forEach(k => {
             const key: Keys = k as any;
+            const proto = (Bindings[key] as Function).prototype;
 
-            if ((Bindings[key] as Function).prototype.hasOwnProperty('init')) {
+            if (proto && proto.hasOwnProperty('init')) {
                 const instance = (container.get(Inject[key]) as AsyncInit);
-                // instance['doInit']();
                 promises.push(instance.initialized);
             }
         });
-        console.log('I');
 
         Injector._initialized = Promise.all(promises).then(() => {});
-        console.log('J');
         return container;
     })();
 

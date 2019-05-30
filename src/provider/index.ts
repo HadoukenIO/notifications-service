@@ -4,18 +4,17 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
 
 import {APITopic, API, ClearPayload} from '../client/internal';
-import {OptionButton, NotificationOptions, Notification} from '../client';
+import {OptionButton, NotificationOptions, Notification, NotificationClosedEvent, NotificationButtonClickedEvent, NotificationClickedEvent} from '../client';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
-import {APIHandler} from './model/APIHandler';
-import {toggleCenterWindowVisibility} from './store/ui/actions';
-import {getNotificationById, getNotificationsByApplication} from './store/notifications/selectors';
-import {removeNotifications, createNotification as createNotificationAction} from './store/notifications/actions';
-import {StoredNotification} from './model/StoredNotification';
-import {StoreContainer} from './store';
 import {NotificationCenter} from './controller/NotificationCenter';
 import {ToastManager} from './controller/ToastManager';
+import {APIHandler} from './model/APIHandler';
+import {StoredNotification} from './model/StoredNotification';
+import {Action, RootAction} from './store/Actions';
+import {mutable, Immutable} from './store/State';
+import {Store} from './store/Store';
 
 @injectable()
 export class Main {
@@ -25,7 +24,7 @@ export class Main {
     private _apiHandler!: APIHandler<APITopic>;
 
     @inject(Inject.STORE)
-    private _store!: StoreContainer;
+    private _store!: Store;
 
     @inject(Inject.NOTIFICATION_CENTER)
     private _notificationCenter!: NotificationCenter;
@@ -36,7 +35,10 @@ export class Main {
     public async register(): Promise<void> {
         Object.assign(window, {
             main: this,
-            config: this._config
+            config: this._config,
+            store: this._store,
+            center: this._notificationCenter,
+            toast: this._toastManager
         });
 
         // Wait for creation of any injected components that require async initialization
@@ -51,6 +53,33 @@ export class Main {
             [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this)
         });
 
+        this._store.onAction.add((action: RootAction) => {
+            if (action.type === Action.REMOVE) {
+                // Send notification closed event to uuid with the context.
+                action.notifications.forEach((notification: StoredNotification) => {
+                    const target: Identity = notification.source;
+                    const event: NotificationClosedEvent = {type: 'notification-closed', notification: notification.notification};
+
+                    this._apiHandler.dispatchClientEvent(target, event);
+                });
+            } else if (action.type === Action.CLICK_BUTTON) {
+                const {notification, buttonIndex} = action;
+                const target: Identity = notification.source;
+                const event: NotificationButtonClickedEvent = {
+                    type: 'notification-button-clicked',
+                    notification: notification.notification,
+                    buttonIndex
+                };
+                this._apiHandler.dispatchClientEvent(target, event);
+            } else if (action.type === Action.CLICK_NOTIFICATION) {
+                const {notification, source} = action.notification;
+                const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
+
+                // Send notification clicked event to uuid with the context.
+                this._apiHandler.dispatchClientEvent(source, event);
+            }
+        });
+
         console.log('Service Initialised');
     }
 
@@ -60,9 +89,9 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async createNotification(payload: NotificationOptions, sender: ProviderIdentity): Promise<Notification> {
-        const storedNotification = this.hydrateNotification(payload, sender);
-        this._store.store.dispatch(createNotificationAction(storedNotification));
-        return storedNotification.notification;
+        const notification = this.hydrateNotification(payload, sender);
+        this._store.dispatch({type: Action.CREATE, notification});
+        return notification.notification;
     }
 
     /**
@@ -71,7 +100,7 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        this._store.dispatch(toggleCenterWindowVisibility());
+        this._store.dispatch({type: Action.TOGGLE_VISIBILITY});
     }
 
     /**
@@ -82,9 +111,9 @@ export class Main {
      */
     private async clearNotification(payload: ClearPayload, sender: ProviderIdentity): Promise<boolean> {
         const id = this.encodeID(payload.id, sender);
-        const notification = getNotificationById(this._store.store.getState(), id);
+        const notification = this._store.state.notifications.find(n => n.id === id);
         if (notification) {
-            this._store.dispatch(removeNotifications(notification));
+            this._store.dispatch({type: Action.REMOVE, notifications: [mutable(notification)]});
             return true;
         }
         return false;
@@ -95,17 +124,22 @@ export class Main {
      * @param payload The payload can contain the uuid
      * @param sender The sender info contains the uuid of the sender
      */
-    private async fetchAppNotifications(payload: Identity | undefined, sender: ProviderIdentity): Promise<Notification[]> {
-        const storedNotifications = getNotificationsByApplication(payload || sender, this._store.store.getState());
+    private fetchAppNotifications(payload: undefined, sender: ProviderIdentity): Notification[] {
+        const notifications = this.getAppNotifications(sender.uuid);
 
-        return storedNotifications.map(notification => notification.notification);
+        return notifications.map(notification => mutable(notification.notification));
     }
 
-    private async clearAppNotifications(payload: Identity | undefined, sender: ProviderIdentity): Promise<number> {
-        const storedNotifications = getNotificationsByApplication(sender, this._store.getState());
-        removeNotifications(...storedNotifications);
+    private clearAppNotifications(payload: undefined, sender: ProviderIdentity): number {
+        const notifications = mutable(this.getAppNotifications(sender.uuid));
+        this._store.dispatch({type: Action.REMOVE, notifications});
 
-        return storedNotifications.length;
+        return notifications.length;
+    }
+
+    private getAppNotifications(uuid: string): Immutable<StoredNotification>[] {
+        const notifications = this._store.state.notifications;
+        return notifications.filter(n => n.source.uuid === uuid);
     }
 
     /**

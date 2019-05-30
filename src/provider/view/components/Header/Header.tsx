@@ -1,18 +1,18 @@
 import * as React from 'react';
 
-import {GroupingType} from '../../containers/NotificationCenterApp';
+import {GroupingType, Actionable} from '../../containers/NotificationCenterApp';
+import {Action} from '../../../store/Actions';
 
-interface HeaderProps {
+interface HeaderProps extends Actionable {
     groupBy: GroupingType;
     handleGroupBy: (groupBy: GroupingType) => void;
-    onHideWindow: (visible?: boolean) => void;
 }
 
 export function Header(props: HeaderProps): React.ReactElement {
-    const {groupBy, handleGroupBy, onHideWindow} = props;
+    const {groupBy, handleGroupBy, dispatch} = props;
 
     const handleHideWindow = () => {
-        onHideWindow(false);
+        dispatch({type: Action.TOGGLE_VISIBILITY, visible: false});
     };
 
     return (
