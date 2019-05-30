@@ -110,7 +110,6 @@ ul, li {
 
 .notification {
     width: 320px;
-    max-height: 160px;
     border: 1px solid #404048;
     padding: 15px;
     display: flex;
