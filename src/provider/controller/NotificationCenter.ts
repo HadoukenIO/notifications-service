@@ -49,11 +49,13 @@ export class NotificationCenter extends AsyncInit {
         this._trayIcon.addLeftClickHandler(() => {
             this._store.dispatch({type: Action.TOGGLE_VISIBILITY});
         });
-
         await this.sizeToFit();
         await this.addListeners();
         renderApp(this._webWindow.document, this._store);
         await this.subscribe();
+        if (this.visible) {
+            this.toggleWindow(this.visible);
+        }
     }
 
     /**
