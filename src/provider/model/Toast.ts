@@ -259,11 +259,7 @@ export class Toast {
      * Unfreeze the toast. This moves & resets timeout.
      */
     public unfreeze = async (): Promise<void> => {
-        let newTimoutLength = this._timeout + 5000;
-        if (newTimoutLength > this._options.timeout) {
-            newTimoutLength = this._options.timeout;
-        }
-        this._timeout = window.setTimeout(this.timeoutHandler, newTimoutLength);
+        this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
 
         this.moveTo(this.position);
     }
