@@ -10,20 +10,6 @@
         <button onclick="fin.System.showDeveloperTools({uuid: 'notifications-service', name: 'notifications-service'})">
             Show Debugger
         </button>
-        <br />
-        <button onclick="closeChildWindows()">
-            Close Child Windows
-        </button>
     </body>
-    <script>
-        async function closeChildWindows() {
-            const children = await fin.Application.getCurrentSync().getChildWindows();
-
-            children.forEach(async (x) => await x.close());
-
-            console.log('Children closed');
-        }
-
-    </script>
 
 </html>
