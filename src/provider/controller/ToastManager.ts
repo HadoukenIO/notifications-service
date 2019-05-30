@@ -1,6 +1,7 @@
 import {injectable, inject} from 'inversify';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Rect} from 'openfin/_v2/api/system/monitor';
+import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
@@ -223,5 +224,11 @@ export class ToastManager extends AsyncInit {
                 this.pauseToasts(toast);
             }
         });
+
+        fin.System.addListener('monitor-info-changed', (async (event: MonitorEvent<string, string>) => {
+            const monitorInfo = await fin.System.getMonitorInfo();
+            this._availableRect = monitorInfo.primaryMonitor.availableRect;
+            await this.updateToasts();
+        }));
     }
 }
