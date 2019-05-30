@@ -1,4 +1,3 @@
-// tslint:disable-next-line:no-any
 type Context = any;
 
 /**
@@ -75,7 +74,7 @@ class SignalBase<R, R2> {
     private _length: number;
     private _slots: SignalSlot[];
 
-    private aggregator: Aggregator<R, R2>|null;
+    private aggregator: Aggregator<R, R2> | null;
 
     constructor(length: number, aggregator?: Aggregator<R, R2>) {
         this._length = length;
@@ -127,7 +126,6 @@ class SignalBase<R, R2> {
         return this._slots.findIndex((c) => c.callback === callback && c.context === context) >= 0;
     }
 
-    // tslint:disable-next-line:no-any
     protected emitInternal(...args: any[]): R2 {
         const callbacks = this._slots.slice();  // Clone array, in case a callback modifies this signal
 
@@ -168,7 +166,7 @@ export class Signal0<R = void, R2 = R> extends SignalBase<R, R2> {
         return super.hasInternal(listener, context);
     }
 
-    public emit(): R2|void {
+    public emit(): R2 | void {
         return super.emitInternal();
     }
 }

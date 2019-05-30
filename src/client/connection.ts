@@ -49,7 +49,7 @@ if (fin.Window.me.uuid !== SERVICE_IDENTITY.uuid || fin.Window.me.name !== SERVI
         Promise.reject(new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.')) :
         fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
             // Register service listeners
-            channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
+            channel.register('WARN', (payload: any) => console.warn(payload));
             channel.register('event', (event: NotificationsEvent) => {
                 eventEmitter.emit(event.type, event);
             });

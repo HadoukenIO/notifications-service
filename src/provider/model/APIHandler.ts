@@ -38,7 +38,7 @@ export type APISpecification<T extends Enum> = {
  * Given an entry from an APISpecification, defines the function signature of a callback that is can be registered to
  * handle that API call.
  */
-export type APIAction<T extends APIDefinition> = (payload: T[0], source: ProviderIdentity) => T[1]|Promise<T[1]>;
+export type APIAction<T extends APIDefinition> = (payload: T[0], source: ProviderIdentity) => T[1] | Promise<T[1]>;
 
 /**
  * Defines an object that contains a callback for each API method.
@@ -90,7 +90,6 @@ export class APIHandler<T extends Enum> {
     }
 
     // TODO?: Remove the need for this any by defining connection payload type?
-    // tslint:disable-next-line:no-any
     private onConnection(app: Identity, payload?: any): void {
         if (payload && payload.version && payload.version.length > 0) {
             console.log(`connection from client: ${app.name}, version: ${payload.version}`);
