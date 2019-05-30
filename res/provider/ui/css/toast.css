@@ -12,12 +12,16 @@ body {
 
 #toast-container {
     margin: 0;
-    background: magenta;
     display: inline-block;
     user-select: none;
     cursor: pointer;
 }
 
-.close {
+.notification .close {
     cursor: pointer;
+}
+
+
+.close img {
+    margin-top: 4px;
 }
