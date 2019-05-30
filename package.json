@@ -19,7 +19,7 @@
     "prepack": "npm run clean && npm run build && tsc -p src/client/tsconfig.types.json",
     "test": "npm run test:unit && npm run test:int",
     "test:int": "echo 'Integration tests not available yet'",
-    "test:unit": "jest --config jest-unit.config.json",
+    "test:unit": "svc-tools test unit",
     "zip": "svc-tools zip",
     "start": "svc-tools start",
     "start:redux": "redux-devtools --open --port=9950"
@@ -36,7 +36,6 @@
   "homepage": "https://github.com/openfin/Notification-Service#readme",
   "dependencies": {},
   "devDependencies": {
-    "@types/jest": "^22.2.0",
     "@types/moment": "^2.13.0",
     "@types/node": "^9.4.6",
     "@types/openfin": "^39.0.1",
@@ -47,22 +46,16 @@
     "express": "^4.16.2",
     "hadouken-js-adapter": "^0.36.1-alpha.1",
     "inversify": "^5.0.1",
-    "jest": "^24.5.0",
-    "jest-cli": "^24.5.0",
-    "jest-environment-node": "^24.5.0",
-    "jest-junit": "^6.3.0",
-    "jest-util": "^23.4.0",
     "localforage": "^1.7.3",
     "moment": "^2.22.1",
-    "openfin-service-tooling": "^1.0.7",
-    "react": "^16.8.6",
+    "openfin-service-tooling": "^1.0.10",
+    "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-redux": "^7.0.2",
     "redux": "^4.0.1",
     "redux-devtools-cli": "0.0.1-1",
     "reflect-metadata": "^0.1.13",
     "remote-redux-devtools": "^0.5.16",
-    "ts-jest": "^23.10.4",
     "typescript": "^3.4.5"
   }
 }
