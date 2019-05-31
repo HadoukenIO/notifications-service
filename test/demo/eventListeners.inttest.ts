@@ -6,7 +6,7 @@ import {NotificationClickedEvent, Notification, NotificationOptions} from '../..
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
 import {getCardsByNotification} from './utils/notificationCenterUtils';
-import { delay } from './utils/delay';
+import {delay} from './utils/delay';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -52,8 +52,9 @@ describe('Click listeners', () => {
                 // This is tested more thoroughly in creatNotification tests
                 expect(noteCards).toHaveLength(1);
 
-                // Click on the card
+                // Click on the card and pause momentarily to allow the event to propagate
                 await noteCards[0].click();
+                await delay(100);
 
                 // Listener was triggered once with the correct data
                 expect(clickListener).toHaveBeenCalledTimes(1);
