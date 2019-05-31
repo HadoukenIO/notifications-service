@@ -1,71 +1,64 @@
 import * as React from 'react';
 
 import {NotificationTime} from '../NotificationTime/NotificationTime';
-import {NotificationCenterAPI} from '../../../model/NotificationCenterAPI';
 import {Button} from '../Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
-declare const window: Window & {openfin: {notifications: NotificationCenterAPI}};
+import {CloseButton} from '../CloseButton/CloseButton';
+import {Action} from '../../../store/Actions';
+import {Actionable} from '../../containers/NotificationCenterApp';
 
-
-interface NotificationProps {
-    meta: StoredNotification;
+interface NotificationCardProps extends Actionable {
+    notification: StoredNotification;
 }
 
-/**
- * Displays a single notification within the UI
- */
-export function Notification(props: NotificationProps) {
-    function handleNotificationClose(e: React.MouseEvent<HTMLElement>) {
-        e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation();
-        window.openfin.notifications.closeHandler(props.meta);
-    }
+export function NotificationCard(props: NotificationCardProps) {
+    const {notification, dispatch} = props;
+    const data = notification.notification;
 
-    let buttons = null;
-    if (props.meta.notification.buttons.length > 0) {
-        buttons = props.meta.notification.buttons.map((button, idx) => {
-            return (
-                <Button
-                    key={idx}
-                    buttonIndex={idx}
-                    meta={props.meta}
-                />
-            );
-        });
-    }
+    const handleNotificationClose = () => {
+        dispatch({type: Action.REMOVE, notifications: [notification]});
+    };
+
+    const handleButtonClick = (buttonIndex: number) => {
+        dispatch({type: Action.CLICK_BUTTON, notification, buttonIndex});
+    };
+
+    const handleNotificationClick = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        dispatch({type: Action.CLICK_NOTIFICATION, notification});
+    };
 
     return (
-        <li
-            className="notification-item"
-            onClick={() => window.openfin.notifications.clickHandler(props.meta)}
-        >
-            <img
-                className="notification-close-x"
-                src="image/shapes/notifications-x.png"
-                alt=""
-                onClick={e => handleNotificationClose(e)}
-            />
-
-            <NotificationTime date={props.meta.notification.date} />
-
-            <div className="notification-body">
-                <div className="notification-source">
+        <div className="notification" data-id={notification.id} onClick={handleNotificationClick}>
+            <CloseButton onClick={handleNotificationClose} />
+            <NotificationTime date={data.date} />
+            <div className="body">
+                <div className="source">
                     <img
-                        src={props.meta.notification.icon}
-                        className="notification-small-img"
+                        src={data.icon}
                     />
-                    <span className="notification-source-text">
-                        {props.meta.source.name}
+                    <span className="app-name">
+                        {notification.source.name}
                     </span>
                 </div>
-                <div className="notification-body-title">
-                    {props.meta.notification.title}
+                <div className="title">
+                    {data.title}
                 </div>
-                <div className="notification-body-text">
-                    {props.meta.notification.body}
+                <div className="text">
+                    {data.body}
                 </div>
-                {buttons ? (<div id="notification-body-buttons">{buttons}</div>) : null}
+
+                {data.buttons.length > 0 &&
+                    <div className="buttons">
+                        {data.buttons.map((btn, i) => {
+                            return (
+                                <Button key={btn.title + i} onClick={handleButtonClick} buttonIndex={i} text={btn.title} icon={btn.iconUrl} />
+                            );
+                        })}
+                    </div>
+                }
             </div>
-        </li>
+        </div >
     );
 }
