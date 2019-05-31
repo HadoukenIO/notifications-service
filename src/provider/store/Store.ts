@@ -99,9 +99,7 @@ export class Store {
         Object.assign(initialState, {notifications});
 
         settingsStorage.iterate((value: string, key: string) => {
-            if (key === 'windowVisible') {
-                initialState[key] = JSON.parse(value);
-            }
+
         });
 
         return initialState;
