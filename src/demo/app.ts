@@ -92,3 +92,13 @@ fin.desktop.main(async () => {
         logit(`BUTTON CLICK on button ${buttonIndex} on notification ${notification.id}`);
     });
 });
+
+
+declare global {
+    interface Window {fire: () => void;}
+}
+
+window.fire = function fireNotifications() {
+    makeNote(`id:${Math.random() * 100}`, normalNote);
+};
+
