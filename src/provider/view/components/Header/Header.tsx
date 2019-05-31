@@ -34,7 +34,7 @@ export function Header(props: HeaderProps): React.ReactElement {
                     })
                 }
             </div>
-            <img id="exit-link" onClick={handleHideWindow} src="image/shapes/arrow.svg" alt="" />
+            <img id="exit-link" onClick={handleHideWindow} src="image/shapes/arrow.png" alt="" />
         </div>
     );
 }
