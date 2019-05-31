@@ -5,6 +5,7 @@ import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispat
 import {Signal1} from '../common/Signal';
 import {Inject} from '../common/Injectables';
 import {notificationStorage, settingsStorage} from '../model/Storage';
+import {StoredNotification} from '../model/StoredNotification';
 
 import {ActionMap, ActionHandler, RootAction, Action, ActionOf} from './Actions';
 import {RootState, Immutable} from './State';
@@ -55,8 +56,8 @@ export class Store {
         };
     }
 
-    private reduce<T extends Action>(state: RootState|undefined, action: ActionOf<T>): RootState {
-        const handler: ActionHandler<T>|undefined = this._actionMap[action.type] as ActionHandler<T>;
+    private reduce<T extends Action>(state: RootState | undefined, action: ActionOf<T>): RootState {
+        const handler: ActionHandler<T> | undefined = this._actionMap[action.type] as ActionHandler<T>;
 
         if (handler) {
             return handler(state!, action);
@@ -91,20 +92,20 @@ export class Store {
     private getInitialState(): RootState {
         const initialState = this.cloneState(Store.INITIAL_STATE);
 
+        const notifications: StoredNotification[] = [];
         notificationStorage.iterate((value: string, key: string) => {
-            Object.assign(initialState.notifications, {[key]: JSON.parse(value)});
+            notifications.push(JSON.parse(value));
         });
+        Object.assign(initialState, {notifications});
 
         settingsStorage.iterate((value: string, key: string) => {
-            if (key === 'windowVisible') {
-                initialState[key] = JSON.parse(value);
-            }
+
         });
 
         return initialState;
     }
 
-    private cloneState<T extends {}>(state: T|Immutable<T>): T {
+    private cloneState<T extends {}>(state: T | Immutable<T>): T {
         const ret: T = {} as T;
         const keys: (keyof T)[] = Object.keys(state) as (keyof T)[];
 

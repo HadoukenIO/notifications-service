@@ -53,9 +53,6 @@ export class NotificationCenter extends AsyncInit {
         await this.addListeners();
         renderApp(this._webWindow.document, this._store);
         await this.subscribe();
-        if (this.visible) {
-            this.toggleWindow(this.visible);
-        }
     }
 
     /**
@@ -83,7 +80,7 @@ export class NotificationCenter extends AsyncInit {
      */
     private async addListeners(): Promise<void> {
         const {window} = this._webWindow;
-        const hideOnBlur = process.env.NODE_ENV === 'production';
+        const hideOnBlur = false;
 
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
