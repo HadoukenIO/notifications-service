@@ -71,7 +71,10 @@ export class ToastManager {
 
         this._toasts.set(id, toast);
         this._stack.push(toast);
-        toast.show();
+        const isShowing = await toast.show();
+        if (isShowing) {
+            this.updateToasts(this._stack.length - 1);
+        }
     }
 
     /**
