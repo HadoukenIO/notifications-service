@@ -12,11 +12,11 @@ export async function getAllCards() {
 }
 export async function getCardsByApp(sourceUuid: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$(`.notification-item[note-id*="${sourceUuid}"]`);
+    return centerPage!.$$(`.notification-item[data-id*="${sourceUuid}"]`);
 }
 export async function getCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$(`.notification-item[note-id="${sourceUuid}:${notificationId}"]`);
+    return centerPage!.$$(`.notification-item[data-id="${sourceUuid}:${notificationId}"]`);
 }
 
 export async function isCenterShowing(): Promise<boolean> {
