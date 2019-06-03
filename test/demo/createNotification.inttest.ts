@@ -3,12 +3,13 @@ import 'jest';
 import {Application, Identity} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
+import {SERVICE_IDENTITY} from '../../src/client/internal';
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
+import * as notifs from './utils/notificationsNode';
 import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
-import { SERVICE_IDENTITY } from '../../src/client/internal';
-import { delay } from './utils/delay';
+import {delay} from './utils/delay';
 
 const managerWindowIdentity = {uuid: 'test-app', name: 'test-app'};
 
@@ -21,10 +22,7 @@ describe('When calling createNotification', () => {
     describe('With the notification center not showing', () => {
         beforeAll(async () => {
             // Hide the center to be sure we get toasts
-            const centerShowing = await isCenterShowing();
-            if (centerShowing) {
-                await notifsRemote.toggleNotificationCenter(managerWindowIdentity);
-            }
+            await toggleCenter(false);
         });
 
         let testApp: Application;
@@ -43,7 +41,7 @@ describe('When calling createNotification', () => {
             await delay(1000);
 
             const toastIdentity = getToastIdentity(testApp.identity, note.id);
-            
+
             // Check that a toast window does not exist for the notification
             const providerApp = await fin.Application.wrapSync(SERVICE_IDENTITY);
             const childWindows = await providerApp.getChildWindows();
@@ -56,10 +54,7 @@ describe('When calling createNotification', () => {
     describe('With the notification center showing', () => {
         beforeAll(async () => {
             // Show the center to ensure we don't get toasts
-            const centerShowing = await isCenterShowing();
-            if (!centerShowing) {
-                await notifsRemote.toggleNotificationCenter(managerWindowIdentity);
-            }
+            await toggleCenter(true);
         });
 
         let testApp: Application;
@@ -78,12 +73,12 @@ describe('When calling createNotification', () => {
             await delay(1000);
 
             const toastIdentity = getToastIdentity(testApp.identity, note.id);
-            
+
             // Check that a toast window does not exist for the notification
             const providerApp = await fin.Application.wrapSync(SERVICE_IDENTITY);
             const childWindows = await providerApp.getChildWindows();
             expect(childWindows).not.toContainEqual(fin.Window.wrapSync(toastIdentity));
-            
+
             await notifsRemote.clear(testWindowIdentity, note.id);
         });
 
@@ -141,6 +136,18 @@ describe('When calling createNotification', () => {
     });
 });
 
+async function toggleCenter(show?: boolean) {
+    const centerShowing = await isCenterShowing();
+    if (show === true && !centerShowing) {
+        await notifs.toggleNotificationCenter();
+    } else if (show === false && centerShowing) {
+        await notifs.toggleNotificationCenter();
+    } else {
+        await notifs.toggleNotificationCenter();
+    }
+    // Slight delay to let the animation finish
+    await delay(200);
+}
 
 function getToastIdentity(sourceApp: Identity, notificationId: string): Identity {
     return {uuid: SERVICE_IDENTITY.uuid, name: `Notification-Toast:${sourceApp.uuid}:${notificationId}`};
