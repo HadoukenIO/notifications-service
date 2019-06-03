@@ -96,7 +96,7 @@ describe('Click listeners', () => {
                 // Click on the button and pause momentarily to allow the event to propagate
                 await buttonHandles[0].click();
                 await delay(100);
-                
+
                 // buttonClickListener triggered with correct metadata
                 expect(buttonClickListener).toHaveBeenCalledTimes(1);
                 expect(buttonClickListener).toHaveBeenCalledWith({
@@ -119,7 +119,7 @@ describe('Click listeners', () => {
                     // Get a remote handle to the close button DOM element
                     const closeHandles = await noteCards[0].$$('.close');
                     expect(closeHandles).toHaveLength(1);
-    
+
                     // Click on the button and pause momentarily to allow the event to propagate
                     await closeHandles[0].click();
                     await delay(100);
@@ -131,7 +131,7 @@ describe('Click listeners', () => {
                         type: 'notification-closed',
                         notification: note
                     });
-                    
+
                     // Other listeners not triggered
                     expect(clickListener).toHaveBeenCalledTimes(0);
                     expect(buttonClickListener).toHaveBeenCalledTimes(0);
@@ -147,7 +147,6 @@ describe('Click listeners', () => {
                     expect(appNotes).not.toContainEqual(note);
                 });
             });
-
         });
     });
 });
