@@ -10,16 +10,15 @@ import * as notifsRemote from './utils/notificationsRemoteExecution';
 import {delay} from './utils/delay';
 import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 
-const mainWindowIdentity = {uuid: 'test-app', name: 'test-app'};
+const managerWindowIdentity = {uuid: 'test-app', name: 'test-app'};
 
 describe('When calling createNotification', () => {
     beforeAll(async () => {
         // Show the center to avoid dealing with toasts for the time being
-        // TODO: Revisit when we have more than one file.
         // TODO: Figure out how to test toasts effectively
         const centerShowing = await isCenterShowing();
         if (!centerShowing) {
-            await notifsRemote.toggleNotificationCenter(mainWindowIdentity);
+            await notifsRemote.toggleNotificationCenter(managerWindowIdentity);
         }
     });
 

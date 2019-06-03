@@ -5,7 +5,7 @@ import {NotificationClickedEvent, Notification, NotificationOptions, Notificatio
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {getCardsByNotification} from './utils/notificationCenterUtils';
+import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
 
 const defaultNoteOptions: NotificationOptions = {
@@ -16,7 +16,18 @@ const defaultNoteOptions: NotificationOptions = {
     ]
 };
 
+const managerWindowIdentity = {uuid: 'test-app', name: 'test-app'};
+
 describe('Click listeners', () => {
+    beforeAll(async () => {
+        // Show the center to avoid dealing with toasts for the time being
+        // TODO: Figure out how to test toasts effectively
+        const centerShowing = await isCenterShowing();
+        if (!centerShowing) {
+            await notifsRemote.toggleNotificationCenter(managerWindowIdentity);
+        }
+    });
+
     describe('With one app running', () => {
         let testApp: Application;
         let testAppMainWindow: FinWindow;
@@ -85,10 +96,7 @@ describe('Click listeners', () => {
                 // Click on the button and pause momentarily to allow the event to propagate
                 await buttonHandles[0].click();
                 await delay(100);
-
-                // clickListener not triggered
-                expect(clickListener).toHaveBeenCalledTimes(0);
-
+                
                 // buttonClickListener triggered with correct metadata
                 expect(buttonClickListener).toHaveBeenCalledTimes(1);
                 expect(buttonClickListener).toHaveBeenCalledWith({
@@ -96,7 +104,50 @@ describe('Click listeners', () => {
                     notification: note,
                     buttonIndex: 0
                 });
+
+                // clickListener not triggered
+                expect(clickListener).toHaveBeenCalledTimes(0);
             });
+
+            describe('When clicking the close button', () => {
+                beforeEach(async () => {
+                    const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+
+                    // Close button is only visible/clickable when card is hovered
+                    await noteCards[0].hover();
+
+                    // Get a remote handle to the close button DOM element
+                    const closeHandles = await noteCards[0].$$('.close');
+                    expect(closeHandles).toHaveLength(1);
+    
+                    // Click on the button and pause momentarily to allow the event to propagate
+                    await closeHandles[0].click();
+                    await delay(100);
+                });
+
+                test('The closeListener is called once with the correct metadata the other listeners are not called', async () => {
+                    expect(closeListener).toHaveBeenCalledTimes(1);
+                    expect(closeListener).toHaveBeenCalledWith({
+                        type: 'notification-closed',
+                        notification: note
+                    });
+                    
+                    // Other listeners not triggered
+                    expect(clickListener).toHaveBeenCalledTimes(0);
+                    expect(buttonClickListener).toHaveBeenCalledTimes(0);
+                });
+
+                test('The notification is cleared and no longer appears in the center or when calling getAll', async () => {
+                    // No card in the center
+                    const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+                    expect(noteCards).toHaveLength(0);
+
+                    // Not returned from getAll
+                    const appNotes = await notifsRemote.getAll(testAppMainWindow.identity);
+                    expect(appNotes).not.toContainEqual(note);
+                });
+            });
+
         });
     });
 });
