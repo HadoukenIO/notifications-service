@@ -1,7 +1,7 @@
 import 'jest';
 import {Application, Window as FinWindow} from 'hadouken-js-adapter';
 
-import {NotificationClickedEvent, Notification, NotificationOptions} from '../../src/client';
+import {NotificationClickedEvent, Notification, NotificationOptions, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../src/client';
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
@@ -10,7 +10,10 @@ import {delay} from './utils/delay';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
-    title: 'Test Notification Title'
+    title: 'Test Notification Title',
+    buttons: [
+        {title: 'Button 1'}
+    ]
 };
 
 describe('Click listeners', () => {
@@ -28,29 +31,37 @@ describe('Click listeners', () => {
             await delay(2000);
         });
 
-        test('Can call addEventListener witout errors', async () => {
-            await expect(notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-clicked', () => {})).resolves;
-        });
-
-        describe('With a notification in the center and a click-listener registered', () => {
+        describe('With a notification in the center and all three listener types registered', () => {
             let clickListener: jest.Mock<void, [NotificationClickedEvent]>;
+            let buttonClickListener: jest.Mock<void, [NotificationButtonClickedEvent]>;
+            let closeListener: jest.Mock<void, [NotificationClosedEvent]>;
             let note: Notification;
 
             beforeEach(async () => {
                 // Register the listener
                 clickListener = jest.fn<void, [NotificationClickedEvent]>();
+                buttonClickListener = jest.fn<void, [NotificationButtonClickedEvent]>();
+                closeListener = jest.fn<void, [NotificationClosedEvent]>();
                 await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-clicked', clickListener);
+                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-button-clicked', buttonClickListener);
+                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-closed', closeListener);
 
                 // Create the notification
                 note = await notifsRemote.create(testAppMainWindow.identity, defaultNoteOptions);
+
+                // Quick sanity check that there is exactly one notification card with this ID
+                // This is tested more thoroughly in creatNotification tests
+                const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+                expect(noteCards).toHaveLength(1);
+            });
+
+            afterEach(async () => {
+                // Clean up the leftover notification
+                await notifsRemote.clearAll(testAppMainWindow.identity);
             });
 
             test('Clicking on the card will trigger the listener with the metadata of the clicked notification', async () => {
                 const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
-
-                // Quick sanity check that there is only one notification with this ID
-                // This is tested more thoroughly in creatNotification tests
-                expect(noteCards).toHaveLength(1);
 
                 // Click on the card and pause momentarily to allow the event to propagate
                 await noteCards[0].click();
@@ -61,6 +72,29 @@ describe('Click listeners', () => {
                 expect(clickListener).toHaveBeenCalledWith({
                     type: 'notification-clicked',
                     notification: note
+                });
+            });
+
+            test('Clicking on the card\'s button triggers the buttonClickListener and does not trigger the clickListener', async () => {
+                const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+
+                // Get a remote handle to the button DOM element
+                const buttonHandles = await noteCards[0].$$('.button');
+                expect(buttonHandles).toHaveLength(1);
+
+                // Click on the button and pause momentarily to allow the event to propagate
+                await buttonHandles[0].click();
+                await delay(100);
+
+                // clickListener not triggered
+                expect(clickListener).toHaveBeenCalledTimes(0);
+
+                // buttonClickListener triggered with correct metadata
+                expect(buttonClickListener).toHaveBeenCalledTimes(1);
+                expect(buttonClickListener).toHaveBeenCalledWith({
+                    type: 'notification-button-clicked',
+                    notification: note,
+                    buttonIndex: 0
                 });
             });
         });
