@@ -171,16 +171,3 @@ async function createTestApp():Promise<Application> {
     await app.run();
     return app;
 }
-
-
-// Params:
-// Event Type:
-// - Click
-// - Button click
-// - Closed
-
-// Multiple windows/apps
-// - One app / one window
-// - One app / two windows
-// - Two apps / one window each
-// - Two apps / two windows each

@@ -1,13 +1,11 @@
 import 'jest';
 
 import {Application, Identity} from 'hadouken-js-adapter';
-import {ElementHandle} from 'puppeteer';
 
-import {NotificationClosedEvent, NotificationClickedEvent, Notification, NotificationOptions} from '../../src/client';
+import {Notification, NotificationOptions} from '../../src/client';
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {delay} from './utils/delay';
 import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 
 const managerWindowIdentity = {uuid: 'test-app', name: 'test-app'};
@@ -33,7 +31,6 @@ describe('When calling createNotification', () => {
         testApp.close();
     });
 
-    // TODO: Make the create call fail properly
     describe('When passing invalid options', () => {
         let createPromise: Promise<Notification>;
         beforeEach(() => {
@@ -89,39 +86,6 @@ describe('When calling createNotification', () => {
             expect(note).toMatchObject(options);
             expect(note.id).toMatch(/[0-9]{6,9}/); // Random 9-digit numeric string
         });
-    });
-
-    test.skip('legacy test', async () => {
-        const clickListener = jest.fn<void, [NotificationClickedEvent]>();
-        const closeListener = jest.fn<void, [NotificationClosedEvent]>();
-        await notifsRemote.addEventListener(testWindowIdentity, 'notification-clicked', clickListener);
-        await notifsRemote.addEventListener(testWindowIdentity, 'notification-closed', closeListener);
-
-        // Check that returned object has the correct data
-        const note: Notification = await notifsRemote.create(testWindowIdentity, {body: 'body body body body', title: 'Title title title'});
-        expect(note).toHaveProperty('body', 'body body body body');
-
-        // Get all cards for the notification we just created
-        const noteCards: ElementHandle[] = await getCardsByNotification(testWindowIdentity.uuid, note.id);
-
-        // Should only be one card per ID
-        expect(noteCards.length).toBe(1);
-
-        // Click triggers listener
-        await noteCards[0].click();
-        await delay(1000);
-        expect(clickListener).toHaveBeenCalledTimes(1);
-
-        // Close triggers listener
-        const closeButtonHandle: ElementHandle | null = await noteCards[0].$('.notification-close-x');
-        if (closeButtonHandle) {
-            await closeButtonHandle.click();
-        }
-        await delay(1000);
-        expect(closeListener).toHaveBeenCalledTimes(1);
-
-        // Clear after close returns false
-        expect(await notifsRemote.clear(testWindowIdentity, note.id)).toBe(false);
     });
 });
 
