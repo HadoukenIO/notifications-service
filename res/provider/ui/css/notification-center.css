@@ -1,0 +1,90 @@
+html {
+    overflow-y: hidden;
+    overflow-x: hidden;
+    user-select: none;
+    cursor: default;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+ul {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    -webkit-padding-start: 0;
+}
+
+.notification-center .header {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sort-buttons {
+    color: #FFFFFF;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    top: 12px;
+    left: 16px;
+    z-index: 1000;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sort-button {
+    font-size: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 3px solid #2A2A30;
+    padding: 3px 10px;
+    margin: 3px;
+    box-shadow: 0.5px 0.5px 0px 0 #1b1b2b;
+    background-color: #1F1E24;
+    color: #FFFFFF;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.sort-button.selected {
+    background-color: #6D6A82;
+}
+
+.sort-button.selected:hover {
+    background-color: #6D6A82;
+}
+
+.sort-button:hover {
+    cursor: pointer;
+    background-color: #2A2A30;
+}
+
+.sort-button:active {
+    background-color: #6D6A82;
+}
+
+#exit-link {
+    top: 12px;
+    right: 12px;
+    height: 15px;
+    padding: 5px;
+    cursor: pointer;
+    z-index: 100000;
+}
+
+#exit-link:hover {
+    background-color: #3b3b57;
+    border-radius: 3px;
+}
+
+.fade {
+    position: absolute;
+    pointer-events: none;
+    bottom: 0;
+    left: 0;
+    height: 80px;
+    width: 100%;
+    background: linear-gradient(0deg, #1F1E24 0%, rgba(33, 34, 46, 0) 100%);
+}

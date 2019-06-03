@@ -13,9 +13,7 @@ fin.desktop.main(async () => {
             'mainWindowOptions': {
                 'defaultHeight': 420,
                 'defaultWidth': 250,
-                'defaultTop': 100 * i + 40,
-                'defaultLeft': 100 * i + 40,
-                'saveWindowState': false,
+                'saveWindowState': true,
                 'autoShow': true
             }
         };
