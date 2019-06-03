@@ -28,7 +28,7 @@ namespace OpenFin.Notifications
         public static void Initialize(Uri manifestUri)
         {
             if (InitializationComplete == null)
-                throw new ArgumentNullException("InitializationComplete must be handled before calling Initialize.");
+                throw new InvalidOperationException("InitializationComplete must be handled before calling Initialize.");
 
             var runtimeOptions = RuntimeOptions.LoadManifest(manifestUri);
 
