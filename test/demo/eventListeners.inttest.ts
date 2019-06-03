@@ -5,6 +5,7 @@ import {NotificationClickedEvent, Notification, NotificationOptions, Notificatio
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
+import * as notifs from './utils/notificationsNode';
 import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
 
@@ -20,12 +21,8 @@ const managerWindowIdentity = {uuid: 'test-app', name: 'test-app'};
 
 describe('Click listeners', () => {
     beforeAll(async () => {
-        // Show the center to avoid dealing with toasts for the time being
-        // TODO: Figure out how to test toasts effectively
-        const centerShowing = await isCenterShowing();
-        if (!centerShowing) {
-            await notifsRemote.toggleNotificationCenter(managerWindowIdentity);
-        }
+        // Make sure the center is showing
+        toggleCenter(true);
     });
 
     describe('With one app running', () => {
@@ -150,6 +147,20 @@ describe('Click listeners', () => {
         });
     });
 });
+
+// TODO: this should probably be a util
+async function toggleCenter(show?: boolean) {
+    const centerShowing = await isCenterShowing();
+    if (show === true && !centerShowing) {
+        await notifs.toggleNotificationCenter();
+    } else if (show === false && centerShowing) {
+        await notifs.toggleNotificationCenter();
+    } else {
+        await notifs.toggleNotificationCenter();
+    }
+    // Slight delay to let the animation finish
+    await delay(200);
+}
 
 // TODO: Window/App creation utils
 const nextUuid = (() => {

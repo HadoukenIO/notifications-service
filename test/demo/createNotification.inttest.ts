@@ -42,6 +42,7 @@ describe('When calling createNotification', () => {
 
             const toastIdentity = getToastIdentity(testApp.identity, note.id);
 
+            // TODO: Toast utils
             // Check that a toast window does not exist for the notification
             const providerApp = await fin.Application.wrapSync(SERVICE_IDENTITY);
             const childWindows = await providerApp.getChildWindows();
@@ -136,6 +137,7 @@ describe('When calling createNotification', () => {
     });
 });
 
+// TODO: this should probably be a util
 async function toggleCenter(show?: boolean) {
     const centerShowing = await isCenterShowing();
     if (show === true && !centerShowing) {
@@ -149,6 +151,7 @@ async function toggleCenter(show?: boolean) {
     await delay(200);
 }
 
+// TODO: make part of some kind of toast utils
 function getToastIdentity(sourceApp: Identity, notificationId: string): Identity {
     return {uuid: SERVICE_IDENTITY.uuid, name: `Notification-Toast:${sourceApp.uuid}:${notificationId}`};
 }
