@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
 using Openfin.Desktop;
 using Openfin.Desktop.Messaging;
-using OpenFin.Notifications;
 using OpenFin.Notifications.Constants;
 using System;
 using System.Threading.Tasks;
 
-namespace OpenNotifications
+namespace OpenFin.Notifications
 {
     public class NotificationClient
     {
