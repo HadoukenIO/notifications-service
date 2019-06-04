@@ -2,6 +2,8 @@ import {ElementHandle} from 'puppeteer';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
+import {toggleNotificationCenter} from './notificationsNode';
+import {delay} from './delay';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 
@@ -21,5 +23,19 @@ export async function getCardsByNotification(sourceUuid: string, notificationId:
 
 export async function isCenterShowing(): Promise<boolean> {
     const center = fin.Window.wrapSync(CENTER_IDENTITY);
-    return center.isShowing();
+    const centerOpacity = (await center.getOptions()).opacity;
+    return (await center.isShowing()) && centerOpacity === 1;
+}
+
+export async function toggleCenter(show?: boolean) {
+    const centerShowing = await isCenterShowing();
+    if (show === true && !centerShowing) {
+        await toggleNotificationCenter();
+    } else if (show === false && centerShowing) {
+        await toggleNotificationCenter();
+    } else if (show === undefined) {
+        await toggleNotificationCenter();
+    }
+    // Slight delay to let the animation finish
+    await delay(1000);
 }

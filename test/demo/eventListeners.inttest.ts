@@ -5,8 +5,7 @@ import {NotificationClickedEvent, Notification, NotificationOptions, Notificatio
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import * as notifs from './utils/notificationsNode';
-import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
+import {getCardsByNotification, toggleCenter} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
 
 const defaultNoteOptions: NotificationOptions = {
@@ -16,8 +15,6 @@ const defaultNoteOptions: NotificationOptions = {
         {title: 'Button 1'}
     ]
 };
-
-const managerWindowIdentity = {uuid: 'test-app', name: 'test-app'};
 
 describe('Click listeners', () => {
     beforeAll(async () => {
@@ -148,19 +145,6 @@ describe('Click listeners', () => {
     });
 });
 
-// TODO: this should probably be a util
-async function toggleCenter(show?: boolean) {
-    const centerShowing = await isCenterShowing();
-    if (show === true && !centerShowing) {
-        await notifs.toggleNotificationCenter();
-    } else if (show === false && centerShowing) {
-        await notifs.toggleNotificationCenter();
-    } else {
-        await notifs.toggleNotificationCenter();
-    }
-    // Slight delay to let the animation finish
-    await delay(200);
-}
 
 // TODO: Window/App creation utils
 const nextUuid = (() => {

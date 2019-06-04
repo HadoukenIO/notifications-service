@@ -3,15 +3,12 @@ import 'jest';
 import {Application, Identity} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
-import {SERVICE_IDENTITY} from '../../src/client/internal';
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import * as notifs from './utils/notificationsNode';
-import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
+import {getCardsByNotification, toggleCenter, isCenterShowing} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
-
-const managerWindowIdentity = {uuid: 'test-app', name: 'test-app'};
+import {getToastWindow} from './utils/toastUtils';
 
 const validOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -39,14 +36,9 @@ describe('When calling createNotification', () => {
         test('A toast is shown for the notification', async () => {
             const note = await notifsRemote.create(testWindowIdentity, validOptions);
             await delay(1000);
+            const toastWindow = await getToastWindow(testApp.identity, note.id);
+            expect(toastWindow).not.toBe(undefined);
 
-            const toastIdentity = getToastIdentity(testApp.identity, note.id);
-
-            // TODO: Toast utils
-            // Check that a toast window does not exist for the notification
-            const providerApp = await fin.Application.wrapSync(SERVICE_IDENTITY);
-            const childWindows = await providerApp.getChildWindows();
-            expect(childWindows.map(win => win.identity)).toContainEqual(toastIdentity);
 
             await notifsRemote.clear(testWindowIdentity, note.id);
         });
@@ -73,12 +65,8 @@ describe('When calling createNotification', () => {
             const note = await notifsRemote.create(testWindowIdentity, validOptions);
             await delay(1000);
 
-            const toastIdentity = getToastIdentity(testApp.identity, note.id);
-
-            // Check that a toast window does not exist for the notification
-            const providerApp = await fin.Application.wrapSync(SERVICE_IDENTITY);
-            const childWindows = await providerApp.getChildWindows();
-            expect(childWindows).not.toContainEqual(fin.Window.wrapSync(toastIdentity));
+            const toastWindow = await getToastWindow(testApp.identity, note.id);
+            expect(toastWindow).toBe(undefined);
 
             await notifsRemote.clear(testWindowIdentity, note.id);
         });
@@ -136,25 +124,6 @@ describe('When calling createNotification', () => {
         });
     });
 });
-
-// TODO: this should probably be a util
-async function toggleCenter(show?: boolean) {
-    const centerShowing = await isCenterShowing();
-    if (show === true && !centerShowing) {
-        await notifs.toggleNotificationCenter();
-    } else if (show === false && centerShowing) {
-        await notifs.toggleNotificationCenter();
-    } else {
-        await notifs.toggleNotificationCenter();
-    }
-    // Slight delay to let the animation finish
-    await delay(200);
-}
-
-// TODO: make part of some kind of toast utils
-function getToastIdentity(sourceApp: Identity, notificationId: string): Identity {
-    return {uuid: SERVICE_IDENTITY.uuid, name: `Notification-Toast:${sourceApp.uuid}:${notificationId}`};
-}
 
 // TODO: Window/App creation utils
 const nextUuid = (() => {
