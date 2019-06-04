@@ -6,9 +6,9 @@ import {Notification, NotificationOptions} from '../../src/client';
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {getCardsByNotification, toggleCenter, isCenterShowing} from './utils/notificationCenterUtils';
+import {getCardsByNotification, toggleCenter} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
-import {getToastWindow} from './utils/toastUtils';
+import {getToastWindow, getToastCards} from './utils/toastUtils';
 
 const validOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -41,6 +41,22 @@ describe('When calling createNotification', () => {
 
 
             await notifsRemote.clear(testWindowIdentity, note.id);
+        });
+
+        test('The toast is displaying the correct data', async () => {
+            const note = await notifsRemote.create(testWindowIdentity, validOptions);
+            await delay(1000);
+
+            const toastCards = await getToastCards(testApp.identity, note.id);
+
+            expect(Array.isArray(toastCards)).toBe(true);
+            expect(toastCards).toHaveLength(1);
+
+            const toastCard = toastCards![0];
+            const titleElement = await toastCard.$('.title');
+            const cardTitle = await titleElement!.getProperty('innerHTML').then(val => val.jsonValue());
+
+            expect(cardTitle).toEqual(note.title);
         });
     });
 
