@@ -16,11 +16,13 @@ const defaultNoteOptions: NotificationOptions = {
     ]
 };
 
+const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
+
 describe('Click listeners', () => {
     beforeAll(async () => {
         // Make sure the center is showing
         if (!(await isCenterShowing())) {
-            await notifsRemote.toggleNotificationCenter({uuid: 'test-app', name: 'test-app'});
+            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
         }
     });
 

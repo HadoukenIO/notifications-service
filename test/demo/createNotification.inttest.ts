@@ -15,12 +15,14 @@ const validOptions: NotificationOptions = {
     title: 'Test Notification Title'
 };
 
+const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
+
 describe('When calling createNotification', () => {
     describe('With the notification center not showing', () => {
         beforeAll(async () => {
             // Hide the center to be sure we get toasts
             if (await isCenterShowing()) {
-                await notifsRemote.toggleNotificationCenter({uuid: 'test-app', name: 'test-app'});
+                await notifsRemote.toggleNotificationCenter(testManagerIdentity);
             }
         });
 
