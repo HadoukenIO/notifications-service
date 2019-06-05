@@ -6,7 +6,7 @@ import {Notification, NotificationOptions} from '../../src/client';
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {getCardsByNotification, toggleCenter} from './utils/notificationCenterUtils';
+import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
 import {getToastWindow, getToastCards} from './utils/toastUtils';
 
@@ -19,7 +19,9 @@ describe('When calling createNotification', () => {
     describe('With the notification center not showing', () => {
         beforeAll(async () => {
             // Hide the center to be sure we get toasts
-            await toggleCenter(false);
+            if (await isCenterShowing()) {
+                await notifsRemote.toggleNotificationCenter({uuid: 'test-app', name: 'test-app'});
+            }
         });
 
         let testApp: Application;
@@ -63,7 +65,9 @@ describe('When calling createNotification', () => {
     describe('With the notification center showing', () => {
         beforeAll(async () => {
             // Show the center to ensure we don't get toasts
-            await toggleCenter(true);
+            if (!(await isCenterShowing())) {
+                await notifsRemote.toggleNotificationCenter({uuid: 'test-app', name: 'test-app'});
+            }
         });
 
         let testApp: Application;
@@ -141,7 +145,7 @@ describe('When calling createNotification', () => {
     });
 });
 
-// TODO: Window/App creation utils
+// TODO: Make this a util modeled on layouts' spawn utils (SERVICE-524)
 const nextUuid = (() => {
     let count = 0;
     return () => 'notifications-test-app-' + (count++);

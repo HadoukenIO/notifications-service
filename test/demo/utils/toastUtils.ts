@@ -1,9 +1,10 @@
-import {Identity, Window} from 'openfin/_v2/main';
 import {ElementHandle} from 'puppeteer';
+import {Identity, Window} from 'hadouken-js-adapter';
 
 import {SERVICE_IDENTITY} from '../../../src/client/internal';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
+import {fin} from './fin';
 
 export function getToastIdentity(sourceApp: Identity, notificationId: string): Identity {
     return {uuid: SERVICE_IDENTITY.uuid, name: `Notification-Toast:${sourceApp.uuid}:${notificationId}`};

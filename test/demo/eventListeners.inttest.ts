@@ -5,7 +5,7 @@ import {NotificationClickedEvent, Notification, NotificationOptions, Notificatio
 
 import {fin} from './utils/fin';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {getCardsByNotification, toggleCenter} from './utils/notificationCenterUtils';
+import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
 
 const defaultNoteOptions: NotificationOptions = {
@@ -19,7 +19,9 @@ const defaultNoteOptions: NotificationOptions = {
 describe('Click listeners', () => {
     beforeAll(async () => {
         // Make sure the center is showing
-        toggleCenter(true);
+        if (!(await isCenterShowing())) {
+            await notifsRemote.toggleNotificationCenter({uuid: 'test-app', name: 'test-app'});
+        }
     });
 
     describe('With one app running', () => {
