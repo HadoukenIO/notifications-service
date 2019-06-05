@@ -46,7 +46,7 @@ describe('When calling createNotification', () => {
 
         test('The toast is displaying the correct data', async () => {
             const note = await notifsRemote.create(testWindowIdentity, validOptions);
-            await delay(500);
+            await delay(1000);
 
             const toastCards = await getToastCards(testApp.identity, note.id);
 
