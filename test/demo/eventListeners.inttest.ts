@@ -30,12 +30,10 @@ describe('Click listeners', () => {
         beforeEach(async () => {
             testApp = await createTestApp();
             testAppMainWindow = await testApp.getWindow();
-            await delay(2000);
         });
 
         afterEach(async () => {
             await testApp.close();
-            await delay(2000);
         });
 
         describe('With a notification in the center and all three listener types registered', () => {

@@ -37,7 +37,7 @@ describe('When calling createNotification', () => {
 
         test('A toast is shown for the notification', async () => {
             const note = await notifsRemote.create(testWindowIdentity, validOptions);
-            await delay(1000);
+            await delay(100);
             const toastWindow = await getToastWindow(testApp.identity, note.id);
             expect(toastWindow).not.toBe(undefined);
 
@@ -46,7 +46,7 @@ describe('When calling createNotification', () => {
 
         test('The toast is displaying the correct data', async () => {
             const note = await notifsRemote.create(testWindowIdentity, validOptions);
-            await delay(1000);
+            await delay(500);
 
             const toastCards = await getToastCards(testApp.identity, note.id);
 
@@ -82,7 +82,7 @@ describe('When calling createNotification', () => {
 
         test('No toast is shown for the created notification', async () => {
             const note = await notifsRemote.create(testWindowIdentity, validOptions);
-            await delay(1000);
+            await delay(100);
 
             const toastWindow = await getToastWindow(testApp.identity, note.id);
             expect(toastWindow).toBe(undefined);
