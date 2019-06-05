@@ -146,7 +146,7 @@ describe('Click listeners', () => {
 });
 
 
-// TODO: Window/App creation utils
+// TODO: Make this a util modeled on layouts' spawn utils (SERVICE-524)
 const nextUuid = (() => {
     let count = 100;
     return () => 'notifications-test-app-' + (count++);
