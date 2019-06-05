@@ -21,7 +21,6 @@ export async function getToastCards(sourceApp: Identity, notificationId: string)
     const toastPage = await ofBrowser.getPage(toastIdentity);
 
     if (!toastPage) {
-        // TODO: Should this null or error?
         return null;
     } else {
         return toastPage.$$('.notification');
