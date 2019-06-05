@@ -17,12 +17,12 @@ export async function getToastWindow(sourceApp: Identity, notificationId: string
 }
 
 const ofBrowser = new OFPuppeteerBrowser();
-export async function getToastCards(sourceApp: Identity, notificationId: string): Promise<ElementHandle[] | null> {
+export async function getToastCards(sourceApp: Identity, notificationId: string): Promise<ElementHandle[] | undefined> {
     const toastIdentity = getToastIdentity(sourceApp, notificationId);
     const toastPage = await ofBrowser.getPage(toastIdentity);
 
     if (!toastPage) {
-        return null;
+        return undefined;
     } else {
         return toastPage.$$('.notification');
     }
