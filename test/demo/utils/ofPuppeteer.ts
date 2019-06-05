@@ -2,7 +2,12 @@ import {Fin, Identity} from 'openfin/_v2/main';
 import {Browser, Page, JSHandle} from 'puppeteer';
 import {connect} from 'hadouken-js-adapter';
 
+import {uuidv4} from './uuidv4';
+
 declare const global: NodeJS.Global & {__BROWSER__: Browser};
+
+// Helper type. Works better with puppeteer than the builtin Function type
+type AnyFunction = (...args: any[]) => any;
 
 export type BaseWindowContext = Window & {fin: Fin};
 
@@ -10,13 +15,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
     private _pageIdentityCache: Map<Page, Identity>;
     private _identityPageCache: Map<string, Page>;
     private _mountedFunctionCache: Map<Page, Map<Function, JSHandle>>;
-
     private _browser: Browser;
-
-    public get browser() {
-        return this._browser;
-    }
-
     private _ready: Promise<void>;
 
     constructor() {
@@ -27,17 +26,8 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
         this._ready = this.registerCleanupListener();
     }
 
-    private async registerCleanupListener() {
-        const fin = await connect({address: `ws://localhost:${process.env.OF_PORT}`, uuid: 'TEST-puppeteer-' + Math.random().toString()});
-        fin.System.addListener('window-closing', win => {
-            const page = this._identityPageCache.get(getIdString(win));
-            if (page) {
-                this._identityPageCache.delete(getIdString(win));
-                this._pageIdentityCache.delete(page);
-                this._mountedFunctionCache.delete(page);
-            }
-        });
-        return;
+    public get browser() {
+        return this._browser;
     }
 
     public async getPage(identity: Identity): Promise<Page|undefined> {
@@ -60,6 +50,43 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
 
         // No pages found that match
         return undefined;
+    }
+
+    public async executeOnWindow<
+        // tslint:disable-next-line: no-any Needed for tuple types.
+        T extends any[], R, C extends WindowContext = WindowContext>(executionTarget: Identity, fn: (this: C, ...args: T) => R, ...args: T):
+        Promise<R> {
+        const page = await this.getPage(executionTarget);
+        if (!page) {
+            throw new Error('could not find specified executionTarget: ' + JSON.stringify(executionTarget));
+        }
+
+        // Explicit cast needed to appease typescript. Puppeteer types make liberal
+        // use of the any type, which confuses things here.
+        // tslint:disable-next-line: no-any
+        return page.evaluate(fn as (...args: any[]) => R, ...args);
+    }
+
+    public async getOrMountRemoteFunction(executionTarget: Identity, fn: AnyFunction): Promise<JSHandle> {
+        const page = await this.getPage(executionTarget);
+        if (!page) {
+            throw new Error('could not find specified executionTarget: ' + JSON.stringify(executionTarget));
+        }
+        const cachedHandle = this.getRemoteFunctionHandle(page, fn);
+        if (cachedHandle) {
+            return cachedHandle;
+        } else {
+            const name = uuidv4();
+            await page.exposeFunction(name, fn);
+            const newHandle = await page.evaluateHandle(function(this: {[k: string]: AnyFunction}, remoteName){
+                return this[remoteName];
+            }, name);
+            if (!this._mountedFunctionCache.get(page)) {
+                this._mountedFunctionCache.set(page, new Map<Function, JSHandle>());
+            }
+            this._mountedFunctionCache.get(page)!.set(fn, newHandle);
+            return newHandle;
+        }
     }
 
     private async getIdentity(page: Page): Promise<Identity|undefined> {
@@ -87,43 +114,17 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
         return identity;
     }
 
-    public async executeOnWindow<
-        // tslint:disable-next-line: no-any Needed for tuple types.
-        T extends any[], R, C extends WindowContext = WindowContext>(executionTarget: Identity, fn: (this: C, ...args: T) => R, ...args: T):
-        Promise<R> {
-        const page = await this.getPage(executionTarget);
-        if (!page) {
-            throw new Error('could not find specified executionTarget: ' + JSON.stringify(executionTarget));
-        }
-
-        // Explicit cast needed to appease typescript. Puppeteer types make liberal
-        // use of the any type, which confuses things here.
-        // tslint:disable-next-line: no-any
-        return page.evaluate(fn as (...args: any[]) => R, ...args);
-    }
-
-
-
-    public async getOrMountRemoteFunction(executionTarget: Identity, fn: AnyFunction): Promise<JSHandle> {
-        const page = await this.getPage(executionTarget);
-        if (!page) {
-            throw new Error('could not find specified executionTarget: ' + JSON.stringify(executionTarget));
-        }
-        const cachedHandle = this.getRemoteFunctionHandle(page, fn);
-        if (cachedHandle) {
-            return cachedHandle;
-        } else {
-            const name = uuidv4();
-            await page.exposeFunction(name, fn);
-            const newHandle = await page.evaluateHandle(function(this: {[k: string]: AnyFunction}, remoteName){
-                return this[remoteName];
-            }, name);
-            if (!this._mountedFunctionCache.get(page)) {
-                this._mountedFunctionCache.set(page, new Map<Function, JSHandle>());
+    private async registerCleanupListener() {
+        const fin = await connect({address: `ws://localhost:${process.env.OF_PORT}`, uuid: 'TEST-puppeteer-' + Math.random().toString()});
+        fin.System.addListener('window-closing', win => {
+            const page = this._identityPageCache.get(getIdString(win));
+            if (page) {
+                this._identityPageCache.delete(getIdString(win));
+                this._pageIdentityCache.delete(page);
+                this._mountedFunctionCache.delete(page);
             }
-            this._mountedFunctionCache.get(page)!.set(fn, newHandle);
-            return newHandle;
-        }
+        });
+        return;
     }
 
     private getRemoteFunctionHandle(page: Page, localFunction: AnyFunction) {
@@ -133,9 +134,4 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
 
 function getIdString(identity: Identity): string {
     return `${identity.uuid}/${identity.name}`;
-}
-
-type AnyFunction = (...args: any[]) => any;
-function uuidv4() {
-    return (Math.random().toString(36).substring(2) + Date.now().toString(36));
 }
