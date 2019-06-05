@@ -140,7 +140,7 @@ describe('When calling createNotification', () => {
                 const note = await createPromise;
 
                 expect(note).toMatchObject(validOptions);
-                expect(note.id).toMatch(/[0-9]{6,9}/); // Random 9-digit numeric string
+                expect(note.id).toMatch(/[0-9]{9}/); // Random 9-digit numeric string
             });
         });
     });
