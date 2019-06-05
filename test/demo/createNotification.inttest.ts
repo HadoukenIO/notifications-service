@@ -41,7 +41,6 @@ describe('When calling createNotification', () => {
             const toastWindow = await getToastWindow(testApp.identity, note.id);
             expect(toastWindow).not.toBe(undefined);
 
-
             await notifsRemote.clear(testWindowIdentity, note.id);
         });
 
