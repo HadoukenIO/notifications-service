@@ -12,6 +12,7 @@ module.exports = [
     }),
     webpackTools.createConfig(`${outputDir}/demo`, {
         app: './src/demo/app.ts',
-        launcher: './src/demo/launcher.ts'
+        launcher: './src/demo/launcher.ts',
+        testApp: './src/demo/testApp.ts'
     }, undefined, webpackTools.versionPlugin)
 ];

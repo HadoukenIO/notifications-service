@@ -9,6 +9,7 @@
         "dom",
         "es7"
       ],
+      "types": ["node"],
       "esModuleInterop": false,
     },
     "exclude": [
