@@ -67,7 +67,7 @@ describe('When calling createNotification', () => {
         beforeAll(async () => {
             // Show the center to ensure we don't get toasts
             if (!(await isCenterShowing())) {
-                await notifsRemote.toggleNotificationCenter({uuid: 'test-app', name: 'test-app'});
+                await notifsRemote.toggleNotificationCenter(testManagerIdentity);
             }
         });
 
