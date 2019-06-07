@@ -52,19 +52,16 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
         return undefined;
     }
 
-    public async executeOnWindow<
-        // tslint:disable-next-line: no-any Needed for tuple types.
-        T extends any[], R, C extends WindowContext = WindowContext>(executionTarget: Identity, fn: (this: C, ...args: T) => R, ...args: T):
-        Promise<R> {
+    public async executeOnWindow<T extends any[], R, C extends WindowContext = WindowContext>(
+        executionTarget: Identity,
+        fn: (this: C, ...args: T) => R,
+        ...args: T
+    ): Promise<R> {
         const page = await this.getPage(executionTarget);
         if (!page) {
             throw new Error('could not find specified executionTarget: ' + JSON.stringify(executionTarget));
         }
-
-        // Explicit cast needed to appease typescript. Puppeteer types make liberal
-        // use of the any type, which confuses things here.
-        // tslint:disable-next-line: no-any
-        return page.evaluate(fn as (...args: any[]) => R, ...args);
+        return page.evaluate(fn, ...args);
     }
 
     public async getOrMountRemoteFunction(executionTarget: Identity, fn: AnyFunction): Promise<JSHandle> {
