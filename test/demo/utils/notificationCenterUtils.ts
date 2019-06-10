@@ -2,7 +2,6 @@ import {ElementHandle} from 'puppeteer';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
-import {delay} from './delay';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 
