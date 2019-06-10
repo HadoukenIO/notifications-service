@@ -34,7 +34,7 @@ describe('When calling createNotification', () => {
         });
 
         afterEach(async () => {
-            testApp.close();
+            testApp.quit();
         });
 
         test('A toast is shown for the notification', async () => {
@@ -79,7 +79,7 @@ describe('When calling createNotification', () => {
         });
 
         afterEach(async () => {
-            testApp.close();
+            testApp.quit();
         });
 
         test('No toast is shown for the created notification', async () => {

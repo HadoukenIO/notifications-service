@@ -35,7 +35,7 @@ describe('Click listeners', () => {
         });
 
         afterEach(async () => {
-            await testApp.close();
+            await testApp.quit();
         });
 
         describe('With a notification in the center and all three listener types registered', () => {
