@@ -1,4 +1,5 @@
 {
-    
+    "globalSetup": "<rootDir>/test/demo/utils/globalSetup.ts",
+    "globalTeardown": "<rootDir>/test/demo/utils/globalTeardown.ts",
+    "testEnvironment": "<rootDir>/test/demo/utils/integrationTestEnv.js"
 }
- 

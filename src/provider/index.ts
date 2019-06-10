@@ -158,6 +158,12 @@ export class Main {
      * @param sender The source of the notification.
      */
     private hydrateNotification(payload: NotificationOptions, sender: Identity): StoredNotification {
+        if (!payload.body) {
+            throw new Error('Invalid arguments passed to createNotification. "body" must have a value');
+        }
+        if (!payload.title) {
+            throw new Error('Invalid arguments passed to createNotification. "title" must have a value');
+        }
         const notification: Notification = {
             id: payload.id || this.generateId(),
             body: payload.body,
