@@ -6,9 +6,6 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 import {Point} from './PointUtils';
 
-type ConfigurationObject = {};
-type ConfigWithRules<T> = {};
-
 export type Dictionary<T = string> = {
     [key: string]: T
 };
@@ -102,11 +99,6 @@ export interface AppData extends WindowData {
     provider?: string;
 
     /**
-     * Config object to include within the manifest. May also contain rules.
-     */
-    config?: ConfigWithRules<ConfigurationObject>|null;
-
-    /**
      * Runtime version, can be a release channel name or an explicit version number.
      */
     runtime?: string;
@@ -178,7 +170,7 @@ async function createApplication(options: Omit<AppData, 'parent'>): Promise<Appl
             mainWindowOptions: {
                 ...position,
                 url,
-                frame: options.frame,
+                frame: options.frame === undefined ? true : options.frame,
                 state,
                 autoShow: true,
                 saveWindowState: false,
@@ -195,13 +187,12 @@ async function createApplication(options: Omit<AppData, 'parent'>): Promise<Appl
             state,
             defaultWidth: size.x,
             defaultHeight: size.y,
-            frame: options.frame || false,
+            frame: options.frame === undefined ? true : options.frame,
             realmName: options.realm || '',
             enableMesh: options.enableMesh || false,
             runtime: options.runtime || await fin.System.getVersion(),
             useService: options.useService !== undefined ? options.useService : false,
-            provider: options.provider || 'local',
-            config: options.config ? JSON.stringify(options.config) : ''
+            provider: options.provider || 'local'
         };
 
         const manifest = `http://localhost:3922/manifest?${
