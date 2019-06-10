@@ -4,11 +4,14 @@ import {_Window} from 'openfin/_v2/api/window/window';
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
-import {Point} from './PointUtils';
-
 export type Dictionary<T = string> = {
     [key: string]: T
 };
+
+export interface Point<T = number> {
+    x: T;
+    y: T;
+}
 
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 
