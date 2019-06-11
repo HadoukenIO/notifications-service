@@ -4,37 +4,21 @@ import 'jest';
 
 import {Application, Window} from 'hadouken-js-adapter';
 
+import {Notification, NotificationOptions} from '../../src/client';
+
 import {createApp} from './utils/spawnRemote';
 import {isCenterShowing, getCardsByNotification} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import { Notification, NotificationOptions } from '../../src/client';
 
 const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 
-type DisplayType = 'toast'|'center';
-
-interface UtilFunction {
-
-}
-
-const functionMap: {[key in DisplayType]: UtilFunction} = {
-    toast: {
-
-    },
-    center: {
-
-    }
-};
-
-describe.each(['center'] as DisplayType[])('When creating a notification - %s', (displayType: DisplayType) => {
+describe('When creating a notification with the center displayed', () => {
     let testApp: Application;
     let testWindow: Window;
 
     beforeAll(async () => {
         // Toggle the center on/off based on test type
-        if (displayType === 'center' && !(await isCenterShowing())) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-        } else if (displayType === 'toast' && await isCenterShowing()) {
+        if (!(await isCenterShowing())) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
         }
     });
@@ -56,7 +40,7 @@ describe.each(['center'] as DisplayType[])('When creating a notification - %s', 
         beforeEach(async () => {
             // Intentionally circumventing type check with cast for testing purposes
             createPromise = notifsRemote.create(testWindow.identity, options);
-            
+
             // We want to be sure the operation is completed, but don't care about the result
             await createPromise.catch(() => {});
         });
