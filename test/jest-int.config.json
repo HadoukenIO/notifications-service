@@ -2,5 +2,5 @@
     "globalSetup": "<rootDir>/test/demo/utils/globalSetup.ts",
     "globalTeardown": "<rootDir>/test/demo/utils/globalTeardown.ts",
     "testEnvironment": "<rootDir>/test/demo/utils/integrationTestEnv.js",
-    "setupFilesAfterEnv": ["<rootDir>/test/demo/utils/jestSetupAfterEnv.ts"]
+    "setupFilesAfterEnv": ["<rootDir>/test/demo/utils/integrationSetupAfterEnv.ts"]
 }
