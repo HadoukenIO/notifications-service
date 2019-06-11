@@ -80,4 +80,15 @@ describe('When creating a notification with the center displayed', () => {
         test.todo('The card has the same data as the returned notification object');
         test.todo('The notification is included in the result of a getAll call');
     });
+
+    describe.each([1, 2, 3])('With %i button(s)', numButtons => {
+        const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notificaiton Title', buttons: []};
+        for (let i = 0; i < numButtons; i++) {
+            options.buttons!.push({title: 'Button ' + i});
+        }
+
+        test.todo('The notification is created as expected');
+        test.todo('The notification card has the correct number of button elements');
+        test.todo('The button elements are in the correct order');
+    });
 });
