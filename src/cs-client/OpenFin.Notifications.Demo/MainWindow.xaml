@@ -10,40 +10,42 @@
         <ResourceDictionary Source="Styles.xaml">
         </ResourceDictionary>
     </Window.Resources>
-    <StackPanel Margin="25,10,25,0">
-        <Grid>
+    <StackPanel x:Name="sp" Margin="25,10,25,0">
+        <Grid x:Name="buttonGrid">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="create1" Grid.Row="0" Grid.Column="0" Click="CreateButton_Click">Create Notification 1</Button>
-            <Button x:Name="create2" Grid.Row="1" Grid.Column="0" Click="CreateButton_Click">Create Notification 2</Button>
-            <Button x:Name="create3" Grid.Row="2" Grid.Column="0" Click="CreateButton_Click">Create Notification 3</Button>
-            <Button x:Name="create4" Grid.Row="3" Grid.Column="0" Click="CreateButton_Click">Create Notification 4</Button>
-            <Button x:Name="create5" Grid.Row="4" Grid.Column="0" Click="CreateButton_Click">Create Notification 5</Button>
-            <Button x:Name="create6" Grid.Row="5" Grid.Column="0" Click="CreateButton_Click">Create Notification 6</Button>
+            <Button x:Name="create1" Grid.Row="0" Grid.Column="0" Click="CreateButton_Click" IsEnabled="False">Create Notification 1</Button>
+            <Button x:Name="create2" Grid.Row="1" Grid.Column="0" Click="CreateButton_Click" IsEnabled="False">Create Notification 2</Button>
+            <Button x:Name="create3" Grid.Row="2" Grid.Column="0" Click="CreateButton_Click" IsEnabled="False">Create Notification 3</Button>
+            <Button x:Name="create4" Grid.Row="3" Grid.Column="0" Click="CreateButton_Click" IsEnabled="False">Create Notification 4</Button>
+            <Button x:Name="create5" Grid.Row="4" Grid.Column="0" Click="CreateButton_Click" IsEnabled="False">Create Notification 5</Button>
+            <Button x:Name="create6" Grid.Row="5" Grid.Column="0" Click="CreateButton_Click" IsEnabled="False">Create Notification 6</Button>
 
-            <Button x:Name="close1" Grid.Row="0" Grid.Column="1" Click="CloseButton_Click">Clear Notification 1</Button>
-            <Button x:Name="close2" Grid.Row="1" Grid.Column="1" Click="CloseButton_Click">Clear Notification 2</Button>
-            <Button x:Name="close3" Grid.Row="2" Grid.Column="1" Click="CloseButton_Click">Clear Notification 3</Button>
-            <Button x:Name="close4" Grid.Row="3" Grid.Column="1" Click="CloseButton_Click">Clear Notification 4</Button>
-            <Button x:Name="close5" Grid.Row="4" Grid.Column="1" Click="CloseButton_Click">Clear Notification 5</Button>
-            <Button x:Name="close6" Grid.Row="5" Grid.Column="1" Click="CloseButton_Click">Clear Notification 6</Button>
-
+            <Button x:Name="close1" Grid.Row="0" Grid.Column="1" Click="CloseButton_Click" IsEnabled="False">Clear Notification 1</Button>
+            <Button x:Name="close2" Grid.Row="1" Grid.Column="1" Click="CloseButton_Click" IsEnabled="False">Clear Notification 2</Button>
+            <Button x:Name="close3" Grid.Row="2" Grid.Column="1" Click="CloseButton_Click" IsEnabled="False">Clear Notification 3</Button>
+            <Button x:Name="close4" Grid.Row="3" Grid.Column="1" Click="CloseButton_Click" IsEnabled="False">Clear Notification 4</Button>
+            <Button x:Name="close5" Grid.Row="4" Grid.Column="1" Click="CloseButton_Click" IsEnabled="False">Clear Notification 5</Button>
+            <Button x:Name="close6" Grid.Row="5" Grid.Column="1" Click="CloseButton_Click" IsEnabled="False">Clear Notification 6</Button>
+            <Button Click="FetchButton_Click" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="False">Fetch Notifications</Button>
+            <Button Click="ToggleButton_Click" Margin="10,3" Width="Auto" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="False">Toggle Notification Center</Button>
         </Grid>
-        <Button Click="FetchButton_Click">Fetch Notifications</Button>
-        <Button Click="ToggleButton_Click" Margin="10,3" Width="Auto">Toggle Notification Center</Button>
+        
         <Border Style="{DynamicResource textBlockBorder}">
-            <TextBlock x:Name="messageBox" MouseDown="messageBox_MouseDown"/>
+            <TextBlock x:Name="messageBox" MouseDown="messageBox_MouseDown" />
         </Border>
     </StackPanel>
 </Window>

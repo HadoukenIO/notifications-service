@@ -7,6 +7,7 @@ namespace OpenFin.Notifications
     {
         [JsonProperty("title")]
         public string Title { get; set; }
+
         [JsonProperty("iconUrl")]
         public string Icon { get; set; }
     }
