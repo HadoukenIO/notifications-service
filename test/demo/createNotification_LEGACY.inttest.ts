@@ -34,7 +34,8 @@ describe('When calling createNotification', () => {
         });
 
         afterEach(async () => {
-            testApp.quit();
+            await notifsRemote.clearAll(testWindowIdentity);
+            await testApp.quit();
         });
 
         test('A toast is shown for the notification', async () => {

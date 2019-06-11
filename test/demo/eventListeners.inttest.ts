@@ -35,6 +35,7 @@ describe('Click listeners', () => {
         });
 
         afterEach(async () => {
+            await notifsRemote.clearAll(testAppMainWindow.identity);
             await testApp.quit();
         });
 
