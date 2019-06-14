@@ -3,12 +3,14 @@
 import 'jest';
 
 import {Application, Window} from 'hadouken-js-adapter';
+import * as moment from 'moment';
 
-import {Notification, NotificationOptions} from '../../src/client';
+import {Notification, NotificationOptions, OptionButton} from '../../src/client';
 
 import {createApp} from './utils/spawnRemote';
-import {isCenterShowing, getCardsByNotification} from './utils/notificationCenterUtils';
+import {isCenterShowing, getCardsByNotification, getCardMetadata, NotificationCardMetadata} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
+
 
 const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 
@@ -34,11 +36,11 @@ describe('When creating a notification with the center displayed', () => {
     });
 
     describe('When options does not include title and/or body', () => {
+        // Intentionally circumventing type check with cast for testing purposes
         const options: NotificationOptions = {id: 'invalid-notification'} as NotificationOptions;
 
         let createPromise: Promise<Notification>;
         beforeEach(async () => {
-            // Intentionally circumventing type check with cast for testing purposes
             createPromise = notifsRemote.create(testWindow.identity, options);
 
             // We want to be sure the operation is completed, but don't care about the result
@@ -69,7 +71,6 @@ describe('When creating a notification with the center displayed', () => {
 
         let createPromise: Promise<Notification>;
         beforeEach(async () => {
-            // Intentionally circumventing type check with cast for testing purposes
             createPromise = notifsRemote.create(testWindow.identity, options);
 
             // We want to be sure the operation is completed, but don't care about the result
@@ -96,7 +97,6 @@ describe('When creating a notification with the center displayed', () => {
 
         let createPromise: Promise<Notification>;
         beforeEach(async () => {
-            // Intentionally circumventing type check with cast for testing purposes
             createPromise = notifsRemote.create(testWindow.identity, options);
 
             // We want to be sure the operation is completed, but don't care about the result
@@ -116,8 +116,30 @@ describe('When creating a notification with the center displayed', () => {
             const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
         });
-        test.todo('The card has the same data as the returned notification object');
-        test.todo('The notification is included in the result of a getAll call');
+        test('The card has the same data as the returned notification object', async () => {
+            const note = await createPromise;
+
+            const cardContent: NotificationCardMetadata | undefined = await getCardMetadata(testApp.identity.uuid, note.id);
+            expect(cardContent).not.toBeUndefined();
+
+            const expectedContent: NotificationCardMetadata = {
+                title: note.title,
+                body: note.body,
+                buttons: note.buttons,
+                icon: note.icon,
+                sourceApp: testApp.identity.uuid,
+                timeString: moment(note.date).fromNow()
+            };
+
+            expect(cardContent).toEqual(expectedContent);
+        });
+        test('The notification is included in the result of a getAll call', async () => {
+            const note = await createPromise;
+
+            const appNotes = await notifsRemote.getAll(testWindow.identity);
+
+            expect(appNotes).toContainEqual(note);
+        });
     });
 
     describe.each([1, 2, 3])('With %i button(s)', numButtons => {
@@ -126,8 +148,24 @@ describe('When creating a notification with the center displayed', () => {
             options.buttons!.push({title: 'Button ' + i});
         }
 
+        let createPromise: Promise<Notification>;
+        beforeEach(async () => {
+            createPromise = notifsRemote.create(testWindow.identity, options);
+
+            // We want to be sure the operation is completed, but don't care about the result
+            await createPromise.catch(() => {});
+        });
+
         test.todo('The notification is created as expected');
-        test.todo('The notification card has the correct number of button elements');
+        test('The notification card has the correct number of button elements', async () => {
+            const note = await createPromise;
+
+            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            expect(noteCards).toHaveLength(1);
+
+            const buttons = await noteCards[0].$$('.button');
+            expect(buttons).toHaveLength(numButtons);
+        });
         test.todo('The button elements are in the correct order');
     });
 });
