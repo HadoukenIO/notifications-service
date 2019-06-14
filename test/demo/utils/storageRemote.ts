@@ -1,10 +1,10 @@
-import * as LocalForage from 'localforage';
 
 import {SERVICE_IDENTITY} from '../../../src/client/internal';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
+type LocalForage = typeof import('localforage');
 
 interface ProviderWindow extends BaseWindowContext {
     settingsStorage: LocalForage;
