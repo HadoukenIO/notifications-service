@@ -5,7 +5,7 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 import * as moment from 'moment';
 
-import {Notification, NotificationOptions, OptionButton} from '../../src/client';
+import {Notification, NotificationOptions} from '../../src/client';
 
 import {createApp} from './utils/spawnRemote';
 import {isCenterShowing, getCardsByNotification, getCardMetadata, NotificationCardMetadata} from './utils/notificationCenterUtils';
