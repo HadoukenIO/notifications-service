@@ -3,7 +3,7 @@
 import 'jest';
 
 import {Application, Window} from 'hadouken-js-adapter';
-import moment from 'moment';
+import * as moment from 'moment';
 
 import {Notification, NotificationOptions} from '../../src/client';
 
