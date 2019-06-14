@@ -10,6 +10,8 @@ import {Notification, NotificationOptions} from '../../src/client';
 import {createApp} from './utils/spawnRemote';
 import {isCenterShowing, getCardsByNotification, getCardMetadata, NotificationCardMetadata} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
+import {delay} from './utils/delay';
+import {getToastWindow} from './utils/toastUtils';
 
 
 const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
@@ -139,6 +141,14 @@ describe('When creating a notification with the center displayed', () => {
             const appNotes = await notifsRemote.getAll(testWindow.identity);
 
             expect(appNotes).toContainEqual(note);
+        });
+
+        test('No toast is shown for the created notification', async () => {
+            const note = await createPromise;
+            await delay(100);
+
+            const toastWindow = await getToastWindow(testApp.identity, note.id);
+            expect(toastWindow).toBe(undefined);
         });
     });
 
