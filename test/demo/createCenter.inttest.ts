@@ -166,7 +166,14 @@ describe('When creating a notification with the center displayed', () => {
             await createPromise.catch(() => {});
         });
 
-        test.todo('The notification is created as expected');
+        test('The notification is created as expected', async () => {
+            await expect(createPromise).resolves;
+            const note = await createPromise;
+            expect(note).toMatchObject(options);
+
+            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            expect(noteCards).toHaveLength(1);
+        });
         test('The notification card has the correct number of button elements', async () => {
             const note = await createPromise;
 
