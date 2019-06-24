@@ -95,7 +95,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
 
         const identity: Identity|undefined = await page.evaluate(function(this: BaseWindowContext): Identity|undefined {
             // Could be devtools or other non-fin-enabled windows so need a guard
-            if (!fin) {
+            if (!this.fin) {
                 return undefined;
             } else {
                 return this.fin.Window.me;

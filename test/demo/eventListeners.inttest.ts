@@ -6,7 +6,7 @@ import {NotificationClickedEvent, Notification, NotificationOptions, Notificatio
 import * as notifsRemote from './utils/notificationsRemoteExecution';
 import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
-import {createTestApp} from './utils/createTestApp';
+import {createApp} from './utils/spawnRemote';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -30,12 +30,12 @@ describe('Click listeners', () => {
         let testApp: Application;
         let testAppMainWindow: FinWindow;
         beforeEach(async () => {
-            testApp = await createTestApp();
+            testApp = await createApp(testManagerIdentity, {});
             testAppMainWindow = await testApp.getWindow();
         });
 
         afterEach(async () => {
-            await testApp.close();
+            await testApp.quit();
         });
 
         describe('With a notification in the center and all three listener types registered', () => {

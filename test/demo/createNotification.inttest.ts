@@ -8,7 +8,7 @@ import * as notifsRemote from './utils/notificationsRemoteExecution';
 import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
 import {getToastWindow, getToastCards} from './utils/toastUtils';
-import {createTestApp} from './utils/createTestApp';
+import {createApp} from './utils/spawnRemote';
 
 const validOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -29,12 +29,12 @@ describe('When calling createNotification', () => {
         let testApp: Application;
         let testWindowIdentity: Identity;
         beforeEach(async () => {
-            testApp = await createTestApp();
+            testApp = await createApp(testManagerIdentity, {});
             testWindowIdentity = await testApp.getWindow().then(w => w.identity);
         });
 
         afterEach(async () => {
-            testApp.close();
+            testApp.quit();
         });
 
         test('A toast is shown for the notification', async () => {
@@ -74,12 +74,12 @@ describe('When calling createNotification', () => {
         let testApp: Application;
         let testWindowIdentity: Identity;
         beforeEach(async () => {
-            testApp = await createTestApp();
+            testApp = await createApp(testManagerIdentity, {});
             testWindowIdentity = await testApp.getWindow().then(w => w.identity);
         });
 
         afterEach(async () => {
-            testApp.close();
+            testApp.quit();
         });
 
         test('No toast is shown for the created notification', async () => {
