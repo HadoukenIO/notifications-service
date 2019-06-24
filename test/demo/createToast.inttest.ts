@@ -63,5 +63,4 @@ describe('When calling createNotification', () => {
             expect(cardTitle).toEqual(note.title);
         });
     });
-
 });
