@@ -90,7 +90,7 @@ export interface AppData extends WindowData {
     type?: 'manifest'|'programmatic';
 
     /**
-     * If the application's manifest should declare a 'services' section containing the layouts service.
+     * If the application's manifest should declare a 'services' section containing the current project's service.
      */
     useService?: boolean;
 
