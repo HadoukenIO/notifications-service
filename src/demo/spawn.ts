@@ -1,3 +1,5 @@
+// TODO: Extract this util into service-tooling (SERVICE-531)
+
 import {Identity, Application} from 'openfin/_v2/main';
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 import {_Window} from 'openfin/_v2/api/window/window';
