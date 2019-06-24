@@ -11,8 +11,3 @@ export const notificationStorage = localforage.createInstance({
     name: 'notifications',
     storeName: 'notifications'
 });
-
-// Mount on window
-if (window !== undefined) {
-    Object.assign(window, {settingsStorage, notificationStorage});
-}

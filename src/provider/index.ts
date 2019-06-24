@@ -15,6 +15,7 @@ import {StoredNotification} from './model/StoredNotification';
 import {Action, RootAction} from './store/Actions';
 import {mutable, Immutable} from './store/State';
 import {Store} from './store/Store';
+import {notificationStorage, settingsStorage} from './model/Storage';
 
 @injectable()
 export class Main {
@@ -38,7 +39,10 @@ export class Main {
             config: this._config,
             store: this._store,
             center: this._notificationCenter,
-            toast: this._toastManager
+            toast: this._toastManager,
+            // Include the two localforage instances for debugging/integration testing
+            notificationStorage,
+            settingsStorage
         });
 
         // Wait for creation of any injected components that require async initialization
@@ -89,7 +93,8 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async createNotification(payload: NotificationOptions, sender: ProviderIdentity): Promise<Notification> {
-        const notification = this.hydrateNotification(payload, sender);
+        // Explicity create the identity object to avoid storing other unneeded info from ProviderIdentity
+        const notification = this.hydrateNotification(payload, {uuid: sender.uuid, name: sender.name});
         this._store.dispatch({type: Action.CREATE, notification});
         return notification.notification;
     }

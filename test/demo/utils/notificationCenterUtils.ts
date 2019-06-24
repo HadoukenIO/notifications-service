@@ -1,7 +1,5 @@
 import {ElementHandle} from 'puppeteer';
 
-import {Notification} from '../../../src/client';
-
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
 

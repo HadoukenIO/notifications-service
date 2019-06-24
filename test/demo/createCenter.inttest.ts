@@ -6,17 +6,19 @@ import {Application, Window} from 'hadouken-js-adapter';
 import * as moment from 'moment';
 
 import {Notification, NotificationOptions} from '../../src/client';
+import {StoredNotification} from '../../src/provider/model/StoredNotification';
 
 import {createApp} from './utils/spawnRemote';
 import {isCenterShowing, getCardsByNotification, getCardMetadata, NotificationCardMetadata} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
+import * as storageRemote from './utils/storageRemote';
 import {delay} from './utils/delay';
 import {getToastWindow} from './utils/toastUtils';
 
 
 const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 
-describe('When creating a notification with the center displayed', () => {
+describe('When creating a notification with the center showing', () => {
     let testApp: Application;
     let testWindow: Window;
 
@@ -135,6 +137,21 @@ describe('When creating a notification with the center displayed', () => {
 
             expect(cardContent).toEqual(expectedContent);
         });
+
+        test('The notification is persisted in localForage', async () => {
+            const note = await createPromise;
+            const storedId = `${testApp.identity.uuid}:${note.id}`;
+
+            const expectedStoredNote: StoredNotification = {
+                id: storedId,
+                notification: note,
+                source: testWindow.identity
+            };
+            const actualStoredNote = await storageRemote.getStoredNotification(storedId);
+
+            expect(actualStoredNote).toEqual(expectedStoredNote);
+        });
+
         test('The notification is included in the result of a getAll call', async () => {
             const note = await createPromise;
 

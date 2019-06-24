@@ -43,8 +43,8 @@ export async function getAppNotifications(uuid: string): Promise<StoredNotificat
  */
 export async function getStoredNotification(id: string): Promise<StoredNotification | undefined>{
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined>{
-        const note = await this.notificationStorage.getItem<StoredNotification | null>(remoteID);
+        const note = await this.notificationStorage.getItem<string | null>(remoteID);
         // Localforage returns null for non-existent keys, but we will return undefined for consistency with other utils
-        return note || undefined;
+        return note !== null ? JSON.parse(note) : undefined;
     }, id);
 }
