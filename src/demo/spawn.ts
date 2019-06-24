@@ -230,7 +230,7 @@ async function startApp(appPromise: Promise<Application>): Promise<Application> 
 
 function getUrl(options: WindowData): string {
     // Create URL from base URL + queryArgs
-    let url = options.url || 'http://localhost:3922/test/test-app.html';
+    let url = options.url || 'http://localhost:3922/demo/app.html';
     const urlQueryParams = options.queryArgs || {};
     const urlQueryKeys = Object.keys(urlQueryParams);
 

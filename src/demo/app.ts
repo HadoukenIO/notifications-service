@@ -1,6 +1,13 @@
 import * as ofnotes from '../client/index';
 import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/index';
 
+import {addSpawnListeners, createWindow, createApp} from './spawn';
+
+addSpawnListeners();
+
+// Mount createWindow and createApp on the window to be used by puppeteer
+Object.assign(window, {createWindow, createApp, notifications: ofnotes});
+
 function makeNote(id: string, opts: NotificationOptions) {
     return ofnotes.create(Object.assign(opts, {date: Date.now(), id}));
 }

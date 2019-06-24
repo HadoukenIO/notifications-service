@@ -2,7 +2,7 @@
     "devtools_port": 9090,
     "startup_app": {
         "name": "test-app",
-        "url": "http://localhost:3922/test/test-app.html",
+        "url": "http://localhost:3922/demo/app.html",
         "uuid": "test-app",
         "autoShow": true,
         "showTaskbarIcon": false,
