@@ -3,15 +3,13 @@
 import 'jest';
 
 import {Application, Window} from 'hadouken-js-adapter';
-import * as moment from 'moment';
 
 import {Notification, NotificationOptions} from '../../src/client';
-import {StoredNotification} from '../../src/provider/model/StoredNotification';
 
 import {createApp} from './utils/spawnRemote';
-import {isCenterShowing, getCardsByNotification, getCardMetadata, NotificationCardMetadata} from './utils/notificationCenterUtils';
+import {isCenterShowing, getCardsByNotification, assertDOMMatches} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import * as storageRemote from './utils/storageRemote';
+import {assertNotificationStored} from './utils/storageRemote';
 import {delay} from './utils/delay';
 import {getToastWindow} from './utils/toastUtils';
 
@@ -88,7 +86,17 @@ describe('When creating a notification with the center showing', () => {
             expect(note).toMatchObject(options);
             expect(note.id).toMatch(/[0-9]{9}/); // Random 9-digit numeric string
         });
-        test.todo('The notification is created as expected');
+        test('The notification is created as expected', async () => {
+            await expect(createPromise).resolves;
+            const note = await createPromise;
+            expect(note).toMatchObject(options);
+
+            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            expect(noteCards).toHaveLength(1);
+
+            await assertDOMMatches(testApp.identity.uuid, note);
+            await assertNotificationStored(testWindow.identity, note);
+        });
     });
 
     describe('When passing a valid set of options', () => {
@@ -123,33 +131,12 @@ describe('When creating a notification with the center showing', () => {
         test('The card has the same data as the returned notification object', async () => {
             const note = await createPromise;
 
-            const cardContent: NotificationCardMetadata | undefined = await getCardMetadata(testApp.identity.uuid, note.id);
-            expect(cardContent).not.toBeUndefined();
-
-            const expectedContent: NotificationCardMetadata = {
-                title: note.title,
-                body: note.body,
-                buttons: note.buttons,
-                icon: note.icon,
-                sourceApp: testApp.identity.uuid,
-                timeString: moment(note.date).fromNow()
-            };
-
-            expect(cardContent).toEqual(expectedContent);
+            await assertDOMMatches(testApp.identity.uuid, note);
         });
 
         test('The notification is persisted in localForage', async () => {
             const note = await createPromise;
-            const storedId = `${testApp.identity.uuid}:${note.id}`;
-
-            const expectedStoredNote: StoredNotification = {
-                id: storedId,
-                notification: note,
-                source: testWindow.identity
-            };
-            const actualStoredNote = await storageRemote.getStoredNotification(storedId);
-
-            expect(actualStoredNote).toEqual(expectedStoredNote);
+            await assertNotificationStored(testWindow.identity, note);
         });
 
         test('The notification is included in the result of a getAll call', async () => {
@@ -190,6 +177,9 @@ describe('When creating a notification with the center showing', () => {
 
             const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
+
+            await assertDOMMatches(testApp.identity.uuid, note);
+            await assertNotificationStored(testWindow.identity, note);
         });
         test('The notification card has the correct number of button elements', async () => {
             const note = await createPromise;

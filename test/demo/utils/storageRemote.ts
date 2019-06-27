@@ -1,6 +1,9 @@
 
+import {Identity} from 'hadouken-js-adapter';
+
 import {SERVICE_IDENTITY} from '../../../src/client/internal';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
+import {Notification} from '../../../src/client';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
@@ -47,4 +50,17 @@ export async function getStoredNotification(id: string): Promise<StoredNotificat
         // Localforage returns null for non-existent keys, but we will return undefined for consistency with other utils
         return note !== null ? JSON.parse(note) : undefined;
     }, id);
+}
+
+export async function assertNotificationStored(source: Identity, note: Notification): Promise<void> {
+    const storedId = `${source.uuid}:${note.id}`;
+
+    const expectedStoredNote: StoredNotification = {
+        id: storedId,
+        notification: note,
+        source
+    };
+    const actualStoredNote = await getStoredNotification(storedId);
+
+    expect(actualStoredNote).toEqual(expectedStoredNote);
 }
