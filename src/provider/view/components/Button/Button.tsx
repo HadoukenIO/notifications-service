@@ -20,7 +20,10 @@ export function Button(props: NotificationButtonProps) {
 
     return (
         <div className="button" onClick={handleButtonClick}>
-            <img className="" src={icon} />
+            {icon && icon !== '' ?
+                <img className="" src={icon} />:
+                ''
+            }
             <span className={text}>{text}</span>
         </div>
     );
