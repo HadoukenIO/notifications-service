@@ -169,6 +169,14 @@ export class Main {
         if (!payload.title) {
             throw new Error('Invalid arguments passed to createNotification. "title" must have a value');
         }
+        // If buttons is specified then hydrate the entries
+        if (payload.buttons) {
+            payload.buttons = payload.buttons.map(btn => ({
+                title: btn.title,
+                iconUrl: btn.iconUrl || ''
+            }));
+        }
+
         const notification: Notification = {
             id: payload.id || this.generateId(),
             body: payload.body,
