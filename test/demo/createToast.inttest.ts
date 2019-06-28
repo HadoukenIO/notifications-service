@@ -5,10 +5,11 @@ import {Application, Identity} from 'hadouken-js-adapter';
 import {NotificationOptions} from '../../src/client';
 
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {isCenterShowing} from './utils/notificationCenterUtils';
+import {isCenterShowing, getCardsByNotification, assertDOMMatches} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
 import {getToastWindow, getToastCards} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
+import { assertNotificationStored } from './utils/storageRemote';
 
 const validOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -62,5 +63,21 @@ describe('When calling createNotification', () => {
 
             expect(cardTitle).toEqual(note.title);
         });
+
+        test('A card is added to the center with correct data', async () =>{
+            const note = await notifsRemote.create(testWindowIdentity, validOptions);
+            expect(note).toMatchObject(validOptions);
+
+            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            expect(noteCards).toHaveLength(1);
+
+            await assertDOMMatches(testApp.identity.uuid, note);
+        });
+
+        test('The notification is added to the persistence store', async () => {
+            const note = await notifsRemote.create(testWindowIdentity, validOptions);
+
+            await assertNotificationStored(testWindowIdentity, note);
+        })
     });
 });
