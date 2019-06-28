@@ -9,7 +9,7 @@ import {isCenterShowing, getCardsByNotification, assertDOMMatches} from './utils
 import {delay} from './utils/delay';
 import {getToastWindow, getToastCards} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
-import { assertNotificationStored } from './utils/storageRemote';
+import {assertNotificationStored} from './utils/storageRemote';
 
 const validOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -78,6 +78,6 @@ describe('When calling createNotification', () => {
             const note = await notifsRemote.create(testWindowIdentity, validOptions);
 
             await assertNotificationStored(testWindowIdentity, note);
-        })
+        });
     });
 });
