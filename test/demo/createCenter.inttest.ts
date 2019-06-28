@@ -121,7 +121,6 @@ describe('When creating a notification with the center showing', () => {
 
             expect(note).toMatchObject(options);
         });
-        test.todo('The missing options are filled in with default values'); // Maybe don't do??
         test('Once card appears in the notification center', async () => {
             const note = await createPromise;
 
@@ -190,6 +189,5 @@ describe('When creating a notification with the center showing', () => {
             const buttons = await noteCards[0].$$('.button');
             expect(buttons).toHaveLength(numButtons);
         });
-        test.todo('The button elements are in the correct order');
     });
 });
