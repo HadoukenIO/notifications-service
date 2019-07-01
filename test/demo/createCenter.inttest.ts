@@ -37,6 +37,62 @@ describe('When creating a notification with the center showing', () => {
         await testApp.quit();
     });
 
+    describe('When passing a valid set of options', () => {
+        const options: NotificationOptions = {
+            body: 'Test Notification Body',
+            title: 'Test Notificaiton Title',
+            id: 'test-notification-0',
+            icon: 'https://openfin.co/favicon.ico'
+        };
+
+        let createPromise: Promise<Notification>;
+        beforeEach(async () => {
+            createPromise = notifsRemote.create(testWindow.identity, options);
+
+            // We want to be sure the operation is completed, but don't care about the result
+            await createPromise.catch(() => {});
+        });
+
+        test('The promise resolves to the fully hydrated notification object', async () => {
+            await expect(createPromise).resolves;
+            const note = await createPromise;
+
+            expect(note).toMatchObject(options);
+        });
+        test('Once card appears in the notification center', async () => {
+            const note = await createPromise;
+
+            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            expect(noteCards).toHaveLength(1);
+        });
+        test('The card has the same data as the returned notification object', async () => {
+            const note = await createPromise;
+
+            await assertDOMMatches(testApp.identity.uuid, note);
+        });
+
+        test('The notification is persisted in localForage', async () => {
+            const note = await createPromise;
+            await assertNotificationStored(testWindow.identity, note);
+        });
+
+        test('The notification is included in the result of a getAll call', async () => {
+            const note = await createPromise;
+
+            const appNotes = await notifsRemote.getAll(testWindow.identity);
+
+            expect(appNotes).toContainEqual(note);
+        });
+
+        test('No toast is shown for the created notification', async () => {
+            const note = await createPromise;
+            await delay(100);
+
+            const toastWindow = await getToastWindow(testApp.identity, note.id);
+            expect(toastWindow).toBe(undefined);
+        });
+    });
+
     describe('When options does not include title and/or body', () => {
         // Intentionally circumventing type check with cast for testing purposes
         const options: NotificationOptions = {id: 'invalid-notification'} as NotificationOptions;
@@ -96,62 +152,6 @@ describe('When creating a notification with the center showing', () => {
 
             await assertDOMMatches(testApp.identity.uuid, note);
             await assertNotificationStored(testWindow.identity, note);
-        });
-    });
-
-    describe('When passing a valid set of options', () => {
-        const options: NotificationOptions = {
-            body: 'Test Notification Body',
-            title: 'Test Notificaiton Title',
-            id: 'test-notification-0',
-            icon: 'https://openfin.co/favicon.ico'
-        };
-
-        let createPromise: Promise<Notification>;
-        beforeEach(async () => {
-            createPromise = notifsRemote.create(testWindow.identity, options);
-
-            // We want to be sure the operation is completed, but don't care about the result
-            await createPromise.catch(() => {});
-        });
-
-        test('The promise resolves to the fully hydrated notification object', async () => {
-            await expect(createPromise).resolves;
-            const note = await createPromise;
-
-            expect(note).toMatchObject(options);
-        });
-        test('Once card appears in the notification center', async () => {
-            const note = await createPromise;
-
-            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
-            expect(noteCards).toHaveLength(1);
-        });
-        test('The card has the same data as the returned notification object', async () => {
-            const note = await createPromise;
-
-            await assertDOMMatches(testApp.identity.uuid, note);
-        });
-
-        test('The notification is persisted in localForage', async () => {
-            const note = await createPromise;
-            await assertNotificationStored(testWindow.identity, note);
-        });
-
-        test('The notification is included in the result of a getAll call', async () => {
-            const note = await createPromise;
-
-            const appNotes = await notifsRemote.getAll(testWindow.identity);
-
-            expect(appNotes).toContainEqual(note);
-        });
-
-        test('No toast is shown for the created notification', async () => {
-            const note = await createPromise;
-            await delay(100);
-
-            const toastWindow = await getToastWindow(testApp.identity, note.id);
-            expect(toastWindow).toBe(undefined);
         });
     });
 
