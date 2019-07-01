@@ -9,7 +9,7 @@ import {Notification, NotificationOptions} from '../../src/client';
 import {createApp} from './utils/spawnRemote';
 import {isCenterShowing, getCardsByNotification, assertDOMMatches} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {assertNotificationStored} from './utils/storageRemote';
+import {assertNotificationStored, getAppNotifications} from './utils/storageRemote';
 import {delay} from './utils/delay';
 import {getToastWindow} from './utils/toastUtils';
 
@@ -46,46 +46,40 @@ describe('When creating a notification with the center showing', () => {
         };
 
         let createPromise: Promise<Notification>;
+        let note: Notification;
         beforeEach(async () => {
             createPromise = notifsRemote.create(testWindow.identity, options);
 
-            // We want to be sure the operation is completed, but don't care about the result
-            await createPromise.catch(() => {});
+            // We want to be sure the operation is completed, but don't care if it succeeds
+            note = await createPromise.catch(() => ({} as Notification));
         });
 
         test('The promise resolves to the fully hydrated notification object', async () => {
             await expect(createPromise).resolves;
-            const note = await createPromise;
-
             expect(note).toMatchObject(options);
         });
-        test('Once card appears in the notification center', async () => {
-            const note = await createPromise;
 
+        test('One card appears in the notification center', async () => {
             const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
         });
-        test('The card has the same data as the returned notification object', async () => {
-            const note = await createPromise;
 
+        test('The card has the same data as the returned notification object', async () => {
             await assertDOMMatches(testApp.identity.uuid, note);
         });
 
-        test('The notification is persisted in localForage', async () => {
-            const note = await createPromise;
+        test('The notification is added to the persistence store', async () => {
             await assertNotificationStored(testWindow.identity, note);
         });
 
         test('The notification is included in the result of a getAll call', async () => {
-            const note = await createPromise;
-
             const appNotes = await notifsRemote.getAll(testWindow.identity);
-
             expect(appNotes).toContainEqual(note);
         });
 
         test('No toast is shown for the created notification', async () => {
-            const note = await createPromise;
+            // The notification is created immediately before this, so we need
+            // a slight delay to allow time for the toast to spawn.
             await delay(100);
 
             const toastWindow = await getToastWindow(testApp.identity, note.id);
@@ -101,7 +95,7 @@ describe('When creating a notification with the center showing', () => {
         beforeEach(async () => {
             createPromise = notifsRemote.create(testWindow.identity, options);
 
-            // We want to be sure the operation is completed, but don't care about the result
+            // We want to be sure the operation is completed, but don't care if it succeeds
             await createPromise.catch(() => {});
         });
 
@@ -118,6 +112,13 @@ describe('When creating a notification with the center showing', () => {
             const noteCards = await getCardsByNotification(testApp.identity.uuid, options.id!);
             expect(noteCards).toEqual([]);
         });
+
+        test('The notification is not added to the persistence store', async () => {
+            const storedNotes = await getAppNotifications(testApp.identity.uuid);
+
+            expect(storedNotes).toEqual([]);
+        });
+
         test('The notification does not appear in the result of getAll', async () => {
             const appNotes = await notifsRemote.getAll(testWindow.identity);
             expect(appNotes).toEqual([]);
@@ -128,30 +129,34 @@ describe('When creating a notification with the center showing', () => {
         const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notificaiton Title'};
 
         let createPromise: Promise<Notification>;
+        let note: Notification;
         beforeEach(async () => {
             createPromise = notifsRemote.create(testWindow.identity, options);
 
-            // We want to be sure the operation is completed, but don't care about the result
-            await createPromise.catch(() => {});
+            // We want to be sure the operation is completed, but don't care if it succeeds
+            note = await createPromise.catch(() => ({} as Notification));
+        });
+
+        test('The notification is created as expected', async () => {
+            await expect(createPromise).resolves;
+            expect(note).toMatchObject(options);
+
+            // Card is created
+            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            expect(noteCards).toHaveLength(1);
+
+            // Card is correct
+            await assertDOMMatches(testApp.identity.uuid, note);
+
+            // Notification is persisted
+            await assertNotificationStored(testWindow.identity, note);
         });
 
         test('An id is generated by the service and returned in the hydrated object', async () => {
             await expect(createPromise).resolves;
-            const note = await createPromise;
 
             expect(note).toMatchObject(options);
             expect(note.id).toMatch(/[0-9]{9}/); // Random 9-digit numeric string
-        });
-        test('The notification is created as expected', async () => {
-            await expect(createPromise).resolves;
-            const note = await createPromise;
-            expect(note).toMatchObject(options);
-
-            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
-            expect(noteCards).toHaveLength(1);
-
-            await assertDOMMatches(testApp.identity.uuid, note);
-            await assertNotificationStored(testWindow.identity, note);
         });
     });
 
@@ -162,22 +167,26 @@ describe('When creating a notification with the center showing', () => {
         }
 
         let createPromise: Promise<Notification>;
+        let note: Notification;
         beforeEach(async () => {
             createPromise = notifsRemote.create(testWindow.identity, options);
 
-            // We want to be sure the operation is completed, but don't care about the result
-            await createPromise.catch(() => {});
+            // We want to be sure the operation is completed, but don't care if it succeeds
+            note = await createPromise.catch(() => ({} as Notification));
         });
 
         test('The notification is created as expected', async () => {
             await expect(createPromise).resolves;
-            const note = await createPromise;
             expect(note).toMatchObject(options);
 
+            // Card is created
             const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
 
+            // Card is correct
             await assertDOMMatches(testApp.identity.uuid, note);
+
+            // Notification is persisted
             await assertNotificationStored(testWindow.identity, note);
         });
         test('The notification card has the correct number of button elements', async () => {
