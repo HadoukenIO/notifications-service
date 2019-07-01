@@ -35,11 +35,7 @@ export function NotificationCard(props: NotificationCardProps) {
             <NotificationTime date={data.date} />
             <div className="body">
                 <div className="source">
-                    {
-                        data.icon && data.icon !== ''?
-                            <img src={data.icon} /> :
-                            ''
-                    }
+                    {data.icon && <img src={data.icon} />}
                     <span className="app-name">
                         {notification.source.name}
                     </span>
