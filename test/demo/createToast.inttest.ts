@@ -1,83 +1,94 @@
 import 'jest';
 
-import {Application, Identity} from 'hadouken-js-adapter';
+import {Application, Window} from 'hadouken-js-adapter';
 
-import {NotificationOptions} from '../../src/client';
+import {NotificationOptions, Notification} from '../../src/client';
 
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {isCenterShowing, getCardsByNotification, assertDOMMatches} from './utils/notificationCenterUtils';
+import {isCenterShowing, getCardsByNotification, assertDOMMatches as assertCenterDOMMatches} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
-import {getToastWindow, getToastCards} from './utils/toastUtils';
+import {getToastWindow, getToastCards, assertDOMMatches as assertToastDOMMatches} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
 
-const validOptions: NotificationOptions = {
+const options: NotificationOptions = {
     body: 'Test Notification Body',
     title: 'Test Notification Title'
 };
 
 const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 
-describe('When calling createNotification', () => {
-    describe('With the notification center not showing', () => {
-        beforeAll(async () => {
-            // Hide the center to be sure we get toasts
-            if (await isCenterShowing()) {
-                await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            }
-        });
+describe('When calling createNotification with the notification center not showing', () => {
+    let testApp: Application;
+    let testWindow: Window;
 
-        let testApp: Application;
-        let testWindowIdentity: Identity;
-        beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {});
-            testWindowIdentity = await testApp.getWindow().then(w => w.identity);
-        });
+    let createPromise: Promise<Notification>;
+    let note: Notification;
 
-        afterEach(async () => {
-            await notifsRemote.clearAll(testWindowIdentity);
-            await testApp.quit();
-        });
+    beforeAll(async () => {
+        // Toggle the center on/off based on test type
+        if (await isCenterShowing()) {
+            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+        }
+    });
 
-        test('A toast is shown for the notification', async () => {
-            const note = await notifsRemote.create(testWindowIdentity, validOptions);
-            await delay(100);
-            const toastWindow = await getToastWindow(testApp.identity, note.id);
-            expect(toastWindow).not.toBe(undefined);
+    beforeEach(async () => {
+        testApp = await createApp(testManagerIdentity, {});
+        testWindow = await testApp.getWindow();
 
-            await notifsRemote.clear(testWindowIdentity, note.id);
-        });
+        createPromise = notifsRemote.create(testWindow.identity, options);
 
-        test('The toast is displaying the correct data', async () => {
-            const note = await notifsRemote.create(testWindowIdentity, validOptions);
-            await delay(1000);
+        // We want to be sure the operation is completed, but don't care if it succeeds
+        note = await createPromise.catch(() => ({} as Notification));
+    });
 
-            const toastCards = await getToastCards(testApp.identity, note.id);
+    afterEach(async () => {
+        await notifsRemote.clearAll(testWindow.identity);
+        await testApp.quit();
+    });
 
-            expect(Array.isArray(toastCards)).toBe(true);
-            expect(toastCards).toHaveLength(1);
+    test('The promise resolves to the fully hydrated notification object', async () => {
+        await expect(createPromise).resolves;
+        expect(note).toMatchObject(options);
+    });
 
-            const toastCard = toastCards![0];
-            const titleElement = await toastCard.$('.title');
-            const cardTitle = await titleElement!.getProperty('innerHTML').then(val => val.jsonValue());
+    test('A toast is shown for the notification', async () => {
+        // The toast creation is not awaited as part of notes.create, so we add a small
+        // delay to allow the window time to spawn.
+        await delay(500);
 
-            expect(cardTitle).toEqual(note.title);
-        });
+        const toastWindow = await getToastWindow(testApp.identity, note.id);
+        expect(toastWindow).not.toBe(undefined);
 
-        test('A card is added to the center with correct data', async () =>{
-            const note = await notifsRemote.create(testWindowIdentity, validOptions);
-            expect(note).toMatchObject(validOptions);
+        await notifsRemote.clear(testWindow.identity, note.id);
+    });
 
-            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
-            expect(noteCards).toHaveLength(1);
+    test('The toast is displaying the correct data', async () => {
+        // The toast creation is not awaited as part of notes.create, so we add a small
+        // delay to allow the window time to spawn.
+        await delay(500);
 
-            await assertDOMMatches(testApp.identity.uuid, note);
-        });
+        const toastCards = await getToastCards(testApp.identity, note.id);
 
-        test('The notification is added to the persistence store', async () => {
-            const note = await notifsRemote.create(testWindowIdentity, validOptions);
+        expect(Array.isArray(toastCards)).toBe(true);
+        expect(toastCards).toHaveLength(1);
 
-            await assertNotificationStored(testWindowIdentity, note);
-        });
+        await assertToastDOMMatches(testApp.identity.uuid, note);
+    });
+
+    test('A card is added to the center with correct data', async () =>{
+        const note = await notifsRemote.create(testWindow.identity, options);
+        expect(note).toMatchObject(options);
+
+        const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+        expect(noteCards).toHaveLength(1);
+
+        await assertCenterDOMMatches(testApp.identity.uuid, note);
+    });
+
+    test('The notification is added to the persistence store', async () => {
+        const note = await notifsRemote.create(testWindow.identity, options);
+
+        await assertNotificationStored(testWindow.identity, note);
     });
 });

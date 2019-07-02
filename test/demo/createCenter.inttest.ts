@@ -163,6 +163,7 @@ describe('When creating a notification with the center showing', () => {
     describe.each([1, 2, 3])('With %i button(s)', numButtons => {
         const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notificaiton Title', buttons: []};
         for (let i = 0; i < numButtons; i++) {
+            // options.buttons is assigned immediatly before this, but we need the ! because typescript doesn't realize.
             options.buttons!.push({title: 'Button ' + i});
         }
 
