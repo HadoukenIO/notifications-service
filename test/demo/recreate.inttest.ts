@@ -6,11 +6,12 @@ import {WindowEvent} from 'hadouken-js-adapter/out/types/src/api/events/base';
 import {NotificationOptions, Notification, NotificationClosedEvent} from '../../src/client';
 
 import {createApp} from './utils/spawnRemote';
-import {isCenterShowing, assertDOMMatches as assertCenterDOMMatches} from './utils/notificationCenterUtils';
+import {isCenterShowing} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
 import {delay} from './utils/delay';
 import {fin} from './utils/fin';
-import {getToastIdentity, assertDOMMatches as assertToastDOMMatches} from './utils/toastUtils';
+import {getToastIdentity} from './utils/toastUtils';
+import {assertDOMMatches, CardType} from './utils/noteCardUtils';
 
 const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 
@@ -79,13 +80,13 @@ describe('When creating a notification with an ID that already exists but differ
 
         test('The card in the center is updated to show the new notification details', async () => {
             // Existing card matches `firstOptions`
-            await assertCenterDOMMatches(testApp.identity.uuid, existingNote);
+            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, existingNote);
 
             // Recreate the notification
             const newNote = await notifsRemote.create(testWindow.identity, secondOptions);
 
             // New card matches `secondOptions`
-            await assertCenterDOMMatches(testApp.identity.uuid, newNote);
+            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, newNote);
         });
 
         // Extra tests for toasts only when the center is hidden
@@ -95,7 +96,7 @@ describe('When creating a notification with an ID that already exists but differ
                     const expectedEvent = {
                         topic: 'system',
                         type: 'window-closed',
-                        ...getToastIdentity(testApp.identity, firstOptions.id!)
+                        ...getToastIdentity(testApp.identity.uuid, firstOptions.id!)
                     };
 
                     // Listen for window-closed events globally
@@ -114,7 +115,7 @@ describe('When creating a notification with an ID that already exists but differ
                     const expectedEvent = {
                         topic: 'system',
                         type: 'window-created',
-                        ...getToastIdentity(testApp.identity, firstOptions.id!)
+                        ...getToastIdentity(testApp.identity.uuid, firstOptions.id!)
                     };
 
                     // Listen for window-closed events globally
@@ -135,7 +136,7 @@ describe('When creating a notification with an ID that already exists but differ
                     await delay(700);
 
                     // New toast matches `secondOptions`
-                    await assertToastDOMMatches(testApp.identity.uuid, newNote);
+                    await assertDOMMatches(CardType.TOAST, testApp.identity.uuid, newNote);
                 });
             });
         }
