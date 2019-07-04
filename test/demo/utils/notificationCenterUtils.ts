@@ -5,6 +5,7 @@ import {Notification} from '../../../src/client';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
+import { promiseMap } from './asyncUtils';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 
@@ -87,10 +88,6 @@ async function getPropertyByQueryString(rootElement: ElementHandle, queryString:
     }
     const propertyHandle = await queryElement.getProperty(property);
     return propertyHandle.jsonValue();
-}
-
-async function promiseMap<T, R>(arr: T[], fn: (elem: T) => Promise<R>): Promise<R[]> {
-    return Promise.all(arr.map(fn));
 }
 
 export async function assertDOMMatches(sourceUuid: string, note: Notification): Promise<void> {
