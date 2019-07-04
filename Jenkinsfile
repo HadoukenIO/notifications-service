@@ -39,11 +39,11 @@ pipeline {
                         bat "npm install"
                         bat "npm run test:int -- --noColor -x \"--no-cache --verbose\""
                     }
-                    // post {
-                    //     always {
-                    //         junit "dist/test/results-int.xml"
-                    //     }
-                    // }
+                    post {
+                        always {
+                            junit "dist/test/results-int.xml"
+                        }
+                    }
                 }
             }
         }
