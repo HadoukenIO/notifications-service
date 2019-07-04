@@ -5,11 +5,12 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {NotificationOptions, Notification} from '../../src/client';
 
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {isCenterShowing, getCardsByNotification, assertDOMMatches as assertCenterDOMMatches} from './utils/notificationCenterUtils';
+import {isCenterShowing, getCenterCardsByNotification} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
-import {getToastWindow, getToastCards, assertDOMMatches as assertToastDOMMatches} from './utils/toastUtils';
+import {getToastWindow, getToastCards} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
+import {assertDOMMatches, CardType} from './utils/noteCardUtils';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
@@ -57,7 +58,7 @@ describe('When calling createNotification with the notification center not showi
         // delay to allow the window time to spawn.
         await delay(500);
 
-        const toastWindow = await getToastWindow(testApp.identity, note.id);
+        const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
         expect(toastWindow).not.toBe(undefined);
 
         await notifsRemote.clear(testWindow.identity, note.id);
@@ -68,22 +69,22 @@ describe('When calling createNotification with the notification center not showi
         // delay to allow the window time to spawn.
         await delay(500);
 
-        const toastCards = await getToastCards(testApp.identity, note.id);
+        const toastCards = await getToastCards(testApp.identity.uuid, note.id);
 
         expect(Array.isArray(toastCards)).toBe(true);
         expect(toastCards).toHaveLength(1);
 
-        await assertToastDOMMatches(testApp.identity.uuid, note);
+        await assertDOMMatches(CardType.TOAST, testApp.identity.uuid, note);
     });
 
     test('A card is added to the center with correct data', async () =>{
         const note = await notifsRemote.create(testWindow.identity, options);
         expect(note).toMatchObject(options);
 
-        const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+        const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
         expect(noteCards).toHaveLength(1);
 
-        await assertCenterDOMMatches(testApp.identity.uuid, note);
+        await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, note);
     });
 
     test('The notification is added to the persistence store', async () => {

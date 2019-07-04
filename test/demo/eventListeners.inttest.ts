@@ -4,7 +4,7 @@ import {Application, Window as FinWindow} from 'hadouken-js-adapter';
 import {NotificationClickedEvent, Notification, NotificationOptions, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../src/client';
 
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {getCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
+import {getCenterCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
 import {delay} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 
@@ -59,7 +59,7 @@ describe('Click listeners', () => {
 
                 // Quick sanity check that there is exactly one notification card with this ID
                 // This is tested more thoroughly in creatNotification tests
-                const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+                const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
                 expect(noteCards).toHaveLength(1);
             });
 
@@ -69,7 +69,7 @@ describe('Click listeners', () => {
             });
 
             test('Clicking on the card will trigger the listener with the metadata of the clicked notification', async () => {
-                const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+                const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
 
                 // Click on the card and pause momentarily to allow the event to propagate
                 await noteCards[0].click();
@@ -84,7 +84,7 @@ describe('Click listeners', () => {
             });
 
             test('Clicking on the card\'s button triggers the buttonClickListener and does not trigger the clickListener', async () => {
-                const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+                const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
 
                 // Get a remote handle to the button DOM element
                 const buttonHandles = await noteCards[0].$$('.button');
@@ -108,7 +108,7 @@ describe('Click listeners', () => {
 
             describe('When clicking the close button', () => {
                 beforeEach(async () => {
-                    const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+                    const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
 
                     // Close button is only visible/clickable when card is hovered
                     await noteCards[0].hover();
@@ -136,7 +136,7 @@ describe('Click listeners', () => {
 
                 test('The notification is cleared and no longer appears in the center or when calling getAll', async () => {
                     // No card in the center
-                    const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+                    const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
                     expect(noteCards).toHaveLength(0);
 
                     // Not returned from getAll

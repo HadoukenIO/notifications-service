@@ -7,11 +7,12 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {Notification, NotificationOptions} from '../../src/client';
 
 import {createApp} from './utils/spawnRemote';
-import {isCenterShowing, getCardsByNotification, assertDOMMatches} from './utils/notificationCenterUtils';
+import {isCenterShowing, getCenterCardsByNotification} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
 import {assertNotificationStored, getAppNotifications} from './utils/storageRemote';
 import {delay} from './utils/delay';
 import {getToastWindow} from './utils/toastUtils';
+import {assertDOMMatches, CardType} from './utils/noteCardUtils';
 
 
 const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
@@ -60,12 +61,12 @@ describe('When creating a notification with the center showing', () => {
         });
 
         test('One card appears in the notification center', async () => {
-            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
         });
 
         test('The card has the same data as the returned notification object', async () => {
-            await assertDOMMatches(testApp.identity.uuid, note);
+            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, note);
         });
 
         test('The notification is added to the persistence store', async () => {
@@ -82,7 +83,7 @@ describe('When creating a notification with the center showing', () => {
             // a slight delay to allow time for the toast to spawn.
             await delay(100);
 
-            const toastWindow = await getToastWindow(testApp.identity, note.id);
+            const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
             expect(toastWindow).toBe(undefined);
         });
     });
@@ -109,7 +110,7 @@ describe('When creating a notification with the center showing', () => {
         });
 
         test('A card is not added to the notification center', async () => {
-            const noteCards = await getCardsByNotification(testApp.identity.uuid, options.id!);
+            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, options.id!);
             expect(noteCards).toEqual([]);
         });
 
@@ -142,11 +143,11 @@ describe('When creating a notification with the center showing', () => {
             expect(note).toMatchObject(options);
 
             // Card is created
-            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
 
             // Card is correct
-            await assertDOMMatches(testApp.identity.uuid, note);
+            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, note);
 
             // Notification is persisted
             await assertNotificationStored(testWindow.identity, note);
@@ -181,11 +182,11 @@ describe('When creating a notification with the center showing', () => {
             expect(note).toMatchObject(options);
 
             // Card is created
-            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
 
             // Card is correct
-            await assertDOMMatches(testApp.identity.uuid, note);
+            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, note);
 
             // Notification is persisted
             await assertNotificationStored(testWindow.identity, note);
@@ -193,7 +194,7 @@ describe('When creating a notification with the center showing', () => {
         test('The notification card has the correct number of button elements', async () => {
             const note = await createPromise;
 
-            const noteCards = await getCardsByNotification(testApp.identity.uuid, note.id);
+            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
 
             const buttons = await noteCards[0].$$('.button');
