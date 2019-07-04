@@ -7,7 +7,7 @@ import {Notification} from '../../../src/client';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
-import { promiseMap } from './asyncUtils';
+import {promiseMap} from './asyncUtils';
 
 export function getToastIdentity(sourceApp: Identity, notificationId: string): Identity {
     return {uuid: SERVICE_IDENTITY.uuid, name: `Notification-Toast:${sourceApp.uuid}:${notificationId}`};

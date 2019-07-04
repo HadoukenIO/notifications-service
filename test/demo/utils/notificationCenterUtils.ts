@@ -5,7 +5,7 @@ import {Notification} from '../../../src/client';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
-import { promiseMap } from './asyncUtils';
+import {promiseMap} from './asyncUtils';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 
