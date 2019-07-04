@@ -1,15 +1,18 @@
 import 'jest';
 
-import { Application, Window } from 'hadouken-js-adapter';
+import {Application, Window} from 'hadouken-js-adapter';
+import {WindowEvent} from 'hadouken-js-adapter/out/types/src/api/events/base';
 
-import { NotificationOptions, Notification, NotificationClosedEvent } from '../../src/client';
+import {NotificationOptions, Notification, NotificationClosedEvent} from '../../src/client';
 
-import { createApp } from './utils/spawnRemote';
-import { isCenterShowing, assertDOMMatches } from './utils/notificationCenterUtils';
+import {createApp} from './utils/spawnRemote';
+import {isCenterShowing, assertDOMMatches as assertCenterDOMMatches} from './utils/notificationCenterUtils';
 import * as notifsRemote from './utils/notificationsRemoteExecution';
-import { delay } from './utils/delay';
+import {delay} from './utils/delay';
+import {fin} from './utils/fin';
+import {getToastIdentity, assertDOMMatches as assertToastDOMMatches} from './utils/toastUtils';
 
-const testManagerIdentity = { uuid: 'test-app', name: 'test-app' };
+const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',
@@ -51,7 +54,7 @@ describe('When creating a notification with an ID that already exists but differ
 
         afterEach(async () => {
             await notifsRemote.clearAll(testWindow.identity);
-            await testApp.quit();
+            await testApp.quit(true).catch(() => {});
         });
 
         test('The promise resolves to the new notification object', async () => {
@@ -76,21 +79,64 @@ describe('When creating a notification with an ID that already exists but differ
 
         test('The card in the center is updated to show the new notification details', async () => {
             // Existing card matches `firstOptions`
-            await assertDOMMatches(testApp.identity.uuid, existingNote);
+            await assertCenterDOMMatches(testApp.identity.uuid, existingNote);
 
             // Recreate the notification
             const newNote = await notifsRemote.create(testWindow.identity, secondOptions);
 
             // New card matches `secondOptions`
-            await assertDOMMatches(testApp.identity.uuid, newNote);
+            await assertCenterDOMMatches(testApp.identity.uuid, newNote);
         });
 
         // Extra tests for toasts only when the center is hidden
         if (!showCenter) {
             describe('When the existing notification has an active toast', () => {
-                test.todo('The existing toast window is closed');
-                test.todo('A new toast window is created');
-                test.todo('The new toast matches the options of the new notification');
+                test('The existing toast window is closed', async () => {
+                    const expectedEvent = {
+                        topic: 'system',
+                        type: 'window-closed',
+                        ...getToastIdentity(testApp.identity, firstOptions.id!)
+                    };
+
+                    // Listen for window-closed events globally
+                    const finCloseListener = jest.fn<void, [WindowEvent<'system', 'window-closed'>]>();
+                    await fin.System.addListener('window-closed', finCloseListener);
+
+                    // Recreate the notification and pause momentarily to allow the service time to process
+                    await notifsRemote.create(testWindow.identity, secondOptions);
+                    await delay(200);
+
+                    expect(finCloseListener).toHaveBeenCalledWith(expectedEvent);
+
+                    await fin.System.removeListener('window-closed', finCloseListener);
+                });
+                test('A new toast window is created', async () => {
+                    const expectedEvent = {
+                        topic: 'system',
+                        type: 'window-created',
+                        ...getToastIdentity(testApp.identity, firstOptions.id!)
+                    };
+
+                    // Listen for window-closed events globally
+                    const finOpenListener = jest.fn<void, [WindowEvent<'system', 'window-created'>]>();
+                    await fin.System.addListener('window-created', finOpenListener);
+
+                    // Recreate the notification and pause momentarily to allow the service time to process
+                    await notifsRemote.create(testWindow.identity, secondOptions);
+                    await delay(200);
+
+                    expect(finOpenListener).toHaveBeenCalledWith(expectedEvent);
+
+                    await fin.System.removeListener('window-created', finOpenListener);
+                });
+                test('The new toast matches the options of the new notification', async () => {
+                    // Recreate the notification and delay stlight to allow the toast to spawn
+                    const newNote = await notifsRemote.create(testWindow.identity, secondOptions);
+                    await delay(700);
+
+                    // New toast matches `secondOptions`
+                    await assertToastDOMMatches(testApp.identity.uuid, newNote);
+                });
             });
         }
     });
