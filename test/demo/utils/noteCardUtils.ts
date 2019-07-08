@@ -51,18 +51,6 @@ export async function getCardMetadata(card: ElementHandle): Promise<Notification
     return {title, body, sourceApp, timeString, icon, buttons};
 }
 
-/**
- * Uses `$`, so only the first matching element is queried
- */
-async function getPropertyByQueryString(rootElement: ElementHandle, queryString: string, property: string): Promise<string | undefined> {
-    const queryElement = await rootElement.$(queryString);
-    if (!queryElement) {
-        return undefined;
-    }
-    const propertyHandle = await queryElement.getProperty(property);
-    return propertyHandle.jsonValue();
-}
-
 export async function assertDOMMatches(type: CardType, sourceUuid: string, note: Notification): Promise<void> {
     const noteCards = type === 'center' ? await getCenterCardsByNotification(sourceUuid, note.id): await getToastCards(sourceUuid, note.id);
     if (!noteCards || noteCards.length === 0) {
@@ -87,4 +75,16 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
     };
 
     expect(cardContent).toEqual(expectedContent);
+}
+
+/**
+ * Uses `$`, so only the first matching element is queried
+ */
+async function getPropertyByQueryString(rootElement: ElementHandle, queryString: string, property: string): Promise<string | undefined> {
+    const queryElement = await rootElement.$(queryString);
+    if (!queryElement) {
+        return undefined;
+    }
+    const propertyHandle = await queryElement.getProperty(property);
+    return propertyHandle.jsonValue();
 }

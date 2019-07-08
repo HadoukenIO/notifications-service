@@ -111,6 +111,7 @@ describe('When creating a notification with an ID that already exists but differ
 
                     await fin.System.removeListener('window-closed', finCloseListener);
                 });
+
                 test('A new toast window is created', async () => {
                     const expectedEvent = {
                         topic: 'system',
@@ -130,6 +131,7 @@ describe('When creating a notification with an ID that already exists but differ
 
                     await fin.System.removeListener('window-created', finOpenListener);
                 });
+
                 test('The new toast matches the options of the new notification', async () => {
                     // Recreate the notification and delay stlight to allow the toast to spawn
                     const newNote = await notifsRemote.create(testWindow.identity, secondOptions);

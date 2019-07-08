@@ -1,4 +1,3 @@
-
 import {Identity} from 'hadouken-js-adapter';
 
 import {SERVICE_IDENTITY} from '../../../src/client/internal';
@@ -39,19 +38,6 @@ export async function getAppNotifications(uuid: string): Promise<StoredNotificat
     }, uuid);
 }
 
-/**
- * @param id ID of the stored notificaiton. Note: this is the internal id of format "UUID:NoteID" and must be an exact match.
- *
- * Returns `undefined` if no notification is stored with given id.
- */
-export async function getStoredNotification(id: string): Promise<StoredNotification | undefined>{
-    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined>{
-        const note = await this.notificationStorage.getItem<string | null>(remoteID);
-        // Localforage returns null for non-existent keys, but we will return undefined for consistency with other utils
-        return note !== null ? JSON.parse(note) : undefined;
-    }, id);
-}
-
 export async function assertNotificationStored(source: Identity, note: Notification): Promise<void> {
     const storedId = `${source.uuid}:${note.id}`;
 
@@ -63,4 +49,17 @@ export async function assertNotificationStored(source: Identity, note: Notificat
     const actualStoredNote = await getStoredNotification(storedId);
 
     expect(actualStoredNote).toEqual(expectedStoredNote);
+}
+
+/**
+ * @param id ID of the stored notificaiton. Note: this is the internal id of format "UUID:NoteID" and must be an exact match.
+ *
+ * Returns `undefined` if no notification is stored with given id.
+ */
+async function getStoredNotification(id: string): Promise<StoredNotification | undefined>{
+    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined>{
+        const note = await this.notificationStorage.getItem<string | null>(remoteID);
+        // Localforage returns null for non-existent keys, but we will return undefined for consistency with other utils
+        return note !== null ? JSON.parse(note) : undefined;
+    }, id);
 }

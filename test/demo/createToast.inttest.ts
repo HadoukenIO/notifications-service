@@ -77,7 +77,7 @@ describe('When calling createNotification with the notification center not showi
         await assertDOMMatches(CardType.TOAST, testApp.identity.uuid, note);
     });
 
-    test('A card is added to the center with correct data', async () =>{
+    test('A card is added to the center with correct data', async () => {
         const note = await notifsRemote.create(testWindow.identity, options);
         expect(note).toMatchObject(options);
 

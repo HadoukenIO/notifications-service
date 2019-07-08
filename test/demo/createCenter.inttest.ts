@@ -1,5 +1,3 @@
-// Tests for creating notifications with the center showing (i.e. no toasts)
-
 import 'jest';
 
 import {Application, Window} from 'hadouken-js-adapter';
@@ -191,6 +189,7 @@ describe('When creating a notification with the center showing', () => {
             // Notification is persisted
             await assertNotificationStored(testWindow.identity, note);
         });
+
         test('The notification card has the correct number of button elements', async () => {
             const note = await createPromise;
 
