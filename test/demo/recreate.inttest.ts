@@ -6,12 +6,12 @@ import {WindowEvent} from 'hadouken-js-adapter/out/types/src/api/events/base';
 import {NotificationOptions, Notification, NotificationClosedEvent} from '../../src/client';
 
 import {createApp} from './utils/spawnRemote';
-import {isCenterShowing} from './utils/notificationCenterUtils';
-import * as notifsRemote from './utils/notificationsRemoteExecution';
+import {isCenterShowing} from './utils/centerUtils';
+import * as notifsRemote from './utils/notificationsRemote';
 import {delay} from './utils/delay';
 import {fin} from './utils/fin';
 import {getToastIdentity} from './utils/toastUtils';
-import {assertDOMMatches, CardType} from './utils/noteCardUtils';
+import {assertDOMMatches, CardType} from './utils/cardUtils';
 
 const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 

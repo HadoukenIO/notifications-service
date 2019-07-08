@@ -5,7 +5,7 @@ import {Notification} from '../../../src/client';
 
 import {promiseMap} from './asyncUtils';
 import {getToastCards} from './toastUtils';
-import {getCenterCardsByNotification} from './notificationCenterUtils';
+import {getCenterCardsByNotification} from './centerUtils';
 
 export interface NotificationCardMetadata {
     title?: string;

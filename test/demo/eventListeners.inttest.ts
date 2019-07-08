@@ -3,8 +3,8 @@ import {Application, Window as FinWindow} from 'hadouken-js-adapter';
 
 import {NotificationClickedEvent, Notification, NotificationOptions, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../src/client';
 
-import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {getCenterCardsByNotification, isCenterShowing} from './utils/notificationCenterUtils';
+import * as notifsRemote from './utils/notificationsRemote';
+import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
 import {delay} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 

@@ -4,13 +4,13 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, Notification} from '../../src/client';
 
-import * as notifsRemote from './utils/notificationsRemoteExecution';
-import {isCenterShowing, getCenterCardsByNotification} from './utils/notificationCenterUtils';
+import * as notifsRemote from './utils/notificationsRemote';
+import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
 import {delay} from './utils/delay';
 import {getToastWindow, getToastCards} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
-import {assertDOMMatches, CardType} from './utils/noteCardUtils';
+import {assertDOMMatches, CardType} from './utils/cardUtils';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
