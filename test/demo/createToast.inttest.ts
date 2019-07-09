@@ -26,7 +26,7 @@ describe('When calling createNotification with the notification center not showi
     let note: Notification;
 
     beforeAll(async () => {
-        // Toggle the center on/off based on test type
+        // Ensure center is not showing
         if (await isCenterShowing()) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
         }

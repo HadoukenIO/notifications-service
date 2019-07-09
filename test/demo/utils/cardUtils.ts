@@ -32,10 +32,10 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
         return undefined;
     }
     if (noteCards.length > 1) {
-        throw new Error(`Multiple notification cards found for the given uuid/id pair: ${sourceUuid}/${note.id}`);
+        throw new Error(`Multiple notification cards found for the given UUID/ID pair: ${sourceUuid}/${note.id}`);
     }
 
-    const expectedContent: NotificationCardMetadata = {
+    const expectedMetadata: NotificationCardMetadata = {
         title: note.title,
         body: note.body,
         buttons: note.buttons,
@@ -44,8 +44,8 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
         timeString: moment(note.date).fromNow()
     };
 
-    const actualContent: NotificationCardMetadata = await getCardMetadata(noteCards[0]);
-    expect(actualContent).toEqual(expectedContent);
+    const actualMetadata: NotificationCardMetadata = await getCardMetadata(noteCards[0]);
+    expect(actualMetadata).toEqual(expectedMetadata);
 }
 
 /**
