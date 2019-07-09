@@ -169,8 +169,8 @@ export class Main {
         if (!payload.title) {
             throw new Error('Invalid arguments passed to createNotification. "title" must have a value');
         }
-        // If buttons is specified then hydrate the entries
-        if (payload.buttons) {
+        // If "buttons" property is specified, and its value is an array we neeed to hydrate the entries
+        if (Array.isArray(payload.buttons)) {
             payload.buttons = payload.buttons.map(btn => ({
                 title: btn.title,
                 iconUrl: btn.iconUrl || ''

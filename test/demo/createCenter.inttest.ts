@@ -7,13 +7,11 @@ import {Notification, NotificationOptions} from '../../src/client';
 import {createApp} from './utils/spawnRemote';
 import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
 import * as notifsRemote from './utils/notificationsRemote';
-import {assertNotificationStored, getAppNotifications} from './utils/storageRemote';
+import {assertNotificationStored, getStoredNotificationsByApp} from './utils/storageRemote';
 import {delay} from './utils/delay';
 import {getToastWindow} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
-
-
-const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
+import {testManagerIdentity} from './utils/constants';
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;
@@ -113,7 +111,7 @@ describe('When creating a notification with the center showing', () => {
         });
 
         test('The notification is not added to the persistence store', async () => {
-            const storedNotes = await getAppNotifications(testApp.identity.uuid);
+            const storedNotes = await getStoredNotificationsByApp(testApp.identity.uuid);
 
             expect(storedNotes).toEqual([]);
         });

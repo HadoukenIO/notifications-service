@@ -7,6 +7,7 @@ import * as notifsRemote from './utils/notificationsRemote';
 import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
 import {delay} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
+import {testManagerIdentity} from './utils/constants';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -15,8 +16,6 @@ const defaultNoteOptions: NotificationOptions = {
         {title: 'Button 1'}
     ]
 };
-
-const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 
 describe('Click listeners', () => {
     beforeAll(async () => {

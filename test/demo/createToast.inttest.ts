@@ -11,13 +11,12 @@ import {getToastWindow, getToastCards} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
+import {testManagerIdentity} from './utils/constants';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
     title: 'Test Notification Title'
 };
-
-const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
 
 describe('When calling createNotification with the notification center not showing', () => {
     let testApp: Application;

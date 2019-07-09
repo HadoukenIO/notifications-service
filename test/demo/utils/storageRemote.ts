@@ -15,20 +15,20 @@ interface ProviderWindow extends BaseWindowContext {
 
 const ofBrowser = new OFPuppeteerBrowser<ProviderWindow>();
 
-export async function getAllNotifications(): Promise<StoredNotification[]> {
+export async function getAllStoredNotifications(): Promise<StoredNotification[]> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(): Promise<StoredNotification[]> {
         const allNotes: StoredNotification[] = [];
-        this.notificationStorage.iterate((val: StoredNotification) => {
-            allNotes.push(val);
+        await this.notificationStorage.iterate((val: string) => {
+            allNotes.push(JSON.parse(val));
         });
         return allNotes;
     });
 }
 
-export async function getAppNotifications(uuid: string): Promise<StoredNotification[]> {
+export async function getStoredNotificationsByApp(uuid: string): Promise<StoredNotification[]> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(appUuid: string): Promise<StoredNotification[]> {
         const allNotes: StoredNotification[] = [];
-        this.notificationStorage.iterate((val: string) => {
+        await this.notificationStorage.iterate((val: string) => {
             const noteObject: StoredNotification = JSON.parse(val);
             if (noteObject.source.uuid === appUuid) {
                 allNotes.push(noteObject);

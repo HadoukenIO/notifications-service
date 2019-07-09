@@ -26,14 +26,34 @@ export enum CardType {
     TOAST = 'toast'
 }
 
+export async function assertDOMMatches(type: CardType, sourceUuid: string, note: Notification): Promise<void> {
+    const noteCards = type === 'center' ? await getCenterCardsByNotification(sourceUuid, note.id): await getToastCards(sourceUuid, note.id);
+    if (!noteCards || noteCards.length === 0) {
+        return undefined;
+    }
+    if (noteCards.length > 1) {
+        throw new Error(`Multiple notification cards found for the given uuid/id pair: ${sourceUuid}/${note.id}`);
+    }
+
+    const expectedContent: NotificationCardMetadata = {
+        title: note.title,
+        body: note.body,
+        buttons: note.buttons,
+        icon: note.icon,
+        sourceApp: sourceUuid,
+        timeString: moment(note.date).fromNow()
+    };
+
+    const actualContent: NotificationCardMetadata = await getCardMetadata(noteCards[0]);
+    expect(actualContent).toEqual(expectedContent);
+}
+
 /**
  * Allow you to get a `Notification`-like object containing the data displayed on a notification card.
- *
- * Returns undefined if it cannot find a card for the given uuid/id pair
- *
+
  * Undefined properties imply that the html element for that property could not be found
  */
-export async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMetadata | undefined> {
+async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMetadata> {
     const title = await getPropertyByQueryString(card, '.body .title', 'innerHTML');
     const body = await getPropertyByQueryString(card, '.body .text', 'innerHTML');
     const sourceApp = await getPropertyByQueryString(card, '.source .app-name', 'innerHTML');
@@ -51,34 +71,8 @@ export async function getCardMetadata(card: ElementHandle): Promise<Notification
     return {title, body, sourceApp, timeString, icon, buttons};
 }
 
-export async function assertDOMMatches(type: CardType, sourceUuid: string, note: Notification): Promise<void> {
-    const noteCards = type === 'center' ? await getCenterCardsByNotification(sourceUuid, note.id): await getToastCards(sourceUuid, note.id);
-    if (!noteCards || noteCards.length === 0) {
-        return undefined;
-    }
-    if (noteCards.length > 1) {
-        throw new Error(`Multiple notification cards found for the given uuid/id pair: ${sourceUuid}/${note.id}`);
-    }
-
-    const card = noteCards[0];
-
-    const cardContent: NotificationCardMetadata | undefined = await getCardMetadata(card);
-    expect(cardContent).not.toBeUndefined();
-
-    const expectedContent: NotificationCardMetadata = {
-        title: note.title,
-        body: note.body,
-        buttons: note.buttons,
-        icon: note.icon,
-        sourceApp: sourceUuid,
-        timeString: moment(note.date).fromNow()
-    };
-
-    expect(cardContent).toEqual(expectedContent);
-}
-
 /**
- * Uses `$`, so only the first matching element is queried
+ * Uses `$`, so only the first matching element is returned
  */
 async function getPropertyByQueryString(rootElement: ElementHandle, queryString: string, property: string): Promise<string | undefined> {
     const queryElement = await rootElement.$(queryString);

@@ -12,8 +12,7 @@ import {delay} from './utils/delay';
 import {fin} from './utils/fin';
 import {getToastIdentity} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
-
-const testManagerIdentity = {uuid: 'test-app', name: 'test-app'};
+import {testManagerIdentity} from './utils/constants';
 
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',
