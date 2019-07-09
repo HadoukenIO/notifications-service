@@ -100,6 +100,21 @@ describe('When creating a notification with an ID that already exists but differ
         // Extra tests for toasts only when the center is hidden
         if (!showCenter) {
             describe('When the existing notification has an active toast', () => {
+                const finOpenListener = jest.fn<void, [WindowEvent<'system', 'window-created'>]>();
+                const finCloseListener = jest.fn<void, [WindowEvent<'system', 'window-closed'>]>();
+
+                beforeEach(async () => {
+                    // Listen for any window-opened and -closed events
+                    await fin.System.addListener('window-created', finOpenListener);
+                    await fin.System.addListener('window-closed', finCloseListener);
+                });
+
+                afterEach(async () =>{
+                    // Tidy up the listeners when we're done
+                    await fin.System.removeListener('window-created', finOpenListener);
+                    await fin.System.removeListener('window-closed', finCloseListener);
+                });
+
                 test('The existing toast window is closed', async () => {
                     const expectedEvent = {
                         topic: 'system',
@@ -107,17 +122,11 @@ describe('When creating a notification with an ID that already exists but differ
                         ...getToastIdentity(testApp.identity.uuid, firstOptions.id!)
                     };
 
-                    // Listen for window-closed events globally
-                    const finCloseListener = jest.fn<void, [WindowEvent<'system', 'window-closed'>]>();
-                    await fin.System.addListener('window-closed', finCloseListener);
-
                     // Recreate the notification and pause momentarily to allow the service time to process
                     await notifsRemote.create(testWindow.identity, secondOptions);
                     await delay(Duration.windowClosed);
 
                     expect(finCloseListener).toHaveBeenCalledWith(expectedEvent);
-
-                    await fin.System.removeListener('window-closed', finCloseListener);
                 });
 
                 test('A new toast window is created', async () => {
@@ -127,17 +136,11 @@ describe('When creating a notification with an ID that already exists but differ
                         ...getToastIdentity(testApp.identity.uuid, firstOptions.id!)
                     };
 
-                    // Listen for window-closed events globally
-                    const finOpenListener = jest.fn<void, [WindowEvent<'system', 'window-created'>]>();
-                    await fin.System.addListener('window-created', finOpenListener);
-
                     // Recreate the notification and pause momentarily to allow the service time to process
                     await notifsRemote.create(testWindow.identity, secondOptions);
                     await delay(Duration.windowClosed + Duration.windowCreated);
 
                     expect(finOpenListener).toHaveBeenCalledWith(expectedEvent);
-
-                    await fin.System.removeListener('window-created', finOpenListener);
                 });
 
                 test('The new toast matches the options of the new notification', async () => {
