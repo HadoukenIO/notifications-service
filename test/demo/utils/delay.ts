@@ -6,5 +6,6 @@ export enum Duration {
     toastDOMLoaded = 500,
     windowClosed = 200,
     windowCreated = 200,
-    eventPropagated = 100
+    eventPropagated = 100,
+    centerToggled = 300
 }

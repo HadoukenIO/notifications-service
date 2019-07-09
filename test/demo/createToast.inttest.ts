@@ -29,6 +29,7 @@ describe('When calling createNotification with the notification center not showi
         // Ensure center is not showing
         if (await isCenterShowing()) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+            await delay(Duration.centerToggled);
         }
     });
 

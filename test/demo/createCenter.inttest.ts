@@ -28,6 +28,7 @@ describe('When creating a notification with the center showing', () => {
         // Close center when we're done
         if (await isCenterShowing()) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+            await delay(Duration.centerToggled);
         }
     });
 

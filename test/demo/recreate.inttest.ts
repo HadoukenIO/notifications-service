@@ -37,6 +37,7 @@ describe('When creating a notification with an ID that already exists but differ
             // Toggle the center on/off based on test type
             if (await isCenterShowing() !== showCenter) {
                 await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+                await delay(200);
             }
         });
 
@@ -44,6 +45,7 @@ describe('When creating a notification with an ID that already exists but differ
             // Close center when we're done
             if (await isCenterShowing()) {
                 await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+                await delay(Duration.centerToggled);
             }
         });
 
