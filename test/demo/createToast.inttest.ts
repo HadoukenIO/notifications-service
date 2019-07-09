@@ -6,7 +6,7 @@ import {NotificationOptions, Notification} from '../../src/client';
 
 import * as notifsRemote from './utils/notificationsRemote';
 import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
-import {delay} from './utils/delay';
+import {delay, Duration} from './utils/delay';
 import {getToastWindow, getToastCards} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
@@ -54,8 +54,8 @@ describe('When calling createNotification with the notification center not showi
 
     test('A toast is shown for the notification', async () => {
         // The toast creation is not awaited as part of notes.create, so we add a small
-        // delay to allow the window time to spawn.
-        await delay(500);
+        // delay to allow the toast time to spawn.
+        await delay(Duration.toastDOMLoaded);
 
         const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
         expect(toastWindow).not.toBe(undefined);
@@ -65,8 +65,8 @@ describe('When calling createNotification with the notification center not showi
 
     test('The toast is displaying the correct data', async () => {
         // The toast creation is not awaited as part of notes.create, so we add a small
-        // delay to allow the window time to spawn.
-        await delay(500);
+        // delay to allow the toast time to spawn.
+        await delay(Duration.toastDOMLoaded);
 
         const toastCards = await getToastCards(testApp.identity.uuid, note.id);
 

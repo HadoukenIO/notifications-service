@@ -8,7 +8,7 @@ import {createApp} from './utils/spawnRemote';
 import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
 import * as notifsRemote from './utils/notificationsRemote';
 import {assertNotificationStored, getStoredNotificationsByApp} from './utils/storageRemote';
-import {delay} from './utils/delay';
+import {delay, Duration} from './utils/delay';
 import {getToastWindow} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity} from './utils/constants';
@@ -20,6 +20,13 @@ describe('When creating a notification with the center showing', () => {
     beforeAll(async () => {
         // Ensure center is showing
         if (!(await isCenterShowing())) {
+            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+        }
+    });
+
+    afterAll(async () => {
+        // Close center when we're done
+        if (await isCenterShowing()) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
         }
     });
@@ -77,7 +84,7 @@ describe('When creating a notification with the center showing', () => {
         test('No toast is shown for the created notification', async () => {
             // The notification is created immediately before this, so we need
             // a slight delay to allow time for the toast to spawn.
-            await delay(100);
+            await delay(Duration.windowCreated);
 
             const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
             expect(toastWindow).toBe(undefined);
