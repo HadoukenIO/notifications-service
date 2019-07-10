@@ -29,7 +29,7 @@ describe('When calling createNotification with the notification center not showi
         // Ensure center is not showing
         if (await isCenterShowing()) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.centerToggled);
+            await delay(Duration.CENTER_TOGGLED);
         }
     });
 
@@ -56,7 +56,7 @@ describe('When calling createNotification with the notification center not showi
     test('A toast is shown for the notification', async () => {
         // The toast creation is not awaited as part of notes.create, so we add a small
         // delay to allow the toast time to spawn.
-        await delay(Duration.toastDOMLoaded);
+        await delay(Duration.TOAST_DOM_LOADED);
 
         const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
         expect(toastWindow).not.toBe(undefined);
@@ -65,7 +65,7 @@ describe('When calling createNotification with the notification center not showi
     test('The toast is displaying the correct data', async () => {
         // The toast creation is not awaited as part of notes.create, so we add a small
         // delay to allow the toast time to spawn.
-        await delay(Duration.toastDOMLoaded);
+        await delay(Duration.TOAST_DOM_LOADED);
 
         const toastCards = await getToastCards(testApp.identity.uuid, note.id);
 

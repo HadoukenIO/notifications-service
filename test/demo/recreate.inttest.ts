@@ -45,7 +45,7 @@ describe('When creating a notification with an ID that already exists but differ
             // Close center when we're done
             if (await isCenterShowing()) {
                 await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-                await delay(Duration.centerToggled);
+                await delay(Duration.CENTER_TOGGLED);
             }
         });
 
@@ -80,7 +80,7 @@ describe('When creating a notification with an ID that already exists but differ
 
             // Recreate the notification and pause momentarily to allow the event to propagate
             await notifsRemote.create(testWindow.identity, secondOptions);
-            await delay(Duration.eventPropagated);
+            await delay(Duration.EVENT_PROPAGATED);
 
             // Listener not triggered
             expect(closeListener).not.toHaveBeenCalled();
@@ -124,7 +124,7 @@ describe('When creating a notification with an ID that already exists but differ
 
                     // Recreate the notification and pause momentarily to allow the service time to process
                     await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.windowClosed);
+                    await delay(Duration.WINDOW_CLOSED);
 
                     expect(finCloseListener).toHaveBeenCalledWith(expectedEvent);
                 });
@@ -138,7 +138,7 @@ describe('When creating a notification with an ID that already exists but differ
 
                     // Recreate the notification and pause momentarily to allow the service time to process
                     await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.windowClosed + Duration.windowCreated);
+                    await delay(Duration.WINDOW_CLOSED + Duration.WINDOW_CREATED);
 
                     expect(finOpenListener).toHaveBeenCalledWith(expectedEvent);
                 });
@@ -146,7 +146,7 @@ describe('When creating a notification with an ID that already exists but differ
                 test('The new toast matches the options of the new notification', async () => {
                     // Recreate the notification and delay stlight to allow the toast to spawn
                     const newNote = await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.windowClosed + Duration.toastDOMLoaded);
+                    await delay(Duration.WINDOW_CLOSED + Duration.TOAST_DOM_LOADED);
 
                     // New toast matches `secondOptions`
                     await assertDOMMatches(CardType.TOAST, testApp.identity.uuid, newNote);

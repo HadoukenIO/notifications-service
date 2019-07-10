@@ -28,7 +28,7 @@ describe('When creating a notification with the center showing', () => {
         // Close center when we're done
         if (await isCenterShowing()) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.centerToggled);
+            await delay(Duration.CENTER_TOGGLED);
         }
     });
 
@@ -85,7 +85,7 @@ describe('When creating a notification with the center showing', () => {
         test('No toast is shown for the created notification', async () => {
             // The notification is created immediately before this, so we need
             // a slight delay to allow time for the toast to spawn.
-            await delay(Duration.windowCreated);
+            await delay(Duration.WINDOW_CREATED);
 
             const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
             expect(toastWindow).toBe(undefined);

@@ -3,9 +3,9 @@ export async function delay(duration: number) {
 }
 
 export enum Duration {
-    toastDOMLoaded = 500,
-    windowClosed = 200,
-    windowCreated = 200,
-    eventPropagated = 100,
-    centerToggled = 300
+    TOAST_DOM_LOADED = 500,
+    WINDOW_CLOSED = 200,
+    WINDOW_CREATED = 200,
+    EVENT_PROPAGATED = 100,
+    CENTER_TOGGLED = 300
 }

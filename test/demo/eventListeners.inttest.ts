@@ -72,7 +72,7 @@ describe('Click listeners', () => {
 
                 // Click on the card and pause momentarily to allow the event to propagate
                 await noteCards[0].click();
-                await delay(Duration.eventPropagated);
+                await delay(Duration.EVENT_PROPAGATED);
 
                 // Listener was triggered once with the correct data
                 expect(clickListener).toHaveBeenCalledTimes(1);
@@ -91,7 +91,7 @@ describe('Click listeners', () => {
 
                 // Click on the button and pause momentarily to allow the event to propagate
                 await buttonHandles[0].click();
-                await delay(Duration.eventPropagated);
+                await delay(Duration.EVENT_PROPAGATED);
 
                 // buttonClickListener triggered with correct metadata
                 expect(buttonClickListener).toHaveBeenCalledTimes(1);
@@ -118,7 +118,7 @@ describe('Click listeners', () => {
 
                     // Click on the button and pause momentarily to allow the event to propagate
                     await closeHandles[0].click();
-                    await delay(Duration.eventPropagated);
+                    await delay(Duration.EVENT_PROPAGATED);
                 });
 
                 test('The closeListener is called once with the correct metadata the other listeners are not called', async () => {
