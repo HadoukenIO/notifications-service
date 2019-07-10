@@ -157,7 +157,7 @@ export class Main {
     }
 
     /**
-     * Hydrate notification options to create a StoredNotificaiton.
+     * Hydrate notification options to create a StoredNotification.
      *
      * @param payload Notification options to hydrate.
      * @param sender The source of the notification.

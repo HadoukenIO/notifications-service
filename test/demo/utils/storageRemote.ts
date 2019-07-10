@@ -52,7 +52,7 @@ export async function assertNotificationStored(source: Identity, note: Notificat
 }
 
 /**
- * @param id ID of the stored notificaiton. Note: this is the internal ID of format "UUID:NoteID" and must be an exact match.
+ * @param id ID of the stored notification. Note: this is the internal ID of format "UUID:NoteID" and must be an exact match.
  *
  * Returns `undefined` if no notification is stored with given ID.
  */

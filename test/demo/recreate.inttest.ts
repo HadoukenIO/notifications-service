@@ -57,7 +57,7 @@ describe('When creating a notification with an ID that already exists but differ
             const notes = await notifsRemote.getAll(testWindow.identity);
             expect(notes.some(note => note.id === firstOptions.id)).not.toBeTruthy();
 
-            // Create the "exisitng" notificaiton
+            // Create the "exisitng" notification
             existingNote = await notifsRemote.create(testWindow.identity, firstOptions);
         });
 

@@ -45,7 +45,7 @@ describe('When creating a notification with the center showing', () => {
     describe('When passing a valid set of options', () => {
         const options: NotificationOptions = {
             body: 'Test Notification Body',
-            title: 'Test Notificaiton Title',
+            title: 'Test Notification Title',
             id: 'test-notification-0',
             icon: 'https://openfin.co/favicon.ico'
         };
@@ -131,7 +131,7 @@ describe('When creating a notification with the center showing', () => {
     });
 
     describe('When options does not include id', () => {
-        const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notificaiton Title'};
+        const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notification Title'};
 
         let createPromise: Promise<Notification>;
         let note: Notification;
@@ -166,7 +166,7 @@ describe('When creating a notification with the center showing', () => {
     });
 
     describe.each([1, 2, 3])('With %i button(s)', numButtons => {
-        const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notificaiton Title', buttons: []};
+        const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notification Title', buttons: []};
         for (let i = 0; i < numButtons; i++) {
             // options.buttons is assigned immediatly before this, but we need the ! because typescript doesn't realize.
             options.buttons!.push({title: 'Button ' + i});
