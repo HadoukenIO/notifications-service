@@ -12,13 +12,13 @@ export interface NotificationCardMetadata {
     body?: string;
     sourceApp?: string;
     timeString?: string;
-    icon?: string;
+    icon: string;
     buttons?: ButtonMetadata[]
 }
 
 export interface ButtonMetadata {
     title?: string;
-    iconUrl?: string;
+    iconUrl: string;
 }
 
 export enum CardType {
@@ -38,7 +38,7 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
     const expectedMetadata: NotificationCardMetadata = {
         title: note.title,
         body: note.body,
-        buttons: note.buttons,
+        buttons: note.buttons as ButtonMetadata[],
         icon: note.icon,
         sourceApp: sourceUuid,
         timeString: moment(note.date).fromNow()
