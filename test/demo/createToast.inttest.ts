@@ -60,8 +60,6 @@ describe('When calling createNotification with the notification center not showi
 
         const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
         expect(toastWindow).not.toBe(undefined);
-
-        await notifsRemote.clear(testWindow.identity, note.id);
     });
 
     test('The toast is displaying the correct data', async () => {
