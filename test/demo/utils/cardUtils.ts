@@ -54,17 +54,17 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
  * Undefined properties imply that the html element for that property could not be found
  */
 async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMetadata> {
-    const title = await getPropertyByQueryString(card, '.body .title', 'innerHTML');
-    const body = await getPropertyByQueryString(card, '.body .text', 'innerHTML');
-    const sourceApp = await getPropertyByQueryString(card, '.source .app-name', 'innerHTML');
-    const timeString = await getPropertyByQueryString(card, '.time span', 'innerHTML');
-    const icon = (await getPropertyByQueryString(card, '.source img', 'src')) || '';
+    const title = await getPropertyBySelector(card, '.body .title', 'innerHTML');
+    const body = await getPropertyBySelector(card, '.body .text', 'innerHTML');
+    const sourceApp = await getPropertyBySelector(card, '.source .app-name', 'innerHTML');
+    const timeString = await getPropertyBySelector(card, '.time span', 'innerHTML');
+    const icon = (await getPropertyBySelector(card, '.source img', 'src')) || '';
 
     const buttonElements = await card.$$('.button');
     const buttons = await promiseMap(buttonElements, async (button): Promise<ButtonMetadata> => {
         return {
-            title: await getPropertyByQueryString(button, 'span', 'innerHTML'),
-            iconUrl: (await getPropertyByQueryString(button, 'img', 'src')) || ''
+            title: await getPropertyBySelector(button, 'span', 'innerHTML'),
+            iconUrl: (await getPropertyBySelector(button, 'img', 'src')) || ''
         };
     });
 
@@ -74,8 +74,8 @@ async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMet
 /**
  * Uses `$`, so only the first matching element is returned
  */
-async function getPropertyByQueryString(rootElement: ElementHandle, queryString: string, property: string): Promise<string | undefined> {
-    const queryElement = await rootElement.$(queryString);
+async function getPropertyBySelector(rootElement: ElementHandle, selectorString: string, property: string): Promise<string | undefined> {
+    const queryElement = await rootElement.$(selectorString);
     if (!queryElement) {
         return undefined;
     }
