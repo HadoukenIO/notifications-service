@@ -12,6 +12,7 @@ import {createApp} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity} from './utils/constants';
+import {assertHydratedCorrectly} from './utils/hydrateNotification';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
@@ -47,7 +48,7 @@ describe('When calling createNotification with the notification center not showi
 
     test('The promise resolves to the fully hydrated notification object', async () => {
         await expect(createPromise).resolves;
-        expect(note).toMatchObject(options);
+        assertHydratedCorrectly(options, note);
     });
 
     test('A toast is shown for the notification', async () => {
