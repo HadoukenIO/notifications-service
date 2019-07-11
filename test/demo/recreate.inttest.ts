@@ -37,7 +37,7 @@ describe('When creating a notification with an ID that already exists but differ
             // Toggle the center on/off based on test type
             if (await isCenterShowing() !== showCenter) {
                 await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-                await delay(200);
+                await delay(Duration.CENTER_TOGGLED);
             }
         });
 
@@ -57,7 +57,7 @@ describe('When creating a notification with an ID that already exists but differ
             const notes = await notifsRemote.getAll(testWindow.identity);
             expect(notes.some(note => note.id === firstOptions.id)).not.toBeTruthy();
 
-            // Create the "exisitng" notification
+            // Create the "existing" notification
             existingNote = await notifsRemote.create(testWindow.identity, firstOptions);
         });
 
@@ -100,10 +100,12 @@ describe('When creating a notification with an ID that already exists but differ
         // Extra tests for toasts only when the center is hidden
         if (!showCenter) {
             describe('When the existing notification has an active toast', () => {
-                const finOpenListener = jest.fn<void, [WindowEvent<'system', 'window-created'>]>();
-                const finCloseListener = jest.fn<void, [WindowEvent<'system', 'window-closed'>]>();
+                let finOpenListener: jest.Mock<void, [WindowEvent<'system', 'window-created'>]>;
+                let finCloseListener: jest.Mock<void, [WindowEvent<'system', 'window-closed'>]>;
 
                 beforeEach(async () => {
+                    finOpenListener = jest.fn<void, [WindowEvent<'system', 'window-created'>]>();
+                    finCloseListener = jest.fn<void, [WindowEvent<'system', 'window-closed'>]>();
                     // Listen for any window-opened and -closed events
                     await fin.System.addListener('window-created', finOpenListener);
                     await fin.System.addListener('window-closed', finCloseListener);

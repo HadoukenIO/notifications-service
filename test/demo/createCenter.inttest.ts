@@ -53,10 +53,7 @@ describe('When creating a notification with the center showing', () => {
         let createPromise: Promise<Notification>;
         let note: Notification;
         beforeEach(async () => {
-            createPromise = notifsRemote.create(testWindow.identity, options);
-
-            // We want to be sure the operation is completed, but don't care if it succeeds
-            note = await createPromise.catch(() => ({} as Notification));
+            ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
         });
 
         test('The promise resolves to the fully hydrated notification object', async () => {
@@ -98,10 +95,7 @@ describe('When creating a notification with the center showing', () => {
 
         let createPromise: Promise<Notification>;
         beforeEach(async () => {
-            createPromise = notifsRemote.create(testWindow.identity, options);
-
-            // We want to be sure the operation is completed, but don't care if it succeeds
-            await createPromise.catch(() => {});
+            ({createPromise} = await notifsRemote.createAndAwait(testWindow.identity, options));
         });
 
         afterEach(async () => {
@@ -136,10 +130,7 @@ describe('When creating a notification with the center showing', () => {
         let createPromise: Promise<Notification>;
         let note: Notification;
         beforeEach(async () => {
-            createPromise = notifsRemote.create(testWindow.identity, options);
-
-            // We want to be sure the operation is completed, but don't care if it succeeds
-            note = await createPromise.catch(() => ({} as Notification));
+            ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
         });
 
         test('The notification is created as expected', async () => {
@@ -175,10 +166,7 @@ describe('When creating a notification with the center showing', () => {
         let createPromise: Promise<Notification>;
         let note: Notification;
         beforeEach(async () => {
-            createPromise = notifsRemote.create(testWindow.identity, options);
-
-            // We want to be sure the operation is completed, but don't care if it succeeds
-            note = await createPromise.catch(() => ({} as Notification));
+            ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
         });
 
         test('The notification is created as expected', async () => {

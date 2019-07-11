@@ -37,10 +37,7 @@ describe('When calling createNotification with the notification center not showi
         testApp = await createApp(testManagerIdentity, {});
         testWindow = await testApp.getWindow();
 
-        createPromise = notifsRemote.create(testWindow.identity, options);
-
-        // We want to be sure the operation is completed, but don't care if it succeeds
-        note = await createPromise.catch(() => ({} as Notification));
+        ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
     });
 
     afterEach(async () => {

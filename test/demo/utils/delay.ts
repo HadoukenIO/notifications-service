@@ -1,4 +1,4 @@
-export async function delay(duration: number) {
+export async function delay(duration: Duration) {
     return new Promise(res => setTimeout(res, duration));
 }
 

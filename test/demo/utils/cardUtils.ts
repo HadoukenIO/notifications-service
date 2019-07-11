@@ -7,6 +7,9 @@ import {promiseMap} from './asyncUtils';
 import {getToastCards} from './toastUtils';
 import {getCenterCardsByNotification} from './centerUtils';
 
+/**
+ * Manifestation of the elements in the DOM, as opposed to NotificationOptions.
+ */
 export interface NotificationCardMetadata {
     title?: string;
     body?: string;
@@ -16,6 +19,9 @@ export interface NotificationCardMetadata {
     buttons?: ButtonMetadata[]
 }
 
+/**
+ * Manifestation of the elements in the DOM, as opposed to ButtonOptions.
+ */
 export interface ButtonMetadata {
     title?: string;
     iconUrl: string;
