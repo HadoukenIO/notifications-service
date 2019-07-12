@@ -169,13 +169,6 @@ export class Main {
         if (!payload.title) {
             throw new Error('Invalid arguments passed to createNotification. "title" must have a value');
         }
-        // If "buttons" property is specified, and its value is an array we neeed to hydrate the entries
-        if (Array.isArray(payload.buttons)) {
-            payload.buttons = payload.buttons.map(btn => ({
-                title: btn.title,
-                iconUrl: btn.iconUrl || ''
-            }));
-        }
 
         const notification: Notification = {
             id: payload.id || this.generateId(),
@@ -185,7 +178,7 @@ export class Main {
             icon: payload.icon || '',
             customData: payload.customData,
             date: payload.date || new Date(),
-            buttons: payload.buttons || [] as OptionButton[]
+            buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, iconUrl: btn.iconUrl || ''})) : []
         };
 
         const storedNotification: StoredNotification = {
