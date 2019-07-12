@@ -6,15 +6,15 @@ import {fin} from './fin';
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 
 const ofBrowser = new OFPuppeteerBrowser();
-export async function getAllCards() {
+export async function getAllCenterCards() {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
     return centerPage!.$$('.notification');
 }
-export async function getCardsByApp(sourceUuid: string): Promise<ElementHandle[]> {
+export async function getCenterCardsByApp(sourceUuid: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
     return centerPage!.$$(`.notification[data-id*="${sourceUuid}"]`);
 }
-export async function getCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
+export async function getCenterCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
     return centerPage!.$$(`.notification[data-id="${sourceUuid}:${notificationId}"]`);
 }

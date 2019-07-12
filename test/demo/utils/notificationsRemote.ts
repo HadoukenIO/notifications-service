@@ -1,6 +1,6 @@
 import {Identity} from 'openfin/_v2/main';
 
-import {NotificationOptions, NotificationEvent} from '../../../src/client';
+import {NotificationOptions, NotificationEvent, Notification} from '../../../src/client';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
@@ -14,6 +14,15 @@ export async function create(executionTarget: Identity, options: NotificationOpt
     return ofBrowser.executeOnWindow(executionTarget, function(optionsRemote: NotificationOptions){
         return this.notifications.create(optionsRemote);
     }, options);
+}
+
+export async function createAndAwait(executionTarget: Identity, options: NotificationOptions) {
+    const createPromise = create(executionTarget, options);
+
+    // We want to be sure the operation is completed, but don't care if it succeeds
+    const note = await createPromise.catch(() => ({} as Notification));
+
+    return {createPromise, note};
 }
 
 export async function clear(executionTarget: Identity, id: string) {
