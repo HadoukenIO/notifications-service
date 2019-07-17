@@ -3,9 +3,9 @@
 
 ## Overview
 
-OpenFin Notifications provide developers with a uniform way to create, display and organize desktop notifications as well as responding to notification events (notification clicked, closed etc.)
+OpenFin Notifications provide developers with a uniform way to create, display and organize desktop notifications as well as responding to notification events.
 
-Notifications will be displayed as toasts as well as being listed and organized in a notification center. The Notification Center can be accessed by clicking on the system tray notification icon.
+Notifications will be displayed as toasts as well as being listed and organized in a Notification Center. The Notification Center can be accessed by clicking on the system tray notification icon.
 
 This project consist of 3 parts:
 1. The Notifications Service, displaying and managing notifications and owning the Notification Center UI
@@ -13,14 +13,14 @@ This project consist of 3 parts:
 3. The Notifications Demo App, demonstrating the different features of OpenFin Notifications
 
 ### Dependencies
-- OpenFin version for applications using Notifications = 9.61.38.41
+- OpenFin version for applications using Notifications >= 9.61.38.41
 - OpenFin version used in the Notifications Service = 10.66.39.43
 - RVM >= 4.7
 
 ### Features
 * Create notifications
 * Clear/dismiss notifications
-* Attach handlers for click/close events
+* Attach handlers for create/close events and notification interactions
 * Persist notifications in the Notification Center
 
 ## Getting Started
@@ -37,7 +37,7 @@ To ensure the service is running, you must declare it in your application config
    {"name": "notifications"}
 ]
 ```
-Optionally you can add a URL for specifying a custom location or a specific version:
+During development, you can add a URL for specifying a custom location or a specific version:
 
 ```
 "services":
@@ -48,6 +48,7 @@ Optionally you can add a URL for specifying a custom location or a specific vers
    }
 ]
 ```
+Refer to the [Desktop Services documentation](https://developers.openfin.co/docs/desktop-services) for details on managing service location/version within production environments.
 
 ### Import the Client API
 
@@ -73,16 +74,16 @@ An in-depth usage guide and additional documentation will be published in due co
 
 ## Run Locally
 
-To preview the functionality of the service without integrating it into an existing application - or to start contributing to the service - the service can be ran locally. By checking out this repo and then running the project.
+To preview the functionality of the service without integrating it into an existing application - or to start contributing to the service - the service can be ran locally by checking out this repo and then running the project.
 
 ### Setup
 
 After checkout, install project dependencies using `npm install`.
 
 ### Startup
-Once dependencies are installed, start the "built-in" sample application with `npm start`. This uses `webpack-dev-middleware` to both build and host the application; a custom `server.js` script will start the OpenFin application once the server is up and running.
+Once dependencies are installed, start the "built-in" sample application with npm start. This uses webpack-dev-middleware to both build and host the application; a custom server script will start the OpenFin application once the server is up and running.
 
-The startup script has optional arguments which can be used to tweak the behavior of the build and the test server. See the constants at the top of `server.js` for details on the available parameters and their effects.
+The startup script has optional arguments which can be used to tweak the behavior of the build and the test server. Use npm start -- -h for details on the available parameters and their effects.
 
 ### Build Process
 The service consists of several different components unified into a single project. The `package.json` defines the combined dependencies of all components; anything required for the pre-built client to work within an application is included in the `"dependencies"` section, and the remaining dependencies - used to build the client, and to both build & run the provider and demo application - are included under `"devDependencies"`.
@@ -109,7 +110,7 @@ The service provider is a standard OpenFin application, only its lifecycle is co
 A list of known issues can be found on our [versions page](https://developer.openfin.co/versions/?product=Services).
 
 ## License
-This project uses the [Apache2 license](https://www.apache.org/licenses/LICENSE-2.0)
+This project uses the [Apache2 license](https://www.apache.org/licenses/LICENSE-2.0).
 
 However, if you run this code, it may call on the OpenFin RVM or OpenFin Runtime, which are covered by OpenFin's Developer, Community, and Enterprise licenses. You can learn more about OpenFin licensing at the links listed below or just email us at support@openfin.co with questions.
 

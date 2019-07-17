@@ -1,5 +1,5 @@
 import * as ofnotes from '../client/index';
-import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/index';
+import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from '../client/index';
 
 import {addSpawnListeners, createWindow, createApp} from './spawn';
 
@@ -23,21 +23,23 @@ function getNotes() {
 const normalNote: NotificationOptions = {
     body: 'Notification Body',
     title: 'Notification Title ',
-    subtitle: 'testSubtitle',
+    category: 'Test',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
     date: new Date(),
+    onSelect: 'Selected',
     buttons: []
 };
 
 const buttonNote: NotificationOptions = {
     body: 'Notification Body',
     title: 'Notification Title ',
-    subtitle: 'testSubtitle',
+    category: 'Test',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
     date: new Date(),
-    buttons: [{title: 'test1', iconUrl: 'favicon.ico'}, {title: 'test2', iconUrl: 'favicon.ico'}]
+    onSelect: 'Selected',
+    buttons: [{title: 'test1', iconUrl: 'favicon.ico', onClick: 'Button 1'}, {title: 'test2', iconUrl: 'favicon.ico', onClick: 'Button 2'}]
 };
 
 function makeNoteOfType(index: number) {
@@ -72,30 +74,25 @@ fin.desktop.main(async () => {
 
     document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
         getNotes().then((notifications) => {
-            // document.getElementById('clientResponse').innerHTML = `
-            //     ${notifications.value.length} notifications received from the
-            //     Notification Center!
-            // `
             logit(`${notifications.length} notifications received from the Notification Center`);
         });
     });
 
-    ofnotes.addEventListener('notification-clicked', (event: NotificationClickedEvent) => {
-        // document.getElementById('clientResponse').innerHTML = `CLICK action
-        // received from notification ${payload.id}`
-        logit(`CLICK action received from notification ${event.notification.id}`);
-    });
-
-    ofnotes.addEventListener('notification-closed', (event: NotificationClosedEvent) => {
-        // document.getElementById('clientResponse').innerHTML = `CLOSE action
-        // received from notification ${payload.id}`
+    ofnotes.addEventListener('notification-created', (event: NotificationCreatedEvent) => {
         logit(`CLOSE action received from notification ${event.notification.id}`);
     });
-    ofnotes.addEventListener('notification-button-clicked', (event: NotificationButtonClickedEvent) => {
-        const {buttonIndex, notification} = event;
-        console.log(buttonIndex);
-        // document.getElementById('clientResponse').innerHTML = `Button Click
-        // on ${buttonTitle} action received from notification ${payload.id}`
-        logit(`BUTTON CLICK on button ${buttonIndex} on notification ${notification.id}`);
+    ofnotes.addEventListener('notification-closed', (event: NotificationClosedEvent) => {
+        logit(`CLOSE action received from notification ${event.notification.id}`);
+    });
+    ofnotes.addEventListener('notification-action', (event: NotificationActionEvent) => {
+        const {notification, trigger, control} = event;
+
+        if (trigger === 'body') {
+            logit(`SELECT action received from notification ${event.notification.id}`);
+        } else if (control && control.type === 'button') {
+            const buttonIndex = notification.buttons.indexOf(control);
+
+            logit(`CLICK ACTION on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
+        }
     });
 });
