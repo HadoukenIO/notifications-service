@@ -1,8 +1,8 @@
 import {injectable, inject} from 'inversify';
 import {composeWithDevTools} from 'remote-redux-devtools';
 import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispatch, Unsubscribe} from 'redux';
+import {Signal} from 'openfin-service-signal';
 
-import {Signal1} from '../common/Signal';
 import {Inject} from '../common/Injectables';
 import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
@@ -19,7 +19,7 @@ export class Store {
         windowVisible: false
     };
 
-    public readonly onAction: Signal1<RootAction> = new Signal1();
+    public readonly onAction = new Signal<[RootAction]>();
 
     private _actionMap: ActionMap;
     private _store: ReduxStore<RootState, RootAction>;
