@@ -34,7 +34,7 @@ describe('When creating a notification with the center showing', () => {
     });
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {});
+        testApp = await createApp(testManagerIdentity, {url: 'http://localhost:3922/demo/app.html'});
         testWindow = await testApp.getWindow();
     });
 

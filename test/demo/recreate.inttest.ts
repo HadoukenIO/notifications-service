@@ -50,7 +50,7 @@ describe('When creating a notification with an ID that already exists but differ
         });
 
         beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {});
+            testApp = await createApp(testManagerIdentity, {url: 'http://localhost:3922/demo/app.html'});
             testWindow = await testApp.getWindow();
 
             // Quick sanity check that there is not already a notification with that ID

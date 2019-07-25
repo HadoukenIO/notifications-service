@@ -29,7 +29,7 @@ describe('Click listeners', () => {
         let testApp: Application;
         let testAppMainWindow: FinWindow;
         beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {});
+            testApp = await createApp(testManagerIdentity, {url: 'http://localhost:3922/demo/app.html'});
             testAppMainWindow = await testApp.getWindow();
         });
 

@@ -1,6 +1,5 @@
 import {Application, Window, Identity} from 'hadouken-js-adapter';
-
-import {createApp as createAppRemote, createWindow as createWindowRemote} from '../../../src/demo/spawn';
+import {createApp as createAppRemote, createWindow as createWindowRemote} from 'openfin-service-tooling/spawn';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 import {fin} from './fin';

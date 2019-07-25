@@ -1,7 +1,7 @@
+import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
+
 import * as ofnotes from '../client/index';
 import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/index';
-
-import {addSpawnListeners, createWindow, createApp} from './spawn';
 
 addSpawnListeners();
 

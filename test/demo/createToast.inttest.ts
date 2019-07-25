@@ -35,7 +35,7 @@ describe('When calling createNotification with the notification center not showi
     });
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {});
+        testApp = await createApp(testManagerIdentity, {url: 'http://localhost:3922/demo/app.html'});
         testWindow = await testApp.getWindow();
 
         ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
