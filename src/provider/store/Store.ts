@@ -19,7 +19,7 @@ export class Store {
         windowVisible: false
     };
 
-    public readonly onAction = new Signal<[RootAction]>();
+    public readonly onAction: Signal<[RootAction]> = new Signal();
 
     private _actionMap: ActionMap;
     private _store: ReduxStore<RootState, RootAction>;
