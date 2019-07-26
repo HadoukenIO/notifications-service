@@ -1,10 +1,10 @@
 /**
- * Actions are the mechanism through which notifications send messages back to the application that raised them. The
+ * Actions are the mechanism through which notifications send messages back to the application that created them. The
  * service defines a number of ways in which actions can be raised (typically user interactions, such as clicking a
  * button), and it is up to each application to decide if it wishes to be informed of these interactions.
  *
  * For an application to receive an event on each of these actions, the application should specify the message it
- * wishes to receive when that event happens. This is known as the action {@link NotificationActionResult|result}.
+ * wishes to receive when that event happens. This is known as the {@link NotificationActionResult|action result}.
  *
  * All actions passed back to an application come through a single entry point. The application should attach a
  * listener for the {@link NotificationActionEvent|`notification-action`} event. This listener will be called once for
@@ -36,10 +36,10 @@
  *             iconUrl: 'https://www.example.com/cancel.png'
  *         },
  *
- *         // A button that will schedule another reminder for 5 minutes from now. Since the application will need to
- *         // perform an action on this interaction, it will need to know about the user clicking this button. By
- *         // setting 'onClick', the service will raise a "notification-action" event when this button is clicked, and
- *         // will pass the value of 'onClick' as the 'result' field within the event.
+ *         // A button that will schedule another reminder for 5 minutes from now. Since the application will be
+ *         // responsible for snoozing the event, it will need to know about the user clicking this button. By setting
+ *         // 'onClick', the service will raise a "notification-action" event when this button is clicked, and will
+ *         // pass the value of 'onClick' as the 'result' field within the event.
  *         {
  *             title: 'Snooze for 5 minutes',
  *             iconUrl: 'https://www.example.com/timer.png',
@@ -66,10 +66,10 @@
  * });
  * ```
  *
- * The example above uses `customData` to store details about the notification subject (in this case,
- * a calendar event), and `onClick` actions to inform the application about the action to take when the user interacts with the notification. This is
- * our intended usage and recommended best-practice, but the service doesn't require applications to follow this
- * convention - application developers are free to decide how to manage notification state.
+ * The example above uses `customData` to store details about the notification subject (in this case, a calendar
+ * event), and `onClick` actions to inform the application about how the app should respond when the user interacts
+ * with the notification. This is our intended usage and recommended best-practice, but the service doesn't require
+ * applications to follow this convention - application developers are free to decide how to manage notification state.
  *
  * Within the `notification-action` handler, the application must be able to understand which notification is being
  * handled, and how to decide what it should do next. The example above uses an application-defined `action` field to
@@ -78,7 +78,6 @@
  *
  * @module Actions
  */
-
 
 /**
  * Denotes a field as being an action. Defining this field (with a non-`undefined` value) will result in actions being
@@ -102,7 +101,7 @@ export type ActionDeclaration<T extends never, E extends never> = NotificationAc
  * application-defined, the only requirement is that the item is an object and is serializable by `JSON.stringify`.
  *
  * Since this type is entirely application-specific, the type `{}` is used in these definitions. However, there is an
- * optional generic argument here, which can be used if an application were to define it's own conventions for the
+ * optional generic argument here, which can be used if an application were to define its own conventions for the
  * shape of this field (which is recommended). To make use of this, define a `notification-action` handler that
  * includes the application-defined type as a template argument. This type is then propogated up to
  * {@link NotificationActionEvent}. The example below demonstrates this, using the same example as at the top of this

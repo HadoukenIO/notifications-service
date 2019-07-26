@@ -37,8 +37,6 @@ import {tryServiceDispatch, eventEmitter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
 import {APITopic} from './internal';
 
-type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
-
 /**
  * Configuration options for constructing a Notifications object.
  */
@@ -58,7 +56,9 @@ export interface NotificationOptions {
     title: string;
 
     /**
-     * Main notification content.
+     * Notification body text.
+     * 
+     * This is the main notification content, displayed below the notification title. The notification will expand to fit the length of this text.
      */
     body: string;
 
@@ -124,10 +124,11 @@ export interface NotificationOptions {
      * interactions with buttons (both application-defined buttons, and the default 'X' close button) will not trigger
      * a select action.
      *
-     * Applications will only be informed of the user selecting the notification if they specify this field. See
-     * {@link Actions} for more details on Notification actions, and receiving interaction events from notifications.
+     * If omitted or `null`, applications will not receive a {@link NotificationActionEvent|`notification-action`}
+     * event when the notification is clicked. See {@link Actions} for more details on Notification actions, and
+     * receiving interaction events from notifications.
      */
-    onSelect?: ActionDeclaration<never, never>;
+    onSelect?: ActionDeclaration<never, never>|null;
 }
 
 /**
@@ -144,18 +145,17 @@ export type CustomData = any;
  * This object should be treated as immutable, modifying its state will not have any effect on the notification that
  * the user sees on-screen.
  */
-export type Notification = Readonly<NotificationOptions & Required<Omit<NotificationOptions, 'expires'|'onSelect'>>>;
+export type Notification = Readonly<NotificationOptions & Required<NotificationOptions>>>;
 
 /**
- * Event that is fired for interactions with notification UI elements.
+ * Event that is fired for interactions with notification UI elements. It is important to note that applications will
+ * only receive these events if they indicate to the service that they want to receive these events. See
+ * {@link Actions} for a full example of how actions are defined, and how an application can listen to and handle them.
  *
  * This can be for the notification button(s). Later versions of the service will add additional control types. All
  * actions, for all control types, will be returned to the application via the same `notification-action` event type.
  * Check the contents of the event object for details on what triggered this action, which control the user
  * interacted with, and what metadata was attached to the action.
- *
- * See {@link Actions} for a full example of how actions are defined, and how an application can listen to and handle
- * them.
  *
  * This type includes a generic type argument, should applications wish to define their own interface for action
  * results. See {@link NotificationActionResult} for details.
@@ -171,28 +171,24 @@ export interface NotificationActionEvent<T = {}> {
     notification: Readonly<Notification>;
 
     /**
-     * Indicates what triggered this action:
-     *
-     * - **control**: The user interacted with one of the controls within the notification. This currently means a button
-     * click, but other control types will be added in future releases.
-     * - **body**: The user clicked the body of the notification itself. Any clicks of the notification that don't hit a
-     * control will result in this event being fired.
-     * - **programmatic**: The action was triggered programmatically by an application (*Not currently supported*).
+     * Indicates what triggered this action.
+     * 
+     * Note that the `programmatic` trigger is not yet implemented.
      */
-    trigger: 'control'|'body'|'programmatic';
+    trigger: ActionTrigger;
 
     /**
      * The control whose interaction resulted in this action being raised. Will only be present when {@link trigger} is
-     * `control`.
+     * {@link ActionTrigger.CONTROL}.
      *
      * Future versions of the service will add additional controls beyond buttons, and interactions with these new
-     * control types will also come through the same `notification-action` event. For best forward-compatibility,
-     * assume that `control` can be optional, and may have a `type` property of something other than `'button'`.
+     * control types will also come through this one event type. For best forward-compatibility, applications should
+     * always check the `type` property of this control, and not assume that the type will always be `'button'`.
      *
      * This field is marked optional as future versions of the service will also include alternate methods of raising
      * `notification-action` events that do not originate from a button or other control.
      *
-     * When `control` is present, this object will always be strictly equal to one of the control definitions within
+     * When present, the object here will always be strictly equal to one of the control definitions within
      * `notification`. This means `indexOf` checks and other equality checks can be performed on this field if
      * required, such as:
      *
@@ -219,6 +215,32 @@ export interface NotificationActionEvent<T = {}> {
      * actions.
      */
     result: NotificationActionResult<T>;
+}
+
+/**
+ * Lists the different triggers for a notification {@link Actions|action}. Each action that is triggered will result in
+ * a {@link NotificationActionEvent|`notification-action`} event, which can be captured by the application that raised
+ * the notification.
+ */
+export enum ActionTrigger {
+    /**
+     * The user interacted with one of the controls within the notification. This currently means a button click, but
+     * other control types will be added in future releases.
+     */
+    CONTROL = 'control',
+
+    /**
+     * The user clicked the body of the notification itself. Any clicks of the notification that don't hit a control
+     * will result in this event being fired.
+     */
+    BODY = 'body',
+
+    /**
+     * The action was triggered programmatically by an application.
+     * 
+     * *Not currently supported - will be implemented in a future release*
+     */
+    PROGRAMMATIC = 'programmatic'
 }
 
 /**
