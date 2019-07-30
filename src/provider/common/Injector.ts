@@ -5,6 +5,7 @@ import {APITopic} from '../../client/internal';
 import {AsyncInit} from '../controller/AsyncInit';
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {ToastManager} from '../controller/ToastManager';
+import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
 import {ActionMap, Actions} from '../store/Actions';
 import {Store} from '../store/Store';
@@ -19,6 +20,7 @@ type Types = {
     [Inject.API_HANDLER]: APIHandler<APITopic>;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
+    [Inject.LAYOUTER]: Layouter;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
 };
 
@@ -33,7 +35,8 @@ const Bindings = {
     [Inject.API_HANDLER]: APIHandler,
     [Inject.STORE]: Store,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
-    [Inject.TOAST_MANAGER]: ToastManager
+    [Inject.TOAST_MANAGER]: ToastManager,
+    [Inject.LAYOUTER]: Layouter
 };
 
 type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);

@@ -1,29 +1,22 @@
 import {injectable, inject} from 'inversify';
-import {PointTopLeft} from 'openfin/_v2/api/system/point';
-import {Rect} from 'openfin/_v2/api/system/monitor';
-import {MonitorEvent} from 'openfin/_v2/api/events/system';
-
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastEvent} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
-
-export type WindowDimensions = {height: number, width: number};
+import {LayoutEvent, Layouter} from './Layouter';
 
 @injectable()
 export class ToastManager {
+    @inject(Inject.LAYOUTER)
+    private _layouter!: Layouter;
     private _store!: Store;
     private _toasts: Map<string, Toast> = new Map();
     private _stack: Toast[] = [];
-    private _availableRect!: Required<Rect>;
 
     constructor(@inject(Inject.STORE) store: Store) {
         this._store = store;
         this._store.onAction.add(this.onAction, this);
-        fin.System.getMonitorInfo().then(monitorInfo => {
-            this._availableRect = monitorInfo.primaryMonitor.availableRect;
-        });
         this.subscribe();
         this.addListeners();
     }
@@ -33,7 +26,7 @@ export class ToastManager {
      */
     public async closeAll(): Promise<void> {
         this._toasts.forEach(toast => {
-            toast.close(true);
+            this.closeToast(toast);
             this._toasts.delete(toast.id);
         });
         this._stack = [];
@@ -57,24 +50,15 @@ export class ToastManager {
             await this.deleteToast(oldToast, true);
         }
 
-        const lastIndex = this._stack.length - 1;
-        let previousToastBounds: Rect | undefined;
-        if (lastIndex >= 0) {
-            previousToastBounds = await this._stack[lastIndex].calculateBounds();
-        }
-
-        const position = this.getTargetPosition(previousToastBounds);
-
         const toast: Toast = new Toast(this._store, notification, {
             timeout: 10000
-        }, position);
+        });
 
         this._toasts.set(id, toast);
-        this._stack.push(toast);
-        const isShowing = await toast.show();
-        if (isShowing) {
-            this.updateToasts(this._stack.length - 1);
-        }
+        this._stack.unshift(toast);
+        await this._layouter.setInitialTransform(toast);
+        await toast.show();
+        this._layouter.layout(this._stack);
     }
 
     /**
@@ -106,46 +90,6 @@ export class ToastManager {
     }
 
     /**
-     * Update toast positions & visibility.
-     * @param index The index of the toast in the stack to start the update.
-     *  All indices after the index are also updated.
-     */
-    private async updateToasts(index: number = 0): Promise<void> {
-        // Update toasts after the slice
-        let previousToastRect: Rect | undefined;
-        if (index > 0) {
-            previousToastRect = await this._stack[index - 1].calculateBounds();
-        }
-        const toasts: Toast[] = this._stack.slice(index);
-        for (const toast of toasts) {
-            toast.position = this.getTargetPosition(previousToastRect);
-            previousToastRect = await toast.calculateBounds(toast.position);
-            if (toast.canFitInMonitor()) {
-                if (toast.isShowing) {
-                    toast.moveTo(toast.position);
-                } else {
-                    toast.show();
-                }
-            }
-        }
-    }
-
-    /**
-     * Pause toasts so they do not fade away and stop moving. The toasts after the moused over toasts will continue to move to be inline with the toast.
-     * @param mousedToast The toast that was moused over.
-    */
-    private async pauseToasts(mousedToast: Toast): Promise<void> {
-        const toastIndex = this._stack.indexOf(mousedToast);
-        for (let i = 0; i < this._stack.length; i++) {
-            if (i >= toastIndex) {
-                this._stack[i].freeze(true);
-            } else {
-                this._stack[i].freeze();
-            }
-        }
-    }
-
-    /**
      * Delete a toast.
      * @param toast Toast to delete.
      * @param force Force the deleted toast to close without playing animations.
@@ -155,35 +99,15 @@ export class ToastManager {
         const index = this._stack.indexOf(toast);
         this._stack.splice(index, 1);
         const toastWasShowing = toast.isShowing;
-        await toast.close(force);
+        this.closeToast(toast);
         if (toastWasShowing) {
-            this.updateToasts(index);
+            this._layouter.layout(this._stack);
         }
     }
 
-    /**
-     * Get the next position to display on the screen to display a toast.
-     * @param previous Previous Toast rect.
-     * @returns The next available position to display a toast.
-     */
-    private getTargetPosition(previous?: Rect): PointTopLeft {
-        const [vX, vY] = Toast.DIRECTION;
-        const {vertical, horizontal} = Toast.margin;
-        const bounds = this._availableRect;
-
-        let left = (vX > 0) ? bounds.left : bounds.right;
-        let top: number;
-        if (!previous) {
-            top = (vY > 0) ? bounds.top : bounds.bottom;
-        } else {
-            top = (vY < 0) ? previous.top : previous.bottom;
-        }
-
-        // Add margins
-        top += vY * vertical;
-        left += vX * horizontal;
-
-        return {top, left};
+    private async closeToast(toast: Toast): Promise<void> {
+        await this._layouter.removeItem(toast);
+        toast.close();
     }
 
     /**
@@ -213,17 +137,20 @@ export class ToastManager {
             }
         });
 
-        Toast.eventEmitter.addListener(ToastEvent.PAUSE, async (id: string) => {
-            const toast = this._toasts.get(id);
-            if (toast) {
-                this.pauseToasts(toast);
+        Toast.eventEmitter.addListener(ToastEvent.UNPAUSE, async (id: string) => {
+            for (const toast of this._stack) {
+                toast.unfreeze();
             }
         });
 
-        fin.System.addListener('monitor-info-changed', (async (event: MonitorEvent<string, string>) => {
-            const monitorInfo = await fin.System.getMonitorInfo();
-            this._availableRect = monitorInfo.primaryMonitor.availableRect;
-            await this.updateToasts();
-        }));
+        Toast.eventEmitter.addListener(ToastEvent.PAUSE, async (id: string) => {
+            for (const toast of this._stack) {
+                toast.unfreeze();
+            }
+        });
+
+        Layouter.eventEmitter.addListener(LayoutEvent.LAYOUT_REQUIRED, async () => {
+            this._layouter.layout(this._stack);
+        });
     }
 }
