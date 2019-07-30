@@ -182,7 +182,7 @@ export async function clear(id: string): Promise<boolean> {
  *  .then(console.log);
  * ```
  */
-export async function getAll(): Promise<Notification[]>{
+export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
     return tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
 }

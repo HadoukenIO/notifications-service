@@ -11,7 +11,7 @@ export interface NotifsTestContext extends BaseWindowContext {
 const ofBrowser = new OFPuppeteerBrowser<NotifsTestContext>();
 
 export async function create(executionTarget: Identity, options: NotificationOptions) {
-    return ofBrowser.executeOnWindow(executionTarget, function(optionsRemote: NotificationOptions){
+    return ofBrowser.executeOnWindow(executionTarget, function(optionsRemote: NotificationOptions) {
         return this.notifications.create(optionsRemote);
     }, options);
 }
@@ -26,19 +26,19 @@ export async function createAndAwait(executionTarget: Identity, options: Notific
 }
 
 export async function clear(executionTarget: Identity, id: string) {
-    return ofBrowser.executeOnWindow(executionTarget, function(idRemote: string){
+    return ofBrowser.executeOnWindow(executionTarget, function(idRemote: string) {
         return this.notifications.clear(idRemote);
     }, id);
 }
 
 export async function getAll(executionTarget: Identity) {
-    return ofBrowser.executeOnWindow(executionTarget, function(){
+    return ofBrowser.executeOnWindow(executionTarget, function() {
         return this.notifications.getAll();
     });
 }
 
 export async function clearAll(executionTarget: Identity) {
-    return ofBrowser.executeOnWindow(executionTarget, function(){
+    return ofBrowser.executeOnWindow(executionTarget, function() {
         return this.notifications.clearAll();
     });
 }
