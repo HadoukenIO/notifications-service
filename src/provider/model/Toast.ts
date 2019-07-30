@@ -46,13 +46,6 @@ interface Options {
     timeout: number;
 }
 
-/** Animation state of the toast window. */
-enum AnimationState {
-    WAITING = 'WAITING',
-    SHOWING = 'SHOWING',
-    CLOSING = 'CLOSING'
-}
-
 export enum ToastEvent {
     PAUSE = 'pause',
     UNPAUSE = 'unpause',
@@ -64,7 +57,6 @@ export class Toast implements LayoutItem {
 
     private _webWindow: Readonly<Promise<WebWindow>>;
     private _options: Options;
-    private _state: AnimationState;
     private _timeout!: number;
     private _dimensions!: Promise<WindowDimensions>;
     private _id: string;
@@ -92,22 +84,10 @@ export class Toast implements LayoutItem {
         return this._dimensions;
     }
 
-    public get isShowing(): boolean {
-        return this._state === AnimationState.SHOWING;
-    }
-
-    public get isClosing(): boolean {
-        return this._state === AnimationState.CLOSING;
-    }
-
-    public isWaiting(): boolean {
-        return this._state === AnimationState.WAITING;
-    }
 
     public constructor(store: Store, notification: StoredNotification, toastOptions: Options) {
         this._id = notification.id;
         this._options = toastOptions;
-        this._state = AnimationState.WAITING;
         this._position = {top: 0, left: 0};
         // Wait for the React component to render and then get the dimensions of it to resize the window.
         const [dimensionPromise, dimensionResolve] = deferredPromise<WindowDimensions>();
@@ -134,10 +114,6 @@ export class Toast implements LayoutItem {
      * @returns Returns true if the toast can be show, false if it cannot fit in the monitor bounds.
     */
    public async show(): Promise<boolean> {
-        if (this.isShowing) {
-            return true;
-        }
-        this._state = AnimationState.SHOWING;
         const {window: toastWindow} = await this._webWindow;
         await toastWindow.show();
         this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
@@ -146,7 +122,7 @@ export class Toast implements LayoutItem {
 
     public async animate(transitions: Transition, options: TransitionOptions): Promise<void> {
         const {window} = await this._webWindow;
-        window.animate(transitions, options);
+        return window.animate(transitions, options);
     }
 
     public async setTransform(transform: Bounds): Promise<void> {
@@ -159,7 +135,6 @@ export class Toast implements LayoutItem {
      * @param force Force the window to close instantly without animating out.
      */
     public close = async (): Promise<void> => {
-        this._state = AnimationState.CLOSING;
         const {window, document} = await this._webWindow;
 
         clearTimeout(this._timeout);
@@ -176,9 +151,6 @@ export class Toast implements LayoutItem {
      * @param stopMovement If true the toasts movement will be stopped.
      */
     public freeze = async (stopMovement: boolean = false): Promise<void> => {
-        if (this.isWaiting()) {
-            return;
-        }
         clearTimeout(this._timeout!);
     }
 
@@ -205,8 +177,7 @@ export class Toast implements LayoutItem {
     }
 
     private mouseEnterHandler = async (): Promise<void> => {
-        clearTimeout(this._timeout!);
-        Toast.eventEmitter.emit(ToastEvent.PAUSE, this.id);
+        Toast.eventEmitter.emit(ToastEvent.PAUSE);
     };
 
     private mouseLeaveHandler = async (): Promise<void> => {

@@ -32,7 +32,7 @@ export enum LayoutEvent {
 @injectable()
 export class Layouter {
 
-    private static INTERNAL_CONFIG: LayouterConfig = {
+    private static INTERNAL_CONFIG: Readonly<LayouterConfig> = {
         spacing: 10,
         margin: 50,
         anchor:{top: 1, left: 1},
@@ -91,10 +91,10 @@ export class Layouter {
      * @returns {PointTopLeft} initial (spawn) position
      */
     private get spawnPosition(): PointTopLeft {
-        const [originX, originY] = [this._availableRect.right / 2, this._availableRect.bottom / 2];
+        const origin: PointTopLeft = {top: this._availableRect.bottom / 2, left: this._availableRect.right / 2};
         return {
-            top: originY + originY * this.anchor.top + this.margin,
-            left: originX + originX * this.anchor.left
+            top: origin.top + origin.top * this.anchor.top + this.margin,
+            left: origin.left + origin.left * this.anchor.left
         };
     }
 
@@ -106,17 +106,15 @@ export class Layouter {
         let {top, left} = this.spawnPosition;
         let prev: number;
         for (const item of items) {
-            let {height} = await item.dimensions;
+            const {height} = await item.dimensions;
             prev = top;
             top = top + height * this.direction + this.spacing;
-            let newPosition = {
+            const newPosition: PointTopLeft = {
                 top: (this.direction <= 0) ? top : prev,
                 left: left
             };
-            if (item.position.top !== newPosition.top || item.position.left !== newPosition.left) {
-                item.position = newPosition;
-                this.moveItem(item, item.position);
-            }
+            item.position = newPosition;
+            this.moveItem(item, item.position);
         }
     }
 
@@ -129,9 +127,6 @@ export class Layouter {
         const bounds: Bounds = await this.calculateItemBounds(item, position);
         const config: LayouterConfig = Layouter.INTERNAL_CONFIG;
 
-        if (!window) {
-            return;
-        }
         return item.animate(
             {
                 opacity: {
@@ -217,9 +212,4 @@ export class Layouter {
             right: left + width
         };
     }
-
-    private set anchor(newAnchor: PointTopLeft) {
-        Layouter.INTERNAL_CONFIG.anchor = newAnchor;
-    }
-
 }

@@ -98,13 +98,14 @@ export class ToastManager {
         this._toasts.delete(toast.id);
         const index = this._stack.indexOf(toast);
         this._stack.splice(index, 1);
-        const toastWasShowing = toast.isShowing;
-        this.closeToast(toast);
-        if (toastWasShowing) {
-            this._layouter.layout(this._stack);
-        }
+        this._layouter.layout(this._stack);
+        await this.closeToast(toast);
     }
 
+    /**
+     * Animate toast for removal and close.
+     * @param toast {Toast} Toast to close.
+     */
     private async closeToast(toast: Toast): Promise<void> {
         await this._layouter.removeItem(toast);
         toast.close();
@@ -133,19 +134,19 @@ export class ToastManager {
         Toast.eventEmitter.addListener(ToastEvent.CLOSED, async (id: string) => {
             const toast = this._toasts.get(id);
             if (toast) {
-                await this.deleteToast(toast);
+                this.deleteToast(toast);
             }
         });
 
-        Toast.eventEmitter.addListener(ToastEvent.UNPAUSE, async (id: string) => {
+        Toast.eventEmitter.addListener(ToastEvent.UNPAUSE, async () => {
             for (const toast of this._stack) {
                 toast.unfreeze();
             }
         });
 
-        Toast.eventEmitter.addListener(ToastEvent.PAUSE, async (id: string) => {
+        Toast.eventEmitter.addListener(ToastEvent.PAUSE, async () => {
             for (const toast of this._stack) {
-                toast.unfreeze();
+                toast.freeze();
             }
         });
 
