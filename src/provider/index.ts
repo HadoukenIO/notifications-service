@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import {inject, injectable} from 'inversify';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
+import moment from 'moment';
 
 import {APITopic, API, ClearPayload} from '../client/internal';
 import {OptionButton, NotificationOptions, Notification, NotificationClosedEvent, NotificationButtonClickedEvent, NotificationClickedEvent} from '../client';
@@ -163,11 +164,45 @@ export class Main {
      * @param sender The source of the notification.
      */
     private hydrateNotification(payload: NotificationOptions, sender: Identity): StoredNotification {
-        if (!payload.body) {
-            throw new Error('Invalid arguments passed to createNotification. "body" must have a value');
+        const problems: string[] = [];
+
+        if (payload.id !== undefined && typeof payload.id !== 'string') {
+            problems.push('"id" must be a string or undefined');
         }
-        if (!payload.title) {
-            throw new Error('Invalid arguments passed to createNotification. "title" must have a value');
+
+        if (typeof payload.body === 'undefined') {
+            problems.push('"body" must have a value');
+        } else if (typeof payload.body !== 'string') {
+            problems.push('"body" must be a string');
+        }
+
+        if (typeof payload.title === 'undefined') {
+            problems.push('"title" must have a value');
+        } else if (typeof payload.title !== 'string') {
+            problems.push('"title" must be a string');
+        }
+
+        if (payload.subtitle !== undefined && typeof payload.subtitle !== 'string') {
+            problems.push('"subtitle" must be a string or undefined');
+        }
+
+        if (payload.icon !== undefined && typeof payload.icon !== 'string') {
+            problems.push('"icon" must be a string or undefined');
+        }
+
+        const parsedDate = moment(payload.date);
+        if (payload.date !== undefined && !parsedDate.isValid()) {
+            problems.push('"date" must be a date string, unix timestamp, or undefined');
+        }
+
+        if (payload.buttons !== undefined && !Array.isArray(payload.buttons)) {
+            problems.push('"buttons" must be an array or undefined');
+        }
+
+        if (problems.length === 1) {
+            throw new Error(`Invalid arguments passed to create: ${problems[0]}`);
+        } else if (problems.length > 1) {
+            throw new Error(`Invalid arguments passed to create:\n - ${problems.join('\n - ')}`);
         }
 
         const notification: Notification = {
@@ -177,7 +212,7 @@ export class Main {
             subtitle: payload.subtitle || '',
             icon: payload.icon || '',
             customData: payload.customData,
-            date: payload.date || new Date(),
+            date: payload.date && new Date(payload.date) || new Date(),
             buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, iconUrl: btn.iconUrl || ''})) : []
         };
 
