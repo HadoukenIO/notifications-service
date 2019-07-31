@@ -8,11 +8,11 @@ import Bounds from 'openfin/_v2/api/window/bounds';
 import {deferredPromise} from '../common/deferredPromise';
 import {renderApp} from '../view/containers/ToastApp';
 import {Store} from '../store/Store';
+import {LayoutItem, WindowDimensions} from '../controller/Layouter';
 
 import {StoredNotification} from './StoredNotification';
 import {WebWindow, createWebWindow} from './WebWindow';
 
-import {LayoutItem, WindowDimensions} from '../controller/Layouter'
 
 
 const windowOptions: WindowOption = {
@@ -30,7 +30,7 @@ const windowOptions: WindowOption = {
     showTaskbarIcon: false,
     opacity: 0,
     backgroundColor: '#1F1E24',
-    cornerRounding : {
+    cornerRounding: {
         width: 7,
         height: 7
     }
@@ -110,14 +110,11 @@ export class Toast implements LayoutItem {
 
     /**
      * Display the toast.
-     * @param position If a position is given the toast will be shown there, otherwise its current position will be used.
-     * @returns Returns true if the toast can be show, false if it cannot fit in the monitor bounds.
     */
-   public async show(): Promise<boolean> {
+    public async show(): Promise<void> {
         const {window: toastWindow} = await this._webWindow;
         await toastWindow.show();
         this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
-        return true;
     }
 
     public async animate(transitions: Transition, options: TransitionOptions): Promise<void> {
@@ -132,7 +129,6 @@ export class Toast implements LayoutItem {
 
     /**
      * Close Toast window and perform cleanup.
-     * @param force Force the window to close instantly without animating out.
      */
     public close = async (): Promise<void> => {
         const {window, document} = await this._webWindow;
@@ -183,5 +179,4 @@ export class Toast implements LayoutItem {
     private mouseLeaveHandler = async (): Promise<void> => {
         Toast.eventEmitter.emit(ToastEvent.UNPAUSE);
     };
-
 }

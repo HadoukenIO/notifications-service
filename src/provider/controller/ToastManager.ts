@@ -1,15 +1,18 @@
 import {injectable, inject} from 'inversify';
+
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastEvent} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
+
 import {LayoutEvent, Layouter} from './Layouter';
 
 @injectable()
 export class ToastManager {
     @inject(Inject.LAYOUTER)
     private _layouter!: Layouter;
+
     private _store!: Store;
     private _toasts: Map<string, Toast> = new Map();
     private _stack: Toast[] = [];

@@ -1,13 +1,12 @@
-import {injectable} from 'inversify';
+import {EventEmitter} from 'events';
 
+import {injectable} from 'inversify';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Rect} from 'openfin/_v2/api/system/monitor';
 import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
 import {MonitorEvent} from 'openfin/_v2/api/events/system';
-
 import Bounds from 'openfin/_v2/api/window/bounds';
-import { _Window } from 'openfin/_v2/api/window/window';
-import {EventEmitter} from 'events';
+import {_Window} from 'openfin/_v2/api/window/window';
 
 interface LayouterConfig {
     spacing: number;
@@ -31,13 +30,13 @@ export enum LayoutEvent {
 
 @injectable()
 export class Layouter {
-
     private static INTERNAL_CONFIG: Readonly<LayouterConfig> = {
         spacing: 10,
         margin: 50,
-        anchor:{top: 1, left: 1},
+        anchor: {top: 0, left: 0},
         animationTime: 100
     };
+
     private _availableRect!: Required<Rect>;
 
     public static eventEmitter: EventEmitter = new EventEmitter();
@@ -56,7 +55,7 @@ export class Layouter {
 
     /**
      * Anchor point of the layout. clamped between -1 (for minimum) and 1 (for maximum) for each dimension.
-     * @return {PointTopLeft} anchor position
+     * @returns {PointTopLeft} anchor position
      */
     private get anchor(): PointTopLeft {
         return Layouter.INTERNAL_CONFIG.anchor;
@@ -64,7 +63,7 @@ export class Layouter {
 
     /**
      * Direction of the layout animation for the current layout configuration
-     * @return {number} -1 (bottom to top) or 1 (up to bottom)
+     * @returns {number} -1 (bottom to top) or 1 (up to bottom)
      */
     private get direction(): number {
         return (Layouter.INTERNAL_CONFIG.anchor.top >= 0) ? -1 : 1;
@@ -72,7 +71,7 @@ export class Layouter {
 
     /**
      * Returns the spacing between each layoutable item for the current layout configuration
-     * @return {number} spacing
+     * @returns {number} spacing
      */
     private get spacing(): number {
         return Layouter.INTERNAL_CONFIG.spacing * this.direction;
@@ -100,9 +99,10 @@ export class Layouter {
 
     /**
      * Layout a given stack of Layoutable items
-     * @param item {LayoutItem} Target layoutable item stack
+     * @param items {LayoutItem[]} Target layoutable item stack
      */
     public async layout(items: LayoutItem[]): Promise<void> {
+        // eslint-disable-next-line prefer-const
         let {top, left} = this.spawnPosition;
         let prev: number;
         for (const item of items) {
@@ -201,6 +201,7 @@ export class Layouter {
      */
     private async calculateItemBounds(item: LayoutItem, position?: PointTopLeft, dimensions?: WindowDimensions): Promise<Required<Bounds>> {
         const {width, height} = dimensions || await item.dimensions;
+        // eslint-disable-next-line prefer-const
         let {top, left} = position || item.position;
         left = left - width * ((this.anchor.left > 0) ? 1 : 0);
         return {
