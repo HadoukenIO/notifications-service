@@ -29,7 +29,7 @@ export interface LayoutStack {
 export type WindowDimensions = {height: number, width: number};
 
 export enum LayoutEvent {
-    LAYOUT_REQUIRED = 'layoutRequired'
+    LAYOUT_REQUIRED = 'layout-required'
 }
 
 @injectable()
@@ -66,7 +66,7 @@ export class Layouter {
 
     /**
      * Direction of the layout animation for the current layout configuration
-     * @returns {number} -1 (bottom to top) or 1 (up to bottom)
+     * @returns -1 (bottom to top) or 1 (up to bottom)
      */
     private get direction(): number {
         return (Layouter.INTERNAL_CONFIG.anchor.top >= 0) ? -1 : 1;
@@ -74,7 +74,7 @@ export class Layouter {
 
     /**
      * Returns the spacing between each layoutable item for the current layout configuration
-     * @returns {number} spacing
+     * @returns spacing
      */
     private get spacing(): number {
         return Layouter.INTERNAL_CONFIG.spacing * this.direction;
@@ -82,7 +82,7 @@ export class Layouter {
 
     /**
      * Returns initial (spawn) position of any item for the current layout configuration
-     * @returns {PointTopLeft} initial (spawn) position
+     * @returns initial (spawn) position
      */
     private get spawnPosition(): PointTopLeft {
         const origin: PointTopLeft = {
@@ -98,7 +98,7 @@ export class Layouter {
 
     /**
      * Returns the usable screen height for the current layout configuration
-     * @returns {number} height available
+     * @returns height available
      */
     private get availableHeight(): number {
         const origin = this._availableRect.bottom / 2;
@@ -109,7 +109,7 @@ export class Layouter {
 
     /**
      * Layout a given stack of Layoutable items
-     * @param stack {LayoutStack} Target layoutable item stack
+     * @param stack Target layoutable item stack
      */
     public async layout(stack: LayoutStack): Promise<void> {
         // eslint-disable-next-line prefer-const
@@ -133,8 +133,8 @@ export class Layouter {
 
     /**
      * Animate item to its natural size and specified position
-     * @param item {LayoutItem} Target layoutable item
-     * @param position {PointTopLeft} Position of the window.
+     * @param item Target layoutable item
+     * @param position Position of the window.
      */
     public async moveItem(item: LayoutItem, position: PointTopLeft): Promise<void> {
         const bounds: Bounds = await this.calculateItemBounds(item, position);
@@ -166,7 +166,7 @@ export class Layouter {
 
     /**
      * Trigger the pre stack remove animation of the item.
-     * @param item {LayoutItem} Target layoutable item
+     * @param item Target layoutable item
      */
     public async removeItem(item: LayoutItem): Promise<void> {
         const direction: number = (this.anchor.top >= 0) ? 1 : 0;
@@ -196,7 +196,7 @@ export class Layouter {
 
     /**
      * Moves and resizes the window to its initial position after its spawn
-     * @param item {LayoutItem} Target layoutable item
+     * @param item Target layoutable item
      */
     public async setInitialTransform(item: LayoutItem): Promise<void> {
         const dimensions: WindowDimensions = await item.dimensions;
@@ -208,8 +208,8 @@ export class Layouter {
 
     /**
      * Checks if item would fit in screen fully if it was added to the given stack and laid out.
-     * @param stack {LayoutStack} Stack to add the item
-     * @param queue {LayoutItem[]} queue to check the items.
+     * @param stack Stack to add the item
+     * @param queue queue to check the items.
      */
     public async getFittingItems(stack: LayoutStack, queue: LayoutItem[]): Promise<LayoutItem[]> {
         let availableHeight: number = this.availableHeight - stack.layoutHeight;
@@ -228,9 +228,9 @@ export class Layouter {
 
     /**
      * Get bounds for the window, or the possible bounds given a position and the window dimensions.
-     * @param item {LayoutItem} Target layoutable item
-     * @param position {PointTopLeft} Position of the window.
-     * @param dimensions {WindowDimensions} Dimension of the window.
+     * @param item Target layoutable item
+     * @param position Position of the window.
+     * @param dimensions Dimension of the window.
      */
     private async calculateItemBounds(item: LayoutItem, position?: PointTopLeft, dimensions?: WindowDimensions): Promise<Required<Bounds>> {
         const {width, height} = dimensions || await item.dimensions;

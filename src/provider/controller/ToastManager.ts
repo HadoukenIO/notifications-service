@@ -127,7 +127,7 @@ export class ToastManager {
 
     /**
      * Animate toast for removal and close.
-     * @param toast {Toast} Toast to close.
+     * @param toast Toast to close.
      */
     private async closeToast(toast: Toast): Promise<void> {
         await this._layouter.removeItem(toast);
