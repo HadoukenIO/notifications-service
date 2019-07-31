@@ -7,7 +7,7 @@ import * as notifsRemote from './utils/notificationsRemote';
 import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
 import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
-import {testManagerIdentity} from './utils/constants';
+import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -29,7 +29,7 @@ describe('Click listeners', () => {
         let testApp: Application;
         let testAppMainWindow: FinWindow;
         beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {url: 'http://localhost:3922/demo/app.html'});
+            testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
             testAppMainWindow = await testApp.getWindow();
         });
 
