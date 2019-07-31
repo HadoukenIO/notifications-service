@@ -10,7 +10,6 @@ import {_Window} from 'openfin/_v2/api/window/window';
 
 interface LayouterConfig {
     spacing: number;
-    margin: number;
     anchor: PointTopLeft;
     animationTime: number;
 }
@@ -20,6 +19,11 @@ export interface LayoutItem {
     setTransform(transform: Bounds): Promise<void>;
     readonly dimensions: Promise<WindowDimensions>;
     position: PointTopLeft;
+}
+
+export interface LayoutStack {
+    items: LayoutItem[];
+    layoutHeight: number;
 }
 
 export type WindowDimensions = {height: number, width: number};
@@ -32,8 +36,7 @@ export enum LayoutEvent {
 export class Layouter {
     private static INTERNAL_CONFIG: Readonly<LayouterConfig> = {
         spacing: 10,
-        margin: 50,
-        anchor: {top: 0, left: 0},
+        anchor: {top: 1, left: 1},
         animationTime: 100
     };
 
@@ -78,34 +81,42 @@ export class Layouter {
     }
 
     /**
-     * Returns the gap between the top of current available screen rectangle and item spawn position for the current layout configuration
-     * @returns {number} margin
-     */
-    private get margin(): number {
-        return Layouter.INTERNAL_CONFIG.margin * this.direction;
-    }
-
-    /**
      * Returns initial (spawn) position of any item for the current layout configuration
      * @returns {PointTopLeft} initial (spawn) position
      */
     private get spawnPosition(): PointTopLeft {
-        const origin: PointTopLeft = {top: this._availableRect.bottom / 2, left: this._availableRect.right / 2};
+        const origin: PointTopLeft = {
+            top: (this._availableRect.bottom - this._availableRect.top) / 2,
+            left: (this._availableRect.right - this._availableRect.left) / 2
+        };
+        const margin: number = (this.anchor.top < 0) ? this.spacing : 0;
         return {
-            top: origin.top + origin.top * this.anchor.top + this.margin,
-            left: origin.left + origin.left * this.anchor.left
+            top: this._availableRect.top + origin.top + origin.top * this.anchor.top + margin,
+            left: this._availableRect.left + origin.left + origin.left * this.anchor.left
         };
     }
 
     /**
-     * Layout a given stack of Layoutable items
-     * @param items {LayoutItem[]} Target layoutable item stack
+     * Returns the usable screen height for the current layout configuration
+     * @returns {number} height available
      */
-    public async layout(items: LayoutItem[]): Promise<void> {
+    private get availableHeight(): number {
+        const origin = this._availableRect.bottom / 2;
+        const screenHeight = this._availableRect.bottom - this._availableRect.top;
+        const top = this._availableRect.top + origin + origin * this.anchor.top;
+        return screenHeight - (this.direction < 0 ? screenHeight - top : top);
+    }
+
+    /**
+     * Layout a given stack of Layoutable items
+     * @param stack {LayoutStack} Target layoutable item stack
+     */
+    public async layout(stack: LayoutStack): Promise<void> {
         // eslint-disable-next-line prefer-const
         let {top, left} = this.spawnPosition;
         let prev: number;
-        for (const item of items) {
+        stack.layoutHeight = 0;
+        for (const item of stack.items) {
             const {height} = await item.dimensions;
             prev = top;
             top = top + height * this.direction + this.spacing;
@@ -115,6 +126,8 @@ export class Layouter {
             };
             item.position = newPosition;
             this.moveItem(item, item.position);
+            // update stack height.
+            stack.layoutHeight += height + Layouter.INTERNAL_CONFIG.spacing;
         }
     }
 
@@ -191,6 +204,26 @@ export class Layouter {
         item.position = this.spawnPosition;
 
         await item.setTransform(spawnTransform);
+    }
+
+    /**
+     * Checks if item would fit in screen fully if it was added to the given stack and laid out.
+     * @param stack {LayoutStack} Stack to add the item
+     * @param queue {LayoutItem[]} queue to check the items.
+     */
+    public async getFittingItems(stack: LayoutStack, queue: LayoutItem[]): Promise<LayoutItem[]> {
+        let availableHeight: number = this.availableHeight - stack.layoutHeight;
+        const fittingItems: LayoutItem[] = [];
+        while (queue.length > 0) {
+            const {height} = await queue[0].dimensions;
+            if (height + Layouter.INTERNAL_CONFIG.spacing < availableHeight) {
+                availableHeight -= height;
+                fittingItems.push(queue.shift()!);
+            } else {
+                break;
+            }
+        }
+        return fittingItems;
     }
 
     /**

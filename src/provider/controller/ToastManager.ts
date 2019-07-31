@@ -6,7 +6,7 @@ import {Toast, ToastEvent} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
 
-import {LayoutEvent, Layouter} from './Layouter';
+import {LayoutStack, LayoutEvent, Layouter} from './Layouter';
 
 @injectable()
 export class ToastManager {
@@ -15,7 +15,8 @@ export class ToastManager {
 
     private _store!: Store;
     private _toasts: Map<string, Toast> = new Map();
-    private _stack: Toast[] = [];
+    private _stack: LayoutStack = {items: [], layoutHeight: 0};
+    private _queue: Toast[] = [];
 
     constructor(@inject(Inject.STORE) store: Store) {
         this._store = store;
@@ -32,7 +33,8 @@ export class ToastManager {
             this.closeToast(toast);
             this._toasts.delete(toast.id);
         });
-        this._stack = [];
+        this._stack = {items: [], layoutHeight: 0};
+        this._queue = [];
     }
 
     /**
@@ -58,10 +60,14 @@ export class ToastManager {
         });
 
         this._toasts.set(id, toast);
-        this._stack.unshift(toast);
         await this._layouter.setInitialTransform(toast);
-        await toast.show();
-        this._layouter.layout(this._stack);
+        if ((await this._layouter.getFittingItems(this._stack, [toast])).length > 0) {
+            this._stack.items.unshift(toast);
+            await toast.show();
+            this._layouter.layout(this._stack);
+        } else {
+            this._queue.push(toast);
+        }
     }
 
     /**
@@ -99,10 +105,24 @@ export class ToastManager {
      */
     private async deleteToast(toast: Toast, force: boolean = false): Promise<void> {
         this._toasts.delete(toast.id);
-        const index = this._stack.indexOf(toast);
-        this._stack.splice(index, 1);
+        const index = this._stack.items.indexOf(toast);
+        this._stack.items.splice(index, 1);
         this._layouter.layout(this._stack);
         await this.closeToast(toast);
+        // There is extra space now, check the queue.
+        this.checkQueue();
+    }
+
+    /**
+     * Adds a toast from awaiting toasts queue to the layout stack if it would fit.
+     */
+    private async checkQueue(): Promise<void> {
+        const items = await this._layouter.getFittingItems(this._stack, this._queue);
+        for (const toast of items as Toast[]) {
+            this._stack.items.unshift(toast);
+            await toast.show();
+            await this._layouter.layout(this._stack);
+        }
     }
 
     /**
@@ -142,13 +162,13 @@ export class ToastManager {
         });
 
         Toast.eventEmitter.addListener(ToastEvent.UNPAUSE, async () => {
-            for (const toast of this._stack) {
+            for (const toast of this._stack.items as Toast[]) {
                 toast.unfreeze();
             }
         });
 
         Toast.eventEmitter.addListener(ToastEvent.PAUSE, async () => {
-            for (const toast of this._stack) {
+            for (const toast of this._stack.items as Toast[]) {
                 toast.freeze();
             }
         });
