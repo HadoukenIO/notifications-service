@@ -6,7 +6,7 @@ import {Toast, ToastEvent} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
 
-import {LayoutStack, LayoutEvent, Layouter} from './Layouter';
+import {LayoutStack, Layouter} from './Layouter';
 
 @injectable()
 export class ToastManager {
