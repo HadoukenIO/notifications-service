@@ -8,6 +8,7 @@ import {ToastManager} from '../controller/ToastManager';
 import {APIHandler} from '../model/APIHandler';
 import {ActionMap, Actions} from '../store/Actions';
 import {Store} from '../store/Store';
+import {Storage} from '../model/Storage';
 
 import {Inject} from './Injectables';
 
@@ -20,6 +21,7 @@ type Types = {
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
+    [Inject.STORAGE]: Storage;
 };
 
 /**
@@ -33,7 +35,8 @@ const Bindings = {
     [Inject.API_HANDLER]: APIHandler,
     [Inject.STORE]: Store,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
-    [Inject.TOAST_MANAGER]: ToastManager
+    [Inject.TOAST_MANAGER]: ToastManager,
+    [Inject.STORAGE]: Storage
 };
 
 type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);

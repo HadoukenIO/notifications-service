@@ -4,8 +4,8 @@ import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispat
 import {Signal} from 'openfin-service-signal';
 
 import {Inject} from '../common/Injectables';
-import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
+import {Storage} from '../model/Storage';
 
 import {ActionMap, ActionHandler, RootAction, Action, ActionOf} from './Actions';
 import {RootState, Immutable} from './State';
@@ -23,9 +23,11 @@ export class Store {
 
     private _actionMap: ActionMap;
     private _store: ReduxStore<RootState, RootAction>;
+    private _storage: Storage;
 
-    constructor(@inject(Inject.ACTION_MAP) actionMap: ActionMap) {
+    constructor(@inject(Inject.ACTION_MAP) actionMap: ActionMap, @inject(Inject.STORAGE) storage: Storage) {
         this._actionMap = actionMap;
+        this._storage = storage;
         this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), this.getInitialState(), this.createEnhancer());
     }
 
@@ -93,12 +95,12 @@ export class Store {
         const initialState = this.cloneState(Store.INITIAL_STATE);
 
         const notifications: StoredNotification[] = [];
-        notificationStorage.iterate((value: string, key: string) => {
+        this._storage.get('notifications').iterate((value: string, key: string) => {
             notifications.push(JSON.parse(value));
         });
         Object.assign(initialState, {notifications});
 
-        settingsStorage.iterate((value: string, key: string) => {
+        this._storage.get('settings').iterate((value: string, key: string) => {
 
         });
 
