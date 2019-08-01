@@ -41,7 +41,7 @@ export class Layouter {
 
     private _availableRect!: Required<Rect>;
 
-    public onLayoutRequired: Signal<any> = new Signal();
+    public onLayoutRequired: Signal<[]> = new Signal();
 
     constructor() {
         fin.System.getMonitorInfo().then(monitorInfo => {
