@@ -27,10 +27,6 @@ export interface LayoutStack {
 
 export type WindowDimensions = {height: number, width: number};
 
-export enum LayoutEvent {
-    LAYOUT_REQUIRED = 'layout-required'
-}
-
 @injectable()
 export class Layouter {
     private static INTERNAL_CONFIG: Readonly<LayouterConfig> = {
