@@ -192,7 +192,7 @@ export class Main {
 
         const parsedDate = moment(payload.date);
         if (payload.date !== undefined && !parsedDate.isValid()) {
-            problems.push('"date" must be a date string, unix timestamp, or undefined');
+            problems.push('"date" must be a valid Date object');
         }
 
         if (payload.buttons !== undefined && !Array.isArray(payload.buttons)) {
