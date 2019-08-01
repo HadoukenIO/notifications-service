@@ -10,19 +10,19 @@ import {LayoutStack, LayoutEvent, Layouter} from './Layouter';
 
 @injectable()
 export class ToastManager {
-    @inject(Inject.LAYOUTER)
     private _layouter!: Layouter;
-
     private _store!: Store;
     private _toasts: Map<string, Toast> = new Map();
     private _stack: LayoutStack = {items: [], layoutHeight: 0};
     private _queue: Toast[] = [];
 
-    constructor(@inject(Inject.STORE) store: Store) {
+    constructor(@inject(Inject.STORE) store: Store, @inject(Inject.LAYOUTER) layouter: Layouter) {
         this._store = store;
         this._store.onAction.add(this.onAction, this);
         this.subscribe();
         this.addListeners();
+        this._layouter = layouter;
+        this._layouter.onLayoutRequired.add(this.onLayoutRequired, this);
     }
 
     /**
@@ -82,6 +82,14 @@ export class ToastManager {
                 this.deleteToast(toast);
             }
         });
+    }
+
+    /**
+     * Signal callback for layout required event. This signal is emitted by Layouter in events like
+     * monitor info is changed, etc.
+     */
+    private onLayoutRequired(): void {
+        this._layouter.layout(this._stack);
     }
 
     private onAction(action: RootAction): void {
@@ -171,10 +179,6 @@ export class ToastManager {
             for (const toast of this._stack.items as Toast[]) {
                 toast.freeze();
             }
-        });
-
-        Layouter.eventEmitter.addListener(LayoutEvent.LAYOUT_REQUIRED, async () => {
-            this._layouter.layout(this._stack);
         });
     }
 }

@@ -1,5 +1,4 @@
-import {EventEmitter} from 'events';
-
+import {Signal} from 'openfin-service-signal';
 import {injectable} from 'inversify';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Rect} from 'openfin/_v2/api/system/monitor';
@@ -42,7 +41,7 @@ export class Layouter {
 
     private _availableRect!: Required<Rect>;
 
-    public static eventEmitter: EventEmitter = new EventEmitter();
+    public onLayoutRequired: Signal<any> = new Signal();
 
     constructor() {
         fin.System.getMonitorInfo().then(monitorInfo => {
@@ -52,7 +51,7 @@ export class Layouter {
         fin.System.addListener('monitor-info-changed', (async (event: MonitorEvent<string, string>) => {
             const monitorInfo = await fin.System.getMonitorInfo();
             this._availableRect = monitorInfo.primaryMonitor.availableRect;
-            Layouter.eventEmitter.emit(LayoutEvent.LAYOUT_REQUIRED);
+            this.onLayoutRequired.emit();
         }));
     }
 
