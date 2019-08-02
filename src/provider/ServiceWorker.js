@@ -20,7 +20,12 @@ self.addEventListener('fetch', event => {
         }
         return fetch(event.request).then(response => {
             return caches.open(cacheName).then(cache => {
-                cache.put(event.request.url, response.clone());
+                // filter requests to cache
+                ['.js', '.html', '.ico', '.css', '.otf', '.png', '.jpg'].some(suffix => {
+                    const match = event.request.url.endsWith(suffix);
+                    match && cache.put(event.request.url, response.clone());
+                    return match;
+                });
                 return response;
             });
         });
