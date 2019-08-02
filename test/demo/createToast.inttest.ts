@@ -11,7 +11,7 @@ import {getToastWindow, getToastCards} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
-import {testManagerIdentity} from './utils/constants';
+import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {assertHydratedCorrectly} from './utils/hydrateNotification';
 
 const options: NotificationOptions = {
@@ -35,7 +35,7 @@ describe('When calling createNotification with the notification center not showi
     });
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {});
+        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
 
         ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));

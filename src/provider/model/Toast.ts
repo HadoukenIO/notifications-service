@@ -55,7 +55,6 @@ export enum ToastEvent {
     CLOSED = 'closed'
 }
 
-
 export class Toast {
     public static DIRECTION: Readonly<[number, number]> = [-1, 1];
     public static eventEmitter: EventEmitter = new EventEmitter();

@@ -1,7 +1,7 @@
+import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
+
 import * as ofnotes from '../client/index';
 import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/index';
-
-import {addSpawnListeners, createWindow, createApp} from './spawn';
 
 addSpawnListeners();
 
@@ -50,7 +50,6 @@ function makeNoteOfType(index: number) {
 
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
-
 
     function logit(msg: string) {
         const logEntry = document.createElement('div');
