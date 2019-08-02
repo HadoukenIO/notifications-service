@@ -36,6 +36,21 @@ import {ActionDeclaration, NotificationActionResult} from './actions';
 import {tryServiceDispatch, eventEmitter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
 import {APITopic} from './internal';
+import {EventRouter, getEventRouter, EventTransport} from './EventRouter';
+
+const eventHandler: EventRouter = getEventRouter();
+
+eventHandler.registerEmitterProvider('main', () => eventEmitter);
+eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: EventTransport<NotificationActionEvent>) => {
+    const {controlSource, controlIndex, target, ...rest} = event;
+
+    if (event.trigger === ActionTrigger.CONTROL && controlSource && controlIndex !== undefined) {
+        const control: ControlOptions = event.notification[controlSource][controlIndex] as ControlOptions;
+        return {...rest, control};
+    } else {
+        return rest;
+    }
+});
 
 /**
  * Configuration options for constructing a Notifications object.
@@ -57,7 +72,7 @@ export interface NotificationOptions {
 
     /**
      * Notification body text.
-     * 
+     *
      * This is the main notification content, displayed below the notification title. The notification will expand to fit the length of this text.
      */
     body: string;
@@ -145,7 +160,7 @@ export type CustomData = any;
  * This object should be treated as immutable, modifying its state will not have any effect on the notification that
  * the user sees on-screen.
  */
-export type Notification = Readonly<NotificationOptions & Required<NotificationOptions>>>;
+export type Notification = Readonly<NotificationOptions & Required<NotificationOptions>>;
 
 /**
  * Event that is fired for interactions with notification UI elements. It is important to note that applications will
@@ -172,7 +187,7 @@ export interface NotificationActionEvent<T = {}> {
 
     /**
      * Indicates what triggered this action.
-     * 
+     *
      * Note that the `programmatic` trigger is not yet implemented.
      */
     trigger: ActionTrigger;
@@ -203,7 +218,7 @@ export interface NotificationActionEvent<T = {}> {
      * }
      * ```
      */
-    control?: ControlOptions;
+    control?: Readonly<ControlOptions>;
 
     /**
      * Application-defined metadata that this event is passing back to the application.
@@ -233,11 +248,11 @@ export enum ActionTrigger {
      * The user clicked the body of the notification itself. Any clicks of the notification that don't hit a control
      * will result in this event being fired.
      */
-    BODY = 'body',
+    SELECT = 'select',
 
     /**
      * The action was triggered programmatically by an application.
-     * 
+     *
      * *Not currently supported - will be implemented in a future release*
      */
     PROGRAMMATIC = 'programmatic'

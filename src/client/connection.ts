@@ -16,6 +16,7 @@ import {EventEmitter} from 'events';
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
 import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY} from './internal';
+import {getEventRouter, EventTransport, Transport} from './EventRouter';
 
 import {NotificationEvent} from './index';
 
@@ -48,10 +49,12 @@ if (fin.Window.me.uuid !== SERVICE_IDENTITY.uuid || fin.Window.me.name !== SERVI
     channelPromise = typeof fin === 'undefined' ?
         Promise.reject(new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.')) :
         fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
+            const eventHandler = getEventRouter();
+
             // Register service listeners
             channel.register('WARN', (payload: any) => console.warn(payload));
-            channel.register('event', (event: NotificationsEvent) => {
-                eventEmitter.emit(event.type, event);
+            channel.register('event', (event: EventTransport<NotificationsEvent>) => {
+                eventHandler.dispatchEvent(event);
             });
             // Any unregistered action will simply return false
             channel.setDefaultAction(() => false);

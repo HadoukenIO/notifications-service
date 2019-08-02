@@ -5,11 +5,11 @@
  * `Injector.ts`. These mappings can be programmatically overridden by calling the methods of the {@link Injector} util.
  */
 enum Injectable {
-    ACTION_MAP,
     API_HANDLER,
+    MIDDLEWARE,
     NOTIFICATION_CENTER,
-    TOAST_MANAGER,
-    STORE
+    STORE,
+    TOAST_MANAGER
 }
 
 type InjectableMap = {

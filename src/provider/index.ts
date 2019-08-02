@@ -4,8 +4,9 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
 
 import {APITopic, API, ClearPayload} from '../client/internal';
-import {NotificationOptions, Notification, NotificationClosedEvent, NotificationActionEvent} from '../client';
+import {NotificationOptions, Notification, NotificationClosedEvent, NotificationActionEvent, ActionTrigger, NotificationCreatedEvent} from '../client';
 import {ButtonOptions} from '../client/controls';
+import {EventTransport} from '../client/EventRouter';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -13,7 +14,7 @@ import {NotificationCenter} from './controller/NotificationCenter';
 import {ToastManager} from './controller/ToastManager';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
-import {Action, RootAction} from './store/Actions';
+import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisibility} from './store/Actions';
 import {mutable, Immutable} from './store/State';
 import {Store} from './store/Store';
 import {notificationStorage, settingsStorage} from './model/Storage';
@@ -58,41 +59,51 @@ export class Main {
             [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this)
         });
 
-        this._store.onAction.add((action: RootAction) => {
-            if (action.type === Action.REMOVE) {
-                // Send notification closed event to uuid with the context.
-                action.notifications.forEach((notification: StoredNotification) => {
-                    const target: Identity = notification.source;
-                    const event: NotificationClosedEvent = {type: 'notification-closed', notification: notification.notification};
-
-                    this._apiHandler.dispatchClientEvent(target, event);
+        this._store.onAction.add(async (action: RootAction): Promise<void> => {
+            if (action.type === Action.CREATE) {
+                const {notification, source} = action.notification;
+                const event: EventTransport<NotificationCreatedEvent> = {
+                    type: 'notification-created',
+                    notification: mutable(notification)
+                };
+                this._apiHandler.dispatchEvent(source, event);
+            } else if (action.type === Action.REMOVE) {
+                const {notifications} = action;
+                notifications.forEach((storedNotification: Immutable<StoredNotification>) => {
+                    const {notification, source} = storedNotification;
+                    const event: EventTransport<NotificationClosedEvent> = {
+                        type: 'notification-closed',
+                        notification: mutable(notification)
+                    };
+                    this._apiHandler.dispatchEvent(source, event);
                 });
             } else if (action.type === Action.CLICK_BUTTON) {
                 const {notification, source} = action.notification;
                 const button: ButtonOptions = notification.buttons[action.buttonIndex];
 
                 if (button && button.onClick !== undefined) {
-                    const target: Identity = source;
-                    const event: NotificationActionEvent = {
+                    const event: EventTransport<NotificationActionEvent> = {
                         type: 'notification-action',
-                        trigger: 'control',
-                        notification: notification,
-                        control: {type: 'button', ...button},
+                        trigger: ActionTrigger.CONTROL,
+                        notification: mutable(notification),
+                        controlSource: 'buttons',
+                        controlIndex: action.buttonIndex,
                         result: button.onClick
                     };
-                    this._apiHandler.dispatchClientEvent(target, event);
+                    this._apiHandler.dispatchEvent(source, event);
                 }
             } else if (action.type === Action.CLICK_NOTIFICATION) {
                 const {notification, source} = action.notification;
 
                 if (notification.onSelect) {
-                    const event: NotificationActionEvent = {
+                    const event: EventTransport<NotificationActionEvent> = {
+                        target: {type: 'main', id: 'main'},
                         type: 'notification-action',
-                        trigger: 'body',
-                        notification: notification,
+                        trigger: ActionTrigger.SELECT,
+                        notification: mutable(notification),
                         result: notification.onSelect
                     };
-                    this._apiHandler.dispatchClientEvent(source, event);
+                    this._apiHandler.dispatchEvent(source, event);
                 }
             }
         });
@@ -108,7 +119,7 @@ export class Main {
     private async createNotification(payload: NotificationOptions, sender: ProviderIdentity): Promise<Notification> {
         // Explicitly create the identity object to avoid storing other unneeded info from ProviderIdentity
         const notification = this.hydrateNotification(payload, {uuid: sender.uuid, name: sender.name});
-        this._store.dispatch({type: Action.CREATE, notification});
+        this._store.dispatch(new CreateNotification(notification));
         return notification.notification;
     }
 
@@ -118,7 +129,7 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        this._store.dispatch({type: Action.TOGGLE_VISIBILITY});
+        this._store.dispatch(new ToggleVisibility());
     }
 
     /**
@@ -131,7 +142,7 @@ export class Main {
         const id = this.encodeID(payload.id, sender);
         const notification = this._store.state.notifications.find(n => n.id === id);
         if (notification) {
-            this._store.dispatch({type: Action.REMOVE, notifications: [mutable(notification)]});
+            this._store.dispatch(new RemoveNotifications(notification));
             return true;
         }
         return false;
@@ -148,9 +159,9 @@ export class Main {
         return notifications.map(notification => mutable(notification.notification));
     }
 
-    private clearAppNotifications(payload: undefined, sender: ProviderIdentity): number {
+    private async clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
         const notifications = mutable(this.getAppNotifications(sender.uuid));
-        this._store.dispatch({type: Action.REMOVE, notifications});
+        await this._store.dispatch(new RemoveNotifications(notifications));
 
         return notifications.length;
     }
@@ -203,10 +214,10 @@ export class Main {
             category: payload.category,
             icon: payload.icon || '',
             customData: payload.customData,
-            date: payload.date || new Date(),
+            date: new Date(payload.date ? Date.parse(payload.date.toString()) : Date.now()),
             expires: payload.expires || null,
-            onSelect: payload.onSelect,
-            buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, iconUrl: btn.iconUrl || ''})) : []
+            onSelect: payload.onSelect || null,
+            buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, type: 'button', iconUrl: btn.iconUrl || ''})) : []
         };
 
         const storedNotification: StoredNotification = {

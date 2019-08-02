@@ -15,26 +15,26 @@ export enum GroupingType {
 }
 
 export interface Actionable {
-    dispatch: (action: RootAction)=>void;
+    storeDispatch: (action: RootAction)=>void;
 }
 
 type Props = ReturnType<typeof mapStateToProps> & Actionable;
 
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, dispatch} = props;
+    const {notifications, storeDispatch} = props;
 
     return (
         <div className='notification-center'>
             <Header
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}
-                dispatch={dispatch}
+                storeDispatch={storeDispatch}
             />
             <NotificationView
                 notifications={mutable(notifications)}
                 groupBy={groupBy}
-                dispatch={dispatch}
+                storeDispatch={storeDispatch}
             />
             <Footer />
         </div>
@@ -56,7 +56,7 @@ const Container = connect(mapStateToProps)(NotificationCenterApp);
 export function renderApp(document: Document, store: Store): void {
     ReactDOM.render(
         <Provider store={store['_store']}>
-            <Container dispatch={store.dispatch} />
+            <Container storeDispatch={store.dispatch.bind(store)} />
         </Provider>,
         document.getElementById('react-app')
     );

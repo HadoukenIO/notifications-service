@@ -2,12 +2,12 @@ import {injectable, inject} from 'inversify';
 import {composeWithDevTools} from 'remote-redux-devtools';
 import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispatch, Unsubscribe} from 'redux';
 
-import {Signal1} from '../common/Signal';
+import {Signal1, Aggregators} from '../common/Signal';
 import {Inject} from '../common/Injectables';
 import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
 
-import {ActionMap, ActionHandler, RootAction, Action, ActionOf} from './Actions';
+import {MiddlewareMap, Middleware, RootAction, Action, ActionOf, CustomAction} from './Actions';
 import {RootState, Immutable} from './State';
 
 export type StoreChangeObserver<T> = (oldValue: T, newValue: T) => void;
@@ -19,12 +19,12 @@ export class Store {
         windowVisible: false
     };
 
-    public readonly onAction: Signal1<RootAction> = new Signal1();
+    public readonly onAction: Signal1<RootAction, void, Promise<void>> = new Signal1(Aggregators.AWAIT_VOID);
 
-    private _actionMap: ActionMap;
+    private _actionMap: MiddlewareMap;
     private _store: ReduxStore<RootState, RootAction>;
 
-    constructor(@inject(Inject.ACTION_MAP) actionMap: ActionMap) {
+    constructor(@inject(Inject.MIDDLEWARE) actionMap: MiddlewareMap) {
         this._actionMap = actionMap;
         this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), this.getInitialState(), this.createEnhancer());
     }
@@ -33,8 +33,14 @@ export class Store {
         return this._store.getState() as Immutable<RootState>;
     }
 
-    public dispatch(action: RootAction): void {
-        this._store.dispatch(action);
+    public async dispatch(action: RootAction): Promise<void> {
+        if (action instanceof CustomAction) {
+            // Action has custom dispatch logic
+            await action.dispatch(this);
+        } else {
+            // Pass straight through to redux store
+            await this._store.dispatch({...action});
+        }
     }
 
     public watchForChange<T>(getObject: (state: RootState) => T, observer: StoreChangeObserver<T>): Unsubscribe {
@@ -57,12 +63,12 @@ export class Store {
     }
 
     private reduce<T extends Action>(state: RootState | undefined, action: ActionOf<T>): RootState {
-        const handler: ActionHandler<T> | undefined = this._actionMap[action.type] as ActionHandler<T>;
+        const handler: Middleware<T> | undefined = this._actionMap[action.type] as Middleware<T>;
 
         if (handler) {
             return handler(state!, action);
         } else {
-            console.info(`No handler registered for ${action && action.type}`);
+            // No handler registered for this action - action does not modify the store's state
             return state!;
         }
     }
@@ -81,9 +87,9 @@ export class Store {
         return enhancer;
     }
 
-    private createMiddleware(): (next: Dispatch<RootAction>) => (action: any) => any {
-        return (next: Dispatch<RootAction>) => (action: RootAction) => {
-            this.onAction.emit(action);
+    private createMiddleware(): (next: Dispatch<RootAction>) => (action: RootAction) => Promise<RootAction> {
+        return (next: Dispatch<RootAction>) => async (action: RootAction): Promise<RootAction> => {
+            await this.onAction.emit(action);
 
             return next(action);
         };

@@ -30,7 +30,7 @@ export class Aggregators {
      * An aggregator for use with Promise<void> signals. Will await all promises that are returned by callback
      * functions, but discard the (void) return values.
      */
-    public static async AWAIT_VOID(items: Promise<void>[]): Promise<void> {
+    public static async AWAIT_VOID<T=void|Promise<void>>(items: T[]): Promise<void> {
         await Promise.all(items);
     }
 }

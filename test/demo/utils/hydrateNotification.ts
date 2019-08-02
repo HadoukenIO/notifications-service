@@ -20,7 +20,6 @@ export function assertHydratedCorrectly(options: NotificationOptions, fullNote: 
     const expectedValues = {
         body: options.body,
         title: options.title,
-        subtitle: options.subtitle || '',
         icon: options.icon || '',
         buttons: options.buttons ? options.buttons.map(btn => ({...btn, iconUrl: btn.iconUrl || ''})) : []
     };

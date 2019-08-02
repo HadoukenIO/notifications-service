@@ -47,6 +47,7 @@ describe('When creating a notification with the center showing', () => {
         const options: NotificationOptions = {
             body: 'Test Notification Body',
             title: 'Test Notification Title',
+            category: 'Test Notification Category',
             id: 'test-notification-0',
             icon: 'https://openfin.co/favicon.ico'
         };
@@ -83,7 +84,7 @@ describe('When creating a notification with the center showing', () => {
         test('No toast is shown for the created notification', async () => {
             // The notification is created immediately before this, so we need
             // a slight delay to allow time for the toast to spawn.
-            await delay(Duration.WINDOW_CREATED);
+            await delay(Duration.TOAST_CLOSE);
 
             const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
             expect(toastWindow).toBe(undefined);
@@ -105,7 +106,7 @@ describe('When creating a notification with the center showing', () => {
         });
 
         test('The promise rejects with a suitable error message', async () => {
-            await expect(createPromise).rejects.toThrow(/Invalid arguments passed to createNotification/);
+            await expect(createPromise).rejects.toThrow(/Invalid arguments passed to create/);
         });
 
         test('A card is not added to the notification center', async () => {
@@ -126,7 +127,11 @@ describe('When creating a notification with the center showing', () => {
     });
 
     describe('When options does not include id', () => {
-        const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notification Title'};
+        const options: NotificationOptions = {
+            body: 'Test Notification Body',
+            title: 'Test Notification Title',
+            category: 'Test Notification Category'
+        };
 
         test('The notification is created as expected with a randomly generated ID', async () => {
             const {createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options);
@@ -147,7 +152,13 @@ describe('When creating a notification with the center showing', () => {
     });
 
     describe.each([1, 2, 3])('With %i button(s)', numButtons => {
-        const options: NotificationOptions = {body: 'Test Notification Body', title: 'Test Notification Title', buttons: []};
+        const options: NotificationOptions = {
+            body: 'Test Notification Body',
+            title: 'Test Notification Title',
+            category: 'Test Notification Category',
+            buttons: []
+        };
+
         for (let i = 0; i < numButtons; i++) {
             // options.buttons is assigned immediatly before this, but we need the ! because typescript doesn't realize.
             options.buttons!.push({title: 'Button ' + i});

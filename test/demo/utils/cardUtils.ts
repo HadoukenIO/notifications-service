@@ -44,7 +44,7 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
     const expectedMetadata: NotificationCardMetadata = {
         title: note.title,
         body: note.body,
-        buttons: note.buttons as ButtonMetadata[],
+        buttons: note.buttons.map(button => ({title: button.title, iconUrl: button.iconUrl || ''})),
         icon: note.icon,
         sourceApp: sourceUuid,
         timeString: moment(note.date).fromNow()

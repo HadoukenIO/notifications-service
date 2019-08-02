@@ -9,7 +9,9 @@
  * This file is excluded from the public-facing TypeScript documentation.
  */
 
-import {NotificationOptions, Notification} from './index';
+import {NotificationActionResult} from './actions';
+
+import {NotificationOptions, Notification, ActionTrigger} from './index';
 
 /**
  * The identity of the main application window of the service provider
@@ -33,7 +35,7 @@ export const enum APITopic {
 }
 
 export type API = {
-    [APITopic.CREATE_NOTIFICATION]: [NotificationOptions, Notification];
+    [APITopic.CREATE_NOTIFICATION]: [CreatePayload, Notification];
     [APITopic.CLEAR_NOTIFICATION]: [ClearPayload, boolean];
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
     [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
@@ -41,9 +43,19 @@ export type API = {
 };
 
 export interface CreatePayload extends NotificationOptions {
-    id: string;
 }
 
 export interface ClearPayload {
     id: string;
+}
+
+export interface NotificationActionEventTransport {
+    type: 'notification-action';
+    notification: Readonly<Notification>;
+    result: NotificationActionResult;
+    trigger: ActionTrigger;
+
+    // Following are present only if trigger is `CONTROL`
+    controlSource?: 'buttons';  // Additional sources will be added in future release
+    controlIndex?: number;      // The index of the originating control, within notification[controlSource]
 }

@@ -5,6 +5,7 @@ import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
 import {NotificationEvent} from '../../client';
+import {EventTransport} from '../../client/EventRouter';
 
 /**
  * Semantic type definition.
@@ -73,6 +74,22 @@ export class APIHandler<T extends Enum> {
         return this._providerChannel.connections;
     }
 
+    public async dispatchMessage<S extends APISpecification<T>, K extends T>(identity: Identity, action: K, payload: S[K][0]): Promise<S[K][1]> {
+        return this._providerChannel.dispatch(identity, action, payload);
+    }
+
+    public async dispatchEvent<T extends NotificationEvent>(targetWindow: Identity, eventTransport: EventTransport<T>): Promise<void> {
+        return this._providerChannel.dispatch(targetWindow, 'event', eventTransport);
+    }
+
+    public async publishMessage<S extends APISpecification<T>, K extends T>(action: K, payload: S[K][0]): Promise<S[K][1]> {
+        return this._providerChannel.publish(action, payload);
+    }
+
+    public async publishEvent<T extends NotificationEvent>(eventTransport: EventTransport<T>): Promise<void> {
+        return Promise.all(this._providerChannel.publish('event', eventTransport)).then(() => {});
+    }
+
     public async registerListeners<S extends APISpecification<T>>(actionHandlerMap: APIImplementation<T, S>): Promise<void> {
         const providerChannel: ChannelProvider = this._providerChannel = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
 
@@ -83,10 +100,6 @@ export class APIHandler<T extends Enum> {
                 this._providerChannel.register(action, actionHandlerMap[action]);
             }
         }
-    }
-
-    public async dispatchClientEvent(target: Identity, payload: NotificationEvent): Promise<void> {
-        return this.channel.dispatch(target, 'event', payload);
     }
 
     // TODO?: Remove the need for this any by defining connection payload type?
