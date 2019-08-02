@@ -1,4 +1,4 @@
-// Set a name for 'he current cache
+// Set a name for the current cache
 const cacheName = PACKAGE_VERSION; // eslint-disable-line no-undef
 
 self.addEventListener('activate', (e) => {
