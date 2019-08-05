@@ -3,6 +3,7 @@ import {Action as ReduxAction} from 'redux';
 import {StoredNotification} from '../model/StoredNotification';
 import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
+import {StorageMap} from '../model/Storage';
 
 import {RootState, Immutable, mutable} from './State';
 
@@ -52,7 +53,7 @@ export const Actions: ActionMap = {
     [Action.CREATE]: (state: Immutable<RootState>, action: CreateNotification): RootState => {
         const {notification} = action;
         const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
-        storage.get('notifications').setItem(notification.id, JSON.stringify(notification));
+        storage.get(StorageMap.NOTIFICATIONS).setItem(notification.id, JSON.stringify(notification));
 
         const notifications = mutable(state.notifications.slice());
         const index: number = state.notifications.findIndex(n => n.id === notification.id);
@@ -73,7 +74,7 @@ export const Actions: ActionMap = {
         const {notifications} = action;
         const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
         const idsToRemove = notifications.map(n => {
-            storage.get('notifications').removeItem(n.id);
+            storage.get(StorageMap.NOTIFICATIONS).removeItem(n.id);
             return n.id;
         });
 
@@ -85,7 +86,7 @@ export const Actions: ActionMap = {
     [Action.TOGGLE_VISIBILITY]: (state: Immutable<RootState>, action: ToggleVisibility): RootState => {
         const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
-        storage.get('settings').setItem('windowVisible', windowVisible);
+        storage.get(StorageMap.SETTINGS).setItem('windowVisible', windowVisible);
 
         return {
             ...mutable(state),

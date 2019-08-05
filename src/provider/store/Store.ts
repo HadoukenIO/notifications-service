@@ -5,7 +5,7 @@ import {Signal} from 'openfin-service-signal';
 
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
-import {Storage} from '../model/Storage';
+import {Storage, StorageMap} from '../model/Storage';
 import {AsyncInit} from '../controller/AsyncInit';
 
 import {ActionMap, ActionHandler, RootAction, Action, ActionOf} from './Actions';
@@ -102,12 +102,12 @@ export class Store extends AsyncInit {
         const initialState = this.cloneState(Store.INITIAL_STATE);
 
         const notifications: StoredNotification[] = [];
-        this._storage.get('notifications').iterate((value: string, key: string) => {
+        this._storage.get(StorageMap.NOTIFICATIONS).iterate((value: string, key: string) => {
             notifications.push(JSON.parse(value));
         });
         Object.assign(initialState, {notifications});
 
-        this._storage.get('settings').iterate((value: string, key: string) => {
+        this._storage.get(StorageMap.SETTINGS).iterate((value: string, key: string) => {
 
         });
 
