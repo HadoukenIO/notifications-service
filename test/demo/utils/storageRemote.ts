@@ -56,8 +56,8 @@ export async function assertNotificationStored(source: Identity, note: Notificat
  *
  * Returns `undefined` if no notification is stored with given ID.
  */
-async function getStoredNotification(id: string): Promise<StoredNotification | undefined>{
-    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined>{
+async function getStoredNotification(id: string): Promise<StoredNotification | undefined> {
+    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined> {
         const note = await this.notificationStorage.getItem<string | null>(remoteID);
         // Localforage returns null for non-existent keys, but we will return undefined for consistency with other utils
         return note !== null ? JSON.parse(note) : undefined;

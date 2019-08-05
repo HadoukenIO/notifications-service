@@ -240,3 +240,5 @@ export class Main {
 // Start service provider
 Injector.getClass(Main).register();
 
+// Register the offline-mode service worker.
+navigator.serviceWorker.register('./sw.js', {scope: './'});

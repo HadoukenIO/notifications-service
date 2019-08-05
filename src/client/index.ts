@@ -188,7 +188,7 @@ export async function clear(id: string): Promise<boolean> {
  *  .then(console.log);
  * ```
  */
-export async function getAll(): Promise<Notification[]>{
+export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
     const response = await tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
     return response.map(note => ({...note, date: new Date(note.date)}));
