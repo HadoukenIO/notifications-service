@@ -36,7 +36,7 @@ export async function clear(executionTarget: Identity, id: string) {
 }
 
 export async function getAll(executionTarget: Identity) {
-    const result = await ofBrowser.executeOnWindow(executionTarget, async function(){
+    const result = await ofBrowser.executeOnWindow(executionTarget, async function() {
         const notes = await this.notifications.getAll();
         // We need to manually stringify the date object as puppeteer fails to do so
         return notes.map(note => ({...note, date: note.date.toJSON()}));
