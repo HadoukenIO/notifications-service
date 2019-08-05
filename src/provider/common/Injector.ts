@@ -66,7 +66,7 @@ export class Injector {
 
             if (proto && proto.hasOwnProperty('init')) {
                 const instance = (container.get(Inject[key]) as AsyncInit);
-                promises.push(instance.initialized);
+                promises.push(instance.delayedInit());
             }
         });
 

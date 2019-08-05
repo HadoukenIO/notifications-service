@@ -6,6 +6,7 @@ import {Signal} from 'openfin-service-signal';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Storage} from '../model/Storage';
+import {AsyncInit} from '../controller/AsyncInit';
 
 import {ActionMap, ActionHandler, RootAction, Action, ActionOf} from './Actions';
 import {RootState, Immutable} from './State';
@@ -13,7 +14,7 @@ import {RootState, Immutable} from './State';
 export type StoreChangeObserver<T> = (oldValue: T, newValue: T) => void;
 
 @injectable()
-export class Store {
+export class Store extends AsyncInit {
     private static INITIAL_STATE: RootState = {
         notifications: [],
         windowVisible: false
@@ -22,13 +23,17 @@ export class Store {
     public readonly onAction: Signal<[RootAction]> = new Signal();
 
     private _actionMap: ActionMap;
-    private _store: ReduxStore<RootState, RootAction>;
+    private _store!: ReduxStore<RootState, RootAction>;
     private _storage: Storage;
 
     constructor(@inject(Inject.ACTION_MAP) actionMap: ActionMap, @inject(Inject.STORAGE) storage: Storage) {
+        super();
         this._actionMap = actionMap;
         this._storage = storage;
-        this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), this.getInitialState(), this.createEnhancer());
+    }
+
+    protected async init(): Promise<void> {
+        this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), await this.getInitialState(), this.createEnhancer());
     }
 
     public get state(): Immutable<RootState> {
@@ -39,7 +44,8 @@ export class Store {
         this._store.dispatch(action);
     }
 
-    public watchForChange<T>(getObject: (state: RootState) => T, observer: StoreChangeObserver<T>): Unsubscribe {
+    public async watchForChange<T>(getObject: (state: RootState) => T, observer: StoreChangeObserver<T>): Promise<Unsubscribe> {
+        await this.initialized;
         const watcher = this.watch<T>(() => this.state, getObject);
         return this._store.subscribe(watcher(observer));
     }
@@ -91,7 +97,8 @@ export class Store {
         };
     }
 
-    private getInitialState(): RootState {
+    private async getInitialState(): Promise<RootState> {
+        await this._storage.initialized;
         const initialState = this.cloneState(Store.INITIAL_STATE);
 
         const notifications: StoredNotification[] = [];

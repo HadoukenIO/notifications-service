@@ -1,6 +1,8 @@
 import localforage from 'localforage';
 import {injectable} from 'inversify';
 
+import {AsyncInit} from '../controller/AsyncInit';
+
 /**
  * The version of the NPM package.
  *
@@ -9,12 +11,13 @@ import {injectable} from 'inversify';
 declare const PACKAGE_VERSION: string;
 
 @injectable()
-export class Storage {
+export class Storage extends AsyncInit {
     private readonly _version: number;
     private _storages: Map<string, LocalForage>;
-    private _initialized: Promise<this>;
+
     constructor() {
-        this._version = 1; //parseInt(PACKAGE_VERSION.replace(/\./g, ''));
+        super();
+        this._version = parseInt(PACKAGE_VERSION.replace(/\./g, ''));
         this._storages = new Map<string, LocalForage>();
 
         this.add({
@@ -30,15 +33,9 @@ export class Storage {
             storeName: 'notifications',
             version: this._version
         });
-
-        this._initialized = this.init().then(() => this);
     }
 
-    public get initialized(): Promise<this> {
-        return this._initialized;
-    }
-
-    private async init(): Promise<void> {
+    protected async init(): Promise<void> {
         await Promise.all([...this._storages.values()].map(storage => storage.ready()));
 
         const settingsStorage = this.get('settings');
@@ -49,10 +46,9 @@ export class Storage {
         if (!storedVersion) {
             await this.initializeDatabase();
         } else if (storedVersion < dbVersion) {
-            await this.upgradeDatabases();
+            console.log(`Upgrading database from version ${storedVersion} to ${dbVersion}`);
+            await this.upgradeDatabase();
         }
-
-        console.log('storage actually init');
     }
 
     private add(options: LocalForageOptions): void {
@@ -60,7 +56,7 @@ export class Storage {
         this._storages.set(options.storeName!, instance);
     }
 
-    private async upgradeDatabases(): Promise<void> {
+    private async upgradeDatabase(): Promise<void> {
         const settingsStorage = this.get('settings');
         const notificationStorage = this.get('notifications');
 
@@ -69,7 +65,6 @@ export class Storage {
 
         // Example code.  Fill in actual upgrade paths here.
         if (storedVersion < 2) {
-            console.log('u1');
             const notes: any = [];
 
             // Do some upgrade to v2
@@ -81,7 +76,7 @@ export class Storage {
                 note.value.notification.title = note.value.notification.title += `${this._version}`;
                 await notificationStorage.setItem(note.key, JSON.stringify(note.value));
                 await new Promise((resolve, reject) => {
-                    setTimeout(resolve, 100);
+                    setTimeout(resolve, 2500);
                 });
             }
 
@@ -90,12 +85,11 @@ export class Storage {
             // // Do some upgrade to v3
             await settingsStorage.setItem('dbVersion', 3);
         } else {
-            console.log('u3');
             await settingsStorage.setItem('dbVersion', dbVersion);
             return;
         }
 
-        return this.upgradeDatabases();
+        return this.upgradeDatabase();
     }
 
     private async initializeDatabase() {

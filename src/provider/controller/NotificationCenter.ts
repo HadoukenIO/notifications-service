@@ -37,6 +37,8 @@ export class NotificationCenter extends AsyncInit {
     private _trayIcon!: TrayIcon;
 
     protected async init() {
+        await this._store.initialized;
+
         // Create notification center app window
         try {
             this._webWindow = await createWebWindow(windowOptions);
