@@ -78,7 +78,7 @@ describe('Click listeners', () => {
                 expect(clickListener).toHaveBeenCalledTimes(1);
                 expect(clickListener).toHaveBeenCalledWith({
                     type: 'notification-clicked',
-                    notification: note
+                    notification: {...note, date: note.date.toJSON()}
                 });
             });
 
@@ -97,7 +97,7 @@ describe('Click listeners', () => {
                 expect(buttonClickListener).toHaveBeenCalledTimes(1);
                 expect(buttonClickListener).toHaveBeenCalledWith({
                     type: 'notification-button-clicked',
-                    notification: note,
+                    notification: {...note, date: note.date.toJSON()},
                     buttonIndex: 0
                 });
 
@@ -125,7 +125,7 @@ describe('Click listeners', () => {
                     expect(closeListener).toHaveBeenCalledTimes(1);
                     expect(closeListener).toHaveBeenCalledWith({
                         type: 'notification-closed',
-                        notification: note
+                        notification: {...note, date: note.date.toJSON()}
                     });
 
                     // Other listeners not triggered
