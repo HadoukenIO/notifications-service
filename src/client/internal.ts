@@ -33,17 +33,23 @@ export const enum APITopic {
 }
 
 export type API = {
-    [APITopic.CREATE_NOTIFICATION]: [NotificationOptions, Notification];
+    [APITopic.CREATE_NOTIFICATION]: [CreatePayload, NotificationInternal];
     [APITopic.CLEAR_NOTIFICATION]: [ClearPayload, boolean];
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
-    [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
+    [APITopic.GET_APP_NOTIFICATIONS]: [undefined, NotificationInternal[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
 };
 
-export interface CreatePayload extends NotificationOptions {
-    id: string;
+export interface CreatePayload extends Omit<NotificationOptions, 'date'> {
+    date?: number;
+}
+
+export interface NotificationInternal extends Omit<Notification, 'date'> {
+    date: number;
 }
 
 export interface ClearPayload {
     id: string;
 }
+
+export type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;

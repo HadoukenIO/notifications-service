@@ -2,7 +2,7 @@ import * as React from 'react';
 import moment from 'moment';
 
 export interface NotificationTimeProps {
-    date: Date;
+    date: number;
 }
 
 export function NotificationTime(props: NotificationTimeProps) {
