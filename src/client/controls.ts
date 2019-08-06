@@ -3,7 +3,7 @@
  * positioning and styling of these components.
  *
  * In this version of the service, only buttons are supported. Additional control types will be added in future
- * releases. Additional controls will be specified in a slightly different way.
+ * releases.
  *
  * @module Controls
  */

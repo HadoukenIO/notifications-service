@@ -67,9 +67,9 @@
  * ```
  *
  * The example above uses `customData` to store details about the notification subject (in this case, a calendar
- * event), and `onClick` actions to inform the application about how the app should respond when the user interacts
- * with the notification. This is our intended usage and recommended best-practice, but the service doesn't require
- * applications to follow this convention - application developers are free to decide how to manage notification state.
+ * event), and `onClick` actions to inform the application about how it should respond when the user interacts with the
+ * notification. This is our intended usage and recommended best-practice, but the service doesn't require applications
+ * to follow this convention - application developers are free to decide how to manage notification state.
  *
  * Within the `notification-action` handler, the application must be able to understand which notification is being
  * handled, and how to decide what it should do next. The example above uses an application-defined `action` field to
