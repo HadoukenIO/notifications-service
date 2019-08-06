@@ -6,9 +6,9 @@ import {AsyncInit} from '../controller/AsyncInit';
 /**
  * List of available storages.
  */
-export enum StorageMap {
-    'NOTIFICATIONS' = 'notifications',
-    'SETTINGS' = 'settings'
+export const enum StorageMap {
+    NOTIFICATIONS = 'notifications',
+    SETTINGS = 'settings'
 }
 
 @injectable()
@@ -24,7 +24,7 @@ export class Storage extends AsyncInit {
         super();
         this._storages = new Map<string, LocalForage>();
 
-        Object.values(StorageMap).forEach(storeName => {
+        [StorageMap.NOTIFICATIONS, StorageMap.SETTINGS].forEach(storeName => {
             this.add({
                 driver: localforage.INDEXEDDB,
                 version: Storage.DATABASE_VERSION,
