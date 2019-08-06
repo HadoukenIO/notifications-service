@@ -4,7 +4,6 @@ import {Identity} from 'openfin/_v2/main';
 import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
-import {NotificationEvent} from '../../client';
 import {EventTransport} from '../../client/EventRouter';
 
 /**
@@ -50,14 +49,18 @@ export type APIImplementation<T extends Enum, S extends APISpecification<T>> = {
     [K in T]: APIAction<S[K]>;
 };
 
+export type EventSpecification = {
+    type: string;
+};
+
 /**
  * Generic client/provider interaction handler.
  *
- * Type args:
- *   T: Defines API topics. An enum that defines each available function call.
+ * @typeparam T Defines API topics. An enum that defines each available function call.
+ * @typeparam E Defines the events that can be sent from provider to client. Should be a union of all `<X>Event` objects.
  */
 @injectable()
-export class APIHandler<T extends Enum> {
+export class APIHandler<T extends Enum, E extends EventSpecification> {
     private _providerChannel!: ChannelProvider;
 
     public get channel(): ChannelProvider {
@@ -78,7 +81,7 @@ export class APIHandler<T extends Enum> {
         return this._providerChannel.dispatch(identity, action, payload);
     }
 
-    public async dispatchEvent<T extends NotificationEvent>(targetWindow: Identity, eventTransport: EventTransport<T>): Promise<void> {
+    public async dispatchEvent<T extends E>(targetWindow: Identity, eventTransport: EventTransport<T>): Promise<void> {
         return this._providerChannel.dispatch(targetWindow, 'event', eventTransport);
     }
 
@@ -86,7 +89,7 @@ export class APIHandler<T extends Enum> {
         return this._providerChannel.publish(action, payload);
     }
 
-    public async publishEvent<T extends NotificationEvent>(eventTransport: EventTransport<T>): Promise<void> {
+    public async publishEvent<T extends E>(eventTransport: EventTransport<T>): Promise<void> {
         return Promise.all(this._providerChannel.publish('event', eventTransport)).then(() => {});
     }
 

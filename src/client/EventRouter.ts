@@ -4,26 +4,21 @@
 
 import {EventEmitter} from 'events';
 
-import {NotificationActionEventTransport} from './internal';
+import {EventSpecification} from '../provider/model/APIHandler';
+
+import {TransportMappings, TransportMemberMappings} from './internal';
 import {eventEmitter} from './connection';
 
-import {NotificationActionEvent, NotificationEvent} from '.';
 
 let eventHandler: EventRouter | null;
 
-type EventDeserializer<E extends NotificationEvent> = (event: EventTransport<E>) => E;
-
-type TransportMappings<T> =
-    T extends NotificationActionEvent ? NotificationActionEventTransport :
-    never;
-type TransportMemberMappings<T> =
-    T;
+type EventDeserializer<E extends EventSpecification> = (event: EventTransport<E>) => E;
 
 interface EventTarget {
     type: string;
     id: string;
 }
-type Targeted<T extends NotificationEvent> = T & {
+type Targeted<T extends EventSpecification> = T & {
     /**
      * If present, will be used to find the correct emitter.
      *
@@ -33,10 +28,10 @@ type Targeted<T extends NotificationEvent> = T & {
     target?: EventTarget;
 }
 
-export type Transport<T extends NotificationEvent> = T extends TransportMappings<T> ? TransportMappings<T> : {
-    [K in keyof T]: TransportMemberMappings<T[K]>;
+export type Transport<E extends EventSpecification> = E extends TransportMappings<E> ? TransportMappings<E> : {
+    [K in keyof E]: TransportMemberMappings<E[K]>;
 };
-export type EventTransport<T extends NotificationEvent> = Targeted<Transport<T>>;
+export type EventTransport<E extends EventSpecification> = Targeted<Transport<E>>;
 
 export function getEventRouter(): EventRouter {
     if (!eventHandler) {
@@ -51,7 +46,7 @@ export function getEventRouter(): EventRouter {
   */
 export class EventRouter {
     private readonly _emitterProviders: {[targetType: string]: (targetId: string) => EventEmitter};
-    private readonly _deserializers: {[eventType: string]: EventDeserializer<NotificationEvent>};
+    private readonly _deserializers: {[eventType: string]: EventDeserializer<EventSpecification>};
 
     private _defaultEmitter: EventEmitter;
 
@@ -66,11 +61,11 @@ export class EventRouter {
         this._emitterProviders[targetType] = emitterProvider;
     }
 
-    public registerDeserializer<E extends NotificationEvent>(eventType: E['type'], deserializer: EventDeserializer<E>): void {
-        this._deserializers[eventType] = deserializer as unknown as EventDeserializer<NotificationEvent>;
+    public registerDeserializer<E extends EventSpecification>(eventType: E['type'], deserializer: EventDeserializer<E>): void {
+        this._deserializers[eventType] = deserializer as unknown as EventDeserializer<EventSpecification>;
     }
 
-    public dispatchEvent(event: EventTransport<NotificationEvent>): void {
+    public dispatchEvent(event: EventTransport<EventSpecification>): void {
         const {type, target} = event;
         const deserializer = this._deserializers[type];
 

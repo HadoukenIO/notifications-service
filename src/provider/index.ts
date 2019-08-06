@@ -3,7 +3,7 @@ import {inject, injectable} from 'inversify';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
 
-import {APITopic, API, ClearPayload} from '../client/internal';
+import {APITopic, API, ClearPayload, Events} from '../client/internal';
 import {NotificationOptions, Notification, NotificationClosedEvent, NotificationActionEvent, ActionTrigger, NotificationCreatedEvent} from '../client';
 import {ButtonOptions} from '../client/controls';
 import {EventTransport} from '../client/EventRouter';
@@ -24,7 +24,7 @@ export class Main {
     private _config = null;
 
     @inject(Inject.API_HANDLER)
-    private _apiHandler!: APIHandler<APITopic>;
+    private _apiHandler!: APIHandler<APITopic, Events>;
 
     @inject(Inject.STORE)
     private _store!: Store;

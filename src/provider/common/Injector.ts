@@ -1,7 +1,7 @@
 import {Container} from 'inversify';
 import {interfaces as inversify} from 'inversify/dts/interfaces/interfaces';
 
-import {APITopic} from '../../client/internal';
+import {APITopic, Events} from '../../client/internal';
 import {AsyncInit} from '../controller/AsyncInit';
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {ToastManager} from '../controller/ToastManager';
@@ -15,7 +15,7 @@ import {Inject} from './Injectables';
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
-    [Inject.API_HANDLER]: APIHandler<APITopic>;
+    [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
     [Inject.MIDDLEWARE]: MiddlewareMap;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.STORE]: Store;

@@ -11,7 +11,7 @@
 
 import {NotificationActionResult} from './actions';
 
-import {NotificationOptions, Notification, ActionTrigger} from './index';
+import {NotificationOptions, Notification, ActionTrigger, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
 
 /**
  * The identity of the main application window of the service provider
@@ -41,6 +41,14 @@ export type API = {
     [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
 };
+
+export type Events = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;
+
+export type TransportMappings<T> =
+    T extends NotificationActionEvent ? NotificationActionEventTransport :
+    never;
+export type TransportMemberMappings<T> =
+    T;
 
 export interface CreatePayload extends NotificationOptions {
 }

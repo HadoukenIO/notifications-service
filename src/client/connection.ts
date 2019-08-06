@@ -15,10 +15,9 @@ import {EventEmitter} from 'events';
 
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
-import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY} from './internal';
-import {getEventRouter, EventTransport, Transport} from './EventRouter';
+import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events} from './internal';
+import {getEventRouter, EventTransport} from './EventRouter';
 
-import {NotificationEvent} from './index';
 
 /**
  * The version of the NPM package.
@@ -33,7 +32,7 @@ declare const PACKAGE_VERSION: string;
  * Currently only one type, but leaving this here to match the service pattern and
  * in case others are needed in future.
  */
-export type NotificationsEvent = NotificationEvent;
+export type NotificationsEvent = Events;
 
 /**
  * The event emitter to emit events received from the service.  All addEventListeners will tap into this.

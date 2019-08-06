@@ -35,7 +35,7 @@
 import {ActionDeclaration, NotificationActionResult} from './actions';
 import {tryServiceDispatch, eventEmitter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
-import {APITopic} from './internal';
+import {APITopic, Events} from './internal';
 import {EventRouter, getEventRouter, EventTransport} from './EventRouter';
 
 const eventHandler: EventRouter = getEventRouter();
@@ -293,11 +293,6 @@ export interface NotificationCreatedEvent {
     notification: Notification;
 }
 
-/**
- * @hidden
- */
-export type NotificationEvent = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;
-
 export function addEventListener(eventType: 'notification-action', listener: (event: NotificationActionEvent) => void): void;
 export function addEventListener(eventType: 'notification-created', listener: (event: NotificationCreatedEvent) => void): void;
 export function addEventListener(eventType: 'notification-closed', listener: (event: NotificationClosedEvent) => void): void;
@@ -308,7 +303,7 @@ export function addEventListener(eventType: 'notification-closed', listener: (ev
  * @param eventType The event being subscribed to
  * @param listener The callback function to add
  */
-export function addEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
+export function addEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
@@ -328,7 +323,7 @@ export function removeEventListener(eventType: 'notification-closed', listener: 
  * @param eventType The event being unsubscribed from
  * @param listener The callback function to remove
  */
-export function removeEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
+export function removeEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
