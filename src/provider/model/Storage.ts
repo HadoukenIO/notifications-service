@@ -63,12 +63,13 @@ export class Storage extends AsyncInit {
 
         // Example code.  Fill in actual upgrade paths here.
         if (storedVersion < 2) {
-            // Do some upgrade to v2
+            // Do some example upgrade to v2
             await settingsStorage.setItem('dbVersion', 2);
         } else if (storedVersion < 3) {
-            // Do some upgrade to v3
+            // Do some example upgrade to v3
             await settingsStorage.setItem('dbVersion', 3);
         } else {
+            // Finally when no more upgrades are needed, set dbVersion to latest.
             await settingsStorage.setItem('dbVersion', dbVersion);
             return;
         }
