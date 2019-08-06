@@ -11,3 +11,9 @@ export const notificationStorage = localforage.createInstance({
     name: 'notifications',
     storeName: 'notifications'
 });
+
+export const clientInfoStorage = localforage.createInstance({
+    driver: localforage.INDEXEDDB,
+    name: 'notifications',
+    storeName: 'clients'
+});

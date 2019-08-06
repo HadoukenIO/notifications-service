@@ -29,7 +29,9 @@ export const enum APITopic {
     CLEAR_NOTIFICATION = 'clear-notification',
     GET_APP_NOTIFICATIONS = 'fetch-app-notifications',
     CLEAR_APP_NOTIFICATIONS = 'clear-app-notifications',
-    TOGGLE_NOTIFICATION_CENTER = 'toggle-notification-center'
+    TOGGLE_NOTIFICATION_CENTER = 'toggle-notification-center',
+    REGISTER_CLIENT = 'register-client',
+    UNREGISTER_CLIENT = 'unregister-client'
 }
 
 export type API = {
@@ -38,6 +40,8 @@ export type API = {
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
     [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
+    [APITopic.REGISTER_CLIENT]: [string, void];
+    [APITopic.UNREGISTER_CLIENT]: [string, void];
 };
 
 export interface CreatePayload extends NotificationOptions {

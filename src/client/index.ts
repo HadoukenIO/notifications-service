@@ -115,6 +115,7 @@ export function addEventListener<E extends NotificationEvent>(eventType: E['type
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
+    tryServiceDispatch(APITopic.REGISTER_CLIENT, eventType);
     eventEmitter.addListener(eventType, listener);
 }
 
@@ -127,6 +128,7 @@ export function removeEventListener<E extends NotificationEvent>(eventType: E['t
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
+    tryServiceDispatch(APITopic.UNREGISTER_CLIENT, eventType);
     eventEmitter.removeListener(eventType, listener);
 }
 

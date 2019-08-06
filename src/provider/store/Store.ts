@@ -16,7 +16,8 @@ export type StoreChangeObserver<T> = (oldValue: T, newValue: T) => void;
 export class Store {
     private static INITIAL_STATE: RootState = {
         notifications: [],
-        windowVisible: false
+        windowVisible: false,
+        deferredEvents: []
     };
 
     public readonly onAction: Signal<[RootAction]> = new Signal();

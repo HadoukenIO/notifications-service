@@ -2,8 +2,11 @@ import {Action as ReduxAction} from 'redux';
 
 import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
+import {DeferredEvent} from '../model/DeferredEvent';
 
 import {RootState, Immutable, mutable} from './State';
+import { Identity } from 'openfin/_v2/main';
+import { NotificationEvent } from '../../client';
 
 export const enum Action {
     CREATE = '@@notifications/CREATE',
@@ -11,6 +14,8 @@ export const enum Action {
     CLICK_NOTIFICATION = '@@notifications/CLICK_NOTIFICATION',
     CLICK_BUTTON = '@@notifications/CLICK_BUTTON',
     TOGGLE_VISIBILITY = '@@ui/TOGGLE_CENTER_WINDOW',
+    DEFER_EVENT_DISPATCH = '@@client/DEFER_EVENT_DISPATCH',
+    DISPATCH_DEFERRED_EVENTS = '@@client/DISPATCH_DEFERRED_EVENTS'
 }
 
 export interface CreateNotification extends ReduxAction<Action> {
@@ -39,7 +44,20 @@ export interface ToggleVisibility extends ReduxAction<Action> {
     visible?: boolean;
 }
 
-export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility;
+export interface DeferEventDispatch extends ReduxAction<Action> {
+    type: Action.DEFER_EVENT_DISPATCH;
+    target: Identity;
+    event: NotificationEvent;
+}
+
+export interface DispatchDeferredEvents extends ReduxAction<Action> {
+    type: Action.DISPATCH_DEFERRED_EVENTS;
+    target: Identity;
+    eventType: string;
+    events: DeferredEvent[];
+}
+
+export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility|DeferEventDispatch|DispatchDeferredEvents;
 
 export type ActionOf<A> = RootAction extends {type: A} ? RootAction : never;
 export type ActionHandler<A> = (state: Immutable<RootState>, action: ActionOf<A>) => RootState;
@@ -48,6 +66,18 @@ export type ActionMap<T extends Action = Action> = {
 };
 
 export const Actions: ActionMap = {
+    [Action.DEFER_EVENT_DISPATCH]: (state: Immutable<RootState>, action: DeferEventDispatch): RootState => {
+        return {
+            ...mutable(state),
+            deferredEvents: mutable([...state.deferredEvents, {target: action.target, event: action.event}])
+        };
+    },
+    [Action.DISPATCH_DEFERRED_EVENTS]: (state: Immutable<RootState>, action: DispatchDeferredEvents): RootState => {
+        return {
+            ...mutable(state),
+            deferredEvents: mutable(state.deferredEvents.filter(a => a.target.uuid !== action.target.uuid || a.event.type !== action.eventType))
+        };
+    },
     [Action.CREATE]: (state: Immutable<RootState>, action: CreateNotification): RootState => {
         const {notification} = action;
 
@@ -64,7 +94,7 @@ export const Actions: ActionMap = {
         }
 
         return {
-            ...state,
+            ...mutable(state),
             notifications
         };
     },
@@ -76,7 +106,7 @@ export const Actions: ActionMap = {
         });
 
         return {
-            ...state,
+            ...mutable(state),
             notifications: mutable(state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1))
         };
     },

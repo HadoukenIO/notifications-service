@@ -4,7 +4,7 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
 
 import {APITopic, API, ClearPayload} from '../client/internal';
-import {OptionButton, NotificationOptions, Notification, NotificationClosedEvent, NotificationButtonClickedEvent, NotificationClickedEvent} from '../client';
+import {NotificationOptions, Notification, NotificationClosedEvent, NotificationButtonClickedEvent, NotificationClickedEvent, NotificationEvent} from '../client';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -12,10 +12,18 @@ import {NotificationCenter} from './controller/NotificationCenter';
 import {ToastManager} from './controller/ToastManager';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
+import {EventInterestMap} from './model/EventInterestMap';
 import {Action, RootAction} from './store/Actions';
 import {mutable, Immutable} from './store/State';
 import {Store} from './store/Store';
-import {notificationStorage, settingsStorage} from './model/Storage';
+import {notificationStorage, settingsStorage, clientInfoStorage} from './model/Storage';
+import { DeferredEvent } from './model/DeferredEvent';
+import { ApplicationOption } from 'openfin/_v2/api/application/applicationOption';
+
+interface AppInitData {
+    type: 'programmatic' | 'manifest';
+    data: ApplicationOption | string;
+}
 
 @injectable()
 export class Main {
@@ -32,6 +40,8 @@ export class Main {
 
     @inject(Inject.TOAST_MANAGER)
     private _toastManager!: ToastManager;
+
+    private interestMap: EventInterestMap = new EventInterestMap;
 
     public async register(): Promise<void> {
         Object.assign(window, {
@@ -54,37 +64,66 @@ export class Main {
             [APITopic.CLEAR_NOTIFICATION]: this.clearNotification.bind(this),
             [APITopic.GET_APP_NOTIFICATIONS]: this.fetchAppNotifications.bind(this),
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
-            [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this)
+            [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
+            [APITopic.REGISTER_CLIENT]: this.registerClient.bind(this),
+            [APITopic.UNREGISTER_CLIENT]: this.unregisterClient.bind(this)
         });
 
         this._store.onAction.add((action: RootAction) => {
-            if (action.type === Action.REMOVE) {
-                // Send notification closed event to uuid with the context.
-                action.notifications.forEach((notification: StoredNotification) => {
+            let client: Identity | undefined;
+
+            if (action.type === Action.CLICK_BUTTON || action.type === Action.CLICK_NOTIFICATION) {
+                client = action.notification.source;
+            } else if (action.type === Action.REMOVE && action.notifications.length > 0) {
+                client = action.notifications[0].source;
+            } else if (action.type === Action.DISPATCH_DEFERRED_EVENTS) {
+                client = action.target;
+            }
+
+            if (client !== undefined) {
+                const connected: boolean = this._apiHandler.isAppConnected(client!.uuid);
+                const deferDispatchOrIgnore = (target: Identity, event: NotificationEvent): void => {
+                    if (this.interestMap.has(event.type, target)) {
+                        if (connected) {
+                            this._apiHandler.dispatchAppEvent(target.uuid, event)
+                        } else {
+                            this._store.dispatch({type: Action.DEFER_EVENT_DISPATCH, target, event});
+                            clientInfoStorage.getItem(target.uuid).then(item => {
+                                if (item) {
+                                    const data = item as AppInitData;
+                                    data.type === 'programmatic' ? fin.Application.start(data.data as ApplicationOption) : fin.Application.startFromManifest(data.data as string);
+                                }
+                            });
+                        }
+                    }
+                }
+                if (action.type === Action.REMOVE) {
+                    action.notifications.forEach((notification: StoredNotification) => {
+                        const target: Identity = notification.source;
+                        const event: NotificationClosedEvent = {type: 'notification-closed', notification: notification.notification};
+                        deferDispatchOrIgnore(target, event);
+                    });
+                } else if (action.type === Action.CLICK_BUTTON) {
+                    const {notification, buttonIndex} = action;
                     const target: Identity = notification.source;
-                    const event: NotificationClosedEvent = {type: 'notification-closed', notification: notification.notification};
-
-                    this._apiHandler.dispatchClientEvent(target, event);
-                });
-            } else if (action.type === Action.CLICK_BUTTON) {
-                const {notification, buttonIndex} = action;
-                const target: Identity = notification.source;
-                const event: NotificationButtonClickedEvent = {
-                    type: 'notification-button-clicked',
-                    notification: notification.notification,
-                    buttonIndex
-                };
-                this._apiHandler.dispatchClientEvent(target, event);
-            } else if (action.type === Action.CLICK_NOTIFICATION) {
-                const {notification, source} = action.notification;
-                const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
-
-                // Send notification clicked event to uuid with the context.
-                this._apiHandler.dispatchClientEvent(source, event);
+                    const event: NotificationButtonClickedEvent = {
+                        type: 'notification-button-clicked',
+                        notification: notification.notification,
+                        buttonIndex
+                    };
+                    deferDispatchOrIgnore(target, event);
+                } else if (action.type === Action.CLICK_NOTIFICATION) {
+                    const {notification, source} = action.notification;
+                    const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
+                    // Send notification clicked event to uuid with the context.
+                    deferDispatchOrIgnore(source, event);
+                } else if (action.type === Action.DISPATCH_DEFERRED_EVENTS && connected) {
+                    action.events.forEach((event: DeferredEvent) => {
+                        this._apiHandler.dispatchAppEvent(event.target.uuid, event.event);
+                    });
+                }
             }
         });
-
-        console.log('Service Initialised');
     }
 
     /**
@@ -97,6 +136,18 @@ export class Main {
         const notification = this.hydrateNotification(payload, {uuid: sender.uuid, name: sender.name});
         this._store.dispatch({type: Action.CREATE, notification});
         return notification.notification;
+    }
+
+    private async registerClient(payload: string, sender: ProviderIdentity): Promise<void> {
+        const events: DeferredEvent[] = mutable(this._store.state.deferredEvents.filter(action => action.target.uuid === sender.uuid && action.event.type === payload));
+        if (events.length > 0) {
+            this._store.dispatch({type: Action.DISPATCH_DEFERRED_EVENTS, target: sender, eventType: payload, events});
+        }
+        this.interestMap.add(payload, sender);
+    }
+
+    private async unregisterClient(payload: string, sender: ProviderIdentity): Promise<void> {
+        this.interestMap.remove(payload, sender);
     }
 
     /**

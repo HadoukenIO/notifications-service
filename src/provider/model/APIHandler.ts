@@ -1,10 +1,11 @@
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
-import {Identity} from 'openfin/_v2/main';
+import {Identity, Application} from 'openfin/_v2/main';
 import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
 import {NotificationEvent} from '../../client';
+import { clientInfoStorage } from './Storage';
 
 /**
  * Semantic type definition.
@@ -63,12 +64,23 @@ export class APIHandler<T extends Enum> {
         return this._providerChannel;
     }
 
-    public isClientConnection(identity: Identity): boolean {
+    public isAppConnected(targetUuid: string): boolean {
+        return this._providerChannel.connections.some((conn: Identity) => {
+            return targetUuid === conn.uuid;
+        });
+    }
+
+    public async dispatchAppEvent(targetUuid: string, payload: NotificationEvent): Promise<void> {
+        let clients: Identity[] = this._providerChannel.connections.filter(c => c.uuid === targetUuid);
+        clients.forEach(client => this.dispatchClientEvent(client, payload));
+    }
+
+    public isClientConnected(identity: Identity): boolean {
         return this._providerChannel.connections.some((conn: Identity) => {
             return identity.uuid === conn.uuid && identity.name === conn.name;
         });
     }
-
+ 
     public getClientConnections(): Identity[] {
         return this._providerChannel.connections;
     }
@@ -96,5 +108,17 @@ export class APIHandler<T extends Enum> {
         } else {
             console.log(`connection from client: ${app.name}, unable to determine version`);
         }
+
+        fin.Application.wrap(app).then(async (application: Application) => {
+            const info = await application.getInfo();
+            clientInfoStorage.setItem(app.uuid, 
+                info.parentUuid ? {
+                    type: 'programmatic',
+                    data: info.initialOptions
+                } : {
+                    type: 'manifest',
+                    data: info.manifestUrl
+                });
+        });
     }
 }

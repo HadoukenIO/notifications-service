@@ -1,8 +1,10 @@
 import {StoredNotification} from '../model/StoredNotification';
+import {DeferredEvent} from '../model/DeferredEvent';
 
 export interface RootState {
     notifications: StoredNotification[];
     windowVisible: boolean;
+    deferredEvents: DeferredEvent[];
 }
 
 export type Immutable<T> = {
