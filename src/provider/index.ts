@@ -15,7 +15,7 @@ import {ToastManager} from './controller/ToastManager';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
 import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisibility} from './store/Actions';
-import {mutable, Immutable} from './store/State';
+import {mutable} from './store/State';
 import {Store} from './store/Store';
 import {notificationStorage, settingsStorage} from './model/Storage';
 
@@ -69,7 +69,7 @@ export class Main {
                 this._apiHandler.dispatchEvent(source, event);
             } else if (action.type === Action.REMOVE) {
                 const {notifications} = action;
-                notifications.forEach((storedNotification: Immutable<StoredNotification>) => {
+                notifications.forEach((storedNotification: StoredNotification) => {
                     const {notification, source} = storedNotification;
                     const event: EventTransport<NotificationClosedEvent> = {
                         type: 'notification-closed',
@@ -120,7 +120,7 @@ export class Main {
         // Explicitly create the identity object to avoid storing other unneeded info from ProviderIdentity
         const notification = this.hydrateNotification(payload, {uuid: sender.uuid, name: sender.name});
         this._store.dispatch(new CreateNotification(notification));
-        return notification.notification;
+        return mutable(notification.notification);
     }
 
     /**
@@ -160,13 +160,13 @@ export class Main {
     }
 
     private async clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
-        const notifications = mutable(this.getAppNotifications(sender.uuid));
+        const notifications = this.getAppNotifications(sender.uuid);
         await this._store.dispatch(new RemoveNotifications(notifications));
 
         return notifications.length;
     }
 
-    private getAppNotifications(uuid: string): Immutable<StoredNotification>[] {
+    private getAppNotifications(uuid: string): StoredNotification[] {
         const notifications = this._store.state.notifications;
         return notifications.filter(n => n.source.uuid === uuid);
     }

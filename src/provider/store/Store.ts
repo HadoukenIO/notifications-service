@@ -4,16 +4,24 @@ import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispat
 
 import {Signal1, Aggregators} from '../common/Signal';
 import {Inject} from '../common/Injectables';
-import {notificationStorage, settingsStorage} from '../model/Storage';
+import {notificationStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
 
 import {ActionHandlerMap, ActionHandler, RootAction, Action, ActionOf, CustomAction} from './Actions';
-import {RootState, Immutable} from './State';
+import {RootState} from './State';
 
 export type StoreChangeObserver<T> = (oldValue: T, newValue: T) => void;
 
+/**
+ * Subset of properties of `Store` that are safe for use from actions and components.
+ */
+export interface StoreAPI {
+    state: RootState;
+    dispatch(action: RootAction): Promise<void>;
+}
+
 @injectable()
-export class Store {
+export class Store implements StoreAPI {
     private static INITIAL_STATE: RootState = {
         notifications: [],
         windowVisible: false
@@ -29,8 +37,8 @@ export class Store {
         this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), this.getInitialState(), this.createEnhancer());
     }
 
-    public get state(): Immutable<RootState> {
-        return this._store.getState() as Immutable<RootState>;
+    public get state(): RootState {
+        return this._store.getState() as RootState;
     }
 
     public async dispatch(action: RootAction): Promise<void> {
@@ -96,42 +104,11 @@ export class Store {
     }
 
     private getInitialState(): RootState {
-        const initialState = this.cloneState(Store.INITIAL_STATE);
-
         const notifications: StoredNotification[] = [];
         notificationStorage.iterate((value: string, key: string) => {
             notifications.push(JSON.parse(value));
         });
-        Object.assign(initialState, {notifications});
 
-        settingsStorage.iterate((value: string, key: string) => {
-
-        });
-
-        return initialState;
-    }
-
-    private cloneState<T extends {}>(state: T | Immutable<T>): T {
-        const ret: T = {} as T;
-        const keys: (keyof T)[] = Object.keys(state) as (keyof T)[];
-
-        keys.forEach(key => {
-            const value = state[key];
-            if (Array.isArray(value)) {
-                ret[key] = value.map(item => {
-                    if (typeof item === 'object' && item !== null) {
-                        return this.cloneState(item);
-                    } else {
-                        return item;
-                    }
-                }) as any;
-            } else if (typeof value !== 'object' || !value) {
-                ret[key] = value as any;
-            } else {
-                ret[key] = this.cloneState(value as any);
-            }
-        });
-
-        return ret;
+        return Object.assign({}, Store.INITIAL_STATE, {notifications});
     }
 }

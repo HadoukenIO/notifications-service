@@ -8,7 +8,6 @@ import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastEvent} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
-import {mutable} from '../store/State';
 
 export type WindowDimensions = {height: number, width: number};
 
@@ -94,11 +93,11 @@ export class ToastManager {
 
     private async onAction(action: RootAction): Promise<void> {
         if (action.type === Action.CREATE) {
-            this.create(mutable(action.notification));
+            this.create(action.notification);
         }
 
         if (action.type === Action.REMOVE) {
-            this.removeToasts(...mutable<StoredNotification>(action.notifications));
+            this.removeToasts(...action.notifications);
         }
 
         if (action.type === Action.TOGGLE_VISIBILITY) {

@@ -5,7 +5,7 @@ import {connect, Provider} from 'react-redux';
 import {Header} from '../components/Header/Header';
 import {Footer} from '../components/Footer/Footer';
 import {NotificationView} from '../components/NotificationView/NotificationView';
-import {RootState, mutable} from '../../store/State';
+import {RootState} from '../../store/State';
 import {Store} from '../../store/Store';
 import {RootAction} from '../../store/Actions';
 
@@ -32,7 +32,7 @@ export function NotificationCenterApp(props: Props) {
                 storeDispatch={storeDispatch}
             />
             <NotificationView
-                notifications={mutable(notifications)}
+                notifications={notifications}
                 groupBy={groupBy}
                 storeDispatch={storeDispatch}
             />
@@ -42,7 +42,7 @@ export function NotificationCenterApp(props: Props) {
 }
 
 const mapStateToProps = (state: RootState, ownProps: Actionable) => ({
-    notifications: Object.values(state.notifications),
+    notifications: state.notifications,
     ...ownProps
 });
 

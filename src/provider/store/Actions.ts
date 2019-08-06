@@ -3,8 +3,8 @@ import {Action as ReduxAction} from 'redux';
 import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
 
-import {RootState, Immutable, mutable} from './State';
-import {Store} from './Store';
+import {RootState} from './State';
+import {StoreAPI} from './Store';
 
 export const enum Action {
     CREATE = '@@notifications/CREATE',
@@ -13,11 +13,6 @@ export const enum Action {
     CLICK_BUTTON = '@@notifications/CLICK_BUTTON',
     TOGGLE_VISIBILITY = '@@ui/TOGGLE_CENTER_WINDOW',
 }
-
-/**
- * Inputs to actions may be either mutable or immutable
- */
-type MaybeMutable<T> = T | Immutable<T>;
 
 export class BaseAction<T extends Action> implements ReduxAction<Action> {
     public readonly type: T;
@@ -28,20 +23,20 @@ export class BaseAction<T extends Action> implements ReduxAction<Action> {
 }
 
 export abstract class CustomAction<T extends Action> extends BaseAction<T> {
-    public abstract async dispatch(store: Store): Promise<void>;
+    public abstract async dispatch(store: StoreAPI): Promise<void>;
 }
 
 export class CreateNotification extends CustomAction<Action.CREATE> {
-    public readonly notification: Immutable<StoredNotification>;
+    public readonly notification: StoredNotification;
 
-    constructor(notification: MaybeMutable<StoredNotification>) {
+    constructor(notification: StoredNotification) {
         super(Action.CREATE);
         this.notification = notification;
     }
 
-    public async dispatch(store: Store): Promise<void> {
+    public async dispatch(store: StoreAPI): Promise<void> {
         const notification = this.notification;
-        const existingNotifications = mutable(store.state.notifications.filter(x => x.id === notification.id));
+        const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
 
         if (existingNotifications.length) {
             await store.dispatch(new RemoveNotifications(existingNotifications));
@@ -51,9 +46,9 @@ export class CreateNotification extends CustomAction<Action.CREATE> {
 }
 
 export class RemoveNotifications extends BaseAction<Action.REMOVE> {
-    public readonly notifications: Immutable<StoredNotification[]>;
+    public readonly notifications: StoredNotification[];
 
-    constructor(notifications: MaybeMutable<StoredNotification[]>) {
+    constructor(notifications: StoredNotification[]) {
         super(Action.REMOVE);
 
         this.notifications = notifications;
@@ -61,19 +56,19 @@ export class RemoveNotifications extends BaseAction<Action.REMOVE> {
 }
 
 export class ClickNotification extends BaseAction<Action.CLICK_NOTIFICATION> {
-    public readonly notification: Immutable<StoredNotification>;
+    public readonly notification: StoredNotification;
 
-    constructor(notifications: MaybeMutable<StoredNotification>) {
+    constructor(notifications: StoredNotification) {
         super(Action.CLICK_NOTIFICATION);
         this.notification = notifications;
     }
 }
 
 export class ClickButton extends BaseAction<Action.CLICK_BUTTON> {
-    public readonly notification: Immutable<StoredNotification>;
+    public readonly notification: StoredNotification;
     public readonly buttonIndex: number;
 
-    constructor(notification: MaybeMutable<StoredNotification>, buttonIndex: number) {
+    constructor(notification: StoredNotification, buttonIndex: number) {
         super(Action.CLICK_BUTTON);
         this.notification = notification;
         this.buttonIndex = buttonIndex;
@@ -92,25 +87,25 @@ export class ToggleVisibility extends BaseAction<Action.TOGGLE_VISIBILITY> {
 export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility;
 
 export type ActionOf<A> = RootAction extends {type: A} ? RootAction : never;
-export type ActionHandler<A> = (state: Immutable<RootState>, action: ActionOf<A>) => RootState;
+export type ActionHandler<A> = (state: RootState, action: ActionOf<A>) => RootState;
 export type ActionHandlerMap<T extends Action = Action> = {
     [K in T]?: ActionHandler<K>;
 };
 
 export const ActionHandlers: ActionHandlerMap = {
-    [Action.CREATE]: (state: Immutable<RootState>, action: CreateNotification): RootState => {
+    [Action.CREATE]: (state: RootState, action: CreateNotification): RootState => {
         const {notification} = action;
 
         notificationStorage.setItem(notification.id, JSON.stringify(notification));
 
-        const notifications: StoredNotification[] = mutable<StoredNotification>(state.notifications.slice());
+        const notifications: StoredNotification[] = state.notifications.slice();
         const index: number = state.notifications.findIndex(n => n.id === notification.id);
         if (index >= 0) {
             // Replace existing notification with this ID
-            notifications[index] = mutable(notification);
+            notifications[index] = notification;
         } else {
             // Add new notification (ordering within array doesn't matter)
-            notifications.push(mutable(notification));
+            notifications.push(notification);
         }
 
         return {
@@ -118,7 +113,7 @@ export const ActionHandlers: ActionHandlerMap = {
             notifications
         };
     },
-    [Action.REMOVE]: (state: Immutable<RootState>, action: RemoveNotifications): RootState => {
+    [Action.REMOVE]: (state: RootState, action: RemoveNotifications): RootState => {
         const {notifications} = action;
         const idsToRemove = notifications.map(n => {
             notificationStorage.removeItem(n.id);
@@ -127,15 +122,15 @@ export const ActionHandlers: ActionHandlerMap = {
 
         return {
             ...state,
-            notifications: mutable<StoredNotification>(state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1))
+            notifications: state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1)
         };
     },
-    [Action.TOGGLE_VISIBILITY]: (state: Immutable<RootState>, action: ToggleVisibility): RootState => {
+    [Action.TOGGLE_VISIBILITY]: (state: RootState, action: ToggleVisibility): RootState => {
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
         settingsStorage.setItem('windowVisible', windowVisible);
 
         return {
-            ...mutable(state),
+            ...state,
             windowVisible
         };
     }
