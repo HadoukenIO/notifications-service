@@ -43,7 +43,7 @@ export async function assertNotificationStored(source: Identity, note: Notificat
 
     const expectedStoredNote: StoredNotification = {
         id: storedId,
-        notification: note,
+        notification: {...note, date: note.date.valueOf()},
         source
     };
     const actualStoredNote = await getStoredNotification(storedId);

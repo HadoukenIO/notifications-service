@@ -1,7 +1,7 @@
+import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
+
 import * as ofnotes from '../client/index';
 import {NotificationOptions, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from '../client/index';
-
-import {addSpawnListeners, createWindow, createApp} from './spawn';
 
 addSpawnListeners();
 
@@ -9,7 +9,7 @@ addSpawnListeners();
 Object.assign(window, {createWindow, createApp, notifications: ofnotes});
 
 function makeNote(id: string, opts: NotificationOptions) {
-    return ofnotes.create(Object.assign(opts, {date: Date.now(), id}));
+    return ofnotes.create(Object.assign(opts, {date: new Date(), id}));
 }
 
 function clearNote(id: string) {

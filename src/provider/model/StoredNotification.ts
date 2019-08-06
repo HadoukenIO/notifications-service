@@ -1,6 +1,6 @@
 import {Identity} from 'openfin/_v2/main';
 
-import {Notification} from '../../client/index';
+import {NotificationInternal} from '../../client/internal';
 
 /**
  * Shape of the data that will be used internally by the service.
@@ -10,5 +10,5 @@ import {Notification} from '../../client/index';
 export interface StoredNotification {
     id: string;
     source: Identity;
-    notification: Notification;
+    notification: NotificationInternal;
 }

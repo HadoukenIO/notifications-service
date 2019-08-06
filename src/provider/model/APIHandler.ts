@@ -5,6 +5,7 @@ import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
 import {NotificationEvent} from '../../client';
+import {EventPayload} from '../../client/connection';
 
 /**
  * Semantic type definition.
@@ -85,7 +86,7 @@ export class APIHandler<T extends Enum> {
         }
     }
 
-    public async dispatchClientEvent(target: Identity, payload: NotificationEvent): Promise<void> {
+    public async dispatchClientEvent(target: Identity, payload: EventPayload<NotificationEvent>): Promise<void> {
         return this.channel.dispatch(target, 'event', payload);
     }
 
