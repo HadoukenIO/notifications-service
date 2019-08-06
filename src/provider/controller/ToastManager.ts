@@ -98,7 +98,7 @@ export class ToastManager {
         }
 
         if (action.type === Action.REMOVE) {
-            this.removeToasts(...mutable(action.notifications));
+            this.removeToasts(...mutable<StoredNotification>(action.notifications));
         }
 
         if (action.type === Action.TOGGLE_VISIBILITY) {

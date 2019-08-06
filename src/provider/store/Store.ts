@@ -7,7 +7,7 @@ import {Inject} from '../common/Injectables';
 import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
 
-import {MiddlewareMap, Middleware, RootAction, Action, ActionOf, CustomAction} from './Actions';
+import {ActionHandlerMap, ActionHandler, RootAction, Action, ActionOf, CustomAction} from './Actions';
 import {RootState, Immutable} from './State';
 
 export type StoreChangeObserver<T> = (oldValue: T, newValue: T) => void;
@@ -21,10 +21,10 @@ export class Store {
 
     public readonly onAction: Signal1<RootAction, void, Promise<void>> = new Signal1(Aggregators.AWAIT_VOID);
 
-    private _actionMap: MiddlewareMap;
+    private _actionMap: ActionHandlerMap;
     private _store: ReduxStore<RootState, RootAction>;
 
-    constructor(@inject(Inject.MIDDLEWARE) actionMap: MiddlewareMap) {
+    constructor(@inject(Inject.ACTION_MAP) actionMap: ActionHandlerMap) {
         this._actionMap = actionMap;
         this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), this.getInitialState(), this.createEnhancer());
     }
@@ -63,7 +63,7 @@ export class Store {
     }
 
     private reduce<T extends Action>(state: RootState | undefined, action: ActionOf<T>): RootState {
-        const handler: Middleware<T> | undefined = this._actionMap[action.type] as Middleware<T>;
+        const handler: ActionHandler<T> | undefined = this._actionMap[action.type] as ActionHandler<T>;
 
         if (handler) {
             return handler(state!, action);

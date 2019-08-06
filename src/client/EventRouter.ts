@@ -42,7 +42,7 @@ export function getEventRouter(): EventRouter {
 }
 
 /**
-  * Class for hepling take events that have arrived at the client via the IAB channel, and dispatching them on the correct client-side object
+  * Class for helping take events that have arrived at the client via the IAB channel, and dispatching them on the correct client-side object
   */
 export class EventRouter {
     private readonly _emitterProviders: {[targetType: string]: (targetId: string) => EventEmitter};

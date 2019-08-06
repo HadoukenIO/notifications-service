@@ -16,7 +16,7 @@ export function NotificationCard(props: NotificationCardProps) {
     const data = notification.notification;
 
     const handleNotificationClose = () => {
-        storeDispatch(new RemoveNotifications(notification));
+        storeDispatch(new RemoveNotifications([notification]));
     };
 
     const handleButtonClick = (buttonIndex: number) => {

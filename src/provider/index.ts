@@ -142,7 +142,7 @@ export class Main {
         const id = this.encodeID(payload.id, sender);
         const notification = this._store.state.notifications.find(n => n.id === id);
         if (notification) {
-            this._store.dispatch(new RemoveNotifications(notification));
+            this._store.dispatch(new RemoveNotifications([notification]));
             return true;
         }
         return false;

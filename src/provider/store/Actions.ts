@@ -51,13 +51,12 @@ export class CreateNotification extends CustomAction<Action.CREATE> {
 }
 
 export class RemoveNotifications extends BaseAction<Action.REMOVE> {
-    public readonly notifications: Immutable<StoredNotification>[];
+    public readonly notifications: Immutable<StoredNotification[]>;
 
-    constructor(notifications: MaybeMutable<StoredNotification|StoredNotification[]>) {
+    constructor(notifications: MaybeMutable<StoredNotification[]>) {
         super(Action.REMOVE);
 
-        const immutable = notifications as Immutable<StoredNotification|StoredNotification[]>;
-        this.notifications = (Array.isArray(immutable) ? immutable.slice() : [immutable]);
+        this.notifications = notifications;
     }
 }
 
@@ -74,9 +73,9 @@ export class ClickButton extends BaseAction<Action.CLICK_BUTTON> {
     public readonly notification: Immutable<StoredNotification>;
     public readonly buttonIndex: number;
 
-    constructor(notifications: MaybeMutable<StoredNotification>, buttonIndex: number) {
+    constructor(notification: MaybeMutable<StoredNotification>, buttonIndex: number) {
         super(Action.CLICK_BUTTON);
-        this.notification = notifications;
+        this.notification = notification;
         this.buttonIndex = buttonIndex;
     }
 }
@@ -93,18 +92,18 @@ export class ToggleVisibility extends BaseAction<Action.TOGGLE_VISIBILITY> {
 export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility;
 
 export type ActionOf<A> = RootAction extends {type: A} ? RootAction : never;
-export type Middleware<A> = (state: Immutable<RootState>, action: ActionOf<A>) => RootState;
-export type MiddlewareMap<T extends Action = Action> = {
-    [K in T]?: Middleware<K>;
+export type ActionHandler<A> = (state: Immutable<RootState>, action: ActionOf<A>) => RootState;
+export type ActionHandlerMap<T extends Action = Action> = {
+    [K in T]?: ActionHandler<K>;
 };
 
-export const Middleware: MiddlewareMap = {
+export const ActionHandlers: ActionHandlerMap = {
     [Action.CREATE]: (state: Immutable<RootState>, action: CreateNotification): RootState => {
         const {notification} = action;
 
         notificationStorage.setItem(notification.id, JSON.stringify(notification));
 
-        const notifications = mutable(state.notifications.slice());
+        const notifications: StoredNotification[] = mutable<StoredNotification>(state.notifications.slice());
         const index: number = state.notifications.findIndex(n => n.id === notification.id);
         if (index >= 0) {
             // Replace existing notification with this ID
@@ -128,7 +127,7 @@ export const Middleware: MiddlewareMap = {
 
         return {
             ...state,
-            notifications: mutable(state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1))
+            notifications: mutable<StoredNotification>(state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1))
         };
     },
     [Action.TOGGLE_VISIBILITY]: (state: Immutable<RootState>, action: ToggleVisibility): RootState => {

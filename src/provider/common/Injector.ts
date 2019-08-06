@@ -6,7 +6,7 @@ import {AsyncInit} from '../controller/AsyncInit';
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {ToastManager} from '../controller/ToastManager';
 import {APIHandler} from '../model/APIHandler';
-import {MiddlewareMap, Middleware} from '../store/Actions';
+import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
 
 import {Inject} from './Injectables';
@@ -15,8 +15,8 @@ import {Inject} from './Injectables';
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
+    [Inject.ACTION_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
-    [Inject.MIDDLEWARE]: MiddlewareMap;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
@@ -29,8 +29,8 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
+    [Inject.ACTION_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
-    [Inject.MIDDLEWARE]: Middleware,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.STORE]: Store,
     [Inject.TOAST_MANAGER]: ToastManager

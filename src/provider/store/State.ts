@@ -14,7 +14,7 @@ export type Immutable<T> = {
         Readonly<T[K]>;
 }
 
-export function mutable<T>(value: Immutable<T>[]): T[]
+export function mutable<T>(value: Immutable<T[]>): T[]
 export function mutable<T>(value: Immutable<T>): T
 export function mutable<T>(value: Immutable<T>): T {
     return value as T;
