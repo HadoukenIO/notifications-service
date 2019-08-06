@@ -22,9 +22,9 @@ export class Store extends AsyncInit {
 
     public readonly onAction: Signal<[RootAction]> = new Signal();
 
-    private _actionMap: ActionMap;
+    private readonly _actionMap: ActionMap;
+    private readonly _storage: Storage;
     private _store!: ReduxStore<RootState, RootAction>;
-    private _storage: Storage;
 
     constructor(@inject(Inject.ACTION_MAP) actionMap: ActionMap, @inject(Inject.STORAGE) storage: Storage) {
         super();

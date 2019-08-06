@@ -18,20 +18,32 @@ export class Storage extends AsyncInit {
      * Must remain in number format.  LocalForage does not support semver.
      */
     public static readonly DATABASE_VERSION: number = 1.0;
-    private _storages: Map<string, LocalForage>;
+    private readonly _storages: Map<string, LocalForage>;
 
     constructor() {
         super();
         this._storages = new Map<string, LocalForage>();
 
         [StorageMap.NOTIFICATIONS, StorageMap.SETTINGS].forEach(storeName => {
-            this.add({
+            const instance = localforage.createInstance({
                 driver: localforage.INDEXEDDB,
                 version: Storage.DATABASE_VERSION,
                 name: 'notifications',
                 storeName
             });
+
+            this._storages.set(storeName, instance);
         });
+    }
+
+    public get(storeName: StorageMap): LocalForage {
+        const requestedStore: LocalForage|undefined = this._storages.get(storeName);
+
+        if (requestedStore) {
+            return requestedStore;
+        } else {
+            throw new Error(`No store found: ${storeName}`);
+        }
     }
 
     protected async init(): Promise<void> {
@@ -40,19 +52,13 @@ export class Storage extends AsyncInit {
         const settingsStorage = this.get(StorageMap.SETTINGS);
 
         const storedVersion = await settingsStorage.getItem<number>('dbVersion');
-        const dbVersion = settingsStorage.config().version!;
 
         if (!storedVersion) {
             await this.initializeDatabase();
-        } else if (storedVersion < dbVersion) {
-            console.log(`Upgrading database from version ${storedVersion} to ${dbVersion}`);
+        } else if (storedVersion < Storage.DATABASE_VERSION) {
+            console.log(`Upgrading database from version ${storedVersion} to ${Storage.DATABASE_VERSION}`);
             await this.upgradeDatabase();
         }
-    }
-
-    private add(options: LocalForageOptions): void {
-        const instance = localforage.createInstance(options);
-        this._storages.set(options.storeName!, instance);
     }
 
     private async upgradeDatabase(): Promise<void> {
@@ -81,15 +87,5 @@ export class Storage extends AsyncInit {
         const settings = this.get(StorageMap.SETTINGS);
 
         await settings.setItem('dbVersion', settings.config().version);
-    }
-
-    public get(storeName: StorageMap): LocalForage {
-        const requestedStore: LocalForage|undefined = this._storages.get(storeName);
-
-        if (requestedStore) {
-            return requestedStore;
-        } else {
-            throw new Error(`No store found: ${storeName}`);
-        }
     }
 }

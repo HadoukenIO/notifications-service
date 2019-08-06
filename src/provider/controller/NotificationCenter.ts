@@ -61,7 +61,7 @@ export class NotificationCenter extends AsyncInit {
      * Subscribe to the store.
      * Perform all watching for state change in here.
      */
-    private async subscribe(): Promise<void> {
+    private subscribe(): void {
         // Window visibility
         this._store.watchForChange(
             state => state.windowVisible,

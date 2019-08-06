@@ -12,7 +12,7 @@ import {deferredPromise} from '../common/deferredPromise';
  */
 @injectable()
 export abstract class AsyncInit {
-    private _initialized!: readonly [Promise<this>, (value?: this) => void, (reason?: any) => void];
+    private readonly _initialized!: readonly [Promise<this>, (value?: this) => void, (reason?: any) => void];
 
     constructor() {
         this._initialized = deferredPromise<this>();
