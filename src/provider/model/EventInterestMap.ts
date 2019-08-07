@@ -1,4 +1,4 @@
-import { Identity } from "openfin/_v2/main";
+import {Identity} from 'openfin/_v2/main';
 
 interface AppClients {
     [uuid: string]: string[];
@@ -9,7 +9,6 @@ interface EventInterest {
 }
 
 export class EventInterestMap {
-
     private _map: EventInterest = {};
 
     public add(event: string, target: Identity): void {
@@ -17,7 +16,7 @@ export class EventInterestMap {
             return;
         }
         if (!this._map.hasOwnProperty(event)) {
-            this._map[event] = {[target.uuid] : []};
+            this._map[event] = {[target.uuid]: []};
         } else if (!this._map[event].hasOwnProperty(target.uuid)) {
             this._map[event][target.uuid] = [];
         }
@@ -34,5 +33,4 @@ export class EventInterestMap {
     public has(event: string, target: Identity): boolean {
         return this._map.hasOwnProperty(event) && this._map[event].hasOwnProperty(target.uuid) && this._map[event][target.uuid].indexOf(target.name!) !== -1;
     }
-
 }

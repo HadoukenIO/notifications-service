@@ -5,7 +5,8 @@ import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
 import {NotificationEvent} from '../../client';
-import { clientInfoStorage } from './Storage';
+
+import {clientInfoStorage} from './Storage';
 
 /**
  * Semantic type definition.
@@ -71,7 +72,7 @@ export class APIHandler<T extends Enum> {
     }
 
     public async dispatchAppEvent(targetUuid: string, payload: NotificationEvent): Promise<void> {
-        let clients: Identity[] = this._providerChannel.connections.filter(c => c.uuid === targetUuid);
+        const clients: Identity[] = this._providerChannel.connections.filter(c => c.uuid === targetUuid);
         clients.forEach(client => this.dispatchClientEvent(client, payload));
     }
 
@@ -80,7 +81,7 @@ export class APIHandler<T extends Enum> {
             return identity.uuid === conn.uuid && identity.name === conn.name;
         });
     }
- 
+
     public getClientConnections(): Identity[] {
         return this._providerChannel.connections;
     }
@@ -111,14 +112,16 @@ export class APIHandler<T extends Enum> {
 
         fin.Application.wrap(app).then(async (application: Application) => {
             const info = await application.getInfo();
-            clientInfoStorage.setItem(app.uuid, 
+            clientInfoStorage.setItem(
+                app.uuid,
                 info.parentUuid ? {
                     type: 'programmatic',
                     data: info.initialOptions
                 } : {
                     type: 'manifest',
                     data: info.manifestUrl
-                });
+                }
+            );
         });
     }
 }

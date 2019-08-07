@@ -1,12 +1,12 @@
 import {Action as ReduxAction} from 'redux';
+import {Identity} from 'openfin/_v2/main';
 
 import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
 import {DeferredEvent} from '../model/DeferredEvent';
+import {NotificationEvent} from '../../client';
 
 import {RootState, Immutable, mutable} from './State';
-import { Identity } from 'openfin/_v2/main';
-import { NotificationEvent } from '../../client';
 
 export const enum Action {
     CREATE = '@@notifications/CREATE',

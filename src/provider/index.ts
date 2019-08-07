@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import {inject, injectable} from 'inversify';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
+import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
 
 import {APITopic, API, ClearPayload} from '../client/internal';
 import {NotificationOptions, Notification, NotificationClosedEvent, NotificationButtonClickedEvent, NotificationClickedEvent, NotificationEvent} from '../client';
@@ -17,8 +18,7 @@ import {Action, RootAction} from './store/Actions';
 import {mutable, Immutable} from './store/State';
 import {Store} from './store/Store';
 import {notificationStorage, settingsStorage, clientInfoStorage} from './model/Storage';
-import { DeferredEvent } from './model/DeferredEvent';
-import { ApplicationOption } from 'openfin/_v2/api/application/applicationOption';
+import {DeferredEvent} from './model/DeferredEvent';
 
 interface AppInitData {
     type: 'programmatic' | 'manifest';
@@ -82,26 +82,30 @@ export class Main {
 
             if (client !== undefined) {
                 const connected: boolean = this._apiHandler.isAppConnected(client!.uuid);
-                const deferDispatchOrIgnore = (target: Identity, event: NotificationEvent): void => {
+                const deferDispatchOrDiscard = (target: Identity, event: NotificationEvent): void => {
                     if (this.interestMap.has(event.type, target)) {
                         if (connected) {
-                            this._apiHandler.dispatchAppEvent(target.uuid, event)
+                            this._apiHandler.dispatchAppEvent(target.uuid, event);
                         } else {
                             this._store.dispatch({type: Action.DEFER_EVENT_DISPATCH, target, event});
                             clientInfoStorage.getItem(target.uuid).then(item => {
                                 if (item) {
                                     const data = item as AppInitData;
-                                    data.type === 'programmatic' ? fin.Application.start(data.data as ApplicationOption) : fin.Application.startFromManifest(data.data as string);
+                                    if (data.type === 'programmatic') {
+                                        fin.Application.start(data.data as ApplicationOption);
+                                    } else {
+                                        fin.Application.startFromManifest(data.data as string);
+                                    }
                                 }
                             });
                         }
                     }
-                }
+                };
                 if (action.type === Action.REMOVE) {
                     action.notifications.forEach((notification: StoredNotification) => {
                         const target: Identity = notification.source;
                         const event: NotificationClosedEvent = {type: 'notification-closed', notification: notification.notification};
-                        deferDispatchOrIgnore(target, event);
+                        deferDispatchOrDiscard(target, event);
                     });
                 } else if (action.type === Action.CLICK_BUTTON) {
                     const {notification, buttonIndex} = action;
@@ -111,12 +115,12 @@ export class Main {
                         notification: notification.notification,
                         buttonIndex
                     };
-                    deferDispatchOrIgnore(target, event);
+                    deferDispatchOrDiscard(target, event);
                 } else if (action.type === Action.CLICK_NOTIFICATION) {
                     const {notification, source} = action.notification;
                     const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
                     // Send notification clicked event to uuid with the context.
-                    deferDispatchOrIgnore(source, event);
+                    deferDispatchOrDiscard(source, event);
                 } else if (action.type === Action.DISPATCH_DEFERRED_EVENTS && connected) {
                     action.events.forEach((event: DeferredEvent) => {
                         this._apiHandler.dispatchAppEvent(event.target.uuid, event.event);
@@ -139,7 +143,8 @@ export class Main {
     }
 
     private async registerClient(payload: string, sender: ProviderIdentity): Promise<void> {
-        const events: DeferredEvent[] = mutable(this._store.state.deferredEvents.filter(action => action.target.uuid === sender.uuid && action.event.type === payload));
+        const deferredEvents = this._store.state.deferredEvents;
+        const events: DeferredEvent[] = mutable(deferredEvents.filter(action => action.target.uuid === sender.uuid && action.event.type === payload));
         if (events.length > 0) {
             this._store.dispatch({type: Action.DISPATCH_DEFERRED_EVENTS, target: sender, eventType: payload, events});
         }
