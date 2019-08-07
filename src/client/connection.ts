@@ -15,8 +15,8 @@ import {EventEmitter} from 'events';
 
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
-import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events, getEventRouter} from './internal';
-import {EventTransport} from './EventRouter';
+import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events} from './internal';
+import {EventTransport, EventRouter} from './EventRouter';
 
 /**
  * The version of the NPM package.
@@ -24,14 +24,6 @@ import {EventTransport} from './EventRouter';
  * Webpack replaces any instances of this constant with a hard-coded string at build time.
  */
 declare const PACKAGE_VERSION: string;
-
-/**
- * Defines all events that are fired by the service.
- *
- * Currently only one type, but leaving this here to match the service pattern and
- * in case others are needed in future.
- */
-export type NotificationsEvent = Events;
 
 /**
  * The event emitter to emit events received from the service.  All addEventListeners will tap into this.
@@ -84,4 +76,14 @@ export function getServicePromise(): Promise<ChannelClient> {
 export async function tryServiceDispatch<T extends APITopic>(action: T, payload: API[T][0]): Promise<API[T][1]> {
     const channel: ChannelClient = await channelPromise;
     return channel.dispatch(action, payload) as Promise<API[T][1]>;
+}
+
+let eventHandler: EventRouter<Events>|null;
+
+export function getEventRouter(): EventRouter<Events> {
+    if (!eventHandler) {
+        eventHandler = new EventRouter(eventEmitter);
+    }
+
+    return eventHandler;
 }

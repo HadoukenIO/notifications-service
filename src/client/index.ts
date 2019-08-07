@@ -33,9 +33,9 @@
  * @hidden
  */
 import {ActionDeclaration, NotificationActionResult} from './actions';
-import {tryServiceDispatch, eventEmitter} from './connection';
+import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
-import {APITopic, Events, NotificationInternal, getEventRouter} from './internal';
+import {APITopic, Events, NotificationInternal} from './internal';
 import {EventRouter, EventTransport} from './EventRouter';
 
 const eventHandler: EventRouter<Events> = getEventRouter();

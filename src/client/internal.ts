@@ -10,8 +10,6 @@
  */
 
 import {NotificationActionResult} from './actions';
-import {EventRouter} from './EventRouter';
-import {eventEmitter} from './connection';
 
 import {NotificationOptions, Notification, ActionTrigger, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
 
@@ -76,14 +74,4 @@ export interface NotificationActionEventTransport {
     // Following are present only if trigger is `CONTROL`
     controlSource?: 'buttons';  // Additional sources will be added in future release
     controlIndex?: number;      // The index of the originating control, within notification[controlSource]
-}
-
-let eventHandler: EventRouter<Events>|null;
-
-export function getEventRouter(): EventRouter<Events> {
-    if (!eventHandler) {
-        eventHandler = new EventRouter(eventEmitter);
-    }
-
-    return eventHandler;
 }
