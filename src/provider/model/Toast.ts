@@ -2,6 +2,7 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
 import Bounds from 'openfin/_v2/api/window/bounds';
+import {Signal} from 'openfin-service-signal';
 
 import {deferredPromise} from '../common/deferredPromise';
 import {renderApp} from '../view/containers/ToastApp';
@@ -10,9 +11,6 @@ import {LayoutItem, WindowDimensions} from '../controller/Layouter';
 
 import {StoredNotification} from './StoredNotification';
 import {WebWindow, createWebWindow} from './WebWindow';
-import { Signal } from 'openfin-service-signal';
-
-
 
 const windowOptions: WindowOption = {
     name: 'Notification-Toast',
@@ -54,7 +52,6 @@ export enum ToastEvent {
 export class Toast implements LayoutItem {
     public static readonly onToastEvent: Signal<[ToastEvent, string]> = new Signal();
 
-
     private _webWindow: Readonly<Promise<WebWindow>>;
     private _options: Options;
     private _timeout!: number;
@@ -83,7 +80,6 @@ export class Toast implements LayoutItem {
     public get dimensions(): Promise<WindowDimensions> {
         return this._dimensions;
     }
-
 
     public constructor(store: Store, notification: StoredNotification, toastOptions: Options) {
         this._id = notification.id;
