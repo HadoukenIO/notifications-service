@@ -1,5 +1,3 @@
-import {EventEmitter} from 'events';
-
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
@@ -12,6 +10,7 @@ import {LayoutItem, WindowDimensions} from '../controller/Layouter';
 
 import {StoredNotification} from './StoredNotification';
 import {WebWindow, createWebWindow} from './WebWindow';
+import { Signal } from 'openfin-service-signal';
 
 
 
@@ -53,7 +52,7 @@ export enum ToastEvent {
 }
 
 export class Toast implements LayoutItem {
-    public static eventEmitter: EventEmitter = new EventEmitter();
+    public static readonly onToastEvent: Signal<[ToastEvent, string]> = new Signal();
 
     private _webWindow: Readonly<Promise<WebWindow>>;
     private _options: Options;
@@ -136,8 +135,6 @@ export class Toast implements LayoutItem {
         clearTimeout(this._timeout);
         document.removeEventListener('mouseenter', this.mouseEnterHandler);
         document.removeEventListener('mouseleave', this.mouseLeaveHandler);
-        Toast.eventEmitter.removeListener(ToastEvent.PAUSE, this.freeze);
-        Toast.eventEmitter.removeListener(ToastEvent.UNPAUSE, this.unfreeze);
 
         await window.close();
     }
@@ -169,14 +166,14 @@ export class Toast implements LayoutItem {
     }
 
     private timeoutHandler = (): void => {
-        Toast.eventEmitter.emit(ToastEvent.CLOSED, this.id);
+        Toast.onToastEvent.emit(ToastEvent.CLOSED, this.id);
     }
 
     private mouseEnterHandler = async (): Promise<void> => {
-        Toast.eventEmitter.emit(ToastEvent.PAUSE);
+        Toast.onToastEvent.emit(ToastEvent.PAUSE, this.id);
     };
 
     private mouseLeaveHandler = async (): Promise<void> => {
-        Toast.eventEmitter.emit(ToastEvent.UNPAUSE);
+        Toast.onToastEvent.emit(ToastEvent.UNPAUSE, this.id);
     };
 }

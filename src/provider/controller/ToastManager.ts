@@ -162,23 +162,21 @@ export class ToastManager {
      * Add listeners for toast events.
     */
     private addListeners() {
-        Toast.eventEmitter.addListener(ToastEvent.CLOSED, async (id: string) => {
-            const toast = this._toasts.get(id);
-            if (toast) {
-                this.deleteToast(toast);
+        Toast.onToastEvent.add((event: ToastEvent, id: string) => {
+            if (event === ToastEvent.CLOSED) {
+                const toast = this._toasts.get(id);
+                if (toast) {
+                    this.deleteToast(toast);
+                }
+            } else if (event === ToastEvent.UNPAUSE) {
+                for (const toast of this._stack.items as Toast[]) {
+                    toast.unfreeze();
+                }
+            } else {
+                for (const toast of this._stack.items as Toast[]) {
+                    toast.freeze();
+                }
             }
-        });
-
-        Toast.eventEmitter.addListener(ToastEvent.UNPAUSE, async () => {
-            for (const toast of this._stack.items as Toast[]) {
-                toast.unfreeze();
-            }
-        });
-
-        Toast.eventEmitter.addListener(ToastEvent.PAUSE, async () => {
-            for (const toast of this._stack.items as Toast[]) {
-                toast.freeze();
-            }
-        });
+        }, this);
     }
 }
