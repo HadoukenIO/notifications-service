@@ -11,7 +11,7 @@ import {assertNotificationStored, getStoredNotificationsByApp} from './utils/sto
 import {delay, Duration} from './utils/delay';
 import {getToastWindow} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
-import {testManagerIdentity} from './utils/constants';
+import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {assertHydratedCorrectly} from './utils/hydrateNotification';
 
 describe('When creating a notification with the center showing', () => {
@@ -34,7 +34,7 @@ describe('When creating a notification with the center showing', () => {
     });
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {});
+        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
     });
 
@@ -90,7 +90,7 @@ describe('When creating a notification with the center showing', () => {
         });
     });
 
-    describe('When options does not include title and/or body', () => {
+    describe('When options does not include title and body', () => {
         // Intentionally circumventing type check with cast for testing purposes
         const options: NotificationOptions = {id: 'invalid-notification'} as NotificationOptions;
 
@@ -105,7 +105,7 @@ describe('When creating a notification with the center showing', () => {
         });
 
         test('The promise rejects with a suitable error message', async () => {
-            await expect(createPromise).rejects.toThrow(/Invalid arguments passed to createNotification/);
+            await expect(createPromise).rejects.toThrow(/Invalid arguments passed to create:.*"body" must have a value.*"title" must have a value/s);
         });
 
         test('A card is not added to the notification center', async () => {

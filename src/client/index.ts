@@ -150,8 +150,14 @@ export function removeEventListener<E extends NotificationEvent>(eventType: E['t
  * @param options Notification configuration options.
  */
 export async function create(options: NotificationOptions): Promise<Notification> {
-    // Should have some sort of input validation here...
-    return tryServiceDispatch(APITopic.CREATE_NOTIFICATION, options);
+    // Most validation logic is handled on the provider, but need an early check here
+    // as we call date.valueOf when converting into a CreatePayload
+    if (options.date !== undefined && !(options.date instanceof Date)) {
+        throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
+    }
+
+    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {...options, date: options.date && options.date.valueOf()});
+    return {...response, date: new Date(response.date)};
 }
 
 /**
@@ -182,9 +188,10 @@ export async function clear(id: string): Promise<boolean> {
  *  .then(console.log);
  * ```
  */
-export async function getAll(): Promise<Notification[]>{
+export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
-    return tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
+    const response = await tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
+    return response.map(note => ({...note, date: new Date(note.date)}));
 }
 
 /**

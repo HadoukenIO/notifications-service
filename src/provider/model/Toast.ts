@@ -54,6 +54,7 @@ export enum ToastEvent {
 export class Toast implements LayoutItem {
     public static readonly onToastEvent: Signal<[ToastEvent, string]> = new Signal();
 
+
     private _webWindow: Readonly<Promise<WebWindow>>;
     private _options: Options;
     private _timeout!: number;

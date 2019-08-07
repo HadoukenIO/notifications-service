@@ -2,9 +2,11 @@ import 'reflect-metadata';
 import {inject, injectable} from 'inversify';
 import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
+import moment from 'moment';
 
-import {APITopic, API, ClearPayload} from '../client/internal';
-import {OptionButton, NotificationOptions, Notification, NotificationClosedEvent, NotificationButtonClickedEvent, NotificationClickedEvent} from '../client';
+import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal} from '../client/internal';
+import {NotificationClosedEvent, NotificationButtonClickedEvent, NotificationClickedEvent} from '../client';
+import {EventPayload} from '../client/connection';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -62,14 +64,14 @@ export class Main {
                 // Send notification closed event to uuid with the context.
                 action.notifications.forEach((notification: StoredNotification) => {
                     const target: Identity = notification.source;
-                    const event: NotificationClosedEvent = {type: 'notification-closed', notification: notification.notification};
+                    const event: EventPayload<NotificationClosedEvent> = {type: 'notification-closed', notification: notification.notification};
 
                     this._apiHandler.dispatchClientEvent(target, event);
                 });
             } else if (action.type === Action.CLICK_BUTTON) {
                 const {notification, buttonIndex} = action;
                 const target: Identity = notification.source;
-                const event: NotificationButtonClickedEvent = {
+                const event: EventPayload<NotificationButtonClickedEvent> = {
                     type: 'notification-button-clicked',
                     notification: notification.notification,
                     buttonIndex
@@ -77,7 +79,7 @@ export class Main {
                 this._apiHandler.dispatchClientEvent(target, event);
             } else if (action.type === Action.CLICK_NOTIFICATION) {
                 const {notification, source} = action.notification;
-                const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
+                const event: EventPayload<NotificationClickedEvent> = {type: 'notification-clicked', notification};
 
                 // Send notification clicked event to uuid with the context.
                 this._apiHandler.dispatchClientEvent(source, event);
@@ -92,7 +94,7 @@ export class Main {
      * @param payload The contents to be dispatched to the UI
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
-    private async createNotification(payload: NotificationOptions, sender: ProviderIdentity): Promise<Notification> {
+    private async createNotification(payload: CreatePayload, sender: ProviderIdentity): Promise<NotificationInternal> {
         // Explicity create the identity object to avoid storing other unneeded info from ProviderIdentity
         const notification = this.hydrateNotification(payload, {uuid: sender.uuid, name: sender.name});
         this._store.dispatch({type: Action.CREATE, notification});
@@ -129,7 +131,7 @@ export class Main {
      * @param payload The payload can contain the uuid
      * @param sender The sender info contains the uuid of the sender
      */
-    private fetchAppNotifications(payload: undefined, sender: ProviderIdentity): Notification[] {
+    private fetchAppNotifications(payload: undefined, sender: ProviderIdentity): NotificationInternal[] {
         const notifications = this.getAppNotifications(sender.uuid);
 
         return notifications.map(notification => mutable(notification.notification));
@@ -162,22 +164,56 @@ export class Main {
      * @param payload Notification options to hydrate.
      * @param sender The source of the notification.
      */
-    private hydrateNotification(payload: NotificationOptions, sender: Identity): StoredNotification {
-        if (!payload.body) {
-            throw new Error('Invalid arguments passed to createNotification. "body" must have a value');
-        }
-        if (!payload.title) {
-            throw new Error('Invalid arguments passed to createNotification. "title" must have a value');
+    private hydrateNotification(payload: CreatePayload, sender: Identity): StoredNotification {
+        const problems: string[] = [];
+
+        if (payload.id !== undefined && typeof payload.id !== 'string') {
+            problems.push('"id" must be a string or undefined');
         }
 
-        const notification: Notification = {
+        if (typeof payload.body === 'undefined') {
+            problems.push('"body" must have a value');
+        } else if (typeof payload.body !== 'string') {
+            problems.push('"body" must be a string');
+        }
+
+        if (typeof payload.title === 'undefined') {
+            problems.push('"title" must have a value');
+        } else if (typeof payload.title !== 'string') {
+            problems.push('"title" must be a string');
+        }
+
+        if (payload.subtitle !== undefined && typeof payload.subtitle !== 'string') {
+            problems.push('"subtitle" must be a string or undefined');
+        }
+
+        if (payload.icon !== undefined && typeof payload.icon !== 'string') {
+            problems.push('"icon" must be a string or undefined');
+        }
+
+        const parsedDate = moment(payload.date);
+        if (payload.date !== undefined && !parsedDate.isValid()) {
+            problems.push('"date" must be a valid Date object');
+        }
+
+        if (payload.buttons !== undefined && !Array.isArray(payload.buttons)) {
+            problems.push('"buttons" must be an array or undefined');
+        }
+
+        if (problems.length === 1) {
+            throw new Error(`Invalid arguments passed to create: ${problems[0]}`);
+        } else if (problems.length > 1) {
+            throw new Error(`Invalid arguments passed to create:\n - ${problems.join('\n - ')}`);
+        }
+
+        const notification: NotificationInternal = {
             id: payload.id || this.generateId(),
             body: payload.body,
             title: payload.title,
             subtitle: payload.subtitle || '',
             icon: payload.icon || '',
             customData: payload.customData,
-            date: payload.date || new Date(),
+            date: payload.date || Date.now(),
             buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, iconUrl: btn.iconUrl || ''})) : []
         };
 

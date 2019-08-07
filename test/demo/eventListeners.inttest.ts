@@ -7,7 +7,7 @@ import * as notifsRemote from './utils/notificationsRemote';
 import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
 import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
-import {testManagerIdentity} from './utils/constants';
+import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -29,7 +29,7 @@ describe('Click listeners', () => {
         let testApp: Application;
         let testAppMainWindow: FinWindow;
         beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {});
+            testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
             testAppMainWindow = await testApp.getWindow();
         });
 
@@ -78,7 +78,7 @@ describe('Click listeners', () => {
                 expect(clickListener).toHaveBeenCalledTimes(1);
                 expect(clickListener).toHaveBeenCalledWith({
                     type: 'notification-clicked',
-                    notification: note
+                    notification: {...note, date: note.date.toJSON()}
                 });
             });
 
@@ -97,7 +97,7 @@ describe('Click listeners', () => {
                 expect(buttonClickListener).toHaveBeenCalledTimes(1);
                 expect(buttonClickListener).toHaveBeenCalledWith({
                     type: 'notification-button-clicked',
-                    notification: note,
+                    notification: {...note, date: note.date.toJSON()},
                     buttonIndex: 0
                 });
 
@@ -125,7 +125,7 @@ describe('Click listeners', () => {
                     expect(closeListener).toHaveBeenCalledTimes(1);
                     expect(closeListener).toHaveBeenCalledWith({
                         type: 'notification-closed',
-                        notification: note
+                        notification: {...note, date: note.date.toJSON()}
                     });
 
                     // Other listeners not triggered

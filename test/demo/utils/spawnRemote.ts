@@ -1,6 +1,5 @@
 import {Application, Window, Identity} from 'hadouken-js-adapter';
-
-import {createApp as createAppRemote, createWindow as createWindowRemote} from '../../../src/demo/spawn';
+import {createApp as createAppRemote, createWindow as createWindowRemote} from 'openfin-service-tooling/spawn';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 import {fin} from './fin';
@@ -14,7 +13,7 @@ type CreateWindowType = typeof createWindowRemote;
 type CreateAppType = typeof createAppRemote;
 
 const ofBrowser = new OFPuppeteerBrowser<SpawnEnabledContext>();
-export async function createApp(executionTarget: Identity, ...spawnArgs: Parameters<CreateAppType>): Promise<Application>{
+export async function createApp(executionTarget: Identity, ...spawnArgs: Parameters<CreateAppType>): Promise<Application> {
     const identity: Identity = await ofBrowser.executeOnWindow(executionTarget, async function(...remoteArgs: Parameters<CreateAppType>) {
         const remoteApp = await this.createApp(...remoteArgs);
         return remoteApp.identity;
