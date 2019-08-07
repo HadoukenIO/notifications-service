@@ -7,8 +7,6 @@ import {Signal} from 'openfin-service-signal';
 import {SERVICE_CHANNEL} from '../../client/internal';
 import {NotificationEvent} from '../../client';
 
-
-
 /**
  * Semantic type definition.
  *

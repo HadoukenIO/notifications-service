@@ -51,7 +51,6 @@ function makeNoteOfType(index: number) {
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
 
-
     function logit(msg: string) {
         const logEntry = document.createElement('div');
         logEntry.innerHTML = msg;

@@ -14,7 +14,7 @@ type CreateWindowType = typeof createWindowRemote;
 type CreateAppType = typeof createAppRemote;
 
 const ofBrowser = new OFPuppeteerBrowser<SpawnEnabledContext>();
-export async function createApp(executionTarget: Identity, ...spawnArgs: Parameters<CreateAppType>): Promise<Application>{
+export async function createApp(executionTarget: Identity, ...spawnArgs: Parameters<CreateAppType>): Promise<Application> {
     const identity: Identity = await ofBrowser.executeOnWindow(executionTarget, async function(...remoteArgs: Parameters<CreateAppType>) {
         const remoteApp = await this.createApp(...remoteArgs);
         return remoteApp.identity;

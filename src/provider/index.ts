@@ -245,14 +245,18 @@ export class Main {
                 this._apiHandler.dispatchAppEvent(target.uuid, event);
             } else {
                 this._store.dispatch({type: Action.DEFER_EVENT_DISPATCH, target, event});
-                clientInfoStorage.getItem(target.uuid).then(item => {
-                    if (item) {
-                        const data = item as AppInitData;
-                        if (data.type === 'programmatic') {
-                            fin.Application.start(data.data as ApplicationOption);
-                        } else {
-                            fin.Application.startFromManifest(data.data as string);
-                        }
+                fin.Application.wrapSync(target).isRunning().then(isRunning => {
+                    if (!isRunning) {
+                        clientInfoStorage.getItem(target.uuid).then(item => {
+                            if (item) {
+                                const data = item as AppInitData;
+                                if (data.type === 'programmatic') {
+                                    fin.Application.start(data.data as ApplicationOption);
+                                } else {
+                                    fin.Application.startFromManifest(data.data as string);
+                                }
+                            }
+                        });
                     }
                 });
             }
