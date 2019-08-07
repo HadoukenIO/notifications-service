@@ -41,7 +41,7 @@ export class Main {
     @inject(Inject.TOAST_MANAGER)
     private _toastManager!: ToastManager;
 
-    private interestMap: EventInterestMap = new EventInterestMap;
+    private _interestMap: Readonly<EventInterestMap> = new EventInterestMap;
 
     public async register(): Promise<void> {
         Object.assign(window, {
@@ -65,8 +65,8 @@ export class Main {
             [APITopic.GET_APP_NOTIFICATIONS]: this.fetchAppNotifications.bind(this),
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
             [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
-            [APITopic.REGISTER_CLIENT]: this.registerClient.bind(this),
-            [APITopic.UNREGISTER_CLIENT]: this.unregisterClient.bind(this)
+            [APITopic.ADD_EVENT_LISTENER]: this.registerClient.bind(this),
+            [APITopic.REMOVE_EVENT_LISTENER]: this.unregisterClient.bind(this)
         });
 
         this._store.onAction.add((action: RootAction) => {
@@ -81,31 +81,11 @@ export class Main {
             }
 
             if (client !== undefined) {
-                const connected: boolean = this._apiHandler.isAppConnected(client!.uuid);
-                const deferDispatchOrDiscard = (target: Identity, event: NotificationEvent): void => {
-                    if (this.interestMap.has(event.type, target)) {
-                        if (connected) {
-                            this._apiHandler.dispatchAppEvent(target.uuid, event);
-                        } else {
-                            this._store.dispatch({type: Action.DEFER_EVENT_DISPATCH, target, event});
-                            clientInfoStorage.getItem(target.uuid).then(item => {
-                                if (item) {
-                                    const data = item as AppInitData;
-                                    if (data.type === 'programmatic') {
-                                        fin.Application.start(data.data as ApplicationOption);
-                                    } else {
-                                        fin.Application.startFromManifest(data.data as string);
-                                    }
-                                }
-                            });
-                        }
-                    }
-                };
                 if (action.type === Action.REMOVE) {
                     action.notifications.forEach((notification: StoredNotification) => {
                         const target: Identity = notification.source;
                         const event: NotificationClosedEvent = {type: 'notification-closed', notification: notification.notification};
-                        deferDispatchOrDiscard(target, event);
+                        this.dispatchDeferOrDiscard(target, event);
                     });
                 } else if (action.type === Action.CLICK_BUTTON) {
                     const {notification, buttonIndex} = action;
@@ -115,19 +95,23 @@ export class Main {
                         notification: notification.notification,
                         buttonIndex
                     };
-                    deferDispatchOrDiscard(target, event);
+                    this.dispatchDeferOrDiscard(target, event);
                 } else if (action.type === Action.CLICK_NOTIFICATION) {
                     const {notification, source} = action.notification;
                     const event: NotificationClickedEvent = {type: 'notification-clicked', notification};
                     // Send notification clicked event to uuid with the context.
-                    deferDispatchOrDiscard(source, event);
-                } else if (action.type === Action.DISPATCH_DEFERRED_EVENTS && connected) {
+                    this.dispatchDeferOrDiscard(source, event);
+                } else if (action.type === Action.DISPATCH_DEFERRED_EVENTS) {
                     action.events.forEach((event: DeferredEvent) => {
                         this._apiHandler.dispatchAppEvent(event.target.uuid, event.event);
                     });
                 }
             }
         });
+
+        this._apiHandler.onConnection.add(this.onApiHandlerConnection, this);
+
+        console.log('Service Initialised');
     }
 
     /**
@@ -148,11 +132,11 @@ export class Main {
         if (events.length > 0) {
             this._store.dispatch({type: Action.DISPATCH_DEFERRED_EVENTS, target: sender, eventType: payload, events});
         }
-        this.interestMap.add(payload, sender);
+        this._interestMap.add(payload, sender);
     }
 
     private async unregisterClient(payload: string, sender: ProviderIdentity): Promise<void> {
-        this.interestMap.remove(payload, sender);
+        this._interestMap.remove(payload, sender);
     }
 
     /**
@@ -244,6 +228,59 @@ export class Main {
         };
 
         return storedNotification;
+    }
+
+    /**
+     * Dispatches, defers or discards a notification event
+     * Each event will be dispatched directly to the client application (and each one of its registered listener for the specific event)
+     * if there is at least one online client window is listening for the specific event.
+     * Event dispatch will be deferred if there is at least one listener for the specific application is registered for the specific event
+     * but there are no connected listeners at the time the event occurs.
+     * Events will be discarded if there are no client listeners registered for the specific app or all the registered listeners for the app
+     * is unregistered.
+     *
+     * @param target Target listener identity
+     * @param event Notification event
+     */
+    private dispatchDeferOrDiscard(target: Identity, event: NotificationEvent): void {
+        const connected: boolean = this._apiHandler.isAppConnected(target.uuid);
+        if (this._interestMap.has(event.type, target)) {
+            if (connected) {
+                this._apiHandler.dispatchAppEvent(target.uuid, event);
+            } else {
+                this._store.dispatch({type: Action.DEFER_EVENT_DISPATCH, target, event});
+                clientInfoStorage.getItem(target.uuid).then(item => {
+                    if (item) {
+                        const data = item as AppInitData;
+                        if (data.type === 'programmatic') {
+                            fin.Application.start(data.data as ApplicationOption);
+                        } else {
+                            fin.Application.startFromManifest(data.data as string);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Signal for API handler connection.
+     *
+    * @param connection Identity of connected client
+     */
+    private onApiHandlerConnection(connection: Identity): void {
+        fin.Application.wrapSync(connection).getInfo().then(info => {
+            clientInfoStorage.setItem(
+                connection.uuid,
+                info.parentUuid ? {
+                    type: 'programmatic',
+                    data: info.initialOptions
+                } : {
+                    type: 'manifest',
+                    data: info.manifestUrl
+                }
+            );
+        });
     }
 
     /**
