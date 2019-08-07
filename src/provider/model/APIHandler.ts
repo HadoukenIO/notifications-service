@@ -91,7 +91,7 @@ export class APIHandler<T extends Enum> {
     public async registerListeners<S extends APISpecification<T>>(actionHandlerMap: APIImplementation<T, S>): Promise<void> {
         const providerChannel: ChannelProvider = this._providerChannel = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
 
-        providerChannel.onConnection(this.onConnectionHandler);
+        providerChannel.onConnection(this.onConnectionHandler.bind(this));
 
         for (const action in actionHandlerMap) {
             if (actionHandlerMap.hasOwnProperty(action)) {

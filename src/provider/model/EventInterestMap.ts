@@ -28,9 +28,6 @@ export class EventInterestMap {
     }
 
     public has(event: string, target: Identity): boolean {
-        return this._map.hasOwnProperty(event) &&
-               this._map[event].hasOwnProperty(target.uuid) &&
-               this._map[event][target.uuid].hasOwnProperty(target.name!) &&
-               this._map[event][target.uuid][target.name!];
+        return ((this._map[event] || {})[target.uuid] || {})[target.name!] || false;
     }
 }
