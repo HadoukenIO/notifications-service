@@ -41,7 +41,7 @@ export class Main {
     @inject(Inject.TOAST_MANAGER)
     private _toastManager!: ToastManager;
 
-    private _interestMap: Readonly<EventInterestMap> = new EventInterestMap;
+    private readonly _interestMap: EventInterestMap = new EventInterestMap();
 
     public async register(): Promise<void> {
         Object.assign(window, {
@@ -231,13 +231,9 @@ export class Main {
     }
 
     /**
-     * Dispatches, defers or discards a notification event
-     * Each event will be dispatched directly to the client application (and each one of its registered listener for the specific event)
-     * if there is at least one online client window is listening for the specific event.
-     * Event dispatch will be deferred if there is at least one listener for the specific application is registered for the specific event
-     * but there are no connected listeners at the time the event occurs.
-     * Events will be discarded if there are no client listeners registered for the specific app or all the registered listeners for the app
-     * is unregistered.
+     * Dispatches an event if the app is actively listening for it.
+     * Defers if a currently closed app was listening for this event and didn't remove it's listeners before it exits.
+     * Ignores if the app is/was not interested in this event.
      *
      * @param target Target listener identity
      * @param event Notification event
@@ -266,7 +262,7 @@ export class Main {
     /**
      * Signal for API handler connection.
      *
-    * @param connection Identity of connected client
+     * @param connection Identity of connected client
      */
     private onApiHandlerConnection(connection: Identity): void {
         fin.Application.wrapSync(connection).getInfo().then(info => {
