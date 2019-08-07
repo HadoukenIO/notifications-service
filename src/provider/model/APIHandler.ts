@@ -81,7 +81,7 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
         return this._providerChannel.dispatch(identity, action, payload);
     }
 
-    public async dispatchEvent<T extends E>(targetWindow: Identity, eventTransport: EventTransport<T>): Promise<void> {
+    public async dispatchEvent<T extends E>(targetWindow: Identity, eventTransport: EventTransport<E, T>): Promise<void> {
         return this._providerChannel.dispatch(targetWindow, 'event', eventTransport);
     }
 
@@ -89,7 +89,7 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
         return this._providerChannel.publish(action, payload);
     }
 
-    public async publishEvent<T extends E>(eventTransport: EventTransport<T>): Promise<void> {
+    public async publishEvent<T extends E>(eventTransport: EventTransport<E, T>): Promise<void> {
         return Promise.all(this._providerChannel.publish('event', eventTransport)).then(() => {});
     }
 

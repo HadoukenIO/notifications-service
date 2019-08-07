@@ -1,7 +1,7 @@
+import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
+
 import * as ofnotes from '../client/index';
 import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll} from '../client/index';
-
-import {addSpawnListeners, createWindow, createApp} from './spawn';
 
 addSpawnListeners();
 
@@ -24,7 +24,6 @@ const buttonNote: NotificationOptions = {
     category: 'Test',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
-    date: new Date(),
     onSelect: 'Selected',
     buttons: [
         {title: 'test1', iconUrl: 'favicon.ico', onClick: 'Button 1'},
@@ -34,9 +33,9 @@ const buttonNote: NotificationOptions = {
 
 function makeNoteOfType(index: number) {
     if (index % 2 === 1) {
-        return create({id: `1q2w3e4r${index}`, ...normalNote});
+        return create({id: `1q2w3e4r${index}`, date: new Date(), ...normalNote});
     } else {
-        return create({id: `1q2w3e4r${index}`, ...buttonNote});
+        return create({id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote});
     }
 }
 

@@ -75,7 +75,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
         } else {
             const name = uuidv4();
             await page.exposeFunction(name, fn);
-            const newHandle = await page.evaluateHandle(function(this: {[k: string]: AnyFunction}, remoteName){
+            const newHandle = await page.evaluateHandle(function(this: {[k: string]: AnyFunction}, remoteName) {
                 return this[remoteName];
             }, name);
             if (!this._mountedFunctionCache.get(page)) {

@@ -15,9 +15,8 @@ import {EventEmitter} from 'events';
 
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
-import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events} from './internal';
-import {getEventRouter, EventTransport} from './EventRouter';
-
+import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events, getEventRouter} from './internal';
+import {EventTransport} from './EventRouter';
 
 /**
  * The version of the NPM package.
@@ -44,22 +43,37 @@ export const eventEmitter = new EventEmitter();
  */
 export let channelPromise: Promise<ChannelClient>;
 
-if (fin.Window.me.uuid !== SERVICE_IDENTITY.uuid || fin.Window.me.name !== SERVICE_IDENTITY.name) {
-    channelPromise = typeof fin === 'undefined' ?
-        Promise.reject(new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.')) :
-        fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
-            const eventHandler = getEventRouter();
+if (typeof fin !== 'undefined') {
+    getServicePromise();
+}
 
-            // Register service listeners
-            channel.register('WARN', (payload: any) => console.warn(payload));
-            channel.register('event', (event: EventTransport<NotificationsEvent>) => {
-                eventHandler.dispatchEvent(event);
+export function getServicePromise(): Promise<ChannelClient> {
+    if (!channelPromise) {
+        if (typeof fin === 'undefined') {
+            const msg: string = 'fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.';
+            channelPromise = Promise.reject(new Error(msg));
+        } else if (fin.Window.me.uuid === SERVICE_IDENTITY.uuid && fin.Window.me.name === SERVICE_IDENTITY.name) {
+            // Currently a runtime bug when provider connects to itself. Ideally the provider would never import a file
+            // that includes this, but for now it is easier to put a guard in place.
+            channelPromise = Promise.reject(new Error('Trying to connect to provider from provider'));
+        } else {
+            channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
+                const eventHandler = getEventRouter();
+
+                // Register service listeners
+                channel.register('WARN', (payload: any) => console.warn(payload));
+                channel.register('event', (event: EventTransport<Events, Events>) => {
+                    eventHandler.dispatchEvent(event);
+                });
+                // Any unregistered action will simply return false
+                channel.setDefaultAction(() => false);
+
+                return channel;
             });
-            // Any unregistered action will simply return false
-            channel.setDefaultAction(() => false);
+        }
+    }
 
-            return channel;
-        });
+    return channelPromise;
 }
 
 /**

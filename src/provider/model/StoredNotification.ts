@@ -1,6 +1,6 @@
 import {Identity} from 'openfin/_v2/main';
 
-import {Notification} from '../../client/index';
+import {NotificationInternal} from '../../client/internal';
 import {Immutable} from '../store/State';
 
 /**
@@ -11,5 +11,5 @@ import {Immutable} from '../store/State';
 export type StoredNotification = Immutable<{
     id: string;
     source: Identity;
-    notification: Notification;
+    notification: NotificationInternal;
 }>;

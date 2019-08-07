@@ -1,8 +1,8 @@
 import {injectable, inject} from 'inversify';
 import {composeWithDevTools} from 'remote-redux-devtools';
 import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispatch, Unsubscribe} from 'redux';
+import {Signal, Aggregators} from 'openfin-service-signal';
 
-import {Signal1, Aggregators} from '../common/Signal';
 import {Inject} from '../common/Injectables';
 import {notificationStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
@@ -27,7 +27,7 @@ export class Store implements StoreAPI {
         windowVisible: false
     };
 
-    public readonly onAction: Signal1<RootAction, void, Promise<void>> = new Signal1(Aggregators.AWAIT_VOID);
+    public readonly onAction: Signal<[RootAction], Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
 
     private _actionMap: ActionHandlerMap;
     private _store: ReduxStore<RootState, RootAction>;

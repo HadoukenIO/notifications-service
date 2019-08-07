@@ -7,7 +7,7 @@ import * as notifsRemote from './utils/notificationsRemote';
 import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
 import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
-import {testManagerIdentity} from './utils/constants';
+import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -31,7 +31,7 @@ describe('Click listeners', () => {
         let testApp: Application;
         let testAppMainWindow: FinWindow;
         beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {});
+            testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
             testAppMainWindow = await testApp.getWindow();
         });
 
@@ -74,7 +74,7 @@ describe('Click listeners', () => {
                 expect(createdListener).toHaveBeenCalledTimes(1);
                 expect(createdListener).toHaveBeenCalledWith({
                     type: 'notification-created',
-                    notification: note
+                    notification: {...note, date: note.date.toJSON()}
                 });
             });
 
@@ -89,13 +89,13 @@ describe('Click listeners', () => {
                 expect(actionListener).toHaveBeenCalledTimes(1);
                 expect(actionListener).toHaveBeenCalledWith({
                     type: 'notification-action',
-                    notification: note,
+                    notification: {...note, date: note.date.toJSON()},
                     trigger: 'select',
                     result: {action: 'select'}
                 });
             });
 
-            test('Clicking on the card\'s button triggers the buttonClickListener and does not trigger the clickListener', async () => {
+            test('Clicking on the card\'s button triggers a CONTROL action and does not trigger a SELECT action', async () => {
                 const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
 
                 // Get a remote handle to the button DOM element
@@ -106,11 +106,11 @@ describe('Click listeners', () => {
                 await buttonHandles[0].click();
                 await delay(Duration.EVENT_PROPAGATED);
 
-                // buttonClickListener triggered with correct metadata
+                // control triggered with correct metadata
                 expect(actionListener).toHaveBeenCalledTimes(1);
                 expect(actionListener).toHaveBeenCalledWith({
                     type: 'notification-action',
-                    notification: note,
+                    notification: {...note, date: note.date.toJSON()},
                     trigger: 'control',
                     control: note.buttons[0],
                     result: {action: 'click'}
@@ -140,7 +140,7 @@ describe('Click listeners', () => {
                     expect(closedListener).toHaveBeenCalledTimes(1);
                     expect(closedListener).toHaveBeenCalledWith({
                         type: 'notification-closed',
-                        notification: note
+                        notification: {...note, date: note.date.toJSON()}
                     });
 
                     // No 'action', or additional 'created', events

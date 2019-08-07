@@ -35,14 +35,31 @@
 import {ActionDeclaration, NotificationActionResult} from './actions';
 import {tryServiceDispatch, eventEmitter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
-import {APITopic, Events} from './internal';
-import {EventRouter, getEventRouter, EventTransport} from './EventRouter';
+import {APITopic, Events, NotificationInternal, getEventRouter} from './internal';
+import {EventRouter, EventTransport} from './EventRouter';
 
-const eventHandler: EventRouter = getEventRouter();
+const eventHandler: EventRouter<Events> = getEventRouter();
 
-eventHandler.registerEmitterProvider('main', () => eventEmitter);
-eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: EventTransport<NotificationActionEvent>) => {
-    const {controlSource, controlIndex, target, ...rest} = event;
+function parseEventWithNotification<T extends {notification: NotificationInternal}>(event: T): T & {notification: Notification} {
+    const {notification} = event;
+
+    return {
+        ...event,
+        notification: {
+            ...notification,
+            date: new Date(notification.date)
+        }
+    };
+}
+
+eventHandler.registerDeserializer<NotificationCreatedEvent>('notification-created', (event: EventTransport<Events, NotificationCreatedEvent>) => {
+    return parseEventWithNotification(event);
+});
+eventHandler.registerDeserializer<NotificationClosedEvent>('notification-closed', (event: EventTransport<Events, NotificationClosedEvent>) => {
+    return parseEventWithNotification(event);
+});
+eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: EventTransport<Events, NotificationActionEvent>) => {
+    const {controlSource, controlIndex, target, ...rest} = parseEventWithNotification(event);
 
     if (event.trigger === ActionTrigger.CONTROL && controlSource && controlIndex !== undefined) {
         const control: ControlOptions = event.notification[controlSource][controlIndex] as ControlOptions;
@@ -352,8 +369,14 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
  * @param options Notification configuration options.
  */
 export async function create(options: NotificationOptions): Promise<Notification> {
-    // Should have some sort of input validation here...
-    return tryServiceDispatch(APITopic.CREATE_NOTIFICATION, options);
+    // Most validation logic is handled on the provider, but need an early check here
+    // as we call date.valueOf when converting into a CreatePayload
+    if (options.date !== undefined && !(options.date instanceof Date)) {
+        throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
+    }
+
+    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {...options, date: options.date && options.date.valueOf()});
+    return {...response, date: new Date(response.date)};
 }
 
 /**
@@ -385,9 +408,10 @@ export async function clear(id: string): Promise<boolean> {
  * });
  * ```
  */
-export async function getAll(): Promise<Notification[]>{
+export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
-    return tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
+    const response = await tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
+    return response.map(note => ({...note, date: new Date(note.date)}));
 }
 
 /**

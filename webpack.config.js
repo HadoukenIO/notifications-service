@@ -10,6 +10,7 @@ module.exports = [
     webpackTools.createConfig(`${outputDir}/provider/ui`, {
         toast: './src/provider/view/containers/ToastApp.tsx'
     }),
+    webpackTools.createConfig(`${outputDir}/provider`, './src/provider/ServiceWorker.js', {minify: true, outputFilename: 'sw'}, webpackTools.versionPlugin),
     webpackTools.createConfig(`${outputDir}/demo`, {
         app: './src/demo/app.ts',
         launcher: './src/demo/launcher.ts'

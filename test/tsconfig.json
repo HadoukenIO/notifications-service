@@ -9,7 +9,7 @@
         "dom",
         "es7"
       ],
-      "types": ["node"],
+      "types": ["node", "openfin"],
       "esModuleInterop": false,
     },
     "exclude": [

@@ -10,8 +10,7 @@ export function assertHydratedCorrectly(options: NotificationOptions, fullNote: 
     if (options.date) {
         expect(fullNote.date).toEqual(options.date);
     } else {
-        // Regex for a (mostly) valid datetime string
-        expect(fullNote.date).toMatch(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/);
+        expect(fullNote.date).toBeInstanceOf(Date);
     }
 
     // customData is never changed in any way by the provider

@@ -12,9 +12,13 @@ export interface NotifsTestContext extends BaseWindowContext {
 const ofBrowser = new OFPuppeteerBrowser<NotifsTestContext>();
 
 export async function create(executionTarget: Identity, options: NotificationOptions) {
-    return ofBrowser.executeOnWindow(executionTarget, function(optionsRemote: NotificationOptions){
-        return this.notifications.create(optionsRemote);
+    const result = await ofBrowser.executeOnWindow(executionTarget, async function(optionsRemote: NotificationOptions) {
+        const note = await this.notifications.create(optionsRemote);
+        // We need to manually stringify the date object as puppeteer fails to do so
+        return {...note, date: note.date.toJSON()};
     }, options);
+    // And then manually un-stringify it
+    return {...result, date: new Date(result.date)};
 }
 
 export async function createAndAwait(executionTarget: Identity, options: NotificationOptions) {
@@ -27,19 +31,23 @@ export async function createAndAwait(executionTarget: Identity, options: Notific
 }
 
 export async function clear(executionTarget: Identity, id: string) {
-    return ofBrowser.executeOnWindow(executionTarget, function(idRemote: string){
+    return ofBrowser.executeOnWindow(executionTarget, function(idRemote: string) {
         return this.notifications.clear(idRemote);
     }, id);
 }
 
 export async function getAll(executionTarget: Identity) {
-    return ofBrowser.executeOnWindow(executionTarget, function(){
-        return this.notifications.getAll();
+    const result = await ofBrowser.executeOnWindow(executionTarget, async function() {
+        const notes = await this.notifications.getAll();
+        // We need to manually stringify the date object as puppeteer fails to do so
+        return notes.map(note => ({...note, date: note.date.toJSON()}));
     });
+    // And then manually un-stringify it
+    return result.map(note => ({...note, date: new Date(note.date)}));
 }
 
 export async function clearAll(executionTarget: Identity) {
-    return ofBrowser.executeOnWindow(executionTarget, function(){
+    return ofBrowser.executeOnWindow(executionTarget, function() {
         return this.notifications.clearAll();
     });
 }
