@@ -17,7 +17,7 @@ export class Storage extends AsyncInit {
      * This value should be updated any time changes are made to the notification shape.
      * Must remain in number format.  LocalForage does not support semver.
      */
-    public static readonly DATABASE_VERSION: number = 1.0;
+    public static readonly DATABASE_VERSION: number = 1;
     private readonly _storages: Map<StorageMap, LocalForage>;
 
     constructor() {
