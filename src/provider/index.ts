@@ -7,7 +7,7 @@ import moment from 'moment';
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
 import {NotificationClosedEvent, NotificationActionEvent, ActionTrigger, NotificationCreatedEvent} from '../client';
 import {ButtonOptions} from '../client/controls';
-import {EventTransport} from '../client/EventRouter';
+import {Transport, Targeted} from '../client/EventRouter';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -63,7 +63,8 @@ export class Main {
         this._store.onAction.add(async (action: RootAction): Promise<void> => {
             if (action.type === Action.CREATE) {
                 const {notification, source} = action.notification;
-                const event: EventTransport<NotificationCreatedEvent> = {
+                const event: Targeted<Transport<NotificationCreatedEvent>> = {
+                    target: 'default',
                     type: 'notification-created',
                     notification: mutable(notification)
                 };
@@ -72,7 +73,8 @@ export class Main {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
                     const {notification, source} = storedNotification;
-                    const event: EventTransport<NotificationClosedEvent> = {
+                    const event: Targeted<Transport<NotificationClosedEvent>> = {
+                        target: 'default',
                         type: 'notification-closed',
                         notification: mutable(notification)
                     };
@@ -83,7 +85,8 @@ export class Main {
                 const button: ButtonOptions = notification.buttons[action.buttonIndex];
 
                 if (button && button.onClick !== undefined) {
-                    const event: EventTransport<NotificationActionEvent> = {
+                    const event: Targeted<Transport<NotificationActionEvent>> = {
+                        target: 'default',
                         type: 'notification-action',
                         trigger: ActionTrigger.CONTROL,
                         notification: mutable(notification),
@@ -97,7 +100,8 @@ export class Main {
                 const {notification, source} = action.notification;
 
                 if (notification.onSelect) {
-                    const event: EventTransport<NotificationActionEvent> = {
+                    const event: Targeted<Transport<NotificationActionEvent>> = {
+                        target: 'default',
                         type: 'notification-action',
                         trigger: ActionTrigger.SELECT,
                         notification: mutable(notification),

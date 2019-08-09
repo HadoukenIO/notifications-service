@@ -4,7 +4,7 @@ import {Identity} from 'openfin/_v2/main';
 import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
-import {EventTransport} from '../../client/EventRouter';
+import {Targeted, Transport} from '../../client/EventRouter';
 
 /**
  * Semantic type definition.
@@ -81,7 +81,7 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
         return this._providerChannel.dispatch(identity, action, payload);
     }
 
-    public async dispatchEvent<T extends E>(targetWindow: Identity, eventTransport: EventTransport<T>): Promise<void> {
+    public async dispatchEvent<T extends E>(targetWindow: Identity, eventTransport: Targeted<Transport<T>>): Promise<void> {
         return this._providerChannel.dispatch(targetWindow, 'event', eventTransport);
     }
 
@@ -89,7 +89,7 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
         return this._providerChannel.publish(action, payload);
     }
 
-    public async publishEvent<T extends E>(eventTransport: EventTransport<T>): Promise<void> {
+    public async publishEvent<T extends E>(eventTransport: Targeted<Transport<T>>): Promise<void> {
         return Promise.all(this._providerChannel.publish('event', eventTransport)).then(() => {});
     }
 

@@ -36,7 +36,7 @@ import {ActionDeclaration, NotificationActionResult} from './actions';
 import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
 import {APITopic, Events, NotificationInternal} from './internal';
-import {EventRouter, EventTransport} from './EventRouter';
+import {EventRouter, Transport} from './EventRouter';
 
 const eventHandler: EventRouter<Events> = getEventRouter();
 
@@ -52,14 +52,14 @@ function parseEventWithNotification<T extends {notification: NotificationInterna
     };
 }
 
-eventHandler.registerDeserializer<NotificationCreatedEvent>('notification-created', (event: EventTransport<NotificationCreatedEvent>) => {
+eventHandler.registerDeserializer<NotificationCreatedEvent>('notification-created', (event: Transport<NotificationCreatedEvent>) => {
     return parseEventWithNotification(event);
 });
-eventHandler.registerDeserializer<NotificationClosedEvent>('notification-closed', (event: EventTransport<NotificationClosedEvent>) => {
+eventHandler.registerDeserializer<NotificationClosedEvent>('notification-closed', (event: Transport<NotificationClosedEvent>) => {
     return parseEventWithNotification(event);
 });
-eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: EventTransport<NotificationActionEvent>) => {
-    const {controlSource, controlIndex, target, ...rest} = parseEventWithNotification(event);
+eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: Transport<NotificationActionEvent>) => {
+    const {controlSource, controlIndex, ...rest} = parseEventWithNotification(event);
 
     if (event.trigger === ActionTrigger.CONTROL && controlSource && controlIndex !== undefined) {
         const control: ControlOptions = event.notification[controlSource][controlIndex] as ControlOptions;

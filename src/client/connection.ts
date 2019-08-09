@@ -16,7 +16,7 @@ import {EventEmitter} from 'events';
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
 import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events} from './internal';
-import {EventTransport, EventRouter} from './EventRouter';
+import {EventRouter, Targeted, Transport} from './EventRouter';
 
 /**
  * The version of the NPM package.
@@ -50,12 +50,12 @@ export function getServicePromise(): Promise<ChannelClient> {
             channelPromise = Promise.reject(new Error('Trying to connect to provider from provider'));
         } else {
             channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
-                const eventHandler = getEventRouter();
+                const eventRouter = getEventRouter();
 
                 // Register service listeners
                 channel.register('WARN', (payload: any) => console.warn(payload));
-                channel.register('event', (event: EventTransport<Events>) => {
-                    eventHandler.dispatchEvent(event);
+                channel.register('event', (event: Targeted<Transport<Events>>) => {
+                    eventRouter.dispatchEvent(event);
                 });
                 // Any unregistered action will simply return false
                 channel.setDefaultAction(() => false);
@@ -78,12 +78,12 @@ export async function tryServiceDispatch<T extends APITopic>(action: T, payload:
     return channel.dispatch(action, payload) as Promise<API[T][1]>;
 }
 
-let eventHandler: EventRouter<Events>|null;
+let eventRouter: EventRouter<Events>|null;
 
 export function getEventRouter(): EventRouter<Events> {
-    if (!eventHandler) {
-        eventHandler = new EventRouter(eventEmitter);
+    if (!eventRouter) {
+        eventRouter = new EventRouter(eventEmitter);
     }
 
-    return eventHandler;
+    return eventRouter;
 }
