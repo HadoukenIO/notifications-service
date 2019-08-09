@@ -54,7 +54,7 @@ export function getServicePromise(): Promise<ChannelClient> {
 
                 // Register service listeners
                 channel.register('WARN', (payload: any) => console.warn(payload));
-                channel.register('event', (event: EventTransport<Events, Events>) => {
+                channel.register('event', (event: EventTransport<Events>) => {
                     eventHandler.dispatchEvent(event);
                 });
                 // Any unregistered action will simply return false

@@ -52,13 +52,13 @@ function parseEventWithNotification<T extends {notification: NotificationInterna
     };
 }
 
-eventHandler.registerDeserializer<NotificationCreatedEvent>('notification-created', (event: EventTransport<Events, NotificationCreatedEvent>) => {
+eventHandler.registerDeserializer<NotificationCreatedEvent>('notification-created', (event: EventTransport<NotificationCreatedEvent>) => {
     return parseEventWithNotification(event);
 });
-eventHandler.registerDeserializer<NotificationClosedEvent>('notification-closed', (event: EventTransport<Events, NotificationClosedEvent>) => {
+eventHandler.registerDeserializer<NotificationClosedEvent>('notification-closed', (event: EventTransport<NotificationClosedEvent>) => {
     return parseEventWithNotification(event);
 });
-eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: EventTransport<Events, NotificationActionEvent>) => {
+eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: EventTransport<NotificationActionEvent>) => {
     const {controlSource, controlIndex, target, ...rest} = parseEventWithNotification(event);
 
     if (event.trigger === ActionTrigger.CONTROL && controlSource && controlIndex !== undefined) {

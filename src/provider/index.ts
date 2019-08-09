@@ -63,7 +63,7 @@ export class Main {
         this._store.onAction.add(async (action: RootAction): Promise<void> => {
             if (action.type === Action.CREATE) {
                 const {notification, source} = action.notification;
-                const event: EventTransport<Events, NotificationCreatedEvent> = {
+                const event: EventTransport<NotificationCreatedEvent> = {
                     type: 'notification-created',
                     notification: mutable(notification)
                 };
@@ -72,7 +72,7 @@ export class Main {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
                     const {notification, source} = storedNotification;
-                    const event: EventTransport<Events, NotificationClosedEvent> = {
+                    const event: EventTransport<NotificationClosedEvent> = {
                         type: 'notification-closed',
                         notification: mutable(notification)
                     };
@@ -83,7 +83,7 @@ export class Main {
                 const button: ButtonOptions = notification.buttons[action.buttonIndex];
 
                 if (button && button.onClick !== undefined) {
-                    const event: EventTransport<Events, NotificationActionEvent> = {
+                    const event: EventTransport<NotificationActionEvent> = {
                         type: 'notification-action',
                         trigger: ActionTrigger.CONTROL,
                         notification: mutable(notification),
@@ -97,7 +97,7 @@ export class Main {
                 const {notification, source} = action.notification;
 
                 if (notification.onSelect) {
-                    const event: EventTransport<Events, NotificationActionEvent> = {
+                    const event: EventTransport<NotificationActionEvent> = {
                         type: 'notification-action',
                         trigger: ActionTrigger.SELECT,
                         notification: mutable(notification),

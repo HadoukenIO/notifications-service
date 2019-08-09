@@ -9,13 +9,13 @@ import {EventSpecification} from '../provider/model/APIHandler';
 import {TransportMappings, TransportMemberMappings} from './internal';
 
 type EmitterProvider = (targetId: string) => EventEmitter;
-type EventDeserializer<E extends EventSpecification, T extends E> = (event: EventTransport<E, T>) => E;
+type EventDeserializer<E extends EventSpecification, T extends E> = (event: EventTransport<T>) => T;
 
 interface EventTarget {
     type: string;
     id: string;
 }
-export type Targeted<T extends EventSpecification> = T & {
+type Targeted<T extends EventSpecification> = T & {
     /**
      * If present, will be used to find the correct emitter.
      *
@@ -24,11 +24,11 @@ export type Targeted<T extends EventSpecification> = T & {
      */
     target?: EventTarget;
 }
-
-export type Transport<E extends EventSpecification, T extends E> = TransportMappings<T> extends never ? {
+type Transport<T extends EventSpecification> = TransportMappings<T> extends never ? {
     [K in keyof T]: TransportMemberMappings<T[K]>;
 } : TransportMappings<T>;
-export type EventTransport<E extends EventSpecification, T extends E> = Targeted<Transport<E, T>>;
+
+export type EventTransport<T extends EventSpecification> = Targeted<Transport<T>>;
 
 /**
   * Class for helping take events that have arrived at the client via the IAB channel, and dispatching them on the correct client-side object
@@ -51,10 +51,10 @@ export class EventRouter<E extends EventSpecification> {
     }
 
     public registerDeserializer<T extends E>(eventType: T['type'], deserializer: EventDeserializer<E, T>): void {
-        this._deserializers[eventType] = deserializer as EventDeserializer<E, E>;
+        this._deserializers[eventType] = deserializer as unknown as EventDeserializer<E, E>;
     }
 
-    public dispatchEvent<T extends E>(event: EventTransport<E, T>): void {
+    public dispatchEvent<T extends E>(event: EventTransport<T>): void {
         const {type, target, ...rest} = event;
         const deserializer = this._deserializers[type];
 
