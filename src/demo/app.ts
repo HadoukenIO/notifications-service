@@ -11,17 +11,28 @@ Object.assign(window, {createWindow, createApp, notifications: ofnotes});
 const normalNote: NotificationOptions = {
     title: 'Notification Title',
     body: 'Notification Body',
-    category: 'Test',
+    category: 'Short',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
     onSelect: 'Selected',
     buttons: []
 };
 
+const longNote: NotificationOptions = {
+    // eslint-disable-next-line max-len
+    body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    category: 'Long',
+    title: 'Notification Title ',
+    icon: 'favicon.ico',
+    customData: {testContext: 'testContext'},
+    date: new Date(),
+    buttons: []
+};
+
 const buttonNote: NotificationOptions = {
     title: 'Notification Title',
     body: 'Notification Body',
-    category: 'Test',
+    category: 'Buttons',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
     onSelect: 'Selected',
@@ -32,8 +43,10 @@ const buttonNote: NotificationOptions = {
 };
 
 function makeNoteOfType(index: number) {
-    if (index % 2 === 1) {
+    if (index % 3 === 1) {
         return create({id: `1q2w3e4r${index}`, date: new Date(), ...normalNote});
+    } else if (index % 3 === 2) {
+        return create({id: `1q2w3e4r${index}`, date: new Date(), ...longNote});
     } else {
         return create({id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote});
     }
