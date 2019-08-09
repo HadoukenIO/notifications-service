@@ -54,7 +54,7 @@ export class NotificationCenter extends AsyncInit {
         await this.sizeToFit();
         await this.addListeners();
         renderApp(this._webWindow.document, this._store);
-        await this.subscribe();
+        this.subscribe();
     }
 
     /**

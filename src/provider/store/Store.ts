@@ -98,16 +98,16 @@ export class Store extends AsyncInit {
     }
 
     private async getInitialState(): Promise<RootState> {
-        await this._storage.initialized;
+        const notificationStorage = await this._storage.get(StorageMap.NOTIFICATIONS);
         const initialState = this.cloneState(Store.INITIAL_STATE);
 
         const notifications: StoredNotification[] = [];
-        this._storage.get(StorageMap.NOTIFICATIONS).iterate((value: string, key: string) => {
+        notificationStorage.iterate((value: string, key: string) => {
             notifications.push(JSON.parse(value));
         });
         Object.assign(initialState, {notifications});
 
-        this._storage.get(StorageMap.SETTINGS).iterate((value: string, key: string) => {
+        notificationStorage.iterate((value: string, key: string) => {
 
         });
 

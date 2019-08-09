@@ -18,11 +18,11 @@ export class Storage extends AsyncInit {
      * Must remain in number format.  LocalForage does not support semver.
      */
     public static readonly DATABASE_VERSION: number = 1.0;
-    private readonly _storages: Map<string, LocalForage>;
+    private readonly _storages: Map<StorageMap, LocalForage>;
 
     constructor() {
         super();
-        this._storages = new Map<string, LocalForage>();
+        this._storages = new Map<StorageMap, LocalForage>();
 
         [StorageMap.NOTIFICATIONS, StorageMap.SETTINGS].forEach(storeName => {
             const instance = localforage.createInstance({
@@ -36,7 +36,9 @@ export class Storage extends AsyncInit {
         });
     }
 
-    public get(storeName: StorageMap): LocalForage {
+    public async get(storeName: StorageMap): Promise<LocalForage> {
+        await this.initialized;
+
         const requestedStore: LocalForage|undefined = this._storages.get(storeName);
 
         if (requestedStore) {
@@ -49,7 +51,7 @@ export class Storage extends AsyncInit {
     protected async init(): Promise<void> {
         await Promise.all([...this._storages.values()].map(storage => storage.ready()));
 
-        const settingsStorage = this.get(StorageMap.SETTINGS);
+        const settingsStorage = this._storages.get(StorageMap.SETTINGS)!;
 
         const storedVersion = await settingsStorage.getItem<number>('dbVersion');
 
@@ -58,13 +60,14 @@ export class Storage extends AsyncInit {
         } else if (storedVersion < Storage.DATABASE_VERSION) {
             console.log(`Upgrading database from version ${storedVersion} to ${Storage.DATABASE_VERSION}`);
             await this.upgradeDatabase();
+            console.log('Database upgrade complete');
         }
     }
 
     private async upgradeDatabase(): Promise<void> {
-        const settingsStorage = this.get(StorageMap.SETTINGS);
+        const settingsStorage = this._storages.get(StorageMap.SETTINGS)!;
 
-        const dbVersion = settingsStorage.config().version!;
+        const dbVersion = Storage.DATABASE_VERSION;
         const storedVersion = await settingsStorage.getItem<number>('dbVersion');
 
         // Example code.  Fill in actual upgrade paths here.
@@ -84,7 +87,7 @@ export class Storage extends AsyncInit {
     }
 
     private async initializeDatabase(): Promise<void> {
-        const settings = this.get(StorageMap.SETTINGS);
+        const settings = this._storages.get(StorageMap.SETTINGS)!;
 
         await settings.setItem('dbVersion', settings.config().version);
     }

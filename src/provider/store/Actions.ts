@@ -53,7 +53,7 @@ export const Actions: ActionMap = {
     [Action.CREATE]: (state: Immutable<RootState>, action: CreateNotification): RootState => {
         const {notification} = action;
         const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
-        storage.get(StorageMap.NOTIFICATIONS).setItem(notification.id, JSON.stringify(notification));
+        storage.get(StorageMap.NOTIFICATIONS).then(notificationStorage => notificationStorage.setItem(notification.id, JSON.stringify(notification)));
 
         const notifications = mutable(state.notifications.slice());
         const index: number = state.notifications.findIndex(n => n.id === notification.id);
@@ -74,7 +74,7 @@ export const Actions: ActionMap = {
         const {notifications} = action;
         const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
         const idsToRemove = notifications.map(n => {
-            storage.get(StorageMap.NOTIFICATIONS).removeItem(n.id);
+            storage.get(StorageMap.NOTIFICATIONS).then(notificationStorage => notificationStorage.removeItem(n.id));
             return n.id;
         });
 
@@ -86,7 +86,7 @@ export const Actions: ActionMap = {
     [Action.TOGGLE_VISIBILITY]: (state: Immutable<RootState>, action: ToggleVisibility): RootState => {
         const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
-        storage.get(StorageMap.SETTINGS).setItem('windowVisible', windowVisible);
+        storage.get(StorageMap.SETTINGS).then(settingsStorage => settingsStorage.setItem('windowVisible', windowVisible));
 
         return {
             ...mutable(state),
