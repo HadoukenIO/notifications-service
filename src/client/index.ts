@@ -133,6 +133,13 @@ export interface NotificationOptions {
      * receiving interaction events from notifications.
      */
     onSelect?: ActionDeclaration<never, never>|null;
+
+    /**
+     * An action that will fire when the notification is closed. This can be from user interaction (until future revisions
+     * allow default click behaviour to be overriden, this will be any click anywhere within the notification), or from
+     * the notification being programmaticially removed, such as a call to `clear`.
+     */
+    onClose?: ActionDeclaration<never, never>|null;
 }
 
 /**

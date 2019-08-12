@@ -75,12 +75,22 @@ export class Main {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
                     const {notification, source} = storedNotification;
-                    const event: Targeted<Transport<NotificationClosedEvent>> = {
+                    if (notification.onClose) {
+                        const actionEvent: Targeted<Transport<NotificationActionEvent>> = {
+                            target: 'default',
+                            type: 'notification-action',
+                            trigger: ActionTrigger.CLOSE,
+                            notification: mutable(notification),
+                            result: notification.onClose
+                        };
+                        this._apiHandler.dispatchEvent<NotificationActionEvent>(source, actionEvent);
+                    }
+                    const closedEvent: Targeted<Transport<NotificationClosedEvent>> = {
                         target: 'default',
                         type: 'notification-closed',
                         notification: mutable(notification)
                     };
-                    this._apiHandler.dispatchEvent<NotificationClosedEvent>(source, event);
+                    this._apiHandler.dispatchEvent<NotificationClosedEvent>(source, closedEvent);
                 });
             } else if (action.type === Action.CLICK_BUTTON) {
                 const {notification, source} = action.notification;
@@ -247,6 +257,7 @@ export class Main {
             customData: payload.customData !== undefined ? payload.customData : {},
             date: payload.date || Date.now(),
             onSelect: payload.onSelect || null,
+            onClose: payload.onClose || null,
             buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, type: 'button', iconUrl: btn.iconUrl || ''})) : []
         };
 
