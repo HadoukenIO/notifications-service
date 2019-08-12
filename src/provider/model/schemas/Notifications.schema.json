@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "Identity": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "NotificationInternal": {
+            "properties": {
+                "body": {
+                    "description": "Main Notification content.",
+                    "type": "string"
+                },
+                "buttons": {
+                    "description": "Text and icons for up to two Notification action buttons.",
+                    "items": {
+                        "$ref": "#/definitions/OptionButton"
+                    },
+                    "type": "array"
+                },
+                "customData": {
+                    "description": "Any custom context data associated with the Notification."
+                },
+                "date": {
+                    "type": "number"
+                },
+                "id": {
+                    "description": "A unique identifier for the Notification.\n\nIf not provided at time of creation, one will be generated for you and returned as part of the {@link create} method.",
+                    "type": "string"
+                },
+                "subtitle": {
+                    "description": "Subtitle of the Notification.",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Title of the Notification (e.g. sender name for email).",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "OptionButton": {
+            "description": "Configuration options for constructing a Button within a Notification.",
+            "properties": {
+                "iconUrl": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "description": "Shape of the data that will be used internally by the service.\n\nThe id property is the encoded notification id (i.e. \"{app uuid}/{notification ID}\")",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "notification": {
+            "$ref": "#/definitions/NotificationInternal"
+        },
+        "source": {
+            "$ref": "#/definitions/Identity"
+        }
+    },
+    "type": "object"
+}

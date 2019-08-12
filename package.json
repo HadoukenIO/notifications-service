@@ -55,6 +55,7 @@
     "node-fetch": "^2.6.0",
     "openfin-service-signal": "^1.0.0",
     "openfin-service-tooling": "1.0.12",
+    "pouchdb-adapter-idb": "^7.1.1",
     "puppeteer": "1.3.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.3",
@@ -63,6 +64,9 @@
     "redux-devtools-cli": "0.0.1-1",
     "reflect-metadata": "^0.1.13",
     "remote-redux-devtools": "^0.5.16",
-    "typescript": "3.4.5"
+    "rxdb": "^8.3.0",
+    "rxjs": "^6.5.2",
+    "typescript": "3.4.5",
+    "typescript-json-schema": "^0.39.0"
   }
 }
