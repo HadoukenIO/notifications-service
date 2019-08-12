@@ -3,7 +3,8 @@ import {Action as ReduxAction} from 'redux';
 import {StoredNotification} from '../model/StoredNotification';
 import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
-import {StorageMap, NotificationCollection, SettingsCollection, SettingsMap} from '../model/Storage';
+import {CollectionMap, NotificationCollection, SettingsCollection} from '../model/database/Database';
+import {SettingsMap} from '../model/StoredSettings';
 
 import {RootState, Immutable, mutable} from './State';
 
@@ -52,9 +53,9 @@ export type ActionMap<T extends Action = Action> = {
 export const Actions: ActionMap = {
     [Action.CREATE]: (state: Immutable<RootState>, action: CreateNotification): RootState => {
         const {notification} = action;
-        const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
-        storage.get<NotificationCollection>(StorageMap.NOTIFICATIONS)
-            .then(collection => collection.atomicUpsert(notification))
+        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
+        storage.get<NotificationCollection>(CollectionMap.NOTIFICATIONS)
+            .then(collection => collection.upsert(notification))
             .catch(error => {
                 throw new Error(error);
             });
@@ -76,9 +77,9 @@ export const Actions: ActionMap = {
     },
     [Action.REMOVE]: (state: Immutable<RootState>, action: RemoveNotifications): RootState => {
         const {notifications} = action;
-        const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
+        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
-            storage.get<NotificationCollection>(StorageMap.NOTIFICATIONS)
+            storage.get<NotificationCollection>(CollectionMap.NOTIFICATIONS)
                 .then(notificationCollection => notificationCollection.getDoc(n.id))
                 .then(note => note ? note.remove() : false)
                 .catch(error => {
@@ -94,11 +95,11 @@ export const Actions: ActionMap = {
         };
     },
     [Action.TOGGLE_VISIBILITY]: (state: Immutable<RootState>, action: ToggleVisibility): RootState => {
-        const storage = Injector.get<'STORAGE'>(Inject.STORAGE);
+        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
 
-        storage.get<SettingsCollection>(StorageMap.SETTINGS)
-            .then(settingsCollection => settingsCollection.atomicUpsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible}))
+        storage.get<SettingsCollection>(CollectionMap.SETTINGS)
+            .then(settingsCollection => settingsCollection.upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible}))
             .catch(error => {
                 throw new Error(error);
             });

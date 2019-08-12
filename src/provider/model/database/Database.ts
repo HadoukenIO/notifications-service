@@ -1,10 +1,20 @@
 // eslint-disable-next-line import/named, Eslint cannot locate the rxdb modules. TS is able locate them OK. This is due to the module allowing cherry picking.
-import RxDB, {RxDatabase, RxCollection, RxJsonSchema, RxDocument, RxCollectionCreator, RxSchema} from 'rxdb';
+import RxDB, {RxDatabase, RxCollection, RxJsonSchema, RxDocument, RxCollectionCreator} from 'rxdb';
 import {injectable} from 'inversify';
 
-import {AsyncInit} from '../controller/AsyncInit';
+import {AsyncInit} from '../../controller/AsyncInit';
+import {StoredNotification} from '../StoredNotification';
+import {StoredSettings} from '../StoredSettings';
 
-import {StoredNotification} from './StoredNotification';
+/**
+ * List of available collections on the database.
+ *
+ * If a new collection is added, make sure to generate and configure its schema.
+ */
+export const enum CollectionMap {
+    NOTIFICATIONS = 'db_notifications',
+    SETTINGS = 'db_settings'
+}
 
 export type NotificationDocument = RxDocument<StoredNotification>;
 export type NotificationCollection = RxCollection<StoredNotification, {}, DefaultCollectionMethods>;
@@ -12,21 +22,15 @@ export type NotificationCollection = RxCollection<StoredNotification, {}, Defaul
 export type SettingsDocument = RxDocument<StoredSettings>;
 export type SettingsCollection = RxCollection<StoredSettings, {}, DefaultCollectionMethods>;
 
-type StoredIdTypes = StoredSettings['id']|StoredNotification['id'];
-
 type Collections = {
-    db_notifications: NotificationCollection,
-    db_settings: SettingsCollection
+    [CollectionMap.NOTIFICATIONS]: NotificationCollection;
+    [CollectionMap.SETTINGS]: SettingsCollection;
 }
 
 type DocumentTypes = NotificationDocument|SettingsDocument;
-type CollectionTypes = Collections[keyof Collections];
-type ServiceDatabase = RxDatabase<Collections>;
+type StoredIdTypes = (StoredSettings|StoredNotification)['id'];
 
-/**
- * Added in TS 3.5.1.  Project is not yet there, so polyfill.
- */
-type Omit<T, K extends string | number | symbol> = { [P in Exclude<keyof T, K>]: T[P]; }
+type CollectionTypes = Collections[keyof Collections];
 
 interface DefaultCollectionMethods {
     [key: string]: Function,
@@ -34,44 +38,38 @@ interface DefaultCollectionMethods {
     getDoc: <T extends DocumentTypes>(id: StoredIdTypes) => Promise<T>
 }
 
-interface StoredSettings {
-    id: SettingsMap,
-    value: string|boolean;
-}
-
 /**
- * List of available settings in the settings collection.
+ * Added in TS 3.5.1.  Project is not yet there, so polyfill.
  */
-export const enum SettingsMap {
-    WINDOW_VISIBLE = 'windowVisible'
-}
-
-/**
- * List of available collections on the database.
- */
-export const enum StorageMap {
-    NOTIFICATIONS = 'db_notifications',
-    SETTINGS = 'db_settings'
-}
+type Omit<T, K extends string | number | symbol> = { [P in Exclude<keyof T, K>]: T[P]; }
 
 @injectable()
-export class Storage extends AsyncInit {
-    public static readonly DATABASE_VERSION: number = 0;
-    private readonly _schemas: Map<StorageMap, RxJsonSchema>;
+export class Database extends AsyncInit {
+    /**
+     * Schema versions for each of the collections.
+     *
+     * If a version is changed make sure to execute `npm run schema:generate` to generate a new schema and commit.
+     */
+    public static readonly DATABASE_VERSION = {
+        [CollectionMap.NOTIFICATIONS]: 0,
+        [CollectionMap.SETTINGS]: 0
+    }
 
-    private _database!: ServiceDatabase;
+    private readonly _schemas: Map<CollectionMap, RxJsonSchema>;
+
+    private _database!: RxDatabase<Collections>;;
 
     constructor() {
         super();
 
-        this._schemas = new Map<StorageMap, RxJsonSchema>();
+        this._schemas = new Map<CollectionMap, RxJsonSchema>();
         this.setupSchemas();
     }
 
     /**
      * Returns a collection with the provided collection name.
      */
-    public async get<T extends CollectionTypes>(collectionName: StorageMap): Promise<T> {
+    public async get<T extends CollectionTypes>(collectionName: CollectionMap): Promise<T> {
         await this.initialized;
 
         const collection: T = this._database[collectionName] as T;
@@ -93,8 +91,8 @@ export class Storage extends AsyncInit {
 
         // Initalize all of the collections
         await Promise.all([
-            this.createCollection(StorageMap.NOTIFICATIONS),
-            this.createCollection(StorageMap.SETTINGS)
+            this.createCollection(CollectionMap.NOTIFICATIONS),
+            this.createCollection(CollectionMap.SETTINGS)
         ]);
     }
 
@@ -103,7 +101,7 @@ export class Storage extends AsyncInit {
      * @param name The name of the collection.  This should be matched against `StorageMap`.
      * @param options Optional RxDB Collection properties
      */
-    private async createCollection(name: StorageMap, options?: Omit<RxCollectionCreator, 'name'|'schema'>): Promise<RxCollection> {
+    private async createCollection(name: CollectionMap, options?: Omit<RxCollectionCreator, 'name'|'schema'>): Promise<RxCollection> {
         const schema: RxJsonSchema | undefined = this._schemas.get(name);
 
         if (!schema) {
@@ -111,7 +109,7 @@ export class Storage extends AsyncInit {
         }
 
         const migrationStrategies: {[key: string]: (data: DocumentTypes) => Promise<DocumentTypes>} = {};
-        for (let x = 1; x <= Storage.DATABASE_VERSION; x++) {
+        for (let x = 1; x <= Database.DATABASE_VERSION[name]; x++) {
             migrationStrategies[x] = (data: DocumentTypes) => this.migrationHandler(x, name, data);
         }
 
@@ -119,7 +117,9 @@ export class Storage extends AsyncInit {
     }
 
     /**
-     * Loads and manipulates collection schemas
+     * Loads and manipulates collection schemas.
+     *
+     * If adding a new schema, make sure to assign a version and primary property to it.
      */
     private setupSchemas(): void {
         const notificationSchema: RxJsonSchema<StoredNotification> = require('./schemas/Notifications.schema.json');
@@ -127,13 +127,14 @@ export class Storage extends AsyncInit {
 
         // TODO
         // Decorate schema jsons with needed missing fields.  Schema files are auto generated from TS types.
-        notificationSchema.version = Storage.DATABASE_VERSION;
-        settingsSchema.version = Storage.DATABASE_VERSION;
+        notificationSchema.version = Database.DATABASE_VERSION[CollectionMap.NOTIFICATIONS];
+        settingsSchema.version = Database.DATABASE_VERSION[CollectionMap.SETTINGS];
 
         notificationSchema.properties.id.primary = true;
+        settingsSchema.properties.id.primary = true;
 
-        this._schemas.set(StorageMap.NOTIFICATIONS, notificationSchema);
-        this._schemas.set(StorageMap.SETTINGS, settingsSchema);
+        this._schemas.set(CollectionMap.NOTIFICATIONS, notificationSchema);
+        this._schemas.set(CollectionMap.SETTINGS, settingsSchema);
     }
 
     /**
@@ -142,12 +143,12 @@ export class Storage extends AsyncInit {
      * @param name Name of the collection being upgraded.
      * @param data The rx document of the existing data.
      */
-    private async migrationHandler(toVersion: number, name: StorageMap, data: DocumentTypes): Promise<DocumentTypes> {
+    private async migrationHandler(toVersion: number, name: CollectionMap, data: DocumentTypes): Promise<DocumentTypes> {
         switch (name) {
-            case StorageMap.NOTIFICATIONS: {
+            case CollectionMap.NOTIFICATIONS: {
                 return notificationUpgradeHandler(toVersion, data as NotificationDocument);
             }
-            case StorageMap.SETTINGS: {
+            case CollectionMap.SETTINGS: {
                 return settingsUpgradeHandler(toVersion, data as SettingsDocument);
             }
         }
@@ -180,6 +181,9 @@ async function notificationUpgradeHandler(toVersion: number, data: NotificationD
     }
 }
 
+/**
+ * Default methods available to collections
+ */
 const defaultCollectionMethods: DefaultCollectionMethods = {
     /**
      * Returns all documents from a collection.

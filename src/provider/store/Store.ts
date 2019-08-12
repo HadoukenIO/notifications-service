@@ -5,7 +5,7 @@ import {Signal} from 'openfin-service-signal';
 
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
-import {Storage, StorageMap, NotificationCollection, NotificationDocument} from '../model/Storage';
+import {Database, CollectionMap, NotificationCollection, NotificationDocument} from '../model/database/Database';
 import {AsyncInit} from '../controller/AsyncInit';
 
 import {ActionMap, ActionHandler, RootAction, Action, ActionOf} from './Actions';
@@ -23,13 +23,13 @@ export class Store extends AsyncInit {
     public readonly onAction: Signal<[RootAction]> = new Signal();
 
     private readonly _actionMap: ActionMap;
-    private readonly _storage: Storage;
+    private readonly _database: Database;
     private _store!: ReduxStore<RootState, RootAction>;
 
-    constructor(@inject(Inject.ACTION_MAP) actionMap: ActionMap, @inject(Inject.STORAGE) storage: Storage) {
+    constructor(@inject(Inject.ACTION_MAP) actionMap: ActionMap, @inject(Inject.DATABASE) database: Database) {
         super();
         this._actionMap = actionMap;
-        this._storage = storage;
+        this._database = database;
     }
 
     protected async init(): Promise<void> {
@@ -98,7 +98,7 @@ export class Store extends AsyncInit {
     }
 
     private async getInitialState(): Promise<RootState> {
-        const notificationCollection: NotificationCollection = await this._storage.get(StorageMap.NOTIFICATIONS);
+        const notificationCollection: NotificationCollection = await this._database.get(CollectionMap.NOTIFICATIONS);
         const initialState = this.cloneState(Store.INITIAL_STATE);
 
         const notifications: StoredNotification[] = [];
