@@ -16,7 +16,7 @@ import {Inject} from './Injectables';
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
-    [Inject.ACTION_MAP]: ActionHandlerMap;
+    [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.LAYOUTER]: Layouter;
@@ -32,7 +32,7 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
-    [Inject.ACTION_MAP]: ActionHandlers,
+    [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
     [Inject.LAYOUTER]: Layouter,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,

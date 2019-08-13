@@ -29,11 +29,11 @@ export class Store implements StoreAPI {
 
     public readonly onAction: Signal<[RootAction], Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
 
-    private _actionMap: ActionHandlerMap;
+    private _actionHandlerMap: ActionHandlerMap;
     private _store: ReduxStore<RootState, RootAction>;
 
-    constructor(@inject(Inject.ACTION_MAP) actionMap: ActionHandlerMap) {
-        this._actionMap = actionMap;
+    constructor(@inject(Inject.ACTION_HANDLER_MAP) actionHandlerMap: ActionHandlerMap) {
+        this._actionHandlerMap = actionHandlerMap;
         this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), this.getInitialState(), this.createEnhancer());
     }
 
@@ -71,7 +71,7 @@ export class Store implements StoreAPI {
     }
 
     private reduce<T extends Action>(state: RootState | undefined, action: ActionOf<T>): RootState {
-        const handler: ActionHandler<T> | undefined = this._actionMap[action.type] as ActionHandler<T>;
+        const handler: ActionHandler<T> | undefined = this._actionHandlerMap[action.type] as ActionHandler<T>;
 
         if (handler) {
             return handler(state!, action);

@@ -95,7 +95,7 @@ describe('Click listeners', () => {
                 });
             });
 
-            test('Clicking on the card\'s button triggers a CONTROL action and does not trigger a SELECT action', async () => {
+            test('Clicking on the card\'s button triggers an ActionTrigger.CONTROL action and does not trigger an ActionTrigger.SELECT action', async () => {
                 const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
 
                 // Get a remote handle to the button DOM element
@@ -115,9 +115,6 @@ describe('Click listeners', () => {
                     control: note.buttons[0],
                     result: {action: 'click'}
                 });
-
-                // select action not triggered
-                expect(actionListener).not.toHaveBeenCalledWith({trigger: 'select'});
             });
 
             describe('When clicking the close button', () => {

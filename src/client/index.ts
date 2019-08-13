@@ -3,7 +3,8 @@
  * as well as responding to notification events.
  *
  * Notifications will be displayed as toasts as well as being listed and organized in a Notification Center. The
- * Notification Center can be accessed by clicking on the system tray notification icon.
+ * Notification Center can be accessed by clicking on the system tray notification icon or toggled programatically with
+ * {@link toggleNotificationCenter}.
  *
  * ## Getting Started
  *
@@ -14,8 +15,8 @@
  * ### Basic example:
  * ```ts
  * // Non-Interactive "fire and forget" notification
- * // Clicking the notification will pass an `notification-activated` event back to the application.
- * // There will still be a `notification-closed` event when the service closes the notification (this occurs in all cases).
+ * // There will be a `notification-closed` event when the service closes the notification (as this occurs in all cases),
+ * // but it will not be possible to determine why the notification was closed.
  * await create({
  *     title: 'Build Complete',
  *     body: 'Job "develop#123" finished with state "SUCCESS"',
@@ -102,9 +103,9 @@ export interface NotificationOptions {
      * the notification center preferences section, and any string passed as a `category` should make sense when
      * displayed in that context.
      *
-     * In general, event categories should list all the different types of notifications raised by your app. As a
-     * general guide, if a user may want to have different preferences for some subset of notifications created by your
-     * app, then ensure those notifications have a distinct category.
+     * Event categories should list all the different types of notifications raised by your app. As a general guide, if
+     * a user may want to have different preferences for some subset of notifications created by your app, then
+     * applications should ensure that those notifications have a distinct category.
      *
      * For example - given a calendar app, notification categories could be:
      * - `"Upcoming Events"`: Notification that an event is about to start
@@ -144,17 +145,20 @@ export interface NotificationOptions {
     expires?: Date|null;
 
     /**
-     * A list of button definitions, to display below the notification text.
+     * A list of buttons to display below the notification text.
      *
-     * Notifications support up to four buttons, attempting to add more than four will result in the notification
+     * Notifications support up to four buttons. Attempting to add more than four will result in the notification
      * being rejected by the service.
      */
     buttons?: ButtonOptions[];
 
     /**
-     * An action that will fire when the notification is clicked. This only fires on clicks to the notification body,
-     * interactions with buttons (both application-defined buttons, and the default 'X' close button) will not trigger
-     * a select action.
+     * An {@link NotificationActionResult|action result} to be passed back to the application inside the
+     * {@link NotificationActionEvent|`notification-action`} event fired when the notification is clicked.
+     *
+     * This action will only be raised on clicks to the notification body. Interactions with buttons (both
+     * application-defined buttons, and the default 'X' close button) will not trigger a
+     * {@link ActionTrigger.SELECT|select} action.
      *
      * If omitted or `null`, applications will not receive a {@link NotificationActionEvent|`notification-action`}
      * event when the notification is clicked. See {@link Actions} for more details on Notification actions, and
@@ -171,23 +175,26 @@ export type CustomData = any;
 /**
  * A fully-hydrated form of {@link NotificationOptions}.
  *
- * After {@link create|creating} a notification, the service will return this object - which will be the given options
- * object, with any unspecified fields filled-in with default values.
+ * After {@link create|creating} a notification, the service will return an object of this type. This will be the given
+ * options object, with any unspecified fields filled-in with default values.
  *
- * This object should be treated as immutable, modifying its state will not have any effect on the notification that
- * the user sees on-screen.
+ * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
+ * state of the service.
  */
-export type Notification = Readonly<NotificationOptions & Required<NotificationOptions>>;
+export type Notification = Readonly<Required<NotificationOptions>>;
 
 /**
- * Event that is fired for interactions with notification UI elements. It is important to note that applications will
- * only receive these events if they indicate to the service that they want to receive these events. See
- * {@link Actions} for a full example of how actions are defined, and how an application can listen to and handle them.
+ * Event fired for interactions with notification UI elements. It is important to note that applications will only
+ * receive these events if they indicate to the service that they want to receive these events. See {@link Actions} for
+ * a full example of how actions are defined, and how an application can listen to and handle them.
  *
- * This can be for the notification button(s). Later versions of the service will add additional control types. All
- * actions, for all control types, will be returned to the application via the same `notification-action` event type.
+ * This can be fired due to interaction with notification buttons, or the notification itself. Later versions of the
+ * service will add additional control types. All actions, for all control types, will be returned to the application
+ * via the same `notification-action` event type.
+ *
  * Check the contents of the event object for details on what triggered this action, which control the user
- * interacted with, and what metadata was attached to the action.
+ * interacted with, and to fetch the application-defined {@link NotificationActionResult|metadata} that resulted in
+ * this action being raised.
  *
  * This type includes a generic type argument, should applications wish to define their own interface for action
  * results. See {@link NotificationActionResult} for details.
@@ -240,8 +247,8 @@ export interface NotificationActionEvent<T = {}> {
     /**
      * Application-defined metadata that this event is passing back to the application.
      *
-     * A `notification-action` event is only raised if the {@link NotificationOptions|notification definition} includes
-     * a payload on the actions of one or more controls (and if the user then performs the corresponding action).
+     * A `notification-action` event is only fired for an interaction with a notification if the
+     * {@link NotificationOptions|notification options} included an action result for that interaction.
      *
      * See the comment on the {@link NotificationActionEvent} type for an example of buttons that do and don't raise
      * actions.
@@ -312,7 +319,7 @@ export function removeEventListener(eventType: 'notification-closed', listener: 
  * Has no effect if `eventType` isn't a valid event, or `listener` isn't a callback registered against `eventType`.
  *
  * @param eventType The event being unsubscribed from
- * @param listener The callback function to remove
+ * @param listener The callback function to remove, must be strictly-equal (`===` equivilance) to a listener previously passed to {@link addEventListener} to have an effect
  */
 export function removeEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
@@ -336,6 +343,7 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
  *      id: "uniqueNotificationId",
  *      title: "Notification Title",
  *      body: "Text to display within the notification body",
+ *      category: "Sample Notifications",
  *      icon: "https://openfin.co/favicon.ico"
  * });
  * ```
@@ -381,6 +389,8 @@ export async function clear(id: string): Promise<boolean> {
  *     console.log(`Service has ${notifications.length} notifications for this app:`, notifications);
  * });
  * ```
+ *
+ * There is deliberately no mechanism provided for fetching notifications that were created by a different application.
  */
 export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...

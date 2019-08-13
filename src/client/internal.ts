@@ -71,7 +71,7 @@ export interface NotificationActionEventTransport {
     result: NotificationActionResult;
     trigger: ActionTrigger;
 
-    // Following are present only if trigger is `CONTROL`
+    // Following are present only if trigger is `ActionTrigger.CONTROL`
     controlSource?: 'buttons';  // Additional sources will be added in future release
     controlIndex?: number;      // The index of the originating control, within notification[controlSource]
 }

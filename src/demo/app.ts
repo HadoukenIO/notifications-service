@@ -55,7 +55,7 @@ function makeNoteOfType(index: number) {
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
 
-    function logit(msg: string) {
+    function logMessage(msg: string) {
         const logEntry = document.createElement('div');
         logEntry.innerHTML = msg;
         clientResponse.insertBefore(logEntry, clientResponse.firstChild);
@@ -64,7 +64,7 @@ fin.desktop.main(async () => {
     for (let index = 1; index < 7; index++) {
         document.getElementById(`button${index}`)!.addEventListener('click', () => {
             makeNoteOfType(index).catch((err) => {
-                logit(`Error creating notification: ${err}`);
+                logMessage(`Error creating notification: ${err}`);
             });
         });
 
@@ -88,25 +88,25 @@ fin.desktop.main(async () => {
 
     document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
         getAll().then((notifications) => {
-            logit(`${notifications.length} notifications received from the Notification Center`);
+            logMessage(`${notifications.length} notifications received from the Notification Center`);
         });
     });
 
     addEventListener('notification-created', (event: NotificationCreatedEvent) => {
-        logit(`CREATE action received from notification ${event.notification.id}`);
+        logMessage(`CREATE action received from notification ${event.notification.id}`);
     });
     addEventListener('notification-closed', (event: NotificationClosedEvent) => {
-        logit(`CLOSE action received from notification ${event.notification.id}`);
+        logMessage(`CLOSE action received from notification ${event.notification.id}`);
     });
     addEventListener('notification-action', (event: NotificationActionEvent) => {
         const {notification, trigger, control} = event;
 
         if (trigger === 'select') {
-            logit(`SELECT action received from notification ${event.notification.id}`);
+            logMessage(`SELECT action received from notification ${event.notification.id}`);
         } else if (control && control.type === 'button') {
             const buttonIndex = notification.buttons.indexOf(control);
 
-            logit(`CONTROL action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
+            logMessage(`CONTROL action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
         }
     });
 });

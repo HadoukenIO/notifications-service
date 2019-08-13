@@ -133,7 +133,7 @@ export type NotificationActionResult<T = {}> = T;
 
 /**
  * Lists the different triggers for a notification {@link Actions|action}. Each action that is triggered will result in
- * a {@link NotificationActionEvent|`notification-action`} event, which can be captured by the application that raised
+ * a {@link NotificationActionEvent|`notification-action`} event, which can be captured by the application that created
  * the notification.
  */
 export enum ActionTrigger {
@@ -145,7 +145,7 @@ export enum ActionTrigger {
 
     /**
      * The user clicked the body of the notification itself. Any clicks of the notification that don't hit a control
-     * will result in this event being fired.
+     * will fire an event with the `'select'` action trigger.
      */
     SELECT = 'select',
 
