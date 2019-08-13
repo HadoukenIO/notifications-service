@@ -326,6 +326,9 @@ export function addEventListener<E extends Events>(eventType: E['type'], listene
     }
 
     eventEmitter.addListener(eventType, listener);
+    if (eventEmitter.listenerCount(eventType) === 1) {
+        tryServiceDispatch(APITopic.ADD_EVENT_LISTENER, eventType);
+    }
 }
 
 export function removeEventListener(eventType: 'notification-action', listener: (event: NotificationActionEvent) => void): void;
@@ -345,6 +348,9 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
+    if (eventEmitter.listenerCount(eventType) === 1) {
+        tryServiceDispatch(APITopic.REMOVE_EVENT_LISTENER, eventType);
+    }
     eventEmitter.removeListener(eventType, listener);
 }
 

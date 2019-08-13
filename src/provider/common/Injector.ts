@@ -9,6 +9,7 @@ import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
 import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
+import {EventPump} from '../model/EventPump';
 
 import {Inject} from './Injectables';
 
@@ -18,6 +19,7 @@ import {Inject} from './Injectables';
 type Types = {
     [Inject.ACTION_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
+    [Inject.EVENT_PUMP]: EventPump;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.LAYOUTER]: Layouter;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
@@ -34,6 +36,7 @@ type Types = {
 const Bindings = {
     [Inject.ACTION_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
+    [Inject.EVENT_PUMP]: EventPump,
     [Inject.LAYOUTER]: Layouter,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.STORE]: Store,

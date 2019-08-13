@@ -33,7 +33,9 @@ export const enum APITopic {
     CLEAR_NOTIFICATION = 'clear-notification',
     GET_APP_NOTIFICATIONS = 'fetch-app-notifications',
     CLEAR_APP_NOTIFICATIONS = 'clear-app-notifications',
-    TOGGLE_NOTIFICATION_CENTER = 'toggle-notification-center'
+    TOGGLE_NOTIFICATION_CENTER = 'toggle-notification-center',
+    ADD_EVENT_LISTENER = 'add-event-listener',
+    REMOVE_EVENT_LISTENER = 'remove-event-listener'
 }
 
 export type API = {
@@ -42,6 +44,8 @@ export type API = {
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
     [APITopic.GET_APP_NOTIFICATIONS]: [undefined, NotificationInternal[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
+    [APITopic.ADD_EVENT_LISTENER]: [string, void];
+    [APITopic.REMOVE_EVENT_LISTENER]: [string, void];
 };
 
 export type Events = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;

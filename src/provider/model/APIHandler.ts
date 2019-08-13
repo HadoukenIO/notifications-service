@@ -2,6 +2,7 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 import {Identity} from 'openfin/_v2/main';
 import {injectable} from 'inversify';
+import {Signal} from 'openfin-service-signal';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
 import {Targeted, Transport} from '../../client/EventRouter';
@@ -62,6 +63,8 @@ export type EventSpecification = {
 @injectable()
 export class APIHandler<T extends Enum, E extends EventSpecification> {
     private _providerChannel!: ChannelProvider;
+    public readonly onConnection: Signal<[Identity]> = new Signal();
+    public readonly onDisconnection: Signal<[Identity]> = new Signal();
 
     public get channel(): ChannelProvider {
         return this._providerChannel;
@@ -96,7 +99,8 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
     public async registerListeners<S extends APISpecification<T>>(actionHandlerMap: APIImplementation<T, S>): Promise<void> {
         const providerChannel: ChannelProvider = this._providerChannel = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
 
-        providerChannel.onConnection(this.onConnection);
+        providerChannel.onConnection(this.onConnectionHandler.bind(this));
+        providerChannel.onDisconnection(this.onDisconnectionHandler.bind(this));
 
         for (const action in actionHandlerMap) {
             if (actionHandlerMap.hasOwnProperty(action)) {
@@ -106,11 +110,16 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
     }
 
     // TODO?: Remove the need for this any by defining connection payload type?
-    private onConnection(app: Identity, payload?: any): void {
+    private onConnectionHandler(app: Identity, payload?: any): void {
         if (payload && payload.version && payload.version.length > 0) {
             console.log(`connection from client: ${app.name}, version: ${payload.version}`);
         } else {
             console.log(`connection from client: ${app.name}, unable to determine version`);
         }
+        this.onConnection.emit(app);
+    }
+
+    private onDisconnectionHandler(app: Identity): void {
+        this.onDisconnection.emit(app);
     }
 }

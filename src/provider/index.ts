@@ -19,6 +19,7 @@ import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisib
 import {mutable} from './store/State';
 import {Store} from './store/Store';
 import {notificationStorage, settingsStorage} from './model/Storage';
+import {EventPump} from './model/EventPump';
 
 @injectable()
 export class Main {
@@ -26,6 +27,9 @@ export class Main {
 
     @inject(Inject.API_HANDLER)
     private _apiHandler!: APIHandler<APITopic, Events>;
+
+    @inject(Inject.EVENT_PUMP)
+    private _eventPump!: EventPump;
 
     @inject(Inject.STORE)
     private _store!: Store;
@@ -57,7 +61,9 @@ export class Main {
             [APITopic.CLEAR_NOTIFICATION]: this.clearNotification.bind(this),
             [APITopic.GET_APP_NOTIFICATIONS]: this.fetchAppNotifications.bind(this),
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
-            [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this)
+            [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
+            [APITopic.ADD_EVENT_LISTENER]: this._eventPump.onAddEventListener.bind(this._notificationCenter),
+            [APITopic.REMOVE_EVENT_LISTENER]: this._eventPump.onRemoveEventListener.bind(this._notificationCenter)
         });
 
         this._store.onAction.add(async (action: RootAction): Promise<void> => {
@@ -68,7 +74,7 @@ export class Main {
                     type: 'notification-created',
                     notification: mutable(notification)
                 };
-                this._apiHandler.dispatchEvent<NotificationCreatedEvent>(source, event);
+                this._eventPump.push<NotificationCreatedEvent>(source, event);
             } else if (action.type === Action.REMOVE) {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
@@ -78,7 +84,7 @@ export class Main {
                         type: 'notification-closed',
                         notification: mutable(notification)
                     };
-                    this._apiHandler.dispatchEvent<NotificationClosedEvent>(source, event);
+                    this._eventPump.push<NotificationClosedEvent>(source, event);
                 });
             } else if (action.type === Action.CLICK_BUTTON) {
                 const {notification, source} = action.notification;
@@ -94,7 +100,7 @@ export class Main {
                         controlIndex: action.buttonIndex,
                         result: button.onClick
                     };
-                    this._apiHandler.dispatchEvent(source, event);
+                    this._eventPump.push<NotificationActionEvent>(source, event);
                 }
             } else if (action.type === Action.CLICK_NOTIFICATION) {
                 const {notification, source} = action.notification;
@@ -107,7 +113,7 @@ export class Main {
                         notification: mutable(notification),
                         result: notification.onSelect
                     };
-                    this._apiHandler.dispatchEvent(source, event);
+                    this._eventPump.push<NotificationActionEvent>(source, event);
                 }
             }
         });
