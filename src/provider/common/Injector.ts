@@ -10,6 +10,7 @@ import {APIHandler} from '../model/APIHandler';
 import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
 import {EventPump} from '../model/EventPump';
+import {ClientHandler} from '../model/ClientHandler';
 
 import {Inject} from './Injectables';
 
@@ -20,6 +21,7 @@ type Types = {
     [Inject.ACTION_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
     [Inject.EVENT_PUMP]: EventPump;
+    [Inject.CLIENT_HANDLER]: ClientHandler;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.LAYOUTER]: Layouter;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
@@ -37,6 +39,7 @@ const Bindings = {
     [Inject.ACTION_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
     [Inject.EVENT_PUMP]: EventPump,
+    [Inject.CLIENT_HANDLER]: ClientHandler,
     [Inject.LAYOUTER]: Layouter,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.STORE]: Store,

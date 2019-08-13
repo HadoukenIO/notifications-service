@@ -20,6 +20,7 @@ import {mutable} from './store/State';
 import {Store} from './store/Store';
 import {notificationStorage, settingsStorage} from './model/Storage';
 import {EventPump} from './model/EventPump';
+import {ClientHandler} from './model/ClientHandler';
 
 @injectable()
 export class Main {
@@ -27,6 +28,9 @@ export class Main {
 
     @inject(Inject.API_HANDLER)
     private _apiHandler!: APIHandler<APITopic, Events>;
+
+    @inject(Inject.CLIENT_HANDLER)
+    private _clientHandler!: ClientHandler;
 
     @inject(Inject.EVENT_PUMP)
     private _eventPump!: EventPump;
@@ -62,8 +66,8 @@ export class Main {
             [APITopic.GET_APP_NOTIFICATIONS]: this.fetchAppNotifications.bind(this),
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
             [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
-            [APITopic.ADD_EVENT_LISTENER]: this._eventPump.onAddEventListener.bind(this._notificationCenter),
-            [APITopic.REMOVE_EVENT_LISTENER]: this._eventPump.onRemoveEventListener.bind(this._notificationCenter)
+            [APITopic.ADD_EVENT_LISTENER]: this._clientHandler.onAddEventListener.bind(this._clientHandler),
+            [APITopic.REMOVE_EVENT_LISTENER]: this._clientHandler.onRemoveEventListener.bind(this._clientHandler)
         });
 
         this._store.onAction.add(async (action: RootAction): Promise<void> => {
