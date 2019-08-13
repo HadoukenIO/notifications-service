@@ -22,7 +22,9 @@
     "test:unit": "svc-tools test unit",
     "zip": "svc-tools zip",
     "start": "svc-tools start",
-    "start:redux": "redux-devtools --open --port=9950"
+    "start:redux": "redux-devtools --open --port=9950",
+    "schema:validate": "node scripts/schemas/SchemaPlugin.js validate",
+    "schema:generate": "node scripts/schemas/SchemaPlugin.js generate"
   },
   "repository": {
     "type": "git",
@@ -46,6 +48,7 @@
     "@types/react-dom": "^16.8.2",
     "@types/react-redux": "^7.0.8",
     "@types/remote-redux-devtools": "^0.5.3",
+    "deep-equal": "^1.0.1",
     "express": "^4.16.2",
     "hadouken-js-adapter": "^0.39.1",
     "inversify": "^5.0.1",
@@ -56,6 +59,7 @@
     "openfin-service-signal": "^1.0.0",
     "openfin-service-tooling": "1.0.12",
     "pouchdb-adapter-idb": "^7.1.1",
+    "pre-commit": "^1.2.2",
     "puppeteer": "1.3.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.3",
@@ -68,5 +72,10 @@
     "rxjs": "^6.5.2",
     "typescript": "3.4.5",
     "typescript-json-schema": "^0.39.0"
+  },
+  "precommit": {
+    "run": [
+      "schema:validate"
+    ]
   }
 }

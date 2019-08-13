@@ -3,35 +3,29 @@ import {Identity} from 'hadouken-js-adapter';
 import {SERVICE_IDENTITY} from '../../../src/client/internal';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {Notification} from '../../../src/client';
-import {Storage, StorageMap} from '../../../src/provider/model/Storage';
+import {Database, CollectionMap} from '../../../src/provider/model/database/Database';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
 interface ProviderWindow extends BaseWindowContext {
-    storage: Storage;
+    database: Database;
 }
 
 const ofBrowser = new OFPuppeteerBrowser<ProviderWindow>();
 
 export async function getAllStoredNotifications(): Promise<StoredNotification[]> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(): Promise<StoredNotification[]> {
-        const allNotes: StoredNotification[] = [];
-        await (await this.storage.get(StorageMap.NOTIFICATIONS)).iterate((val: string) => {
-            allNotes.push(JSON.parse(val));
-        });
+        const allNotes: StoredNotification[] = await(await this.database.get(CollectionMap.NOTIFICATIONS)).getAll();
+
         return allNotes;
     });
 }
 
 export async function getStoredNotificationsByApp(uuid: string): Promise<StoredNotification[]> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(appUuid: string): Promise<StoredNotification[]> {
-        const allNotes: StoredNotification[] = [];
-        await (await this.storage.get(StorageMap.NOTIFICATIONS)).iterate((val: string) => {
-            const noteObject: StoredNotification = JSON.parse(val);
-            if (noteObject.source.uuid === appUuid) {
-                allNotes.push(noteObject);
-            }
-        });
+        const allNotes: StoredNotification[] = (await (await this.database.get(CollectionMap.NOTIFICATIONS)).getAll())
+            .filter(noteObject => noteObject.source.uuid === appUuid);
+
         return allNotes;
     }, uuid);
 }
@@ -56,8 +50,11 @@ export async function assertNotificationStored(source: Identity, note: Notificat
  */
 async function getStoredNotification(id: string): Promise<StoredNotification | undefined> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined> {
-        const note = await (await this.storage.get(StorageMap.NOTIFICATIONS)).getItem<string | null>(remoteID);
+        const note = await (await this.database.get(CollectionMap.NOTIFICATIONS)).get(remoteID);
+        this.console.log(note);
+        const all = await (await this.database.get(CollectionMap.NOTIFICATIONS)).getAll();
+        this.console.log(all);
         // Localforage returns null for non-existent keys, but we will return undefined for consistency with other utils
-        return note !== null ? JSON.parse(note) : undefined;
+        return note !== null ? note : undefined;
     }, id);
 }
