@@ -1,4 +1,5 @@
 {
+    "description": "Shape of the internal settings stored in the database.",
     "type": "object",
     "properties": {
         "id": {
