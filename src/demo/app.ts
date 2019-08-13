@@ -25,7 +25,7 @@ const longNote: NotificationOptions = {
     title: 'Notification Title ',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
-    date: new Date(),
+    onSelect: 'Selected',
     buttons: []
 };
 
@@ -72,6 +72,19 @@ fin.desktop.main(async () => {
             clear(`1q2w3e4r${index}`);
         });
     }
+
+    // Press 1-9 to create a notification, ctrl+1-9 to remove notification
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+        const index = parseInt(event.key);
+
+        if (index >= 1) {
+            if (event.ctrlKey) {
+                clear(`1q2w3e4r${index}`);
+            } else {
+                makeNoteOfType(index);
+            }
+        }
+    });
 
     document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
         getAll().then((notifications) => {

@@ -2,11 +2,16 @@
  * @hidden
  */
 
+/**
+ * Acts as a central point for routing all events received from the provider.
+ */
 import {EventEmitter} from 'events';
 
-import {EventSpecification} from '../provider/model/APIHandler';
-
 import {TransportMappings, TransportMemberMappings} from './internal';
+
+export type EventSpecification = {
+    type: string;
+};
 
 type EmitterProvider = (targetId: string) => EventEmitter;
 type EventDeserializer<E extends EventSpecification, T extends E> = (event: Transport<T>) => T;

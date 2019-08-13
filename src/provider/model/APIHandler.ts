@@ -4,7 +4,7 @@ import {Identity} from 'openfin/_v2/main';
 import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
-import {Targeted, Transport} from '../../client/EventRouter';
+import {Targeted, Transport, EventSpecification} from '../../client/EventRouter';
 
 /**
  * Semantic type definition.
@@ -47,10 +47,6 @@ export type APIAction<T extends APIDefinition> = (payload: T[0], source: Provide
  */
 export type APIImplementation<T extends Enum, S extends APISpecification<T>> = {
     [K in T]: APIAction<S[K]>;
-};
-
-export type EventSpecification = {
-    type: string;
 };
 
 /**

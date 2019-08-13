@@ -5,9 +5,10 @@ import {Identity} from 'openfin/_v2/main';
 import moment from 'moment';
 
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
-import {NotificationClosedEvent, NotificationActionEvent, ActionTrigger, NotificationCreatedEvent} from '../client';
+import {NotificationClosedEvent, NotificationActionEvent, NotificationCreatedEvent} from '../client';
 import {ButtonOptions} from '../client/controls';
 import {Transport, Targeted} from '../client/EventRouter';
+import {ActionTrigger} from '../client/actions';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';

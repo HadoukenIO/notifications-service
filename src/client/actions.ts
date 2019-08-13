@@ -130,3 +130,29 @@ export type ActionDeclaration<T extends never, E extends never> = NotificationAc
  * ```
  */
 export type NotificationActionResult<T = {}> = T;
+
+/**
+ * Lists the different triggers for a notification {@link Actions|action}. Each action that is triggered will result in
+ * a {@link NotificationActionEvent|`notification-action`} event, which can be captured by the application that raised
+ * the notification.
+ */
+export enum ActionTrigger {
+    /**
+     * The user interacted with one of the controls within the notification. This currently means a button click, but
+     * other control types will be added in future releases.
+     */
+    CONTROL = 'control',
+
+    /**
+     * The user clicked the body of the notification itself. Any clicks of the notification that don't hit a control
+     * will result in this event being fired.
+     */
+    SELECT = 'select',
+
+    /**
+     * The action was triggered programmatically by an application.
+     *
+     * *Not currently supported - will be implemented in a future release*
+     */
+    PROGRAMMATIC = 'programmatic'
+}

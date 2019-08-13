@@ -136,7 +136,7 @@ describe('When creating a notification with an ID that already exists but differ
 
                     // Recreate the notification and pause momentarily to allow the service time to process
                     await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.TOAST_CREATE * 2);
+                    await delay(Duration.TOAST_CLOSE + Duration.TOAST_CREATE);
 
                     expect(finCloseListener).toHaveBeenCalledWith(expectedEvent);
                 });
@@ -158,7 +158,7 @@ describe('When creating a notification with an ID that already exists but differ
                 test('The new toast matches the options of the new notification', async () => {
                     // Recreate the notification and delay stlight to allow the toast to spawn
                     const newNote = await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.TOAST_CREATE + Duration.TOAST_DOM_LOADED);
+                    await delay(Duration.TOAST_CLOSE + Duration.TOAST_CREATE + Duration.TOAST_DOM_LOADED);
 
                     // New toast matches `secondOptions`
                     await assertDOMMatches(CardType.TOAST, testApp.identity.uuid, newNote);
