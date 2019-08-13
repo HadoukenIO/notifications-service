@@ -5,8 +5,9 @@ import {Signal} from 'openfin-service-signal';
 
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
-import {Database, CollectionMap, NotificationCollection, NotificationDocument} from '../model/database/Database';
+import {Database, CollectionMap} from '../model/database/Database';
 import {AsyncInit} from '../controller/AsyncInit';
+import {Collection} from '../model/database/Collection';
 
 import {ActionMap, ActionHandler, RootAction, Action, ActionOf} from './Actions';
 import {RootState, Immutable} from './State';
@@ -98,16 +99,10 @@ export class Store extends AsyncInit {
     }
 
     private async getInitialState(): Promise<RootState> {
-        const notificationCollection: NotificationCollection = await this._database.get(CollectionMap.NOTIFICATIONS);
+        const notificationCollection: Collection<StoredNotification> = await this._database.get(CollectionMap.NOTIFICATIONS);
         const initialState = this.cloneState(Store.INITIAL_STATE);
 
-        const notifications: StoredNotification[] = [];
-        const storedNotifications: NotificationDocument[] = await notificationCollection.getAll();
-
-        storedNotifications.forEach((value) => {
-            notifications.push(value.toJSON());
-        });
-
+        const notifications: StoredNotification[] = await notificationCollection.getAll();
         Object.assign(initialState, {notifications});
 
         return initialState;

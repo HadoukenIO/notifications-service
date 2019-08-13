@@ -6,7 +6,7 @@ export const enum SettingsMap {
 }
 
 /**
- * Available keys on the Settings collection.
+ * Shape of the internal settings stored in the database.
  */
 export interface StoredSettings {
     id: SettingsMap,

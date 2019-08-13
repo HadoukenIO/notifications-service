@@ -3,7 +3,7 @@ import {Action as ReduxAction} from 'redux';
 import {StoredNotification} from '../model/StoredNotification';
 import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
-import {CollectionMap, NotificationCollection, SettingsCollection} from '../model/database/Database';
+import {CollectionMap} from '../model/database/Database';
 import {SettingsMap} from '../model/StoredSettings';
 
 import {RootState, Immutable, mutable} from './State';
@@ -53,8 +53,9 @@ export type ActionMap<T extends Action = Action> = {
 export const Actions: ActionMap = {
     [Action.CREATE]: (state: Immutable<RootState>, action: CreateNotification): RootState => {
         const {notification} = action;
-        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
-        storage.get<NotificationCollection>(CollectionMap.NOTIFICATIONS)
+        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
+
+        database.get(CollectionMap.NOTIFICATIONS)
             .then(collection => collection.upsert(notification))
             .catch(error => {
                 throw new Error(error);
@@ -77,11 +78,10 @@ export const Actions: ActionMap = {
     },
     [Action.REMOVE]: (state: Immutable<RootState>, action: RemoveNotifications): RootState => {
         const {notifications} = action;
-        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
+        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
-            storage.get<NotificationCollection>(CollectionMap.NOTIFICATIONS)
-                .then(notificationCollection => notificationCollection.getDoc(n.id))
-                .then(note => note ? note.remove() : false)
+            database.get(CollectionMap.NOTIFICATIONS)
+                .then(collection => collection.delete(n))
                 .catch(error => {
                     throw new Error(error);
                 });
@@ -98,7 +98,7 @@ export const Actions: ActionMap = {
         const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
 
-        storage.get<SettingsCollection>(CollectionMap.SETTINGS)
+        storage.get(CollectionMap.SETTINGS)
             .then(settingsCollection => settingsCollection.upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible}))
             .catch(error => {
                 throw new Error(error);
