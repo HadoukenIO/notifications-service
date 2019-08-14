@@ -75,7 +75,7 @@ export interface NotificationOptions {
      * by an application.
      *
      * This string is not displayed on the notification itself, but should be user-readable. It will be displayed in
-     * the notification center preferences section, and any string passed as a `category` should make sense when
+     * the Notification Center preferences section, and any string passed as a `category` should make sense when
      * displayed in that context.
      *
      * Event categories should list all the different types of notifications raised by your app. As a general guide, if
@@ -83,12 +83,12 @@ export interface NotificationOptions {
      * applications should ensure that those notifications have a distinct category.
      *
      * For example - given a calendar app, notification categories could be:
-     * - `"Upcoming Events"`: Notification that an event is about to start
-     * - `"Event Start"`: Notification raised when event starts, expiring at the event end time
-     * - `"Event Modified"`: When an event is modified
-     * - `"Event Cancelled"`: When an event is cancelled
-     * - `"Event Response"`: An attendee has responded to an event invitation that you created
-     * - `"Daily Agenda"`: A notification sent each morning with event reminders
+     * - `'Upcoming Events'`: Notification that an event is about to start
+     * - `'Event Start'`: Notification raised when event starts, expiring at the event end time
+     * - `'Event Modified'`: When an event is modified
+     * - `'Event Cancelled'`: When an event is cancelled
+     * - `'Event Response'`: An attendee has responded to an event invitation that you created
+     * - `'Daily Agenda'`: A notification sent each morning with event reminders
      *
      * **NOTE:** The user-facing UI that a user would use to manage their preferences is still in progress. This
      * property has been added in advance of this UI being released, to ensure future compatibility.
@@ -161,7 +161,7 @@ export type Notification = Readonly<Required<NotificationOptions>>;
  * via the same `notification-action` event type.
  *
  * The event object will contain the application-defined {@link NotificationActionResult|metadata} that allowed this
- * action to be raised, and details on what triggered this action, which control the user interacted with.
+ * action to be raised, and details on what triggered this action and which control the user interacted with.
  *
  * This type includes a generic type argument, should applications wish to define their own interface for action
  * results. See {@link NotificationActionResult} for details.
@@ -307,11 +307,11 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
  * import {create} from 'openfin-notifications';
  *
  * create({
- *      id: "uniqueNotificationId",
- *      title: "Notification Title",
- *      body: "Text to display within the notification body",
- *      category: "Sample Notifications",
- *      icon: "https://openfin.co/favicon.ico"
+ *      id: 'uniqueNotificationId',
+ *      title: 'Notification Title',
+ *      body: 'Text to display within the notification body',
+ *      category: 'Sample Notifications',
+ *      icon: 'https://openfin.co/favicon.ico'
  * });
  * ```
  *
@@ -329,14 +329,14 @@ export async function create(options: NotificationOptions): Promise<Notification
 }
 
 /**
- * Clears a specific notification from the notification Center.
+ * Clears a specific notification from the Notification Center.
  *
  * Returns true if the notification was successfully cleared.  Returns false if the notification was not cleared, without errors.
  *
  * ```ts
  * import {clear} from 'openfin-notifications';
  *
- * clear("uniqueNotificationId");
+ * clear('uniqueNotificationId');
  * ```
  *
  * @param id ID of the notification to clear.
@@ -382,7 +382,7 @@ export async function clearAll(): Promise<number> {
 }
 
 /**
- * Toggles the visibility of the notification Center.
+ * Toggles the visibility of the Notification Center.
  *
  * ```ts
  * import {toggleNotificationCenter} from 'openfin-notifications';

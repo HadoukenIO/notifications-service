@@ -37,7 +37,7 @@ export class NotificationCenter extends AsyncInit {
     private _trayIcon!: TrayIcon;
 
     protected async init() {
-        // Create notification center app window
+        // Create Notification Center app window
         try {
             this._webWindow = await createWebWindow(windowOptions);
         } catch (error) {
@@ -142,7 +142,7 @@ export class NotificationCenter extends AsyncInit {
     }
 
     /**
-     * Animate the notification center window into view.
+     * Animate the Notification Center window into view.
      * @param duration Animation duration.
      */
     private async animateIn(duration: number = 300): Promise<void> {
@@ -163,7 +163,7 @@ export class NotificationCenter extends AsyncInit {
     }
 
     /**
-     * Animate the notification center window out of view.
+     * Animate the Notification Center window out of view.
      * @param duration Animation duration.
      */
     private async animateOut(duration: number = 400): Promise<void> {

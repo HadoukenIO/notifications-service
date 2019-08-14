@@ -63,7 +63,7 @@ describe('When creating a notification with the center showing', () => {
             assertHydratedCorrectly(options, note);
         });
 
-        test('One card appears in the notification center', async () => {
+        test('One card appears in the Notification Center', async () => {
             const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
         });
@@ -109,7 +109,7 @@ describe('When creating a notification with the center showing', () => {
             await expect(createPromise).rejects.toThrow(/Invalid arguments passed to create:.*"title" must have a value.*"body" must have a value/s);
         });
 
-        test('A card is not added to the notification center', async () => {
+        test('A card is not added to the Notification Center', async () => {
             const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, options.id!);
             expect(noteCards).toEqual([]);
         });

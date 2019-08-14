@@ -129,7 +129,7 @@ export class Main {
     }
 
     /**
-     * Dispatch the notification center toggle action to the UI
+     * Dispatch the Notification Center toggle action to the UI
      * @param payload Not used.
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
