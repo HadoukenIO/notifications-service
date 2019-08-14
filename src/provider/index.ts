@@ -243,7 +243,7 @@ export class Main {
             title: payload.title,
             category: payload.category,
             icon: payload.icon || '',
-            customData: payload.customData || {},
+            customData: payload.customData !== undefined ? payload.customData : {},
             date: payload.date || Date.now(),
             onSelect: payload.onSelect || null,
             buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, type: 'button', iconUrl: btn.iconUrl || ''})) : []
