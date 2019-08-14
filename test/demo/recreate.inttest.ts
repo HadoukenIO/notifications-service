@@ -151,7 +151,7 @@ describe('When creating a notification with an ID that already exists but differ
 
                     // Recreate the notification and pause momentarily to allow the service time to process
                     await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.TOAST_CREATE + Duration.TOAST_CLOSE);
+                    await delay(Duration.TOAST_CLOSE + Duration.TOAST_CREATE);
 
                     expect(finOpenListener).toHaveBeenCalledWith(expectedEvent);
                 });

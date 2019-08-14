@@ -44,9 +44,10 @@
  *             }
  *         },
  *
- *         // Since the application doesn't need to do anything when the user clicks this button, we leave 'onClick'
- *         // undefined rather than specifying a NotificationActionResult. This means that no action will be raised
- *         // when the button is clicked, and hence no "notification-action" event will be fired
+ *         // A button that closes the notification and doesn't prompt the user about this event again. Since the
+ *         // application doesn't need to do anything when the user clicks this button, we leave 'onClick' undefined
+ *         // rather than specifying a NotificationActionResult. This means that no action will be raised when the
+ *         // button is clicked, and hence no "notification-action" event will be fired
  *         {
  *             title: 'Dismiss',
  *             iconUrl: 'https://www.example.com/cancel.png'
@@ -134,8 +135,8 @@ export type ActionDeclaration<T extends never, E extends never> = NotificationAc
 export type NotificationActionResult<T = {}> = T;
 
 /**
- * Lists the different triggers for a notification {@link Actions|action}. Each action that is triggered will result in
- * a {@link NotificationActionEvent|`notification-action`} event, which can be captured by the application that created
+ * Lists the different triggers that can raise an {@link Actions|action}. Each action that is raised will result in a
+ * {@link NotificationActionEvent|`notification-action`} event, which can be captured by the application that created
  * the notification.
  */
 export enum ActionTrigger {

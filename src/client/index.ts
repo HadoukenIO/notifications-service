@@ -160,9 +160,8 @@ export type Notification = Readonly<Required<NotificationOptions>>;
  * service will add additional control types. All actions, for all control types, will be returned to the application
  * via the same `notification-action` event type.
  *
- * Check the contents of the event object for details on what triggered this action, which control the user
- * interacted with, and to fetch the application-defined {@link NotificationActionResult|metadata} that resulted in
- * this action being raised.
+ * The event object will contain the application-defined {@link NotificationActionResult|metadata} that allowed this
+ * action to be raised, and details on what triggered this action, which control the user interacted with.
  *
  * This type includes a generic type argument, should applications wish to define their own interface for action
  * results. See {@link NotificationActionResult} for details.

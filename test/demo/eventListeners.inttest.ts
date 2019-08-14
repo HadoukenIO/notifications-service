@@ -13,9 +13,9 @@ const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
     title: 'Test Notification Title',
     category: 'Test Notification Category',
-    onSelect: {action: 'select'},
+    onSelect: {task: 'select'},
     buttons: [
-        {title: 'Button 1', onClick: {action: 'click'}}
+        {title: 'Button 1', onClick: {task: 'click'}}
     ]
 };
 
@@ -91,7 +91,7 @@ describe('Click listeners', () => {
                     type: 'notification-action',
                     notification: {...note, date: note.date.toJSON()},
                     trigger: 'select',
-                    result: {action: 'select'}
+                    result: {task: 'select'}
                 });
             });
 
@@ -113,7 +113,7 @@ describe('Click listeners', () => {
                     notification: {...note, date: note.date.toJSON()},
                     trigger: 'control',
                     control: note.buttons[0],
-                    result: {action: 'click'}
+                    result: {task: 'click'}
                 });
             });
 
