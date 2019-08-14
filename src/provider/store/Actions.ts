@@ -80,14 +80,14 @@ export const Actions: ActionMap = {
         const {notifications} = action;
         const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
-            database.get(CollectionMap.NOTIFICATIONS)
-                .then(collection => collection.delete(n))
-                .catch(error => {
-                    throw new Error(error);
-                });
-
             return n.id;
         });
+
+        database.get(CollectionMap.NOTIFICATIONS)
+            .then(collection => collection.deleteMany(notifications))
+            .catch(error => {
+                throw new Error(error);
+            });
 
         return {
             ...state,

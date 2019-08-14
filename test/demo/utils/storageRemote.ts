@@ -51,9 +51,6 @@ export async function assertNotificationStored(source: Identity, note: Notificat
 async function getStoredNotification(id: string): Promise<StoredNotification | undefined> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined> {
         const note = await (await this.database.get(CollectionMap.NOTIFICATIONS)).get(remoteID);
-        this.console.log(note);
-        const all = await (await this.database.get(CollectionMap.NOTIFICATIONS)).getAll();
-        this.console.log(all);
         // Localforage returns null for non-existent keys, but we will return undefined for consistency with other utils
         return note !== null ? note : undefined;
     }, id);
