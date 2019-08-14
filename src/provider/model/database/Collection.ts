@@ -113,7 +113,6 @@ export class Collection<T extends Collections[keyof Collections]> {
     }
 
     private async awaitTransactions() {
-        console.log(this._transactions);
         await Promise.all(this._transactions);
     }
 
