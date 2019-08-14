@@ -3,12 +3,15 @@
  * service defines a number of ways in which actions can be raised (typically user interactions, such as clicking a
  * button), and it is up to each application to decide if it wishes to be informed of these interactions.
  *
- * For an application to receive an event on each of these actions, the application should specify the message it
- * wishes to receive when that event happens. This is known as the {@link NotificationActionResult|action result}.
+ * For an action to be raised when one of these interactions occurs, the application must specify an
+ * {@link NotificationActionResult|action result} for each interaction it is interested in. The application should then
+ * listen for when these actions are raised by listening for the {@link NotificationActionEvent|notification-action}
+ * event.
  *
- * All actions passed back to an application come through a single entry point. The application should attach a
- * listener for the {@link NotificationActionEvent|`notification-action`} event. This listener will be called once for
- * each action raised by the service.
+ * This event is fired once each time an action is raised, and will contain the
+ * {@link NotificationActionResult|action result} the application specified for that interaction. The application may
+ * then use the {@link NotificationActionResult|action result} to determine the interaction that occurred and respond
+ * appropriately.
  *
  * For an overview of actions, consider the sample notification below:
  * ```ts
@@ -25,28 +28,28 @@
  *     customData: {eventId: '12345'},
  *
  *     // We want the user clicking the notification to open the associated event, so register an 'onSelect' action
- *     onSelect: {action: 'view-event', target: 'popup'},
+ *     onSelect: {task: 'view-calendar-event', target: 'popup'},
  *
  *     buttons: [
- *         // A button that closes the notification and doesn't prompt the user about this event again. Since there is
- *         // no special action required to handle clicking this button, there is no 'onClick' payload. This means that
- *         // the application will not receive a "notification-action" event when the button is clicked
- *         {
- *             title: 'Dismiss',
- *             iconUrl: 'https://www.example.com/cancel.png'
- *         },
- *
  *         // A button that will schedule another reminder for 5 minutes from now. Since the application will be
  *         // responsible for snoozing the event, it will need to know about the user clicking this button. By setting
- *         // 'onClick', the service will raise a "notification-action" event when this button is clicked, and will
- *         // pass the value of 'onClick' as the 'result' field within the event.
+ *         // a NotificationActionResult for 'onClick', the service will raise a "notification-action" event when this
+ *         // button is clicked, and will pass the value of 'onClick' as the 'result' field within the event
  *         {
  *             title: 'Snooze for 5 minutes',
  *             iconUrl: 'https://www.example.com/timer.png',
  *             onClick: {
- *                 action: 'schedule-reminder',
+ *                 task: 'schedule-reminder',
  *                 intervalMs: 5 * 60 * 1000
  *             }
+ *         },
+ *
+ *         // Since the application doesn't need to do anything when the user clicks this button, we leave 'onClick'
+ *         // undefined rather than specifying a NotificationActionResult. This means that no action will be raised
+ *         // when the button is clicked, and hence no "notification-action" event will be fired
+ *         {
+ *             title: 'Dismiss',
+ *             iconUrl: 'https://www.example.com/cancel.png'
  *         }
  *     ]
  * });
@@ -56,12 +59,12 @@
  * addEventListener('notification-action', (event: NotificationActionEvent) => {
  *     const {result, notification} = event;
  *
- *     if (result.action === 'view-event') {
+ *     if (result['task'] === 'view-calendar-event') {
  *         // Open a window with full details of the associated event
- *         openEventDetails(notification.customData.eventId, result.target);
- *     } else if (result.action === 'schedule-reminder') {
+ *         openEventDetails(notification.customData.eventId, result['target']);
+ *     } else if (result['task'] === 'schedule-reminder') {
  *         // Schedule a new notification
- *         scheduleReminder(notification.customData.eventId, Date.now() + result.intervalMs);
+ *         scheduleReminder(notification.customData.eventId, Date.now() + result['intervalMs']);
  *     } // Etc...
  * });
  * ```
@@ -81,47 +84,46 @@
 
 /**
  * Denotes a field as being an action. Defining this field (with a non-`undefined` value) will result in actions being
- * generated and sent back to the source application when the corresponding event happens.
+ * raised and sent back to the source application when the corresponding event happens.
  *
  * For example, providing a value for the `onClick` field of {@link ButtonOptions} will result in a
- * `notification-action` event being raised when that button is clicked.
+ * {@link NotificationActionEvent|`notification-action`} event being fired when that button is clicked.
  *
- * In the current version of the service, the result payloads returned back to an application are static and must be
- * defined at the point where the notification is created. Later versions of the service will allow some limited
- * programmatic creation of these payloads, for use in situations where a static payload isn't sufficient.
+ * In the current version of the service, the `NotificationActionResult`s returned back to an application are static
+ * and must bedefined at the point where the notification is created. Later versions of the service will allow some
+ * limited programmatic creation of these results, for use in situations where static result data isn't sufficient.
  *
- * *The generic parameters of this type are for future expansion. Future versions of the service will allow for more
- * control over the handling of actions.*
+ * The generic parameters of this type are for future expansion. Future versions of the service will allow for more
+ * control over the handling of actions.
  */
 export type ActionDeclaration<T extends never, E extends never> = NotificationActionResult;
 
 /**
- * Data type used to represent the payloads returned back to applications as the result of an action. Applications
- * capture these payloads by adding a `notification-action` listener. The contents of this type are entirely
- * application-defined, the only requirement is that the item is an object and is serializable by `JSON.stringify`.
+ * Data type used to represent the action result returned back to applications when an action is raised. Applications
+ * capture these responses by adding a `notification-action` listener. The contents of this type are entirely
+ * application-defined, the only requirement is that the item is serializable by `JSON.stringify`.
  *
- * Since this type is entirely application-specific, the type `{}` is used in these definitions. However, there is an
- * optional generic argument here, which can be used if an application were to define its own conventions for the
- * shape of this field (which is recommended). To make use of this, define a `notification-action` handler that
- * includes the application-defined type as a template argument. This type is then propogated up to
- * {@link NotificationActionEvent}. The example below demonstrates this, using the same example as at the top of this
- * page.
+ * Since this type is entirely application-specific, the type  is used in these definitions. However, there is an
+ * optional generic argument here, which can be used if an application were to define its own conventions for the shape
+ * of this field (which is recommended). To make use of this, define a `notification-action` handler that includes the
+ * application-defined type as a template argument. This type is then propogated up to {@link NotificationActionEvent}.
+ * The example below demonstrates this, using the same use-case as at the top of this page.
  *
  * ```ts
  * interface MyAction = SnoozeAction | DetailsAction;
  *
  * interface SnoozeAction {
- *     action: 'schedule-reminder';
+ *     task: 'schedule-reminder';
  *     intervalMs: number;
  * }
  *
  * interface DetailsAction {
- *     action: 'view-event';
+ *     task: 'view-calendar-event';
  *     target: 'self'|'popup';
  * }
  *
  * addEventListener('notification-action', (event: NotificationActionEvent<MyAction>)) => {
- *     if (event.result.action === 'schedule-reminder') {
+ *     if (event.result.task === 'schedule-reminder') {
  *         // 'event.result' will now be strongly-typed as an instance of SnoozeAction
  *         scheduleReminder(notification.customData.eventId, Date.now() + result.intervalMs);
  *     }
@@ -145,7 +147,7 @@ export enum ActionTrigger {
 
     /**
      * The user clicked the body of the notification itself. Any clicks of the notification that don't hit a control
-     * will fire an event with the `'select'` action trigger.
+     * or the close button will fire an event with the `'select'` action trigger.
      */
     SELECT = 'select',
 

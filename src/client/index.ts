@@ -1,29 +1,4 @@
 /**
- * OpenFin Notifications provide developers with a uniform way to create, display and organize desktop notifications
- * as well as responding to notification events.
- *
- * Notifications will be displayed as toasts as well as being listed and organized in a Notification Center. The
- * Notification Center can be accessed by clicking on the system tray notification icon or toggled programatically with
- * {@link toggleNotificationCenter}.
- *
- * ## Getting Started
- *
- * See the [Desktop Services documentation](https://developers.openfin.co/docs/desktop-services) for details on
- * including a desktop service within your application. Once configured via your application manifest, the API
- * documented here will function as expected.
- *
- * ### Basic example:
- * ```ts
- * // Non-Interactive "fire and forget" notification
- * // There will be a `notification-closed` event when the service closes the notification (as this occurs in all cases),
- * // but it will not be possible to determine why the notification was closed.
- * await create({
- *     title: 'Build Complete',
- *     body: 'Job "develop#123" finished with state "SUCCESS"',
- *     category: 'Build Statuses'
- * });
- * ```
- *
  * @module Notifications
  */
 
@@ -62,8 +37,8 @@ eventHandler.registerDeserializer<NotificationClosedEvent>('notification-closed'
 eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: Transport<NotificationActionEvent>) => {
     const {controlSource, controlIndex, ...rest} = parseEventWithNotification(event);
 
-    if (event.trigger === ActionTrigger.CONTROL && controlSource && controlIndex !== undefined) {
-        const control: ControlOptions = event.notification[controlSource][controlIndex] as ControlOptions;
+    if (event.trigger === ActionTrigger.CONTROL) {
+        const control: ControlOptions = event.notification[controlSource!][controlIndex!] as ControlOptions;
         return {...rest, control};
     } else {
         return rest;
@@ -75,7 +50,7 @@ eventHandler.registerDeserializer<NotificationActionEvent>('notification-action'
  */
 export interface NotificationOptions {
     /**
-     * A unique identifier for the Notification.
+     * A unique identifier for the notification.
      *
      * If not provided at time of creation, one will be generated for you and returned as part of the {@link create} method.
      */
@@ -138,13 +113,6 @@ export interface NotificationOptions {
     date?: Date;
 
     /**
-     * A timestamp at which point the notification will be removed from the user's notification center.
-     *
-     * If omitted or `null`, notification will persist until user explicitly actions/clears it.
-     */
-    expires?: Date|null;
-
-    /**
      * A list of buttons to display below the notification text.
      *
      * Notifications support up to four buttons. Attempting to add more than four will result in the notification
@@ -161,7 +129,7 @@ export interface NotificationOptions {
      * {@link ActionTrigger.SELECT|select} action.
      *
      * If omitted or `null`, applications will not receive a {@link NotificationActionEvent|`notification-action`}
-     * event when the notification is clicked. See {@link Actions} for more details on Notification actions, and
+     * event when the notification is clicked. See {@link Actions} for more details on notification actions, and
      * receiving interaction events from notifications.
      */
     onSelect?: ActionDeclaration<never, never>|null;
@@ -170,7 +138,7 @@ export interface NotificationOptions {
 /**
  * Application-defined context data that can be attached to notifications.
  */
-export type CustomData = any;
+export type CustomData = {};
 
 /**
  * A fully-hydrated form of {@link NotificationOptions}.
@@ -330,11 +298,11 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
 }
 
 /**
- * Creates a new Notification.
+ * Creates a new notification.
  *
- * The Notification will appear in the Notification Center and as a toast if the Center is not visible.
+ * The notification will appear in the Notification Center and as a toast if the Center is not visible.
  *
- * If a Notification is created with an `id` of an already existing Notification, the existing Notification will be recreated with the new content.
+ * If a notification is created with an `id` of an already existing notification, the existing notification will be recreated with the new content.
  *
  * ```ts
  * import {create} from 'openfin-notifications';
@@ -362,9 +330,9 @@ export async function create(options: NotificationOptions): Promise<Notification
 }
 
 /**
- * Clears a specific Notification from the Notification Center.
+ * Clears a specific notification from the notification Center.
  *
- * Returns true if the Notification was successfully cleared.  Returns false if the Notification was not cleared, without errors.
+ * Returns true if the notification was successfully cleared.  Returns false if the notification was not cleared, without errors.
  *
  * ```ts
  * import {clear} from 'openfin-notifications';
@@ -372,7 +340,7 @@ export async function create(options: NotificationOptions): Promise<Notification
  * clear("uniqueNotificationId");
  * ```
  *
- * @param id ID of the Notification to clear.
+ * @param id ID of the notification to clear.
  */
 export async function clear(id: string): Promise<boolean> {
     // Should have some sort of input validation here...
@@ -415,7 +383,7 @@ export async function clearAll(): Promise<number> {
 }
 
 /**
- * Toggles the visibility of the Notification Center.
+ * Toggles the visibility of the notification Center.
  *
  * ```ts
  * import {toggleNotificationCenter} from 'openfin-notifications';
