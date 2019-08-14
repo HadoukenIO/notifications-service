@@ -9,8 +9,8 @@ enum Injectable {
     API_HANDLER,
     NOTIFICATION_CENTER,
     TOAST_MANAGER,
-    STORE,
-    DATABASE
+    DATABASE,
+    LAYOUTER
 }
 
 type InjectableMap = {

@@ -4,7 +4,7 @@ import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../model/StoredNotification';
 import {NotificationCard} from '../components/NotificationCard/NotificationCard';
-import {WindowDimensions} from '../../controller/ToastManager';
+import {WindowDimensions} from '../../controller/Layouter';
 import {RootState} from '../../store/State';
 import {Store} from '../../store/Store';
 
