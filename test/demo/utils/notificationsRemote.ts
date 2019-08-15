@@ -63,7 +63,7 @@ export async function addEventListener
     const remoteFn = await ofBrowser.getOrMountRemoteFunction(executionTarget, listener);
     await ofBrowser.executeOnWindow(executionTarget, function(eventTypeRemote: any, listenerRemote: any) {
         return this.notifications.addEventListener(eventTypeRemote, listenerRemote);
-    }, eventType, remoteFn as unknown as typeof listener);
+    }, eventType, remoteFn);
 }
 
 export async function removeEventListener
@@ -71,5 +71,5 @@ export async function removeEventListener
     const remoteFn = await ofBrowser.getOrMountRemoteFunction(executionTarget, listener);
     await ofBrowser.executeOnWindow(executionTarget, function(eventTypeRemote: any, listenerRemote: any) {
         return this.notifications.removeEventListener(eventTypeRemote, listenerRemote);
-    }, eventType, remoteFn as unknown as typeof listener);
+    }, eventType, remoteFn);
 }
