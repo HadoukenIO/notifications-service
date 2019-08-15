@@ -1,20 +1,16 @@
-// eslint-disable-next-line import/named, Eslint cannot locate the rxdb modules. TS is able locate them OK. This is due to the module allowing cherry picking.
-import RxDB, {RxDatabase, RxCollection, RxDocument} from 'rxdb';
 import {injectable} from 'inversify';
+import Dexie from 'dexie';
 
-import {AsyncInit} from '../../controller/AsyncInit';
-import {StoredNotification} from '../StoredNotification';
 import {StoredSettings} from '../StoredSettings';
-import {Collection, CollectionsConfig} from '../database/Collection';
+import {StoredNotification} from '../StoredNotification';
+import {deferredPromise, DeferredPromise} from '../../common/deferredPromise';
+import {AsyncInit} from '../../controller/AsyncInit';
 
-/**
- * List of available collections on the database.
- *
- * If a new collection is added, make sure to generate and configure its schema.
- */
+import {Collection} from './Collection';
+
 export const enum CollectionMap {
-    NOTIFICATIONS = 'db_notifications',
-    SETTINGS = 'db_settings'
+    NOTIFICATIONS = 'notifications',
+    SETTINGS = 'settings'
 }
 
 export type Collections = {
@@ -22,85 +18,52 @@ export type Collections = {
     [CollectionMap.SETTINGS]: StoredSettings;
 };
 
-type RxCollections = {
-    [K in keyof Collections]: RxCollection<Collections[K]>;
-};
-
-const migrationHandlers = {
-    [CollectionMap.NOTIFICATIONS]: notificationUpgradeHandler,
-    [CollectionMap.SETTINGS]: settingsUpgradeHandler
-};
-
 @injectable()
 export class Database extends AsyncInit {
-    private _database!: RxDatabase<RxCollections>;
-    private _collections: Map<CollectionMap, Collection<any>>
+    private _database: Dexie;
+    private _collections: Map<CollectionMap, Collection<any>>;
+    private _databaseReadyPromise: DeferredPromise<this>;
 
-    constructor() {
+    constructor () {
         super();
 
-        this._collections = new Map<CollectionMap, Collection<any>>();
+        this._database = new Dexie('Notifications_Service');
+        this._collections = new Map();
+        this._databaseReadyPromise = deferredPromise();
+
+        this._database.version(1).stores({
+            notifications: '&id',
+            settings: '&id'
+        });
+
+        this.createCollections(this._database.tables);
+
+        this._database.open().then(()=>{
+            this._databaseReadyPromise[1]();
+        });
+    }
+
+    protected async init() {
+        await this._databaseReadyPromise[0];
     }
 
     /**
-     * Returns a collection with the provided collection name.
+     * Returns a collection of the provided name.
+     * @param collectionName The collection name.
      */
-    public async get<T extends keyof Collections>(collectionName: T): Promise<Collection<Collections[T]>> {
-        await this.initialized;
+    public get<T extends keyof Collections>(collectionName: T): Collection<Collections[T]> {
+        const table = this._collections.get(collectionName);
 
-        const collection = this._collections.get(collectionName);
-
-        if (collection) {
-            return collection;
+        if (table) {
+            return table;
         } else {
-            throw new Error(`No collection found: ${collectionName}`);
+            throw new Error('No table found');
         }
     }
 
-    protected async init(): Promise<void> {
-        RxDB.plugin(require('pouchdb-adapter-idb'));
-
-        this._database = await RxDB.create({
-            name: 'notifications_service',
-            adapter: 'idb'
+    private createCollections(tables: Dexie.Table<Collections[keyof Collections], string>[]) {
+        tables.forEach(table => {
+            this._collections.set(table.name as CollectionMap, new Collection(table));
         });
-
-        const collections: CollectionsConfig[] = require('../../../../res/provider/schemas/collections.json').collections;
-
-        await Promise.all(collections.map(config => {
-            const collection = new Collection<Collections[keyof Collections]>(this._database);
-            this._collections.set(config.name, collection);
-
-            return collection.init(config, migrationHandlers[config.name]);
-        }));
-    }
-}
-
-/**
- * Handles version upgrades to the Settings table.
- * @param toVersion Version we are upgrading to.
- * @param data The rx document of the existing data.
- */
-async function settingsUpgradeHandler(toVersion: number, data: RxDocument<StoredSettings>): Promise<RxDocument<StoredSettings>> {
-    switch (toVersion) {
-        default: {
-            return data;
-        }
-    }
-}
-
-/**
- * Handles version upgrades to the Notifications table.
- * @param toVersion Version we are upgrading to.
- * @param data The rx document of the existing data.
- */
-async function notificationUpgradeHandler(
-    toVersion: number,
-    data: RxDocument<StoredNotification>
-): Promise<RxDocument<StoredNotification>> {
-    switch (toVersion) {
-        default: {
-            return data;
-        }
     }
 }

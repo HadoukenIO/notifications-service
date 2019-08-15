@@ -49,16 +49,15 @@
     "@types/react-redux": "^7.0.8",
     "@types/remote-redux-devtools": "^0.5.3",
     "deep-equal": "^1.0.1",
+    "dexie": "^2.0.4",
     "express": "^4.16.2",
     "hadouken-js-adapter": "^0.39.1",
     "inversify": "^5.0.1",
-    "localforage": "^1.7.3",
     "mkdirp": "^0.5.1",
     "moment": "^2.22.1",
     "node-fetch": "^2.6.0",
     "openfin-service-signal": "^1.0.0",
     "openfin-service-tooling": "1.0.12",
-    "pouchdb-adapter-idb": "^7.1.1",
     "pre-commit": "^1.2.2",
     "puppeteer": "1.3.0",
     "react": "^16.8.6",
@@ -68,14 +67,12 @@
     "redux-devtools-cli": "0.0.1-1",
     "reflect-metadata": "^0.1.13",
     "remote-redux-devtools": "^0.5.16",
-    "rxdb": "^8.3.0",
-    "rxjs": "^6.5.2",
     "typescript": "3.4.5",
     "typescript-json-schema": "^0.39.0"
   },
   "precommit": {
     "run": [
-      "schema:validate"
+      "check"
     ]
   }
 }
