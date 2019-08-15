@@ -57,7 +57,7 @@ export class Database extends AsyncInit {
         if (table) {
             return table;
         } else {
-            throw new Error('No table found');
+            throw new Error(`Table with id ${collectionName} not found.`);
         }
     }
 
