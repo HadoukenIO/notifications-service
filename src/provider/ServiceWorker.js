@@ -14,20 +14,22 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', event => {
-    event.respondWith(caches.match(event.request).then(response => {
-        if (response) {
-            return response;
-        }
-        return fetch(event.request).then(response => {
-            return caches.open(cacheName).then(cache => {
-                // filter requests to cache
-                ['.js', '.html', '.ico', '.css', '.otf', '.png', '.jpg'].some(suffix => {
-                    const match = event.request.url.endsWith(suffix);
-                    match && cache.put(event.request.url, response.clone());
-                    return match;
-                });
-                return response;
-            });
+    event.respondWith(fetch(event.request).then(response => {
+        let networkResponse;
+        ['.js', '.html', '.ico', '.css', '.otf', '.png', '.jpg'].some(suffix => {
+            const match = event.request.url.endsWith(suffix);
+            if (match) {
+                networkResponse = response.clone();
+            }
+            return match;
         });
+        if (networkResponse) {
+            caches.open(cacheName).then(cache => {
+                cache.put(event.request.url, networkResponse);
+            });
+        }
+        return response;
+    }).catch(() => {
+        return caches.match(event.request);
     }));
 });
