@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 
 import {StoredSettings} from '../StoredSettings';
 import {StoredNotification} from '../StoredNotification';
-import {DeferredPromise} from '../../common/deferredPromise';
+import {DeferredPromise} from '../../common/DeferredPromise';
 import {AsyncInit} from '../../controller/AsyncInit';
 
 import {Collection} from './Collection';
@@ -22,7 +22,7 @@ export type Collections = {
 export class Database extends AsyncInit {
     private _database: Dexie;
     private _collections: Map<CollectionMap, Collection<any>>;
-    private _databaseReadyPromise: DeferredPromise<this>;
+    private _databaseReadyPromise: DeferredPromise<void>;
 
     constructor () {
         super();

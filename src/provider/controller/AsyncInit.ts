@@ -1,6 +1,6 @@
 import {injectable} from 'inversify';
 
-import {deferredPromise} from '../common/deferredPromise';
+import {DeferredPromise} from '../common/DeferredPromise';
 
 /**
  * Base class for any objects that initialise asynchronously.
@@ -12,14 +12,14 @@ import {deferredPromise} from '../common/deferredPromise';
  */
 @injectable()
 export abstract class AsyncInit {
-    private readonly _initialized!: readonly [Promise<this>, (value?: this) => void, (reason?: any) => void];
+    private readonly _initialized!: DeferredPromise<this>;
 
     constructor() {
-        this._initialized = deferredPromise<this>();
+        this._initialized = new DeferredPromise<this>();
     }
 
     public get initialized(): Promise<this> {
-        return this._initialized[0];
+        return this._initialized.promise;
     }
 
     /**
@@ -29,10 +29,10 @@ export abstract class AsyncInit {
      */
     public delayedInit(): Promise<this> {
         this.init().then(() => {
-            this._initialized[1](this);
+            this._initialized.resolve(this);
         });
 
-        return this._initialized[0];
+        return this._initialized.promise;
     }
 
     protected abstract async init(): Promise<void>;

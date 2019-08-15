@@ -4,7 +4,7 @@ import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
 import Bounds from 'openfin/_v2/api/window/bounds';
 import {Signal} from 'openfin-service-signal';
 
-import {deferredPromise} from '../common/deferredPromise';
+import {DeferredPromise} from '../common/DeferredPromise';
 import {renderApp} from '../view/containers/ToastApp';
 import {Store} from '../store/Store';
 import {LayoutItem, WindowDimensions} from '../controller/Layouter';
@@ -85,8 +85,9 @@ export class Toast implements LayoutItem {
         this._id = notification.id;
         this._options = toastOptions;
         this._position = {top: 0, left: 0};
+        const deferredPromise = new DeferredPromise<WindowDimensions>();
         // Wait for the React component to render and then get the dimensions of it to resize the window.
-        const [dimensionPromise, dimensionResolve] = deferredPromise<WindowDimensions>();
+        const [dimensionPromise, dimensionResolve] = [deferredPromise.promise, deferredPromise.resolve];
         this._dimensions = dimensionPromise;
 
         const name = `${windowOptions.name}:${this.id}`;
