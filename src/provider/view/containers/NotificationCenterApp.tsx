@@ -5,7 +5,7 @@ import {connect, Provider} from 'react-redux';
 import {Header} from '../components/Header/Header';
 import {Footer} from '../components/Footer/Footer';
 import {NotificationView} from '../components/NotificationView/NotificationView';
-import {RootState, mutable} from '../../store/State';
+import {RootState} from '../../store/State';
 import {Store} from '../../store/Store';
 import {RootAction} from '../../store/Actions';
 
@@ -15,26 +15,26 @@ export enum GroupingType {
 }
 
 export interface Actionable {
-    dispatch: (action: RootAction)=>void;
+    storeDispatch: (action: RootAction) => void;
 }
 
 type Props = ReturnType<typeof mapStateToProps> & Actionable;
 
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, dispatch} = props;
+    const {notifications, storeDispatch} = props;
 
     return (
         <div className='notification-center'>
             <Header
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}
-                dispatch={dispatch}
+                storeDispatch={storeDispatch}
             />
             <NotificationView
-                notifications={mutable(notifications)}
+                notifications={notifications}
                 groupBy={groupBy}
-                dispatch={dispatch}
+                storeDispatch={storeDispatch}
             />
             <Footer />
         </div>
@@ -42,7 +42,7 @@ export function NotificationCenterApp(props: Props) {
 }
 
 const mapStateToProps = (state: RootState, ownProps: Actionable) => ({
-    notifications: Object.values(state.notifications),
+    notifications: state.notifications,
     ...ownProps
 });
 
@@ -56,7 +56,7 @@ const Container = connect(mapStateToProps)(NotificationCenterApp);
 export function renderApp(document: Document, store: Store): void {
     ReactDOM.render(
         <Provider store={store['_store']}>
-            <Container dispatch={store.dispatch} />
+            <Container storeDispatch={store.dispatch.bind(store)} />
         </Provider>,
         document.getElementById('react-app')
     );

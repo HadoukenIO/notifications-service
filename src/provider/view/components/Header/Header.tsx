@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {GroupingType, Actionable} from '../../containers/NotificationCenterApp';
-import {Action} from '../../../store/Actions';
+import {ToggleVisibility} from '../../../store/Actions';
 
 interface HeaderProps extends Actionable {
     groupBy: GroupingType;
@@ -9,10 +9,10 @@ interface HeaderProps extends Actionable {
 }
 
 export function Header(props: HeaderProps): React.ReactElement {
-    const {groupBy, handleGroupBy, dispatch} = props;
+    const {groupBy, handleGroupBy, storeDispatch} = props;
 
     const handleHideWindow = () => {
-        dispatch({type: Action.TOGGLE_VISIBILITY, visible: false});
+        storeDispatch(new ToggleVisibility(false));
     };
 
     return (

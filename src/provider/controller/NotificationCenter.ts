@@ -5,7 +5,7 @@ import {MonitorEvent} from 'openfin/_v2/api/events/system';
 import {Inject} from '../common/Injectables';
 import {TrayIcon} from '../common/TrayIcon';
 import {WebWindow, createWebWindow} from '../model/WebWindow';
-import {Action} from '../store/Actions';
+import {ToggleVisibility} from '../store/Actions';
 import {Store} from '../store/Store';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 
@@ -37,7 +37,7 @@ export class NotificationCenter extends AsyncInit {
     private _trayIcon!: TrayIcon;
 
     protected async init() {
-        // Create notification center app window
+        // Create Notification Center app window
         try {
             this._webWindow = await createWebWindow(windowOptions);
         } catch (error) {
@@ -47,7 +47,7 @@ export class NotificationCenter extends AsyncInit {
         await this._webWindow.window.hide();
         this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png');
         this._trayIcon.addLeftClickHandler(() => {
-            this._store.dispatch({type: Action.TOGGLE_VISIBILITY});
+            this._store.dispatch(new ToggleVisibility());
         });
         await this.sizeToFit();
         await this.addListeners();
@@ -85,7 +85,7 @@ export class NotificationCenter extends AsyncInit {
         if (hideOnBlur) {
             window.addListener('blurred', async () => {
                 if (this.visible) {
-                    this._store.dispatch({type: Action.TOGGLE_VISIBILITY, visible: false});
+                    this._store.dispatch(new ToggleVisibility(false));
                 }
             });
         }
@@ -142,7 +142,7 @@ export class NotificationCenter extends AsyncInit {
     }
 
     /**
-     * Animate the notification center window into view.
+     * Animate the Notification Center window into view.
      * @param duration Animation duration.
      */
     private async animateIn(duration: number = 300): Promise<void> {
@@ -163,7 +163,7 @@ export class NotificationCenter extends AsyncInit {
     }
 
     /**
-     * Animate the notification center window out of view.
+     * Animate the Notification Center window out of view.
      * @param duration Animation duration.
      */
     private async animateOut(duration: number = 400): Promise<void> {
