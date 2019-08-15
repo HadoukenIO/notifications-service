@@ -1,7 +1,7 @@
 import {injectable} from 'inversify';
 import Dexie from 'dexie';
 
-import {StoredSetting} from '../StoredSettings';
+import {StoredSetting} from '../StoredSetting';
 import {StoredNotification} from '../StoredNotification';
 import {DeferredPromise} from '../../common/DeferredPromise';
 import {AsyncInit} from '../../controller/AsyncInit';

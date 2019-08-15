@@ -4,7 +4,7 @@ import {StoredNotification} from '../model/StoredNotification';
 import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
 import {CollectionMap} from '../model/database/Database';
-import {SettingsMap} from '../model/StoredSettings';
+import {SettingsMap} from '../model/StoredSetting';
 
 import {RootState, Immutable, mutable} from './State';
 
