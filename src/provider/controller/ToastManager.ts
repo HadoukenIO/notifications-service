@@ -53,6 +53,8 @@ export class ToastManager {
         if (this._toasts.has(notification.id)) {
             const oldToast = this._toasts.get(id)!;
             await this.deleteToast(oldToast, true);
+
+            // Workaround for race conditions within toast manager. Will address with SERVICE-581.
             await new Promise(resolve => setTimeout(resolve, 200));
         }
 
@@ -114,6 +116,8 @@ export class ToastManager {
      */
     private async deleteToast(toast: Toast, force: boolean = false): Promise<void> {
         const index = this._stack.items.indexOf(toast);
+
+        // Workaround for race conditions within toast manager. Will address with SERVICE-581.
         if (index >= 0) {
             this._stack.items.splice(index, 1);
         }
