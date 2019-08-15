@@ -7,9 +7,10 @@ import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
 
 import {LayoutStack, Layouter} from './Layouter';
+import {AsyncInit} from './AsyncInit';
 
 @injectable()
-export class ToastManager {
+export class ToastManager extends AsyncInit {
     private _layouter!: Layouter;
     private _store!: Store;
     private _toasts: Map<string, Toast> = new Map();
@@ -17,12 +18,18 @@ export class ToastManager {
     private _queue: Toast[] = [];
 
     constructor(@inject(Inject.STORE) store: Store, @inject(Inject.LAYOUTER) layouter: Layouter) {
+        super();
+
         this._store = store;
         this._store.onAction.add(this.onAction, this);
-        this.subscribe();
         this.addListeners();
         this._layouter = layouter;
         this._layouter.onLayoutRequired.add(this.onLayoutRequired, this);
+    }
+
+    protected async init() {
+        await this._store.initialized;
+        this.subscribe();
     }
 
     /**

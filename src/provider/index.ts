@@ -19,7 +19,7 @@ import {StoredNotification} from './model/StoredNotification';
 import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisibility} from './store/Actions';
 import {mutable} from './store/State';
 import {Store} from './store/Store';
-import {notificationStorage, settingsStorage} from './model/Storage';
+import {Database} from './model/database/Database';
 
 @injectable()
 export class Main {
@@ -37,6 +37,9 @@ export class Main {
     @inject(Inject.TOAST_MANAGER)
     private _toastManager!: ToastManager;
 
+    @inject(Inject.DATABASE)
+    private _database!: Database;
+
     public async register(): Promise<void> {
         Object.assign(window, {
             main: this,
@@ -44,9 +47,7 @@ export class Main {
             store: this._store,
             center: this._notificationCenter,
             toast: this._toastManager,
-            // Include the two localforage instances for debugging/integration testing
-            notificationStorage,
-            settingsStorage
+            database: this._database
         });
 
         // Wait for creation of any injected components that require async initialization

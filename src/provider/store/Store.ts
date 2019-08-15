@@ -4,8 +4,10 @@ import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispat
 import {Signal, Aggregators} from 'openfin-service-signal';
 
 import {Inject} from '../common/Injectables';
-import {notificationStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
+import {Database, CollectionMap} from '../model/database/Database';
+import {AsyncInit} from '../controller/AsyncInit';
+import {Collection} from '../model/database/Collection';
 
 import {ActionHandlerMap, ActionHandler, RootAction, Action, ActionOf, CustomAction} from './Actions';
 import {RootState} from './State';
@@ -21,7 +23,7 @@ export interface StoreAPI {
 }
 
 @injectable()
-export class Store implements StoreAPI {
+export class Store extends AsyncInit implements StoreAPI {
     private static INITIAL_STATE: RootState = {
         notifications: [],
         windowVisible: false
@@ -29,12 +31,20 @@ export class Store implements StoreAPI {
 
     public readonly onAction: Signal<[RootAction], Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
 
+    private readonly _database: Database;
     private _actionHandlerMap: ActionHandlerMap;
-    private _store: ReduxStore<RootState, RootAction>;
+    private _store!: ReduxStore<RootState, RootAction>;
 
-    constructor(@inject(Inject.ACTION_HANDLER_MAP) actionHandlerMap: ActionHandlerMap) {
+    constructor(@inject(Inject.ACTION_HANDLER_MAP) actionHandlerMap: ActionHandlerMap, @inject(Inject.DATABASE) database: Database) {
+        super();
+
+        this._database = database;
         this._actionHandlerMap = actionHandlerMap;
-        this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), this.getInitialState(), this.createEnhancer());
+    }
+
+    protected async init(): Promise<void> {
+        await this._database.initialized;
+        this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), await this.getInitialState(), this.createEnhancer());
     }
 
     public get state(): RootState {
@@ -103,11 +113,9 @@ export class Store implements StoreAPI {
         };
     }
 
-    private getInitialState(): RootState {
-        const notifications: StoredNotification[] = [];
-        notificationStorage.iterate((value: string, key: string) => {
-            notifications.push(JSON.parse(value));
-        });
+    private async getInitialState(): Promise<RootState> {
+        const notificationCollection: Collection<StoredNotification> = this._database.get(CollectionMap.NOTIFICATIONS);
+        const notifications: StoredNotification[] = await notificationCollection.getAll();
 
         return Object.assign({}, Store.INITIAL_STATE, {notifications});
     }

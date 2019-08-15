@@ -37,7 +37,9 @@ export class NotificationCenter extends AsyncInit {
     private _trayIcon!: TrayIcon;
 
     protected async init() {
-        // Create Notification Center app window
+        await this._store.initialized;
+
+        // Create notification center app window
         try {
             this._webWindow = await createWebWindow(windowOptions);
         } catch (error) {
@@ -52,14 +54,14 @@ export class NotificationCenter extends AsyncInit {
         await this.sizeToFit();
         await this.addListeners();
         renderApp(this._webWindow.document, this._store);
-        await this.subscribe();
+        this.subscribe();
     }
 
     /**
      * Subscribe to the store.
      * Perform all watching for state change in here.
      */
-    private async subscribe(): Promise<void> {
+    private subscribe(): void {
         // Window visibility
         this._store.watchForChange(
             state => state.windowVisible,

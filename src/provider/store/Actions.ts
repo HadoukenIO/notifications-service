@@ -1,7 +1,10 @@
 import {Action as ReduxAction} from 'redux';
 
-import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
+import {Injector} from '../common/Injector';
+import {Inject} from '../common/Injectables';
+import {CollectionMap} from '../model/database/Database';
+import {SettingsMap} from '../model/StoredSetting';
 
 import {RootState} from './State';
 import {StoreAPI} from './Store';
@@ -97,6 +100,10 @@ export type ActionHandlerMap<T extends Action = Action> = {
 export const ActionHandlers: ActionHandlerMap = {
     [Action.CREATE]: (state: RootState, action: CreateNotification): RootState => {
         const {notification} = action;
+
+        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
+        database.get(CollectionMap.NOTIFICATIONS).upsert(notification);
+
         const notifications: StoredNotification[] = state.notifications.slice();
 
         // All notification ID's must be unique. The custom dispatch logic of the `CreateNotification` event should
@@ -110,7 +117,6 @@ export const ActionHandlers: ActionHandlerMap = {
 
         // Add new notification (ordering within array doesn't matter)
         notifications.push(notification);
-        notificationStorage.setItem(notification.id, JSON.stringify(notification));
 
         return {
             ...state,
@@ -119,10 +125,12 @@ export const ActionHandlers: ActionHandlerMap = {
     },
     [Action.REMOVE]: (state: RootState, action: RemoveNotifications): RootState => {
         const {notifications} = action;
+        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
-            notificationStorage.removeItem(n.id);
             return n.id;
         });
+
+        database.get(CollectionMap.NOTIFICATIONS).delete(idsToRemove);
 
         return {
             ...state,
@@ -131,7 +139,9 @@ export const ActionHandlers: ActionHandlerMap = {
     },
     [Action.TOGGLE_VISIBILITY]: (state: RootState, action: ToggleVisibility): RootState => {
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
-        settingsStorage.setItem('windowVisible', windowVisible);
+        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
+
+        storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
 
         return {
             ...state,

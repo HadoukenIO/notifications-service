@@ -9,6 +9,7 @@ import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
 import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
+import {Database} from '../model/database/Database';
 
 import {Inject} from './Injectables';
 
@@ -21,6 +22,7 @@ type Types = {
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.LAYOUTER]: Layouter;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
+    [Inject.DATABASE]: Database;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
 };
@@ -36,6 +38,8 @@ const Bindings = {
     [Inject.API_HANDLER]: APIHandler,
     [Inject.LAYOUTER]: Layouter,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
+    [Inject.DATABASE]: Database,
+    [Inject.LAYOUTER]: Layouter,
     [Inject.STORE]: Store,
     [Inject.TOAST_MANAGER]: ToastManager
 };
@@ -67,7 +71,7 @@ export class Injector {
 
             if (proto && proto.hasOwnProperty('init')) {
                 const instance = (container.get(Inject[key]) as AsyncInit);
-                promises.push(instance.initialized);
+                promises.push(instance.delayedInit());
             }
         });
 
