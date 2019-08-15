@@ -15,9 +15,8 @@ import {EventEmitter} from 'events';
 
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 
-import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY} from './internal';
-
-import {NotificationEvent} from './index';
+import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events} from './internal';
+import {EventRouter, Targeted, Transport} from './EventRouter';
 
 /**
  * The version of the NPM package.
@@ -25,14 +24,6 @@ import {NotificationEvent} from './index';
  * Webpack replaces any instances of this constant with a hard-coded string at build time.
  */
 declare const PACKAGE_VERSION: string;
-
-/**
- * Defines all events that are fired by the service.
- *
- * Currently only one type, but leaving this here to match the service pattern and
- * in case others are needed in future.
- */
-export type NotificationsEvent = NotificationEvent;
 
 /**
  * The event emitter to emit events received from the service.  All addEventListeners will tap into this.
@@ -44,20 +35,37 @@ export const eventEmitter = new EventEmitter();
  */
 export let channelPromise: Promise<ChannelClient>;
 
-if (fin.Window.me.uuid !== SERVICE_IDENTITY.uuid || fin.Window.me.name !== SERVICE_IDENTITY.name) {
-    channelPromise = typeof fin === 'undefined' ?
-        Promise.reject(new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.')) :
-        fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
-            // Register service listeners
-            channel.register('WARN', (payload: any) => console.warn(payload));
-            channel.register('event', (event: NotificationsEvent) => {
-                eventEmitter.emit(event.type, event);
-            });
-            // Any unregistered action will simply return false
-            channel.setDefaultAction(() => false);
+if (typeof fin !== 'undefined') {
+    getServicePromise();
+}
 
-            return channel;
-        });
+export function getServicePromise(): Promise<ChannelClient> {
+    if (!channelPromise) {
+        if (typeof fin === 'undefined') {
+            const msg: string = 'fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.';
+            channelPromise = Promise.reject(new Error(msg));
+        } else if (fin.Window.me.uuid === SERVICE_IDENTITY.uuid && fin.Window.me.name === SERVICE_IDENTITY.name) {
+            // Currently a runtime bug when provider connects to itself. Ideally the provider would never import a file
+            // that includes this, but for now it is easier to put a guard in place.
+            channelPromise = Promise.reject(new Error('Trying to connect to provider from provider'));
+        } else {
+            channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
+                const eventRouter = getEventRouter();
+
+                // Register service listeners
+                channel.register('WARN', (payload: any) => console.warn(payload));
+                channel.register('event', (event: Targeted<Transport<Events>>) => {
+                    eventRouter.dispatchEvent(event);
+                });
+                // Any unregistered action will simply return false
+                channel.setDefaultAction(() => false);
+
+                return channel;
+            });
+        }
+    }
+
+    return channelPromise;
 }
 
 /**
@@ -68,4 +76,14 @@ if (fin.Window.me.uuid !== SERVICE_IDENTITY.uuid || fin.Window.me.name !== SERVI
 export async function tryServiceDispatch<T extends APITopic>(action: T, payload: API[T][0]): Promise<API[T][1]> {
     const channel: ChannelClient = await channelPromise;
     return channel.dispatch(action, payload) as Promise<API[T][1]>;
+}
+
+let eventRouter: EventRouter<Events>|null;
+
+export function getEventRouter(): EventRouter<Events> {
+    if (!eventRouter) {
+        eventRouter = new EventRouter(eventEmitter);
+    }
+
+    return eventRouter;
 }

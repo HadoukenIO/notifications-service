@@ -1,0 +1,21 @@
+{
+    "devtools_port": 9090,
+    "startup_app": {
+        "name": "test-app",
+        "url": "http://localhost:3922/demo/app.html",
+        "uuid": "test-app",
+        "autoShow": true,
+        "showTaskbarIcon": false,
+        "defaultHeight": 400,
+        "defaultWidth": 500
+    },
+    "services": [
+        {
+            "name": "notifications",
+            "manifestUrl": "http://localhost:3922/provider/app.json"
+        }
+    ],
+    "runtime": {
+        "version": "10.66.39.43"
+    }
+}

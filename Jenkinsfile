@@ -39,11 +39,11 @@ pipeline {
                         bat "npm install"
                         bat "npm run test:int -- --noColor -x \"--no-cache --verbose\""
                     }
-                    // post {
-                    //     always {
-                    //         junit "dist/test/results-int.xml"
-                    //     }
-                    // }
+                    post {
+                        always {
+                            junit "dist/test/results-int.xml"
+                        }
+                    }
                 }
             }
         }
@@ -121,7 +121,7 @@ def deployToS3() {
     sh "aws s3 cp ./dist/docs ${DIR_DOCS_VERSION} --recursive"
 
     sh "aws s3 cp ./dist/provider/app.json ${DIR_BUILD_ROOT}${MANIFEST_NAME}"
-    sh "aws s3 cp ./dist/provider/ ${DIR_BUILD_ROOT} --exclude \"*\" --include \"app.runtime-*.json\""
+    sh "aws s3 cp ./dist/provider/ ${DIR_BUILD_ROOT} --recursive --exclude \"*\" --include \"app.runtime-*.json\""
 }
 
 def deployToNPM() {

@@ -1,115 +1,274 @@
 /**
- * @module Index
+ * @module Notifications
  */
 
-import {tryServiceDispatch, eventEmitter} from './connection';
-import {APITopic} from './internal';
+/**
+ * Need a comment block here so that the comment block above is interpreted as a file comment, and not a comment on the
+ * import below.
+ *
+ * @hidden
+ */
+import {ActionDeclaration, NotificationActionResult, ActionTrigger} from './actions';
+import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
+import {ButtonOptions, ControlOptions} from './controls';
+import {APITopic, Events, NotificationInternal} from './internal';
+import {EventRouter, Transport} from './EventRouter';
 
-import {NotificationOptions, Notification, NotificationClickedEvent, NotificationClosedEvent, NotificationButtonClickedEvent} from './index';
-import {NotificationEvent} from './index';
+const eventHandler: EventRouter<Events> = getEventRouter();
+
+function parseEventWithNotification<T extends {notification: NotificationInternal}>(event: T): T & {notification: Notification} {
+    const {notification} = event;
+
+    return {
+        ...event,
+        notification: {
+            ...notification,
+            date: new Date(notification.date)
+        }
+    };
+}
+
+eventHandler.registerDeserializer<NotificationCreatedEvent>('notification-created', (event: Transport<NotificationCreatedEvent>) => {
+    return parseEventWithNotification(event);
+});
+eventHandler.registerDeserializer<NotificationClosedEvent>('notification-closed', (event: Transport<NotificationClosedEvent>) => {
+    return parseEventWithNotification(event);
+});
+eventHandler.registerDeserializer<NotificationActionEvent>('notification-action', (event: Transport<NotificationActionEvent>) => {
+    const {controlSource, controlIndex, ...rest} = parseEventWithNotification(event);
+
+    if (event.trigger === ActionTrigger.CONTROL) {
+        const control: ControlOptions = event.notification[controlSource!][controlIndex!] as ControlOptions;
+        return {...rest, control};
+    } else {
+        return rest;
+    }
+});
 
 /**
  * Configuration options for constructing a Notifications object.
  */
 export interface NotificationOptions {
     /**
-     * A unique identifier for the Notification.
+     * A unique identifier for the notification.
      *
      * If not provided at time of creation, one will be generated for you and returned as part of the {@link create} method.
      */
     id?: string;
+
     /**
-     * Main Notification content.
+     * Title of the notification.
+     *
+     * Displayed as the first line of the notification, in a heading style.
+     */
+    title: string;
+
+    /**
+     * Notification body text.
+     *
+     * This is the main notification content, displayed below the notification title. The notification will expand to fit the length of this text.
      */
     body: string;
+
     /**
-     * Title of the Notification (e.g. sender name for email).
+     * Describes the context of this notification. Allows users to control different notification types that are raised
+     * by an application.
+     *
+     * This string is not displayed on the notification itself, but should be user-readable. It will be displayed in
+     * the Notification Center preferences section, and any string passed as a `category` should make sense when
+     * displayed in that context.
+     *
+     * Event categories should list all the different types of notifications raised by your app. As a general guide, if
+     * a user may want to have different preferences for some subset of notifications created by your app, then
+     * applications should ensure that those notifications have a distinct category.
+     *
+     * For example - given a calendar app, notification categories could be:
+     * - `'Upcoming Events'`: Notification that an event is about to start
+     * - `'Event Start'`: Notification raised when event starts, expiring at the event end time
+     * - `'Event Modified'`: When an event is modified
+     * - `'Event Cancelled'`: When an event is cancelled
+     * - `'Event Response'`: An attendee has responded to an event invitation that you created
+     * - `'Daily Agenda'`: A notification sent each morning with event reminders
+     *
+     * **NOTE:** The user-facing UI that a user would use to manage their preferences is still in progress. This
+     * property has been added in advance of this UI being released, to ensure future compatibility.
      */
-    title: string;
+    category: string;
+
     /**
-     * Subtitle of the Notification.
-     */
-    subtitle?: string;
-    /**
-     * URL of the icon to be displayed in the Notification.
+     * URL of the icon to be displayed in the notification.
      */
     icon?: string;
+
     /**
-     * Any custom context data associated with the Notification.
+     * Any custom context data associated with the notification.
      */
     customData?: CustomData;
+
     /**
-     * The timestamp shown on the Notification.  This is presentational only - a future date will not incur a scheduling action.
+     * The timestamp shown on the notification. If omitted, the current date/time will be used.
+     *
+     * This is presentational only - a future date will not incur a scheduling action.
      */
     date?: Date;
+
     /**
-     * Text and icons for up to two Notification action buttons.
+     * A list of buttons to display below the notification text.
+     *
+     * Notifications support up to four buttons. Attempting to add more than four will result in the notification
+     * being rejected by the service.
      */
-    buttons?: OptionButton[];
+    buttons?: ButtonOptions[];
+
+    /**
+     * An {@link NotificationActionResult|action result} to be passed back to the application inside the
+     * {@link NotificationActionEvent|`notification-action`} event fired when the notification is clicked.
+     *
+     * This action will only be raised on clicks to the notification body. Interactions with buttons (both
+     * application-defined buttons, and the default 'X' close button) will not trigger a
+     * {@link ActionTrigger.SELECT|select} action.
+     *
+     * If omitted or `null`, applications will not receive a {@link NotificationActionEvent|`notification-action`}
+     * event when the notification is clicked. See {@link Actions} for more details on notification actions, and
+     * receiving interaction events from notifications.
+     */
+    onSelect?: ActionDeclaration<never, never>|null;
 }
 
 /**
- * Configuration options for constructing a Button within a Notification.
+ * Application-defined context data that can be attached to notifications.
  */
-export interface OptionButton {
-    title: string;
-    iconUrl?: string;
-}
+export type CustomData = {[key: string]: any};
 
 /**
- * User-defined context data that can be attached to Notifications.
- */
-export type CustomData = any;
-
-/**
- * A fully hydrated form of the {@link NotificationOptions}.
- */
-export type Notification = Required<NotificationOptions>;
-
-/**
- * Event fired whenever the Notification has been clicked on.
+ * A fully-hydrated form of {@link NotificationOptions}.
  *
- * This will not fire in cases of Notification Buttons being clicked.  See {@link NotificationButtonClickedEvent}.
+ * After {@link create|creating} a notification, the service will return an object of this type. This will be the given
+ * options object, with any unspecified fields filled-in with default values.
+ *
+ * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
+ * state of the service.
+ */
+export type Notification = Readonly<Required<NotificationOptions>>;
+
+/**
+ * Event fired for interactions with notification UI elements. It is important to note that applications will only
+ * receive these events if they indicate to the service that they want to receive these events. See {@link Actions} for
+ * a full example of how actions are defined, and how an application can listen to and handle them.
+ *
+ * This can be fired due to interaction with notification buttons, or the notification itself. Later versions of the
+ * service will add additional control types. All actions, for all control types, will be returned to the application
+ * via the same `notification-action` event type.
+ *
+ * The event object will contain the application-defined {@link NotificationActionResult|metadata} that allowed this
+ * action to be raised, and details on what triggered this action and which control the user interacted with.
+ *
+ * This type includes a generic type argument, should applications wish to define their own interface for action
+ * results. See {@link NotificationActionResult} for details.
  *
  * @event
  */
-export interface NotificationClickedEvent {
-    type: 'notification-clicked';
-    notification: Notification;
+export interface NotificationActionEvent<T = CustomData> {
+    type: 'notification-action';
+
+    /**
+     * The notification that created this action
+     */
+    notification: Readonly<Notification>;
+
+    /**
+     * Indicates what triggered this action.
+     *
+     * Note that the `programmatic` trigger is not yet implemented.
+     */
+    trigger: ActionTrigger;
+
+    /**
+     * The control whose interaction resulted in this action being raised. Will only be present when {@link trigger} is
+     * {@link ActionTrigger.CONTROL}.
+     *
+     * Future versions of the service will add additional controls beyond buttons, and interactions with these new
+     * control types will also come through this one event type. For best forward-compatibility, applications should
+     * always check the `type` property of this control, and not assume that the type will always be `'button'`.
+     *
+     * This field is marked optional as future versions of the service will also include alternate methods of raising
+     * `notification-action` events that do not originate from a button or other control.
+     *
+     * When present, the object here will always be strictly equal to one of the control definitions within
+     * `notification`. This means `indexOf` checks and other equality checks can be performed on this field if
+     * required, such as:
+     *
+     * ```ts
+     * function onNotificationAction(event: NotificationActionEvent): void {
+     *     if (event.control && event.control.type === 'button') {
+     *         const butttonIndex = event.notification.buttons.indexOf(event.control);
+     *
+     *         // Handle button click
+     *         // . . .
+     *     }
+     * }
+     * ```
+     */
+    control?: Readonly<ControlOptions>;
+
+    /**
+     * Application-defined metadata that this event is passing back to the application.
+     *
+     * A `notification-action` event is only fired for an interaction with a notification if the
+     * {@link NotificationOptions|notification options} included an action result for that interaction.
+     *
+     * See the comment on the {@link NotificationActionEvent} type for an example of buttons that do and don't raise
+     * actions.
+     */
+    result: NotificationActionResult<T>;
 }
 
 /**
- * Event fired whenever the Notification has been closed.
+ * Event fired whenever the notification has been closed.
+ *
+ * This event is fired regardless of how the notification was closed - i.e.: via a call to `clear`/`clearAll`, or by a
+ * user clicking either the notification itself, the notification's close button, or a button on the notification.
  *
  * @event
  */
 export interface NotificationClosedEvent {
     type: 'notification-closed';
+
+    /**
+     * The notification that has just been closed.
+     *
+     * This object will match what is returned from the `create` call when the notification was first created.
+     */
     notification: Notification;
 }
 
 /**
- * Event fired whenever the Notification has been clicked.
- *
- * This will not fire in cases of non-buttons being clicked.  See {@link NotificationClickedEvent}.
+ * Event fired whenever a new notification has been created.
  *
  * @event
  */
-export interface NotificationButtonClickedEvent {
-    type: 'notification-button-clicked';
+export interface NotificationCreatedEvent {
+    type: 'notification-created';
+
+    /**
+     * The notification that has just been created.
+     *
+     * This object will match what is returned from the `create` call.
+     */
     notification: Notification;
-    buttonIndex: number;
 }
 
-/**
- * @hidden
- */
-export type NotificationEvent = NotificationClickedEvent | NotificationClosedEvent | NotificationButtonClickedEvent;
-
-export function addEventListener(eventType: 'notification-clicked', listener: (event: NotificationClickedEvent) => void): void;
+export function addEventListener(eventType: 'notification-action', listener: (event: NotificationActionEvent) => void): void;
+export function addEventListener(eventType: 'notification-created', listener: (event: NotificationCreatedEvent) => void): void;
 export function addEventListener(eventType: 'notification-closed', listener: (event: NotificationClosedEvent) => void): void;
-export function addEventListener(eventType: 'notification-button-clicked', listener: (event: NotificationButtonClickedEvent) => void): void;
-export function addEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
+
+/**
+ * Adds a listener, see definitions of individual event interfaces for details on each event.
+ *
+ * @param eventType The event being subscribed to
+ * @param listener The callback function to add
+ */
+export function addEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
@@ -117,10 +276,19 @@ export function addEventListener<E extends NotificationEvent>(eventType: E['type
     eventEmitter.addListener(eventType, listener);
 }
 
-export function removeEventListener(eventType: 'notification-clicked', listener: (event: NotificationClickedEvent) => void): void;
+export function removeEventListener(eventType: 'notification-action', listener: (event: NotificationActionEvent) => void): void;
+export function removeEventListener(eventType: 'notification-created', listener: (event: NotificationCreatedEvent) => void): void;
 export function removeEventListener(eventType: 'notification-closed', listener: (event: NotificationClosedEvent) => void): void;
-export function removeEventListener(eventType: 'notification-button-clicked', listener: (event: NotificationButtonClickedEvent) => void): void;
-export function removeEventListener<E extends NotificationEvent>(eventType: E['type'], listener: (event: E) => void): void {
+
+/**
+ * Removes a listener previously added with {@link addEventListener}.
+ *
+ * Has no effect if `eventType` isn't a valid event, or `listener` isn't a callback registered against `eventType`.
+ *
+ * @param eventType The event being unsubscribed from
+ * @param listener The callback function to remove, must be strictly-equal (`===` equivilance) to a listener previously passed to {@link addEventListener} to have an effect
+ */
+export function removeEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
     if (typeof fin === 'undefined') {
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
@@ -129,41 +297,49 @@ export function removeEventListener<E extends NotificationEvent>(eventType: E['t
 }
 
 /**
- * Creates a new Notification.
+ * Creates a new notification.
  *
- * The Notification will appear in the Notification Center and as a toast if the Center is not visible.
+ * The notification will appear in the Notification Center and as a toast if the Center is not visible.
  *
- * If a Notification is created with an `id` of an already existing Notification, the existing Notification will be recreated with the new content.
+ * If a notification is created with an `id` of an already existing notification, the existing notification will be recreated with the new content.
  *
  * ```ts
  * import {create} from 'openfin-notifications';
  *
  * create({
- *      id: "uniqueNotificationId",
- *      body: "I'm the Notification body text",
- *      icon: "https://openfin.co/favicon.ico"
+ *      id: 'uniqueNotificationId',
+ *      title: 'Notification Title',
+ *      body: 'Text to display within the notification body',
+ *      category: 'Sample Notifications',
+ *      icon: 'https://openfin.co/favicon.ico'
  * });
  * ```
  *
  * @param options Notification configuration options.
  */
 export async function create(options: NotificationOptions): Promise<Notification> {
-    // Should have some sort of input validation here...
-    return tryServiceDispatch(APITopic.CREATE_NOTIFICATION, options);
+    // Most validation logic is handled on the provider, but need an early check here
+    // as we call date.valueOf when converting into a CreatePayload
+    if (options.date !== undefined && !(options.date instanceof Date)) {
+        throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
+    }
+
+    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {...options, date: options.date && options.date.valueOf()});
+    return {...response, date: new Date(response.date)};
 }
 
 /**
- * Clears a specific Notification from the Notification Center.
+ * Clears a specific notification from the Notification Center.
  *
- * Returns true if the Notification was successfully cleared.  Returns false if the Notification was not cleared, without errors.
+ * Returns true if the notification was successfully cleared.  Returns false if the notification was not cleared, without errors.
  *
  * ```ts
  * import {clear} from 'openfin-notifications';
  *
- * clear("uniqueNotificationId");
+ * clear('uniqueNotificationId');
  * ```
  *
- * @param id ID of the Notification to clear.
+ * @param id ID of the notification to clear.
  */
 export async function clear(id: string): Promise<boolean> {
     // Should have some sort of input validation here...
@@ -176,13 +352,17 @@ export async function clear(id: string): Promise<boolean> {
  * ```ts
  * import {getAll} from 'openfin-notifications'
  *
- * getAll()
- *  .then(console.log);
+ * getAll().then((notifications: Notification[]) => {
+ *     console.log(`Service has ${notifications.length} notifications for this app:`, notifications);
+ * });
  * ```
+ *
+ * There is deliberately no mechanism provided for fetching notifications that were created by a different application.
  */
-export async function getAll(): Promise<Notification[]>{
+export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
-    return tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
+    const response = await tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
+    return response.map(note => ({...note, date: new Date(note.date)}));
 }
 
 /**

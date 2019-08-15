@@ -1,6 +1,6 @@
 {
   "name": "openfin-notifications",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "Client library for the Openfin Notifications service",
   "main": "dist/client/main-bundle.js",
   "types": "dist/client/index.d.ts",
@@ -18,7 +18,7 @@
     "posttest": "npm run check",
     "prepack": "npm run clean && npm run build && tsc -p src/client/tsconfig.types.json",
     "test": "npm run test:unit && npm run test:int",
-    "test:int": "echo 'Integration tests not available yet'",
+    "test:int": "svc-tools test int",
     "test:unit": "svc-tools test unit",
     "zip": "svc-tools zip",
     "start": "svc-tools start",
@@ -36,19 +36,27 @@
   "homepage": "https://github.com/openfin/Notification-Service#readme",
   "dependencies": {},
   "devDependencies": {
+    "@types/mkdirp": "^0.5.2",
     "@types/moment": "^2.13.0",
     "@types/node": "^9.4.6",
+    "@types/node-fetch": "^2.3.4",
     "@types/openfin": "^39.0.1",
+    "@types/puppeteer": "1.3.0",
     "@types/react": "^16.8.6",
     "@types/react-dom": "^16.8.2",
     "@types/react-redux": "^7.0.8",
     "@types/remote-redux-devtools": "^0.5.3",
+    "dexie": "^2.0.4",
     "express": "^4.16.2",
-    "hadouken-js-adapter": "^0.36.1-alpha.1",
+    "hadouken-js-adapter": "^0.39.1",
     "inversify": "^5.0.1",
-    "localforage": "^1.7.3",
+    "mkdirp": "^0.5.1",
     "moment": "^2.22.1",
-    "openfin-service-tooling": "1.0.10",
+    "node-fetch": "^2.6.0",
+    "openfin-service-signal": "^1.0.0",
+    "openfin-service-tooling": "1.0.12",
+    "pre-commit": "^1.2.2",
+    "puppeteer": "1.3.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.3",
     "react-redux": "^7.0.2",
@@ -57,5 +65,10 @@
     "reflect-metadata": "^0.1.13",
     "remote-redux-devtools": "^0.5.16",
     "typescript": "3.4.5"
+  },
+  "precommit": {
+    "run": [
+      "check"
+    ]
   }
 }

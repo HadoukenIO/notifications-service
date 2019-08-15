@@ -4,7 +4,7 @@ import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {Button} from '../Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {CloseButton} from '../CloseButton/CloseButton';
-import {Action} from '../../../store/Actions';
+import {RemoveNotifications, ClickButton, ClickNotification} from '../../../store/Actions';
 import {Actionable} from '../../containers/NotificationCenterApp';
 
 interface NotificationCardProps extends Actionable {
@@ -12,21 +12,21 @@ interface NotificationCardProps extends Actionable {
 }
 
 export function NotificationCard(props: NotificationCardProps) {
-    const {notification, dispatch} = props;
+    const {notification, storeDispatch} = props;
     const data = notification.notification;
 
     const handleNotificationClose = () => {
-        dispatch({type: Action.REMOVE, notifications: [notification]});
+        storeDispatch(new RemoveNotifications([notification]));
     };
 
     const handleButtonClick = (buttonIndex: number) => {
-        dispatch({type: Action.CLICK_BUTTON, notification, buttonIndex});
+        storeDispatch(new ClickButton(notification, buttonIndex));
     };
 
     const handleNotificationClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
-        dispatch({type: Action.CLICK_NOTIFICATION, notification});
+        storeDispatch(new ClickNotification(notification));
     };
 
     return (
@@ -35,9 +35,7 @@ export function NotificationCard(props: NotificationCardProps) {
             <NotificationTime date={data.date} />
             <div className="body">
                 <div className="source">
-                    <img
-                        src={data.icon}
-                    />
+                    {data.icon && <img src={data.icon} />}
                     <span className="app-name">
                         {notification.source.name}
                     </span>

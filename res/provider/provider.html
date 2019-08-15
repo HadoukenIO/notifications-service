@@ -10,6 +10,16 @@
         <button onclick="fin.System.showDeveloperTools({uuid: 'notifications-service', name: 'notifications-service'})">
             Show Debugger
         </button>
+
+        <button onclick="restart()">
+            Restart
+        </button>
+
+        <script>
+            function restart() {
+                fin.Application.getCurrentSync().getChildWindows().then(children => children.forEach(win => win.close())); window.location.reload();
+            }
+        </script>
     </body>
 
 </html>

@@ -9,7 +9,11 @@
  * This file is excluded from the public-facing TypeScript documentation.
  */
 
-import {NotificationOptions, Notification} from './index';
+import {NotificationActionResult, ActionTrigger} from './actions';
+
+import {NotificationOptions, Notification, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
+
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
 
 /**
  * The identity of the main application window of the service provider
@@ -33,17 +37,41 @@ export const enum APITopic {
 }
 
 export type API = {
-    [APITopic.CREATE_NOTIFICATION]: [NotificationOptions, Notification];
+    [APITopic.CREATE_NOTIFICATION]: [CreatePayload, NotificationInternal];
     [APITopic.CLEAR_NOTIFICATION]: [ClearPayload, boolean];
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
-    [APITopic.GET_APP_NOTIFICATIONS]: [undefined, Notification[]];
+    [APITopic.GET_APP_NOTIFICATIONS]: [undefined, NotificationInternal[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
 };
 
-export interface CreatePayload extends NotificationOptions {
-    id: string;
+export type Events = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;
+
+export type TransportMappings<T> =
+    T extends NotificationActionEvent ? NotificationActionEventTransport :
+    never;
+export type TransportMemberMappings<T> =
+    T extends Notification ? NotificationInternal :
+    T;
+
+export interface CreatePayload extends Omit<NotificationOptions, 'date'> {
+    date?: number;
+}
+
+export interface NotificationInternal extends Omit<Notification, 'date'> {
+    date: number;
 }
 
 export interface ClearPayload {
     id: string;
+}
+
+export interface NotificationActionEventTransport {
+    type: 'notification-action';
+    notification: Readonly<NotificationInternal>
+    result: NotificationActionResult;
+    trigger: ActionTrigger;
+
+    // Following are present only if trigger is `ActionTrigger.CONTROL`
+    controlSource?: 'buttons';  // Additional sources will be added in future release
+    controlIndex?: number;      // The index of the originating control, within notification[controlSource]
 }
