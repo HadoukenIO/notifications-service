@@ -132,7 +132,7 @@ export type ActionDeclaration<T extends never, E extends never> = NotificationAc
  * });
  * ```
  */
-export type NotificationActionResult<T = {}> = T;
+export type NotificationActionResult<T = {[key: string]: string}> = T;
 
 /**
  * Lists the different triggers that can raise an {@link Actions|action}. Each action that is raised will result in a
