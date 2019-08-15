@@ -138,7 +138,7 @@ export interface NotificationOptions {
 /**
  * Application-defined context data that can be attached to notifications.
  */
-export type CustomData = {};
+export type CustomData = {[key: string]: any};
 
 /**
  * A fully-hydrated form of {@link NotificationOptions}.

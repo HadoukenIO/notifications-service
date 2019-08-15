@@ -84,6 +84,11 @@
  */
 
 /**
+ * (Need to comment this so that above is interpreted as a file-level comment)
+ */
+import {CustomData} from '.';
+
+/**
  * Denotes a field as being an action. Defining this field (with a non-`undefined` value) will result in actions being
  * raised and sent back to the source application when the corresponding event happens.
  *
@@ -132,7 +137,7 @@ export type ActionDeclaration<T extends never, E extends never> = NotificationAc
  * });
  * ```
  */
-export type NotificationActionResult<T = {}> = T;
+export type NotificationActionResult<T = CustomData> = T;
 
 /**
  * Lists the different triggers that can raise an {@link Actions|action}. Each action that is raised will result in a

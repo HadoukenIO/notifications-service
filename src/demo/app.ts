@@ -14,7 +14,7 @@ const normalNote: NotificationOptions = {
     category: 'Short',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
-    onSelect: 'Selected',
+    onSelect: {task: 'Selected'},
     buttons: []
 };
 
@@ -25,7 +25,7 @@ const longNote: NotificationOptions = {
     title: 'Notification Title ',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
-    onSelect: 'Selected',
+    onSelect: {task: 'Selected'},
     buttons: []
 };
 
@@ -35,10 +35,10 @@ const buttonNote: NotificationOptions = {
     category: 'Buttons',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
-    onSelect: 'Selected',
+    onSelect: {task: 'Selected'},
     buttons: [
-        {title: 'test1', iconUrl: 'favicon.ico', onClick: 'Button 1'},
-        {title: 'test2', iconUrl: 'favicon.ico', onClick: 'Button 2'}
+        {title: 'test1', iconUrl: 'favicon.ico', onClick: {btn: 'Button 1'}},
+        {title: 'test2', iconUrl: 'favicon.ico', onClick: {btn: 'Button 2'}}
     ]
 };
 
