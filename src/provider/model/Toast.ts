@@ -133,7 +133,7 @@ export class Toast implements LayoutItem {
         document.removeEventListener('mouseenter', this.mouseEnterHandler);
         document.removeEventListener('mouseleave', this.mouseLeaveHandler);
 
-        await window.close();
+        await (window.close && window.close());
     }
 
     /**

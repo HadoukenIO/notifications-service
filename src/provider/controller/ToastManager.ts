@@ -53,6 +53,7 @@ export class ToastManager {
         if (this._toasts.has(notification.id)) {
             const oldToast = this._toasts.get(id)!;
             await this.deleteToast(oldToast, true);
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
 
         const toast: Toast = new Toast(this._store, notification, {
@@ -112,11 +113,17 @@ export class ToastManager {
      * @param force Force the deleted toast to close without playing animations.
      */
     private async deleteToast(toast: Toast, force: boolean = false): Promise<void> {
-        this._toasts.delete(toast.id);
         const index = this._stack.items.indexOf(toast);
-        this._stack.items.splice(index, 1);
+        if (index >= 0) {
+            this._stack.items.splice(index, 1);
+        }
         this._layouter.layout(this._stack);
-        await this.closeToast(toast);
+        if (force) {
+            await toast.close();
+        } else {
+            await this.closeToast(toast);
+        }
+        this._toasts.delete(toast.id);
         // There is extra space now, check the queue.
         this.checkQueue();
     }
