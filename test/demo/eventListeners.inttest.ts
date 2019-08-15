@@ -1,7 +1,7 @@
 import 'jest';
 import {Application, Window as FinWindow} from 'hadouken-js-adapter';
 
-import {NotificationClickedEvent, Notification, NotificationOptions, NotificationButtonClickedEvent, NotificationClosedEvent} from '../../src/client';
+import {Notification, NotificationOptions, NotificationCreatedEvent, NotificationActionEvent, NotificationClosedEvent} from '../../src/client';
 
 import * as notifsRemote from './utils/notificationsRemote';
 import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
@@ -12,8 +12,10 @@ import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
     title: 'Test Notification Title',
+    category: 'Test Notification Category',
+    onSelect: {task: 'select'},
     buttons: [
-        {title: 'Button 1'}
+        {title: 'Button 1', onClick: {task: 'click'}}
     ]
 };
 
@@ -39,19 +41,19 @@ describe('Click listeners', () => {
         });
 
         describe('With a notification in the center and all three listener types registered', () => {
-            let clickListener: jest.Mock<void, [NotificationClickedEvent]>;
-            let buttonClickListener: jest.Mock<void, [NotificationButtonClickedEvent]>;
-            let closeListener: jest.Mock<void, [NotificationClosedEvent]>;
+            let createdListener: jest.Mock<void, [NotificationCreatedEvent]>;
+            let actionListener: jest.Mock<void, [NotificationActionEvent]>;
+            let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
             let note: Notification;
 
             beforeEach(async () => {
                 // Register the listener
-                clickListener = jest.fn<void, [NotificationClickedEvent]>();
-                buttonClickListener = jest.fn<void, [NotificationButtonClickedEvent]>();
-                closeListener = jest.fn<void, [NotificationClosedEvent]>();
-                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-clicked', clickListener);
-                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-button-clicked', buttonClickListener);
-                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-closed', closeListener);
+                createdListener = jest.fn<void, [NotificationCreatedEvent]>();
+                actionListener = jest.fn<void, [NotificationActionEvent]>();
+                closedListener = jest.fn<void, [NotificationClosedEvent]>();
+                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-created', createdListener);
+                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-action', actionListener);
+                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-closed', closedListener);
 
                 // Create the notification
                 note = await notifsRemote.create(testAppMainWindow.identity, defaultNoteOptions);
@@ -67,6 +69,15 @@ describe('Click listeners', () => {
                 await notifsRemote.clearAll(testAppMainWindow.identity);
             });
 
+            test('The createListener is called when a notification is created', async () => {
+                // Listener was triggered once with the correct data
+                expect(createdListener).toHaveBeenCalledTimes(1);
+                expect(createdListener).toHaveBeenCalledWith({
+                    type: 'notification-created',
+                    notification: {...note, date: note.date.toJSON()}
+                });
+            });
+
             test('Clicking on the card will trigger the listener with the metadata of the clicked notification', async () => {
                 const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
 
@@ -75,14 +86,16 @@ describe('Click listeners', () => {
                 await delay(Duration.EVENT_PROPAGATED);
 
                 // Listener was triggered once with the correct data
-                expect(clickListener).toHaveBeenCalledTimes(1);
-                expect(clickListener).toHaveBeenCalledWith({
-                    type: 'notification-clicked',
-                    notification: {...note, date: note.date.toJSON()}
+                expect(actionListener).toHaveBeenCalledTimes(1);
+                expect(actionListener).toHaveBeenCalledWith({
+                    type: 'notification-action',
+                    notification: {...note, date: note.date.toJSON()},
+                    trigger: 'select',
+                    result: {task: 'select'}
                 });
             });
 
-            test('Clicking on the card\'s button triggers the buttonClickListener and does not trigger the clickListener', async () => {
+            test('Clicking on the card\'s button triggers an ActionTrigger.CONTROL action and does not trigger an ActionTrigger.SELECT action', async () => {
                 const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
 
                 // Get a remote handle to the button DOM element
@@ -93,16 +106,15 @@ describe('Click listeners', () => {
                 await buttonHandles[0].click();
                 await delay(Duration.EVENT_PROPAGATED);
 
-                // buttonClickListener triggered with correct metadata
-                expect(buttonClickListener).toHaveBeenCalledTimes(1);
-                expect(buttonClickListener).toHaveBeenCalledWith({
-                    type: 'notification-button-clicked',
+                // control triggered with correct metadata
+                expect(actionListener).toHaveBeenCalledTimes(1);
+                expect(actionListener).toHaveBeenCalledWith({
+                    type: 'notification-action',
                     notification: {...note, date: note.date.toJSON()},
-                    buttonIndex: 0
+                    trigger: 'control',
+                    control: note.buttons[0],
+                    result: {task: 'click'}
                 });
-
-                // clickListener not triggered
-                expect(clickListener).toHaveBeenCalledTimes(0);
             });
 
             describe('When clicking the close button', () => {
@@ -122,15 +134,15 @@ describe('Click listeners', () => {
                 });
 
                 test('The closeListener is called once with the correct metadata the other listeners are not called', async () => {
-                    expect(closeListener).toHaveBeenCalledTimes(1);
-                    expect(closeListener).toHaveBeenCalledWith({
+                    expect(closedListener).toHaveBeenCalledTimes(1);
+                    expect(closedListener).toHaveBeenCalledWith({
                         type: 'notification-closed',
                         notification: {...note, date: note.date.toJSON()}
                     });
 
-                    // Other listeners not triggered
-                    expect(clickListener).toHaveBeenCalledTimes(0);
-                    expect(buttonClickListener).toHaveBeenCalledTimes(0);
+                    // No 'action', or additional 'created', events
+                    expect(createdListener).toHaveBeenCalledTimes(1);
+                    expect(actionListener).toHaveBeenCalledTimes(0);
                 });
 
                 test('The notification is cleared and no longer appears in the center or when calling getAll', async () => {

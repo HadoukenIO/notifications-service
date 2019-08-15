@@ -1,7 +1,7 @@
 import {injectable, inject} from 'inversify';
 import {composeWithDevTools} from 'remote-redux-devtools';
 import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispatch, Unsubscribe} from 'redux';
-import {Signal} from 'openfin-service-signal';
+import {Signal, Aggregators} from 'openfin-service-signal';
 
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
@@ -9,42 +9,56 @@ import {Database, CollectionMap} from '../model/database/Database';
 import {AsyncInit} from '../controller/AsyncInit';
 import {Collection} from '../model/database/Collection';
 
-import {ActionMap, ActionHandler, RootAction, Action, ActionOf} from './Actions';
-import {RootState, Immutable} from './State';
+import {ActionHandlerMap, ActionHandler, RootAction, Action, ActionOf, CustomAction} from './Actions';
+import {RootState} from './State';
 
 export type StoreChangeObserver<T> = (oldValue: T, newValue: T) => void;
 
+/**
+ * Subset of properties of `Store` that are safe for use from actions and components.
+ */
+export interface StoreAPI {
+    state: RootState;
+    dispatch(action: RootAction): Promise<void>;
+}
+
 @injectable()
-export class Store extends AsyncInit {
+export class Store extends AsyncInit implements StoreAPI {
     private static INITIAL_STATE: RootState = {
         notifications: [],
         windowVisible: false
     };
 
-    public readonly onAction: Signal<[RootAction]> = new Signal();
+    public readonly onAction: Signal<[RootAction], Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
 
-    private readonly _actionMap: ActionMap;
     private readonly _database: Database;
+    private _actionHandlerMap: ActionHandlerMap;
     private _store!: ReduxStore<RootState, RootAction>;
 
-    constructor(@inject(Inject.ACTION_MAP) actionMap: ActionMap, @inject(Inject.DATABASE) database: Database) {
+    constructor(@inject(Inject.ACTION_HANDLER_MAP) actionHandlerMap: ActionHandlerMap, @inject(Inject.DATABASE) database: Database) {
         super();
-        this._actionMap = actionMap;
+
         this._database = database;
+        this._actionHandlerMap = actionHandlerMap;
     }
 
     protected async init(): Promise<void> {
         await this._database.initialized;
-
         this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), await this.getInitialState(), this.createEnhancer());
     }
 
-    public get state(): Immutable<RootState> {
-        return this._store.getState() as Immutable<RootState>;
+    public get state(): RootState {
+        return this._store.getState() as RootState;
     }
 
-    public dispatch(action: RootAction): void {
-        this._store.dispatch(action);
+    public async dispatch(action: RootAction): Promise<void> {
+        if (action instanceof CustomAction) {
+            // Action has custom dispatch logic
+            await action.dispatch(this);
+        } else {
+            // Pass straight through to redux store
+            await this._store.dispatch({...action});
+        }
     }
 
     public watchForChange<T>(getObject: (state: RootState) => T, observer: StoreChangeObserver<T>): Unsubscribe {
@@ -67,12 +81,12 @@ export class Store extends AsyncInit {
     }
 
     private reduce<T extends Action>(state: RootState | undefined, action: ActionOf<T>): RootState {
-        const handler: ActionHandler<T> | undefined = this._actionMap[action.type] as ActionHandler<T>;
+        const handler: ActionHandler<T> | undefined = this._actionHandlerMap[action.type] as ActionHandler<T>;
 
         if (handler) {
             return handler(state!, action);
         } else {
-            console.info(`No handler registered for ${action && action.type}`);
+            // No handler registered for this action - action does not modify the store's state
             return state!;
         }
     }
@@ -91,9 +105,9 @@ export class Store extends AsyncInit {
         return enhancer;
     }
 
-    private createMiddleware(): (next: Dispatch<RootAction>) => (action: any) => any {
-        return (next: Dispatch<RootAction>) => (action: RootAction) => {
-            this.onAction.emit(action);
+    private createMiddleware(): (next: Dispatch<RootAction>) => (action: RootAction) => Promise<RootAction> {
+        return (next: Dispatch<RootAction>) => async (action: RootAction): Promise<RootAction> => {
+            await this.onAction.emit(action);
 
             return next(action);
         };
@@ -101,35 +115,8 @@ export class Store extends AsyncInit {
 
     private async getInitialState(): Promise<RootState> {
         const notificationCollection: Collection<StoredNotification> = this._database.get(CollectionMap.NOTIFICATIONS);
-        const initialState = this.cloneState(Store.INITIAL_STATE);
-
         const notifications: StoredNotification[] = await notificationCollection.getAll();
-        Object.assign(initialState, {notifications});
 
-        return initialState;
-    }
-
-    private cloneState<T extends {}>(state: T | Immutable<T>): T {
-        const ret: T = {} as T;
-        const keys: (keyof T)[] = Object.keys(state) as (keyof T)[];
-
-        keys.forEach(key => {
-            const value = state[key];
-            if (Array.isArray(value)) {
-                ret[key] = value.map(item => {
-                    if (typeof item === 'object' && item !== null) {
-                        return this.cloneState(item);
-                    } else {
-                        return item;
-                    }
-                }) as any;
-            } else if (typeof value !== 'object' || !value) {
-                ret[key] = value as any;
-            } else {
-                ret[key] = this.cloneState(value as any);
-            }
-        });
-
-        return ret;
+        return Object.assign({}, Store.INITIAL_STATE, {notifications});
     }
 }

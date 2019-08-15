@@ -134,7 +134,10 @@ export class Toast implements LayoutItem {
         document.removeEventListener('mouseenter', this.mouseEnterHandler);
         document.removeEventListener('mouseleave', this.mouseLeaveHandler);
 
-        await window.close();
+        // Workaround for race conditions within toast manager. Will address with SERVICE-581.
+        if (window.close) {
+            await window.close();
+        }
     }
 
     /**

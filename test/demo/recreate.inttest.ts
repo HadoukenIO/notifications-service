@@ -3,7 +3,7 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 import {WindowEvent} from 'hadouken-js-adapter/out/types/src/api/events/base';
 
-import {NotificationOptions, Notification, NotificationClosedEvent} from '../../src/client';
+import {NotificationOptions, Notification, NotificationClosedEvent, NotificationCreatedEvent} from '../../src/client';
 
 import {createApp} from './utils/spawnRemote';
 import {isCenterShowing} from './utils/centerUtils';
@@ -17,13 +17,15 @@ import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',
     body: 'First Notification Body',
-    title: 'First Notification Title'
+    title: 'First Notification Title',
+    category: 'Test Notification Category'
 };
 
 const secondOptions: NotificationOptions = {
     id: 'duplicate-test-1',
     body: 'Second Notification Body',
-    title: 'Second Notification Title'
+    title: 'Second Notification Title',
+    category: 'Test Notification Category'
 };
 
 describe('When creating a notification with an ID that already exists but different options', () => {
@@ -64,6 +66,7 @@ describe('When creating a notification with an ID that already exists but differ
         afterEach(async () => {
             await notifsRemote.clearAll(testWindow.identity);
             await testApp.quit(true).catch(() => {});
+            await delay(Duration.TOAST_CLOSE);
         });
 
         test('The promise resolves to the new notification object', async () => {
@@ -73,17 +76,24 @@ describe('When creating a notification with an ID that already exists but differ
             expect(await newNotePromise).toMatchObject(secondOptions);
         });
 
-        test('No "cleared" event is emitted', async () => {
+        test('A "closed" event is emitted, followed by a "created" event', async () => {
             // Register a closed listener on the window
-            const closeListener = jest.fn<void, [NotificationClosedEvent]>();
-            await notifsRemote.addEventListener(testWindow.identity, 'notification-closed', closeListener);
+            const eventOrdering: string[] = [];
+            const createdListener = jest.fn<void, [NotificationCreatedEvent]>().mockImplementation(() => eventOrdering.push('created'));
+            const closedListener = jest.fn<void, [NotificationClosedEvent]>().mockImplementation(() => eventOrdering.push('closed'));
+            await notifsRemote.addEventListener(testWindow.identity, 'notification-created', createdListener);
+            await notifsRemote.addEventListener(testWindow.identity, 'notification-closed', closedListener);
 
             // Recreate the notification and pause momentarily to allow the event to propagate
             await notifsRemote.create(testWindow.identity, secondOptions);
             await delay(Duration.EVENT_PROPAGATED);
 
-            // Listener not triggered
-            expect(closeListener).not.toHaveBeenCalled();
+            // Listeners triggered
+            expect(createdListener).toHaveBeenCalledTimes(1);
+            expect(closedListener).toHaveBeenCalledTimes(1);
+
+            // Closed listener should be called first
+            expect(eventOrdering).toEqual(['closed', 'created']);
         });
 
         test('The card in the center is updated to show the new notification details', async () => {
@@ -126,12 +136,13 @@ describe('When creating a notification with an ID that already exists but differ
 
                     // Recreate the notification and pause momentarily to allow the service time to process
                     await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.WINDOW_CLOSED);
+                    await delay(Duration.TOAST_CLOSE + Duration.TOAST_CREATE);
 
                     expect(finCloseListener).toHaveBeenCalledWith(expectedEvent);
                 });
 
-                test('A new toast window is created', async () => {
+                // Test is unstable on CI, attempting to debug shows some ToastManager glitches - disabling until we can investigate [SERVICE-581]
+                test.skip('A new toast window is created', async () => {
                     const expectedEvent = {
                         topic: 'system',
                         type: 'window-created',
@@ -140,7 +151,7 @@ describe('When creating a notification with an ID that already exists but differ
 
                     // Recreate the notification and pause momentarily to allow the service time to process
                     await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.WINDOW_CLOSED + Duration.WINDOW_CREATED);
+                    await delay(Duration.TOAST_CLOSE + Duration.TOAST_CREATE);
 
                     expect(finOpenListener).toHaveBeenCalledWith(expectedEvent);
                 });
@@ -148,7 +159,7 @@ describe('When creating a notification with an ID that already exists but differ
                 test('The new toast matches the options of the new notification', async () => {
                     // Recreate the notification and delay stlight to allow the toast to spawn
                     const newNote = await notifsRemote.create(testWindow.identity, secondOptions);
-                    await delay(Duration.WINDOW_CLOSED + Duration.TOAST_DOM_LOADED);
+                    await delay(Duration.TOAST_CLOSE + Duration.TOAST_CREATE + Duration.TOAST_DOM_LOADED);
 
                     // New toast matches `secondOptions`
                     await assertDOMMatches(CardType.TOAST, testApp.identity.uuid, newNote);

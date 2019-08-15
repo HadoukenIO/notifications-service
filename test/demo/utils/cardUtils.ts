@@ -44,7 +44,7 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
     const expectedMetadata: NotificationCardMetadata = {
         title: note.title,
         body: note.body,
-        buttons: note.buttons as ButtonMetadata[],
+        buttons: note.buttons.map(button => ({title: button.title, iconUrl: button.iconUrl || ''})),
         icon: note.icon,
         sourceApp: sourceUuid,
         timeString: moment(note.date).fromNow()
@@ -56,8 +56,10 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
 
 /**
  * Allow you to get a `Notification`-like object containing the data displayed on a notification card.
-
+ *
  * Undefined properties imply that the html element for that property could not be found
+ *
+ * @param card DOM element that holds the visual representation of a notification
  */
 async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMetadata> {
     const title = await getPropertyBySelector(card, '.body .title', 'innerHTML');
@@ -78,7 +80,11 @@ async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMet
 }
 
 /**
- * Uses `$`, so only the first matching element is returned
+ * Uses `$`, so only the first matching element is returned. Will return `undefined` if no element matching selector.
+ *
+ * @param rootElement The DOM element to query
+ * @param selectorString A selector that matches a child element of rootElement
+ * @param property The property to extract from the selected element
  */
 async function getPropertyBySelector(rootElement: ElementHandle, selectorString: string, property: string): Promise<string | undefined> {
     const queryElement = await rootElement.$(selectorString);
