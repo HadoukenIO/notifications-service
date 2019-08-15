@@ -11,6 +11,11 @@ import {clientInfoStorage} from './Storage';
 
 type AppInitData = ApplicationOption | string;
 
+/**
+ * Client handler is responsible of keeping track of active clients, storing information about them
+ * and re-launching them when requested by other modules. Is intended to be used solely by EventPump.
+ *
+ */
 @injectable()
 export class ClientHandler {
     private _apiHandler!: APIHandler<APITopic, Events>;
@@ -24,12 +29,17 @@ export class ClientHandler {
         this._apiHandler.onDisconnection.add(this.onClientDisconnection, this);
     }
 
+    /**
+     * Launches the app with specified identity if the start-up information about it was stored previously.
+     *
+     * @param app Identity of target client.
+     *
+     */
     public tryLaunchApplication(app: Identity): void {
         fin.Application.wrapSync(app).isRunning().then(running => {
             if (!running) {
                 clientInfoStorage.getItem<AppInitData>(app.uuid, (error: any, value: AppInitData) => {
                     if (error) {
-                        // this shouldn't happen.
                         console.log('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
                     } else {
                         (typeof value === 'string') ? fin.Application.startFromManifest(value) : fin.Application.start(value);
@@ -39,6 +49,12 @@ export class ClientHandler {
         });
     }
 
+    /**
+     * Decides weather an app is running at the moment.
+     *
+     * @param app Identity of the app.
+     *
+     */
     public isAppActive(app: Identity): boolean {
         return this._activeClients.some(client => client.uuid === app.uuid);
     }
