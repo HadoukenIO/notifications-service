@@ -55,10 +55,7 @@ export const Actions: ActionMap = {
         const {notification} = action;
         const database = Injector.get<'DATABASE'>(Inject.DATABASE);
 
-        database.get(CollectionMap.NOTIFICATIONS).upsert(notification)
-            .catch(error => {
-                throw new Error(error);
-            });
+        database.get(CollectionMap.NOTIFICATIONS).upsert(notification);
 
         const notifications = mutable(state.notifications.slice());
         const index: number = state.notifications.findIndex(n => n.id === notification.id);

@@ -85,10 +85,10 @@ export class Toast implements LayoutItem {
         this._id = notification.id;
         this._options = toastOptions;
         this._position = {top: 0, left: 0};
-        const deferredPromise = new DeferredPromise<WindowDimensions>();
         // Wait for the React component to render and then get the dimensions of it to resize the window.
-        const [dimensionPromise, dimensionResolve] = [deferredPromise.promise, deferredPromise.resolve];
-        this._dimensions = dimensionPromise;
+        const dimensionsDeferredPromise = new DeferredPromise<WindowDimensions>();
+        const dimensionResolve = dimensionsDeferredPromise.resolve;
+        this._dimensions = dimensionsDeferredPromise.promise;
 
         const name = `${windowOptions.name}:${this.id}`;
         this._webWindow = createWebWindow({...windowOptions, name}).then(async (webWindow) => {

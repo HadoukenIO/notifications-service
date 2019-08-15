@@ -1,7 +1,7 @@
 import {injectable} from 'inversify';
 import Dexie from 'dexie';
 
-import {StoredSettings} from '../StoredSettings';
+import {StoredSetting} from '../StoredSettings';
 import {StoredNotification} from '../StoredNotification';
 import {DeferredPromise} from '../../common/DeferredPromise';
 import {AsyncInit} from '../../controller/AsyncInit';
@@ -15,7 +15,7 @@ export const enum CollectionMap {
 
 export type Collections = {
     [CollectionMap.NOTIFICATIONS]: StoredNotification;
-    [CollectionMap.SETTINGS]: StoredSettings;
+    [CollectionMap.SETTINGS]: StoredSetting;
 };
 
 @injectable()
@@ -27,24 +27,20 @@ export class Database extends AsyncInit {
     constructor () {
         super();
 
-        this._database = new Dexie('Notifications_Service');
+        this._database = new Dexie('notifications-service');
         this._collections = new Map();
         this._databaseReadyPromise = new DeferredPromise();
 
         this._database.version(1).stores({
-            notifications: '&id',
-            settings: '&id'
+            [CollectionMap.NOTIFICATIONS]: '&id',
+            [CollectionMap.SETTINGS]: '&id'
         });
 
         this.createCollections(this._database.tables);
-
-        this._database.open().then(()=>{
-            this._databaseReadyPromise.resolve();
-        });
     }
 
-    protected async init() {
-        await this._databaseReadyPromise.promise;
+    protected async init(): Promise<void> {
+        await this._database.open();
     }
 
     /**
@@ -61,7 +57,7 @@ export class Database extends AsyncInit {
         }
     }
 
-    private createCollections(tables: Dexie.Table<Collections[keyof Collections], string>[]) {
+    private createCollections(tables: Dexie.Table<Collections[keyof Collections], string>[]): void {
         tables.forEach(table => {
             this._collections.set(table.name as CollectionMap, new Collection(table));
         });
