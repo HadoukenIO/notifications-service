@@ -168,7 +168,7 @@ export type Notification = Readonly<Required<NotificationOptions>>;
  *
  * @event
  */
-export interface NotificationActionEvent<T = {}> {
+export interface NotificationActionEvent<T = CustomData> {
     type: 'notification-action';
 
     /**
