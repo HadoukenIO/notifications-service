@@ -90,10 +90,7 @@ export const Actions: ActionMap = {
         const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
 
-        storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible})
-            .catch(error => {
-                throw new Error(error);
-            });
+        storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
 
         return {
             ...mutable(state),
