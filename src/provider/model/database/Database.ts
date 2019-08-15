@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 
 import {StoredSettings} from '../StoredSettings';
 import {StoredNotification} from '../StoredNotification';
-import {deferredPromise, DeferredPromise} from '../../common/deferredPromise';
+import {DeferredPromise} from '../../common/deferredPromise';
 import {AsyncInit} from '../../controller/AsyncInit';
 
 import {Collection} from './Collection';
@@ -29,7 +29,7 @@ export class Database extends AsyncInit {
 
         this._database = new Dexie('Notifications_Service');
         this._collections = new Map();
-        this._databaseReadyPromise = deferredPromise();
+        this._databaseReadyPromise = new DeferredPromise();
 
         this._database.version(1).stores({
             notifications: '&id',
@@ -39,12 +39,12 @@ export class Database extends AsyncInit {
         this.createCollections(this._database.tables);
 
         this._database.open().then(()=>{
-            this._databaseReadyPromise[1]();
+            this._databaseReadyPromise.resolve();
         });
     }
 
     protected async init() {
-        await this._databaseReadyPromise[0];
+        await this._databaseReadyPromise.promise;
     }
 
     /**
