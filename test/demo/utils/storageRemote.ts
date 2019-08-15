@@ -15,7 +15,7 @@ const ofBrowser = new OFPuppeteerBrowser<ProviderWindow>();
 
 export async function getAllStoredNotifications(): Promise<StoredNotification[]> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(): Promise<StoredNotification[]> {
-        const allNotes: StoredNotification[] = await(await this.database.get(CollectionMap.NOTIFICATIONS)).getAll();
+        const allNotes: StoredNotification[] = await this.database.get(CollectionMap.NOTIFICATIONS).getAll();
 
         return allNotes;
     });
@@ -23,7 +23,7 @@ export async function getAllStoredNotifications(): Promise<StoredNotification[]>
 
 export async function getStoredNotificationsByApp(uuid: string): Promise<StoredNotification[]> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(appUuid: string): Promise<StoredNotification[]> {
-        const allNotes: StoredNotification[] = (await (await this.database.get(CollectionMap.NOTIFICATIONS)).getAll())
+        const allNotes: StoredNotification[] = (await this.database.get(CollectionMap.NOTIFICATIONS).getAll())
             .filter(noteObject => noteObject.source.uuid === appUuid);
 
         return allNotes;
@@ -50,8 +50,8 @@ export async function assertNotificationStored(source: Identity, note: Notificat
  */
 async function getStoredNotification(id: string): Promise<StoredNotification | undefined> {
     return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined> {
-        const note = await (await this.database.get(CollectionMap.NOTIFICATIONS)).get(remoteID);
-        // Localforage returns null for non-existent keys, but we will return undefined for consistency with other utils
-        return note !== null ? note : undefined;
+        const note = await this.database.get(CollectionMap.NOTIFICATIONS).get(remoteID);
+
+        return note;
     }, id);
 }

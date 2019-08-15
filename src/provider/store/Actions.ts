@@ -55,8 +55,7 @@ export const Actions: ActionMap = {
         const {notification} = action;
         const database = Injector.get<'DATABASE'>(Inject.DATABASE);
 
-        database.get(CollectionMap.NOTIFICATIONS)
-            .then(collection => collection.upsert(notification))
+        database.get(CollectionMap.NOTIFICATIONS).upsert(notification)
             .catch(error => {
                 throw new Error(error);
             });
@@ -83,11 +82,7 @@ export const Actions: ActionMap = {
             return n.id;
         });
 
-        database.get(CollectionMap.NOTIFICATIONS)
-            .then(collection => collection.deleteMany(notifications))
-            .catch(error => {
-                throw new Error(error);
-            });
+        database.get(CollectionMap.NOTIFICATIONS).delete(idsToRemove);
 
         return {
             ...state,
@@ -98,8 +93,7 @@ export const Actions: ActionMap = {
         const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
 
-        storage.get(CollectionMap.SETTINGS)
-            .then(settingsCollection => settingsCollection.upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible}))
+        storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible})
             .catch(error => {
                 throw new Error(error);
             });

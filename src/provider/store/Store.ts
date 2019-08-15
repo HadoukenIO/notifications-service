@@ -34,6 +34,8 @@ export class Store extends AsyncInit {
     }
 
     protected async init(): Promise<void> {
+        await this._database.initialized;
+
         this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), await this.getInitialState(), this.createEnhancer());
     }
 
@@ -45,8 +47,7 @@ export class Store extends AsyncInit {
         this._store.dispatch(action);
     }
 
-    public async watchForChange<T>(getObject: (state: RootState) => T, observer: StoreChangeObserver<T>): Promise<Unsubscribe> {
-        await this.initialized;
+    public watchForChange<T>(getObject: (state: RootState) => T, observer: StoreChangeObserver<T>): Unsubscribe {
         const watcher = this.watch<T>(() => this.state, getObject);
         return this._store.subscribe(watcher(observer));
     }
@@ -99,7 +100,7 @@ export class Store extends AsyncInit {
     }
 
     private async getInitialState(): Promise<RootState> {
-        const notificationCollection: Collection<StoredNotification> = await this._database.get(CollectionMap.NOTIFICATIONS);
+        const notificationCollection: Collection<StoredNotification> = this._database.get(CollectionMap.NOTIFICATIONS);
         const initialState = this.cloneState(Store.INITIAL_STATE);
 
         const notifications: StoredNotification[] = await notificationCollection.getAll();
