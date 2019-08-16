@@ -5,11 +5,15 @@ import {Signal} from 'openfin-service-signal';
 
 import {APITopic, Events} from '../../client/internal';
 import {Inject} from '../common/Injectables';
+import {Injector} from '../common/Injector';
 
 import {APIHandler} from './APIHandler';
-import {clientInfoStorage} from './Storage';
+import {CollectionMap} from './database/Database';
 
-type AppInitData = ApplicationOption | string;
+export type AppInitData = {
+    id: string;
+    data: ApplicationOption | string
+}
 
 /**
  * Client handler is responsible of keeping track of active clients, storing information about them
@@ -38,11 +42,12 @@ export class ClientHandler {
     public tryLaunchApplication(app: Identity): void {
         fin.Application.wrapSync(app).isRunning().then(running => {
             if (!running) {
-                clientInfoStorage.getItem<AppInitData>(app.uuid, (error: any, value: AppInitData) => {
-                    if (error) {
-                        console.log('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
+                const database = Injector.get<'DATABASE'>(Inject.DATABASE);
+                database.get(CollectionMap.CLIENTS).get(app.uuid).then(value => {
+                    if (value) {
+                        (typeof value.data === 'string') ? fin.Application.startFromManifest(value.data) : fin.Application.start(value.data);
                     } else {
-                        (typeof value === 'string') ? fin.Application.startFromManifest(value) : fin.Application.start(value);
+                        console.log('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
                     }
                 });
             }
@@ -74,7 +79,11 @@ export class ClientHandler {
 
     public onClientConnect(app: Identity): void {
         fin.Application.wrapSync(app).getInfo().then(info => {
-            clientInfoStorage.setItem<AppInitData>(app.uuid, info.parentUuid ? info.initialOptions as ApplicationOption : info.manifestUrl);
+            const database = Injector.get<'DATABASE'>(Inject.DATABASE);
+            database.get(CollectionMap.CLIENTS).upsert({
+                id: app.uuid,
+                data: info.parentUuid ? info.initialOptions as ApplicationOption : info.manifestUrl
+            });
         });
     }
 

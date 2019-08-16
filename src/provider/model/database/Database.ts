@@ -3,18 +3,21 @@ import Dexie from 'dexie';
 
 import {StoredSetting} from '../StoredSetting';
 import {StoredNotification} from '../StoredNotification';
+import {AppInitData} from '../ClientHandler';
 import {AsyncInit} from '../../controller/AsyncInit';
 
 import {Collection} from './Collection';
 
 export const enum CollectionMap {
     NOTIFICATIONS = 'notifications',
-    SETTINGS = 'settings'
+    SETTINGS = 'settings',
+    CLIENTS = 'clients'
 }
 
 export type Collections = {
     [CollectionMap.NOTIFICATIONS]: StoredNotification;
     [CollectionMap.SETTINGS]: StoredSetting;
+    [CollectionMap.CLIENTS]: AppInitData;
 };
 
 @injectable()
@@ -30,7 +33,8 @@ export class Database extends AsyncInit {
 
         this._database.version(1).stores({
             [CollectionMap.NOTIFICATIONS]: '&id',
-            [CollectionMap.SETTINGS]: '&id'
+            [CollectionMap.SETTINGS]: '&id',
+            [CollectionMap.CLIENTS]: '&id'
         });
 
         this.createCollections(this._database.tables);
