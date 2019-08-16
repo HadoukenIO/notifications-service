@@ -14,7 +14,7 @@ import {AsyncInit} from './AsyncInit';
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
     url: 'ui/notification-center.html',
-    autoShow: true,
+    autoShow: false,
     defaultHeight: 400,
     defaultWidth: 500,
     resizable: false,
@@ -30,6 +30,8 @@ const windowOptions: WindowOption = {
 
 @injectable()
 export class NotificationCenter extends AsyncInit {
+    private static WIDTH: number = 388;
+
     @inject(Inject.STORE)
     private _store!: Store;
 
@@ -46,7 +48,7 @@ export class NotificationCenter extends AsyncInit {
             console.error('Notification Center window could not be created!', error.message);
             throw error;
         }
-        await this._webWindow.window.hide();
+        await this.hideWindowOffscreen();
         this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png');
         this._trayIcon.addLeftClickHandler(() => {
             this._store.dispatch(new ToggleVisibility());
@@ -120,15 +122,23 @@ export class NotificationCenter extends AsyncInit {
      */
     public async sizeToFit(): Promise<void> {
         const {window} = this._webWindow;
+        const idealWidth = NotificationCenter.WIDTH;
         await this.hideWindow(true);
         const monitorInfo = await fin.System.getMonitorInfo();
-        const idealWidth = 388;
         return window.setBounds({
             left: monitorInfo.primaryMonitor.availableRect.right - idealWidth,
             top: 0,
             width: idealWidth,
             height: monitorInfo.primaryMonitor.availableRect.bottom
         });
+    }
+
+    private async hideWindowOffscreen() {
+        const {window} = this._webWindow;
+        const {virtualScreen} = await fin.System.getMonitorInfo();
+        const height = virtualScreen.bottom;
+        await window.showAt(virtualScreen.left - NotificationCenter.WIDTH * 2, virtualScreen.top - height * 2);
+        await window.hide();
     }
 
     /**
