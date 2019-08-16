@@ -30,7 +30,7 @@ const windowOptions: WindowOption = {
 
 @injectable()
 export class NotificationCenter extends AsyncInit {
-    private static WIDTH: number = 388;
+    private static readonly WIDTH: number = 388;
 
     @inject(Inject.STORE)
     private _store!: Store;
@@ -135,8 +135,8 @@ export class NotificationCenter extends AsyncInit {
 
     private async hideWindowOffscreen() {
         const {window} = this._webWindow;
-        const {virtualScreen} = await fin.System.getMonitorInfo();
-        const height = virtualScreen.bottom;
+        const {virtualScreen, primaryMonitor} = await fin.System.getMonitorInfo();
+        const height = primaryMonitor.availableRect.bottom;
         await window.showAt(virtualScreen.left - NotificationCenter.WIDTH * 2, virtualScreen.top - height * 2);
         await window.hide();
     }
