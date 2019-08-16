@@ -2,11 +2,16 @@
  * @hidden
  */
 
+/**
+ * Acts as a central point for routing all events received from the provider.
+ */
 import {EventEmitter} from 'events';
 
-import {EventSpecification} from '../provider/model/APIHandler';
-
 import {TransportMappings, TransportMemberMappings} from './internal';
+
+export type EventSpecification = {
+    type: string;
+};
 
 type EmitterProvider = (targetId: string) => EventEmitter;
 type EventDeserializer<E extends EventSpecification, T extends E> = (event: Transport<T>) => T;
@@ -17,10 +22,11 @@ interface EventTarget {
 }
 export type Targeted<T extends EventSpecification> = T & {
     /**
-     * If present, will be used to find the correct emitter.
+     * Indicates which emitter the client should use to dispatch this event.
      *
-     * Allows events to be raised from client-side objects that mirror a corresponding provider-side object. If target
-     * is omitted, events will be raised from a top-level/"global" event emitter.
+     * Allows events to be raised from client-side objects that mirror a corresponding provider-side object. If there
+     * is no such model of client-side objects, pass `default` to emit the event from a shared top-level/"global" event
+     * emitter.
      */
     target: EventTarget | 'default';
 }
@@ -56,14 +62,14 @@ export class EventRouter<E extends EventSpecification> {
         const {type, target, ...rest} = event;
 
         let emitter: EventEmitter;
-        if (target === 'default') {
-            emitter = this._defaultEmitter;
-        } else if (this._emitterProviders.hasOwnProperty(target && target.type)) {
-            emitter = this._emitterProviders[target.type](target.id);
-        } else if (target) {
-            throw new Error(`Invalid target, no provider registered for '${target.type}'`);
-        } else {
+        if (!target) {
             throw new Error('Invalid event, no target specified');
+        } else if (target === 'default') {
+            emitter = this._defaultEmitter;
+        } else if (this._emitterProviders.hasOwnProperty(target.type)) {
+            emitter = this._emitterProviders[target.type](target.id);
+        } else {
+            throw new Error(`Invalid target, no provider registered for '${target.type}'`);
         }
 
         // Need to remove 'target' from event before emitting event

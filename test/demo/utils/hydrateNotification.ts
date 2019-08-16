@@ -13,13 +13,11 @@ export function assertHydratedCorrectly(options: NotificationOptions, fullNote: 
         expect(fullNote.date).toBeInstanceOf(Date);
     }
 
-    // customData is never changed in any way by the provider
-    expect(fullNote.customData).toEqual(options.customData);
-
     const expectedValues = {
         body: options.body,
         title: options.title,
         icon: options.icon || '',
+        customData: options.customData !== undefined ? options.customData : {},
         buttons: options.buttons ? options.buttons.map(btn => ({...btn, iconUrl: btn.iconUrl || ''})) : []
     };
     expect(fullNote).toMatchObject(expectedValues);

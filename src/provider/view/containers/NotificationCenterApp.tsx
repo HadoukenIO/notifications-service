@@ -15,7 +15,7 @@ export enum GroupingType {
 }
 
 export interface Actionable {
-    storeDispatch: (action: RootAction)=>void;
+    storeDispatch: (action: RootAction) => void;
 }
 
 type Props = ReturnType<typeof mapStateToProps> & Actionable;

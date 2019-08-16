@@ -5,6 +5,8 @@
       "outDir": "../dist/test",
       "target": "es2017",
       "module": "commonjs",
+      "experimentalDecorators": true,
+      "preserveConstEnums": true,
       "lib": [
         "dom",
         "es7"

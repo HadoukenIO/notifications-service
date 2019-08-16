@@ -1,7 +1,10 @@
 import {Action as ReduxAction} from 'redux';
 
-import {notificationStorage, settingsStorage} from '../model/Storage';
 import {StoredNotification} from '../model/StoredNotification';
+import {Injector} from '../common/Injector';
+import {Inject} from '../common/Injectables';
+import {CollectionMap} from '../model/database/Database';
+import {SettingsMap} from '../model/StoredSetting';
 
 import {RootState} from './State';
 import {StoreAPI} from './Store';
@@ -36,8 +39,10 @@ export class CreateNotification extends CustomAction<Action.CREATE> {
 
     public async dispatch(store: StoreAPI): Promise<void> {
         const notification = this.notification;
-        const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
 
+        // First remove any existing notifications with this ID, to ensure ID uniqueness
+        // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
+        const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
         if (existingNotifications.length) {
             await store.dispatch(new RemoveNotifications(existingNotifications));
         }
@@ -96,17 +101,22 @@ export const ActionHandlers: ActionHandlerMap = {
     [Action.CREATE]: (state: RootState, action: CreateNotification): RootState => {
         const {notification} = action;
 
-        notificationStorage.setItem(notification.id, JSON.stringify(notification));
+        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
+        database.get(CollectionMap.NOTIFICATIONS).upsert(notification);
 
         const notifications: StoredNotification[] = state.notifications.slice();
+
+        // All notification ID's must be unique. The custom dispatch logic of the `CreateNotification` event should
+        // enusure this, but to avoid significant side-effects, also adding a sanity check here.
         const index: number = state.notifications.findIndex(n => n.id === notification.id);
         if (index >= 0) {
             // Replace existing notification with this ID
+            console.warn(`Attempted to add a notitification with duplicate id '${notification.id}'. Will replace existing notification.`);
             notifications[index] = notification;
-        } else {
-            // Add new notification (ordering within array doesn't matter)
-            notifications.push(notification);
         }
+
+        // Add new notification (ordering within array doesn't matter)
+        notifications.push(notification);
 
         return {
             ...state,
@@ -115,10 +125,12 @@ export const ActionHandlers: ActionHandlerMap = {
     },
     [Action.REMOVE]: (state: RootState, action: RemoveNotifications): RootState => {
         const {notifications} = action;
+        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
-            notificationStorage.removeItem(n.id);
             return n.id;
         });
+
+        database.get(CollectionMap.NOTIFICATIONS).delete(idsToRemove);
 
         return {
             ...state,
@@ -127,7 +139,9 @@ export const ActionHandlers: ActionHandlerMap = {
     },
     [Action.TOGGLE_VISIBILITY]: (state: RootState, action: ToggleVisibility): RootState => {
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
-        settingsStorage.setItem('windowVisible', windowVisible);
+        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
+
+        storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
 
         return {
             ...state,

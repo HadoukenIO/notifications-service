@@ -63,7 +63,7 @@ describe('When creating a notification with the center showing', () => {
             assertHydratedCorrectly(options, note);
         });
 
-        test('One card appears in the notification center', async () => {
+        test('One card appears in the Notification Center', async () => {
             const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
             expect(noteCards).toHaveLength(1);
         });
@@ -84,7 +84,7 @@ describe('When creating a notification with the center showing', () => {
         test('No toast is shown for the created notification', async () => {
             // The notification is created immediately before this, so we need
             // a slight delay to allow time for the toast to spawn.
-            await delay(Duration.TOAST_CLOSE);
+            await delay(Duration.TOAST_CREATE);
 
             const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
             expect(toastWindow).toBe(undefined);
@@ -109,7 +109,7 @@ describe('When creating a notification with the center showing', () => {
             await expect(createPromise).rejects.toThrow(/Invalid arguments passed to create:.*"title" must have a value.*"body" must have a value/s);
         });
 
-        test('A card is not added to the notification center', async () => {
+        test('A card is not added to the Notification Center', async () => {
             const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, options.id!);
             expect(noteCards).toEqual([]);
         });

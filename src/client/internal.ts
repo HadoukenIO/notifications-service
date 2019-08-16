@@ -9,9 +9,9 @@
  * This file is excluded from the public-facing TypeScript documentation.
  */
 
-import {NotificationActionResult} from './actions';
+import {NotificationActionResult, ActionTrigger} from './actions';
 
-import {NotificationOptions, Notification, ActionTrigger, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
+import {NotificationOptions, Notification, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
 
 type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
 
@@ -75,7 +75,7 @@ export interface NotificationActionEventTransport {
     result: NotificationActionResult;
     trigger: ActionTrigger;
 
-    // Following are present only if trigger is `CONTROL`
+    // Following are present only if trigger is `ActionTrigger.CONTROL`
     controlSource?: 'buttons';  // Additional sources will be added in future release
     controlIndex?: number;      // The index of the originating control, within notification[controlSource]
 }

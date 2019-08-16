@@ -5,9 +5,10 @@ import {Identity} from 'openfin/_v2/main';
 import moment from 'moment';
 
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
-import {NotificationClosedEvent, NotificationActionEvent, ActionTrigger, NotificationCreatedEvent} from '../client';
+import {NotificationClosedEvent, NotificationActionEvent, NotificationCreatedEvent} from '../client';
 import {ButtonOptions} from '../client/controls';
 import {Transport, Targeted} from '../client/EventRouter';
+import {ActionTrigger} from '../client/actions';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -18,9 +19,9 @@ import {StoredNotification} from './model/StoredNotification';
 import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisibility} from './store/Actions';
 import {mutable} from './store/State';
 import {Store} from './store/Store';
-import {notificationStorage, settingsStorage} from './model/Storage';
 import {EventPump} from './model/EventPump';
 import {ClientHandler} from './model/ClientHandler';
+import {Database} from './model/database/Database';
 
 @injectable()
 export class Main {
@@ -44,6 +45,9 @@ export class Main {
     @inject(Inject.TOAST_MANAGER)
     private _toastManager!: ToastManager;
 
+    @inject(Inject.DATABASE)
+    private _database!: Database;
+
     public async register(): Promise<void> {
         Object.assign(window, {
             main: this,
@@ -51,9 +55,7 @@ export class Main {
             store: this._store,
             center: this._notificationCenter,
             toast: this._toastManager,
-            // Include the two localforage instances for debugging/integration testing
-            notificationStorage,
-            settingsStorage
+            database: this._database
         });
 
         // Wait for creation of any injected components that require async initialization
@@ -138,7 +140,7 @@ export class Main {
     }
 
     /**
-     * Dispatch the notification center toggle action to the UI
+     * Dispatch the Notification Center toggle action to the UI
      * @param payload Not used.
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
@@ -252,9 +254,8 @@ export class Main {
             title: payload.title,
             category: payload.category,
             icon: payload.icon || '',
-            customData: payload.customData,
+            customData: payload.customData !== undefined ? payload.customData : {},
             date: payload.date || Date.now(),
-            expires: payload.expires || null,
             onSelect: payload.onSelect || null,
             buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, type: 'button', iconUrl: btn.iconUrl || ''})) : []
         };

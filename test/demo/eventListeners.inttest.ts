@@ -13,9 +13,9 @@ const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
     title: 'Test Notification Title',
     category: 'Test Notification Category',
-    onSelect: {action: 'select'},
+    onSelect: {task: 'select'},
     buttons: [
-        {title: 'Button 1', onClick: {action: 'click'}}
+        {title: 'Button 1', onClick: {task: 'click'}}
     ]
 };
 
@@ -91,11 +91,11 @@ describe('Click listeners', () => {
                     type: 'notification-action',
                     notification: {...note, date: note.date.toJSON()},
                     trigger: 'select',
-                    result: {action: 'select'}
+                    result: {task: 'select'}
                 });
             });
 
-            test('Clicking on the card\'s button triggers a CONTROL action and does not trigger a SELECT action', async () => {
+            test('Clicking on the card\'s button triggers an ActionTrigger.CONTROL action and does not trigger an ActionTrigger.SELECT action', async () => {
                 const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
 
                 // Get a remote handle to the button DOM element
@@ -113,11 +113,8 @@ describe('Click listeners', () => {
                     notification: {...note, date: note.date.toJSON()},
                     trigger: 'control',
                     control: note.buttons[0],
-                    result: {action: 'click'}
+                    result: {task: 'click'}
                 });
-
-                // select action not triggered
-                expect(actionListener).not.toHaveBeenCalledWith({trigger: 'select'});
             });
 
             describe('When clicking the close button', () => {

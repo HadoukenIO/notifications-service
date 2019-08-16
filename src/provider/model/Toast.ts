@@ -4,7 +4,7 @@ import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
 import Bounds from 'openfin/_v2/api/window/bounds';
 import {Signal} from 'openfin-service-signal';
 
-import {deferredPromise} from '../common/deferredPromise';
+import {DeferredPromise} from '../common/DeferredPromise';
 import {renderApp} from '../view/containers/ToastApp';
 import {Store} from '../store/Store';
 import {LayoutItem, WindowDimensions} from '../controller/Layouter';
@@ -86,8 +86,9 @@ export class Toast implements LayoutItem {
         this._options = toastOptions;
         this._position = {top: 0, left: 0};
         // Wait for the React component to render and then get the dimensions of it to resize the window.
-        const [dimensionPromise, dimensionResolve] = deferredPromise<WindowDimensions>();
-        this._dimensions = dimensionPromise;
+        const dimensionsDeferredPromise = new DeferredPromise<WindowDimensions>();
+        const dimensionResolve = dimensionsDeferredPromise.resolve;
+        this._dimensions = dimensionsDeferredPromise.promise;
 
         const name = `${windowOptions.name}:${this.id}`;
         this._webWindow = createWebWindow({...windowOptions, name}).then(async (webWindow) => {
@@ -133,7 +134,10 @@ export class Toast implements LayoutItem {
         document.removeEventListener('mouseenter', this.mouseEnterHandler);
         document.removeEventListener('mouseleave', this.mouseLeaveHandler);
 
-        await window.close();
+        // Workaround for race conditions within toast manager. Will address with SERVICE-581.
+        if (window.close) {
+            await window.close();
+        }
     }
 
     /**

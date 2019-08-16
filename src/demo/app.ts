@@ -14,7 +14,7 @@ const normalNote: NotificationOptions = {
     category: 'Short',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
-    onSelect: 'Selected',
+    onSelect: {task: 'Selected'},
     buttons: []
 };
 
@@ -25,7 +25,7 @@ const longNote: NotificationOptions = {
     title: 'Notification Title ',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
-    date: new Date(),
+    onSelect: {task: 'Selected'},
     buttons: []
 };
 
@@ -35,10 +35,10 @@ const buttonNote: NotificationOptions = {
     category: 'Buttons',
     icon: 'favicon.ico',
     customData: {testContext: 'testContext'},
-    onSelect: 'Selected',
+    onSelect: {task: 'Selected'},
     buttons: [
-        {title: 'test1', iconUrl: 'favicon.ico', onClick: 'Button 1'},
-        {title: 'test2', iconUrl: 'favicon.ico', onClick: 'Button 2'}
+        {title: 'test1', iconUrl: 'favicon.ico', onClick: {btn: 'Button 1'}},
+        {title: 'test2', iconUrl: 'favicon.ico', onClick: {btn: 'Button 2'}}
     ]
 };
 
@@ -55,7 +55,7 @@ function makeNoteOfType(index: number) {
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
 
-    function logit(msg: string) {
+    function logMessage(msg: string) {
         const logEntry = document.createElement('div');
         logEntry.innerHTML = msg;
         clientResponse.insertBefore(logEntry, clientResponse.firstChild);
@@ -64,7 +64,7 @@ fin.desktop.main(async () => {
     for (let index = 1; index < 7; index++) {
         document.getElementById(`button${index}`)!.addEventListener('click', () => {
             makeNoteOfType(index).catch((err) => {
-                logit(`Error creating notification: ${err}`);
+                logMessage(`Error creating notification: ${err}`);
             });
         });
 
@@ -73,27 +73,40 @@ fin.desktop.main(async () => {
         });
     }
 
+    // Press 1-9 to create a notification, ctrl+1-9 to remove notification
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+        const index = parseInt(event.key);
+
+        if (index >= 1) {
+            if (event.ctrlKey) {
+                clear(`1q2w3e4r${index}`);
+            } else {
+                makeNoteOfType(index);
+            }
+        }
+    });
+
     document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
         getAll().then((notifications) => {
-            logit(`${notifications.length} notifications received from the Notification Center`);
+            logMessage(`${notifications.length} notifications received from the Notification Center`);
         });
     });
 
     addEventListener('notification-created', (event: NotificationCreatedEvent) => {
-        logit(`CREATE action received from notification ${event.notification.id}`);
+        logMessage(`CREATE action received from notification ${event.notification.id}`);
     });
     addEventListener('notification-closed', (event: NotificationClosedEvent) => {
-        logit(`CLOSE action received from notification ${event.notification.id}`);
+        logMessage(`CLOSE action received from notification ${event.notification.id}`);
     });
     addEventListener('notification-action', (event: NotificationActionEvent) => {
         const {notification, trigger, control} = event;
 
         if (trigger === 'select') {
-            logit(`SELECT action received from notification ${event.notification.id}`);
+            logMessage(`SELECT action received from notification ${event.notification.id}`);
         } else if (control && control.type === 'button') {
             const buttonIndex = notification.buttons.indexOf(control);
 
-            logit(`CONTROL action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
+            logMessage(`CONTROL action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
         }
     });
 });

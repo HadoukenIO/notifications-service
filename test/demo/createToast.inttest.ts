@@ -20,7 +20,7 @@ const options: NotificationOptions = {
     category: 'Test Notification Category'
 };
 
-describe('When calling createNotification with the notification center not showing', () => {
+describe('When calling createNotification with the Notification Center not showing', () => {
     let testApp: Application;
     let testWindow: Window;
 

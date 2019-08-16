@@ -24,7 +24,7 @@ type WithExplicitType<T extends {type?: string}> = T & {type: string;};
 /**
  * *Not yet implemented*
  *
- * Union of the options objects of all "primary controls" components supported by the service.
+ * Union of the options objects of all "primary control" components supported by the service.
  */
 export type PrimaryControlOptions = never;
 
@@ -35,7 +35,7 @@ export type PrimaryControlOptions = never;
 export type ControlOptions = PrimaryControlOptions | WithExplicitType<ButtonOptions>;
 
 /**
- * Configuration options for constructing a Button within a notification.
+ * Configuration options for constructing a button within a notification.
  */
 export interface ButtonOptions {
     /**
@@ -65,8 +65,8 @@ export interface ButtonOptions {
     /**
      * Defines the data to be passed back to the application when the button is clicked.
      *
-     * The payload specified here will be returned to the application via a `notification-action` event when the button
-     * is clicked.
+     * The {@link NotificationActionResult} specified here will be returned to the application via a
+     * `notification-action` event when the button is clicked.
      *
      * This field must be specified if the application creating the notification wishes to be informed that the user
      * has clicked this button. If the button represents a "dismiss" or some other side-effect-free action then

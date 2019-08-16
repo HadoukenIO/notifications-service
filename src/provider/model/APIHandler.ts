@@ -5,7 +5,7 @@ import {injectable} from 'inversify';
 import {Signal} from 'openfin-service-signal';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
-import {Targeted, Transport} from '../../client/EventRouter';
+import {Targeted, Transport, EventSpecification} from '../../client/EventRouter';
 
 /**
  * Semantic type definition.

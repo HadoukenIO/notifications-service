@@ -11,6 +11,7 @@ import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
 import {EventPump} from '../model/EventPump';
 import {ClientHandler} from '../model/ClientHandler';
+import {Database} from '../model/database/Database';
 
 import {Inject} from './Injectables';
 
@@ -18,13 +19,14 @@ import {Inject} from './Injectables';
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
-    [Inject.ACTION_MAP]: ActionHandlerMap;
+    [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
-    [Inject.EVENT_PUMP]: EventPump;
-    [Inject.CLIENT_HANDLER]: ClientHandler;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.LAYOUTER]: Layouter;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
+    [Inject.EVENT_PUMP]: EventPump;
+    [Inject.CLIENT_HANDLER]: ClientHandler;
+    [Inject.DATABASE]: Database;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
 };
@@ -36,12 +38,14 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
-    [Inject.ACTION_MAP]: ActionHandlers,
+    [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
-    [Inject.EVENT_PUMP]: EventPump,
-    [Inject.CLIENT_HANDLER]: ClientHandler,
     [Inject.LAYOUTER]: Layouter,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
+    [Inject.EVENT_PUMP]: EventPump,
+    [Inject.CLIENT_HANDLER]: ClientHandler,
+    [Inject.DATABASE]: Database,
+    [Inject.LAYOUTER]: Layouter,
     [Inject.STORE]: Store,
     [Inject.TOAST_MANAGER]: ToastManager
 };
@@ -73,7 +77,7 @@ export class Injector {
 
             if (proto && proto.hasOwnProperty('init')) {
                 const instance = (container.get(Inject[key]) as AsyncInit);
-                promises.push(instance.initialized);
+                promises.push(instance.delayedInit());
             }
         });
 
