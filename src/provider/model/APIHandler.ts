@@ -4,8 +4,7 @@ import {Identity} from 'openfin/_v2/main';
 import {injectable} from 'inversify';
 
 import {SERVICE_CHANNEL} from '../../client/internal';
-import {NotificationEvent} from '../../client';
-import {EventPayload} from '../../client/connection';
+import {Targeted, Transport, EventSpecification} from '../../client/EventRouter';
 
 /**
  * Semantic type definition.
@@ -53,11 +52,11 @@ export type APIImplementation<T extends Enum, S extends APISpecification<T>> = {
 /**
  * Generic client/provider interaction handler.
  *
- * Type args:
- *   T: Defines API topics. An enum that defines each available function call.
+ * @typeparam T Defines API topics. An enum that defines each available function call.
+ * @typeparam E Defines the events that can be sent from provider to client. Should be a union of all `<X>Event` objects.
  */
 @injectable()
-export class APIHandler<T extends Enum> {
+export class APIHandler<T extends Enum, E extends EventSpecification> {
     private _providerChannel!: ChannelProvider;
 
     public get channel(): ChannelProvider {
@@ -74,6 +73,22 @@ export class APIHandler<T extends Enum> {
         return this._providerChannel.connections;
     }
 
+    public async dispatchMessage<S extends APISpecification<T>, K extends T>(identity: Identity, action: K, payload: S[K][0]): Promise<S[K][1]> {
+        return this._providerChannel.dispatch(identity, action, payload);
+    }
+
+    public async dispatchEvent<T extends E>(targetWindow: Identity, eventTransport: Targeted<Transport<T>>): Promise<void> {
+        return this._providerChannel.dispatch(targetWindow, 'event', eventTransport);
+    }
+
+    public async publishMessage<S extends APISpecification<T>, K extends T>(action: K, payload: S[K][0]): Promise<S[K][1]> {
+        return this._providerChannel.publish(action, payload);
+    }
+
+    public async publishEvent<T extends E>(eventTransport: Targeted<Transport<T>>): Promise<void> {
+        return Promise.all(this._providerChannel.publish('event', eventTransport)).then(() => {});
+    }
+
     public async registerListeners<S extends APISpecification<T>>(actionHandlerMap: APIImplementation<T, S>): Promise<void> {
         const providerChannel: ChannelProvider = this._providerChannel = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
 
@@ -84,10 +99,6 @@ export class APIHandler<T extends Enum> {
                 this._providerChannel.register(action, actionHandlerMap[action]);
             }
         }
-    }
-
-    public async dispatchClientEvent(target: Identity, payload: EventPayload<NotificationEvent>): Promise<void> {
-        return this.channel.dispatch(target, 'event', payload);
     }
 
     // TODO?: Remove the need for this any by defining connection payload type?

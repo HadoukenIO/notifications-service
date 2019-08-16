@@ -1,6 +1,7 @@
 import {Identity} from 'openfin/_v2/main';
 
-import {NotificationOptions, NotificationEvent, Notification} from '../../../src/client';
+import {NotificationOptions, Notification} from '../../../src/client';
+import {Events} from '../../../src/client/internal';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
@@ -58,17 +59,17 @@ export async function toggleNotificationCenter(executionTarget: Identity) {
 }
 
 export async function addEventListener
-    <E extends NotificationEvent>(executionTarget: Identity, eventType: E['type'], listener: (event: E) => void): Promise<void> {
+    <E extends Events>(executionTarget: Identity, eventType: E['type'], listener: (event: E) => void): Promise<void> {
     const remoteFn = await ofBrowser.getOrMountRemoteFunction(executionTarget, listener);
-    await ofBrowser.executeOnWindow(executionTarget, function(eventTypeRemote: typeof eventType, listenerRemote: typeof listener) {
+    await ofBrowser.executeOnWindow(executionTarget, function(eventTypeRemote: any, listenerRemote: any) {
         return this.notifications.addEventListener(eventTypeRemote, listenerRemote);
-    }, eventType, remoteFn as any as typeof listener);
+    }, eventType, remoteFn);
 }
 
 export async function removeEventListener
-    <E extends NotificationEvent>(executionTarget: Identity, eventType: E['type'], listener: (event: E) => void): Promise<void> {
+    <E extends Events>(executionTarget: Identity, eventType: E['type'], listener: (event: E) => void): Promise<void> {
     const remoteFn = await ofBrowser.getOrMountRemoteFunction(executionTarget, listener);
-    await ofBrowser.executeOnWindow(executionTarget, function(eventTypeRemote: typeof eventType, listenerRemote: typeof listener) {
+    await ofBrowser.executeOnWindow(executionTarget, function(eventTypeRemote: any, listenerRemote: any) {
         return this.notifications.removeEventListener(eventTypeRemote, listenerRemote);
-    }, eventType, remoteFn as any as typeof listener);
+    }, eventType, remoteFn);
 }

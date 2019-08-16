@@ -1,14 +1,15 @@
 import {Container} from 'inversify';
 import {interfaces as inversify} from 'inversify/dts/interfaces/interfaces';
 
-import {APITopic} from '../../client/internal';
+import {APITopic, Events} from '../../client/internal';
 import {AsyncInit} from '../controller/AsyncInit';
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {ToastManager} from '../controller/ToastManager';
 import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
-import {ActionMap, Actions} from '../store/Actions';
+import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
+import {Database} from '../model/database/Database';
 
 import {Inject} from './Injectables';
 
@@ -16,12 +17,14 @@ import {Inject} from './Injectables';
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
-    [Inject.ACTION_MAP]: ActionMap;
-    [Inject.API_HANDLER]: APIHandler<APITopic>;
-    [Inject.STORE]: Store;
-    [Inject.TOAST_MANAGER]: ToastManager;
+    [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
+    [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.LAYOUTER]: Layouter;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
+    [Inject.DATABASE]: Database;
+    [Inject.STORE]: Store;
+    [Inject.TOAST_MANAGER]: ToastManager;
 };
 
 /**
@@ -31,12 +34,14 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
-    [Inject.ACTION_MAP]: Actions,
+    [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
-    [Inject.STORE]: Store,
+    [Inject.LAYOUTER]: Layouter,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
-    [Inject.TOAST_MANAGER]: ToastManager,
-    [Inject.LAYOUTER]: Layouter
+    [Inject.DATABASE]: Database,
+    [Inject.LAYOUTER]: Layouter,
+    [Inject.STORE]: Store,
+    [Inject.TOAST_MANAGER]: ToastManager
 };
 
 type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);
@@ -66,7 +71,7 @@ export class Injector {
 
             if (proto && proto.hasOwnProperty('init')) {
                 const instance = (container.get(Inject[key]) as AsyncInit);
-                promises.push(instance.initialized);
+                promises.push(instance.delayedInit());
             }
         });
 

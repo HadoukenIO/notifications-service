@@ -7,9 +7,10 @@ import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
 
 import {LayoutStack, Layouter} from './Layouter';
+import {AsyncInit} from './AsyncInit';
 
 @injectable()
-export class ToastManager {
+export class ToastManager extends AsyncInit {
     private _layouter!: Layouter;
     private _store!: Store;
     private _toasts: Map<string, Toast> = new Map();
@@ -17,12 +18,18 @@ export class ToastManager {
     private _queue: Toast[] = [];
 
     constructor(@inject(Inject.STORE) store: Store, @inject(Inject.LAYOUTER) layouter: Layouter) {
+        super();
+
         this._store = store;
         this._store.onAction.add(this.onAction, this);
-        this.subscribe();
         this.addListeners();
         this._layouter = layouter;
         this._layouter.onLayoutRequired.add(this.onLayoutRequired, this);
+    }
+
+    protected async init() {
+        await this._store.initialized;
+        this.subscribe();
     }
 
     /**
@@ -53,6 +60,9 @@ export class ToastManager {
         if (this._toasts.has(notification.id)) {
             const oldToast = this._toasts.get(id)!;
             await this.deleteToast(oldToast, true);
+
+            // Workaround for race conditions within toast manager. Will address with SERVICE-581.
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
 
         const toast: Toast = new Toast(this._store, notification, {
@@ -92,7 +102,7 @@ export class ToastManager {
         this._layouter.layout(this._stack);
     }
 
-    private onAction(action: RootAction): void {
+    private async onAction(action: RootAction): Promise<void> {
         if (action.type === Action.CREATE) {
             this.create(action.notification);
         }
@@ -112,11 +122,19 @@ export class ToastManager {
      * @param force Force the deleted toast to close without playing animations.
      */
     private async deleteToast(toast: Toast, force: boolean = false): Promise<void> {
-        this._toasts.delete(toast.id);
         const index = this._stack.items.indexOf(toast);
-        this._stack.items.splice(index, 1);
+
+        // Workaround for race conditions within toast manager. Will address with SERVICE-581.
+        if (index >= 0) {
+            this._stack.items.splice(index, 1);
+        }
         this._layouter.layout(this._stack);
-        await this.closeToast(toast);
+        if (force) {
+            await toast.close();
+        } else {
+            await this.closeToast(toast);
+        }
+        this._toasts.delete(toast.id);
         // There is extra space now, check the queue.
         this.checkQueue();
     }
