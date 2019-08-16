@@ -50,10 +50,6 @@ export type APIImplementation<T extends Enum, S extends APISpecification<T>> = {
     [K in T]: APIAction<S[K]>;
 };
 
-export type EventSpecification = {
-    type: string;
-};
-
 /**
  * Generic client/provider interaction handler.
  *

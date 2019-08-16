@@ -86,7 +86,7 @@ describe('When creating a notification with an ID that already exists but differ
 
             // Recreate the notification and pause momentarily to allow the event to propagate
             await notifsRemote.create(testWindow.identity, secondOptions);
-            await delay(Duration.EVENT_PROPAGATED * 10);
+            await delay(Duration.EVENT_PROPAGATED);
 
             // Listeners triggered
             expect(createdListener).toHaveBeenCalledTimes(1);
