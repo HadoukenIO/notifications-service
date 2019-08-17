@@ -10,7 +10,7 @@ import {APIHandler} from '../model/APIHandler';
 import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
 import {EventPump} from '../model/EventPump';
-import {ClientHandler} from '../model/ClientHandler';
+import {ClientRegistry} from '../model/ClientRegistry';
 import {Database} from '../model/database/Database';
 
 import {Inject} from './Injectables';
@@ -25,7 +25,7 @@ type Types = {
     [Inject.LAYOUTER]: Layouter;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.EVENT_PUMP]: EventPump;
-    [Inject.CLIENT_HANDLER]: ClientHandler;
+    [Inject.CLIENT_REGISTRY]: ClientRegistry;
     [Inject.DATABASE]: Database;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
@@ -43,7 +43,7 @@ const Bindings = {
     [Inject.LAYOUTER]: Layouter,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.EVENT_PUMP]: EventPump,
-    [Inject.CLIENT_HANDLER]: ClientHandler,
+    [Inject.CLIENT_REGISTRY]: ClientRegistry,
     [Inject.DATABASE]: Database,
     [Inject.LAYOUTER]: Layouter,
     [Inject.STORE]: Store,

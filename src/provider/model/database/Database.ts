@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 
 import {StoredSetting} from '../StoredSetting';
 import {StoredNotification} from '../StoredNotification';
-import {AppInitData} from '../ClientHandler';
+import {AppInitData} from '../ClientRegistry';
 import {AsyncInit} from '../../controller/AsyncInit';
 
 import {Collection} from './Collection';

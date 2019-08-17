@@ -7,7 +7,7 @@ import {Transport, Targeted} from '../../client/EventRouter';
 import {NotificationActionEvent} from '../../client';
 
 import {APIHandler} from './APIHandler';
-import {ClientHandler} from './ClientHandler';
+import {ClientRegistry} from './ClientRegistry';
 
 type DeferrableEvent = Targeted<Transport<NotificationActionEvent>>;
 type DeferredEvent = {target: Identity, event: DeferrableEvent};
@@ -15,20 +15,19 @@ type DeferredEvent = {target: Identity, event: DeferrableEvent};
 /**
  * Notification event message handler. EventPump internally handles the events added
  * by either dispatching them immediately or deferring the dispatch.
- *
  */
 @injectable()
 export class EventPump {
-    @inject(Inject.API_HANDLER)
     private _apiHandler!: APIHandler<APITopic, Events>;
 
-    private _clientHandler!: ClientHandler;
+    private _clientRegistry!: ClientRegistry;
 
     private _deferredEvents: DeferredEvent[] = [];
 
-    constructor(@inject(Inject.CLIENT_HANDLER) clientHandler: ClientHandler) {
-        this._clientHandler = clientHandler;
-        this._clientHandler.onClientHandshake.add(this.dispatchDeferredEvents, this);
+    constructor(@inject(Inject.CLIENT_REGISTRY) clientRegistry: ClientRegistry, @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>) {
+        this._apiHandler = apiHandler;
+        this._clientRegistry = clientRegistry;
+        this._clientRegistry.onClientHandshake.add(this.dispatchDeferredEvents, this);
     }
 
     /**
@@ -38,14 +37,13 @@ export class EventPump {
      *
      * @param target Identity of target client.
      * @param event Notification event to be dispatched
-     *
      */
     public async push<T extends Events>(target: Identity, event: Targeted<Transport<T>>): Promise<void> {
-        if (event.type !== 'notification-action' || this._clientHandler.isAppActive(target)) {
+        if (event.type !== 'notification-action' || this._clientRegistry.isAppActive(target)) {
             this._apiHandler.dispatchEvent(target, event);
         } else {
             this._deferredEvents.push({target, event: event as DeferrableEvent});
-            this._clientHandler.tryLaunchApplication(target);
+            this._clientRegistry.tryLaunchApplication(target);
         }
     }
 
@@ -53,7 +51,6 @@ export class EventPump {
      * Dispatches relevant deferred events to a client once a handshake occurs between the provider and the client.
      *
      * @param app Identity of target client.
-     *
      */
     private async dispatchDeferredEvents(app: Identity): Promise<void> {
         this._deferredEvents = this._deferredEvents.filter(event => {

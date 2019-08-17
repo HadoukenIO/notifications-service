@@ -16,12 +16,11 @@ export type AppInitData = {
 }
 
 /**
- * Client handler is responsible of keeping track of active clients, storing information about them
+ * Client registry is responsible of keeping track of active clients, storing information about them
  * and re-launching them when requested by other modules. Is intended to be used solely by EventPump.
- *
  */
 @injectable()
-export class ClientHandler {
+export class ClientRegistry {
     private _apiHandler!: APIHandler<APITopic, Events>;
 
     private _activeClients: Identity[] = [];
@@ -29,7 +28,7 @@ export class ClientHandler {
 
     constructor(@inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>) {
         this._apiHandler = apiHandler;
-        this._apiHandler.onConnection.add(this.onClientConnect, this);
+        this._apiHandler.onConnection.add(this.onClientConnection, this);
         this._apiHandler.onDisconnection.add(this.onClientDisconnection, this);
     }
 
@@ -37,19 +36,25 @@ export class ClientHandler {
      * Launches the app with specified identity if the start-up information about it was stored previously.
      *
      * @param app Identity of target client.
-     *
      */
     public tryLaunchApplication(app: Identity): void {
-        fin.Application.wrapSync(app).isRunning().then(running => {
+        fin.Application.wrapSync(app).isRunning().then(async running => {
             if (!running) {
-                const database = Injector.get<'DATABASE'>(Inject.DATABASE);
-                database.get(CollectionMap.CLIENTS).get(app.uuid).then(value => {
-                    if (value) {
-                        (typeof value.data === 'string') ? fin.Application.startFromManifest(value.data) : fin.Application.start(value.data);
+                try {
+                    const collection = Injector.get<'DATABASE'>(Inject.DATABASE).get(CollectionMap.CLIENTS);
+                    const initData = await collection.get(app.uuid);
+                    if (initData && initData.data) {
+                        if (typeof initData.data === 'string') {
+                            await fin.Application.startFromManifest(initData.data);
+                        } else {
+                            await fin.Application.start(initData.data as ApplicationOption);
+                        }
                     } else {
-                        console.log('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
+                        throw new Error('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
                     }
-                });
+                } catch (error) {
+                    this.logError(error);
+                }
             }
         });
     }
@@ -58,7 +63,6 @@ export class ClientHandler {
      * Decides weather an app is running at the moment.
      *
      * @param app Identity of the app.
-     *
      */
     public isAppActive(app: Identity): boolean {
         return this._activeClients.some(client => client.uuid === app.uuid);
@@ -77,17 +81,29 @@ export class ClientHandler {
         }
     }
 
-    public onClientConnect(app: Identity): void {
-        fin.Application.wrapSync(app).getInfo().then(info => {
-            const database = Injector.get<'DATABASE'>(Inject.DATABASE);
-            database.get(CollectionMap.CLIENTS).upsert({
-                id: app.uuid,
-                data: info.parentUuid ? info.initialOptions as ApplicationOption : info.manifestUrl
-            });
+    private onClientConnection(app: Identity): void {
+        fin.Application.wrapSync(app).getInfo().then(async info => {
+            try {
+                const collection = Injector.get<'DATABASE'>(Inject.DATABASE).get(CollectionMap.CLIENTS);
+                await collection.upsert({
+                    id: app.uuid,
+                    data: info.parentUuid ? info.initialOptions as ApplicationOption : info.manifestUrl
+                });
+            } catch (error) {
+                this.logError(error);
+            }
         });
     }
 
-    public onClientDisconnection(app: Identity): void {
+    private onClientDisconnection(app: Identity): void {
         this.onRemoveEventListener('notification-action', app);
+    }
+
+    private logError(error: Error): void {
+        const e: any = {
+            message: error.message,
+            ...error
+        };
+        console.error(error, e);
     }
 }

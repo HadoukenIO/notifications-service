@@ -20,7 +20,7 @@ import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisib
 import {mutable} from './store/State';
 import {Store} from './store/Store';
 import {EventPump} from './model/EventPump';
-import {ClientHandler} from './model/ClientHandler';
+import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
 
 @injectable()
@@ -30,8 +30,8 @@ export class Main {
     @inject(Inject.API_HANDLER)
     private _apiHandler!: APIHandler<APITopic, Events>;
 
-    @inject(Inject.CLIENT_HANDLER)
-    private _clientHandler!: ClientHandler;
+    @inject(Inject.CLIENT_REGISTRY)
+    private _clientHandler!: ClientRegistry;
 
     @inject(Inject.EVENT_PUMP)
     private _eventPump!: EventPump;

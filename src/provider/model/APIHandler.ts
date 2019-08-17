@@ -112,7 +112,11 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
         } else {
             console.log(`connection from client: ${app.name}, unable to determine version`);
         }
-        this.onConnection.emit(app);
+        // The 'onConnection' callback fires *just before* the channel is ready.
+        // Delaying the firing of our signal slightly, to ensure client is definitely contactable.
+        setImmediate(() => {
+            this.onConnection.emit(app);
+        });
     }
 
     private onDisconnectionHandler(app: Identity): void {

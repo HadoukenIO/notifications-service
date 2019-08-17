@@ -7,7 +7,7 @@
 enum Injectable {
     ACTION_HANDLER_MAP,
     API_HANDLER,
-    CLIENT_HANDLER,
+    CLIENT_REGISTRY,
     EVENT_PUMP,
     DATABASE,
     LAYOUTER,
