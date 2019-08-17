@@ -114,6 +114,7 @@ export class Toast implements LayoutItem {
     */
     public async show(): Promise<void> {
         const {window: toastWindow} = await this._webWindow;
+        await this._dimensions;
         await toastWindow.show();
         this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
     }
