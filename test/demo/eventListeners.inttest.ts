@@ -142,7 +142,7 @@ describe('Click listeners', () => {
                         type: 'notification-action',
                         notification: {...note, date: note.date.toJSON()},
                         trigger: 'close',
-                        result: {action: 'close'}
+                        result: {task: 'close'}
                     });
 
                     expect(closedListener).toHaveBeenCalledTimes(1);
