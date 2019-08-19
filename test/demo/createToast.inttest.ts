@@ -92,20 +92,4 @@ describe('When calling createNotification with the Notification Center not showi
 
         await assertNotificationStored(testWindow.identity, note);
     });
-
-    describe('When application quits and an event that requires app-relaunch occurs', () => {
-        beforeEach(async () => {
-            await delay(Duration.TOAST_DOM_LOADED);
-            const toastCards = await getToastCards(testApp.identity.uuid, note.id);
-            await testApp.quit();
-            toastCards![0].click();
-
-            await delay(Duration.APP_RESTART);
-            testWindow = await testApp.getWindow();
-        });
-
-        test('The application restarts', async () => {
-            expect(await testApp.isRunning()).toBeTruthy();
-        });
-    });
 });

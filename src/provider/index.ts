@@ -26,27 +26,31 @@ import {Database} from './model/database/Database';
 @injectable()
 export class Main {
     private _config = null;
+    private readonly _apiHandler: APIHandler<APITopic, Events>;
+    private readonly _clientHandler: ClientRegistry;
+    private readonly _database!: Database;
+    private readonly _eventPump!: EventPump;
+    private readonly _notificationCenter!: NotificationCenter;
+    private readonly _store: Store;
+    private readonly _toastManager!: ToastManager;
 
-    @inject(Inject.API_HANDLER)
-    private _apiHandler!: APIHandler<APITopic, Events>;
-
-    @inject(Inject.CLIENT_REGISTRY)
-    private _clientHandler!: ClientRegistry;
-
-    @inject(Inject.EVENT_PUMP)
-    private _eventPump!: EventPump;
-
-    @inject(Inject.STORE)
-    private _store!: Store;
-
-    @inject(Inject.NOTIFICATION_CENTER)
-    private _notificationCenter!: NotificationCenter;
-
-    @inject(Inject.TOAST_MANAGER)
-    private _toastManager!: ToastManager;
-
-    @inject(Inject.DATABASE)
-    private _database!: Database;
+    constructor(
+        @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
+        @inject(Inject.CLIENT_REGISTRY) clientHandler: ClientRegistry,
+        @inject(Inject.DATABASE) database: Database,
+        @inject(Inject.EVENT_PUMP) eventPump: EventPump,
+        @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
+        @inject(Inject.STORE) store: Store,
+        @inject(Inject.TOAST_MANAGER) toastManager: ToastManager
+    ) {
+        this._apiHandler = apiHandler;
+        this._clientHandler = clientHandler;
+        this._database = database;
+        this._eventPump = eventPump;
+        this._notificationCenter = notificationCenter;
+        this._store = store;
+        this._toastManager = toastManager;
+    }
 
     public async register(): Promise<void> {
         Object.assign(window, {

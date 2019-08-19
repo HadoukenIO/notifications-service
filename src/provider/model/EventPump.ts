@@ -18,10 +18,8 @@ type DeferredEvent = {target: Identity, event: DeferrableEvent};
  */
 @injectable()
 export class EventPump {
-    private _apiHandler!: APIHandler<APITopic, Events>;
-
-    private _clientRegistry!: ClientRegistry;
-
+    private readonly _apiHandler: APIHandler<APITopic, Events>;
+    private readonly _clientRegistry: ClientRegistry;
     private _deferredEvents: DeferredEvent[] = [];
 
     constructor(@inject(Inject.CLIENT_REGISTRY) clientRegistry: ClientRegistry, @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>) {
@@ -52,7 +50,7 @@ export class EventPump {
      *
      * @param app Identity of target client.
      */
-    private async dispatchDeferredEvents(app: Identity): Promise<void> {
+    private dispatchDeferredEvents(app: Identity): void {
         this._deferredEvents = this._deferredEvents.filter(event => {
             const shouldDispatch: boolean = event.target.uuid === app.uuid;
             if (shouldDispatch) {

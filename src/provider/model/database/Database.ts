@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 
 import {StoredSetting} from '../StoredSetting';
 import {StoredNotification} from '../StoredNotification';
-import {AppInitData} from '../ClientRegistry';
+import {StoredApplication} from '../ClientRegistry';
 import {AsyncInit} from '../../controller/AsyncInit';
 
 import {Collection} from './Collection';
@@ -17,13 +17,13 @@ export const enum CollectionMap {
 export type Collections = {
     [CollectionMap.NOTIFICATIONS]: StoredNotification;
     [CollectionMap.SETTINGS]: StoredSetting;
-    [CollectionMap.CLIENTS]: AppInitData;
+    [CollectionMap.CLIENTS]: StoredApplication;
 };
 
 @injectable()
 export class Database extends AsyncInit {
-    private _database: Dexie;
-    private _collections: Map<CollectionMap, Collection<any>>;
+    private readonly _database: Dexie;
+    private readonly _collections: Map<CollectionMap, Collection<any>>;
 
     constructor () {
         super();

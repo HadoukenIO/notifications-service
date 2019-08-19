@@ -21,12 +21,11 @@ import {Inject} from './Injectables';
 type Types = {
     [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
-    [Inject.LAYOUTER]: Layouter;
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
-    [Inject.EVENT_PUMP]: EventPump;
     [Inject.CLIENT_REGISTRY]: ClientRegistry;
     [Inject.DATABASE]: Database;
+    [Inject.EVENT_PUMP]: EventPump;
+    [Inject.LAYOUTER]: Layouter;
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
 };
@@ -40,12 +39,11 @@ type Types = {
 const Bindings = {
     [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
-    [Inject.LAYOUTER]: Layouter,
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
-    [Inject.EVENT_PUMP]: EventPump,
     [Inject.CLIENT_REGISTRY]: ClientRegistry,
     [Inject.DATABASE]: Database,
+    [Inject.EVENT_PUMP]: EventPump,
     [Inject.LAYOUTER]: Layouter,
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.STORE]: Store,
     [Inject.TOAST_MANAGER]: ToastManager
 };

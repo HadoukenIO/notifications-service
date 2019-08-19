@@ -5,31 +5,32 @@ import {Signal} from 'openfin-service-signal';
 
 import {APITopic, Events} from '../../client/internal';
 import {Inject} from '../common/Injectables';
-import {Injector} from '../common/Injector';
 
 import {APIHandler} from './APIHandler';
-import {CollectionMap} from './database/Database';
+import {CollectionMap, Database} from './database/Database';
 
-export type AppInitData = {
+export type StoredApplication = {
     id: string;
     data: ApplicationOption | string
 }
 
 /**
- * Client registry is responsible of keeping track of active clients, storing information about them
+ * Client registry is responsible for keeping track of active clients, storing information about them
  * and re-launching them when requested by other modules. Is intended to be used solely by EventPump.
  */
 @injectable()
 export class ClientRegistry {
-    private _apiHandler!: APIHandler<APITopic, Events>;
+    private readonly _apiHandler: APIHandler<APITopic, Events>;
+    private readonly _database: Database;
 
     private _activeClients: Identity[] = [];
     public readonly onClientHandshake: Signal<[Identity]> = new Signal();
 
-    constructor(@inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>) {
+    constructor(@inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>, @inject(Inject.DATABASE) database: Database) {
         this._apiHandler = apiHandler;
         this._apiHandler.onConnection.add(this.onClientConnection, this);
         this._apiHandler.onDisconnection.add(this.onClientDisconnection, this);
+        this._database = database;
     }
 
     /**
@@ -38,10 +39,10 @@ export class ClientRegistry {
      * @param app Identity of target client.
      */
     public tryLaunchApplication(app: Identity): void {
-        fin.Application.wrapSync(app).isRunning().then(async running => {
+        fin.Application.wrapSync(app).isRunning().then(async (running) => {
             if (!running) {
                 try {
-                    const collection = Injector.get<'DATABASE'>(Inject.DATABASE).get(CollectionMap.CLIENTS);
+                    const collection = this._database.get(CollectionMap.CLIENTS);
                     const initData = await collection.get(app.uuid);
                     if (initData && initData.data) {
                         if (typeof initData.data === 'string') {
@@ -60,7 +61,7 @@ export class ClientRegistry {
     }
 
     /**
-     * Decides weather an app is running at the moment.
+     * Decides whether an app is running at the moment.
      *
      * @param app Identity of the app.
      */
@@ -82,9 +83,9 @@ export class ClientRegistry {
     }
 
     private onClientConnection(app: Identity): void {
-        fin.Application.wrapSync(app).getInfo().then(async info => {
+        fin.Application.wrapSync(app).getInfo().then(async (info) => {
             try {
-                const collection = Injector.get<'DATABASE'>(Inject.DATABASE).get(CollectionMap.CLIENTS);
+                const collection = this._database.get(CollectionMap.CLIENTS);
                 await collection.upsert({
                     id: app.uuid,
                     data: info.parentUuid ? info.initialOptions as ApplicationOption : info.manifestUrl
