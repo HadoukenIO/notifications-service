@@ -156,7 +156,7 @@ export enum ActionTrigger {
      * or the close button will fire an event with the `'select'` action trigger.
      */
     SELECT = 'select',
-    
+
     /**
      * The notification was closed, either by user interaction, or programmatically by an application.
      */
