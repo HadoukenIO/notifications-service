@@ -17,7 +17,10 @@ import {assertHydratedCorrectly} from './utils/hydrateNotification';
 const options: NotificationOptions = {
     body: 'Test Notification Body',
     title: 'Test Notification Title',
-    category: 'Test Notification Category'
+    category: 'Test Notification Category',
+    customData: {testContext: 'testContext'},
+    onSelect: {task: 'Selected'},
+    buttons: []
 };
 
 describe('When calling createNotification with the Notification Center not showing', () => {
@@ -88,5 +91,21 @@ describe('When calling createNotification with the Notification Center not showi
         const note = await notifsRemote.create(testWindow.identity, options);
 
         await assertNotificationStored(testWindow.identity, note);
+    });
+
+    describe('When application quits and an event that requires app-relaunch occurs', () => {
+        beforeEach(async () => {
+            await delay(Duration.TOAST_DOM_LOADED);
+            const toastCards = await getToastCards(testApp.identity.uuid, note.id);
+            await testApp.quit();
+            toastCards![0].click();
+
+            await delay(Duration.APP_RESTART);
+            testWindow = await testApp.getWindow();
+        });
+
+        test('The application restarts', async () => {
+            expect(await testApp.isRunning()).toBeTruthy();
+        });
     });
 });

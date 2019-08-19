@@ -3,6 +3,7 @@ export async function delay(duration: Duration) {
 }
 
 export enum Duration {
+    APP_RESTART = 3500,
     TOAST_DOM_LOADED = 500,
     TOAST_CREATE = 200,
     TOAST_CLOSE = 600,
