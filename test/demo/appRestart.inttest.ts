@@ -31,30 +31,27 @@ describe('When an app that uses notification-service is created', () => {
     let testApp: Application;
     let testWindow: Window;
 
-    let createPromise: Promise<Notification>;
-    let note: Notification;
-
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
     });
 
-    describe('When the application creates a notification and quits', () => {
+    afterEach(async () => {
+        await notifsRemote.clearAll(testWindow.identity);
+        await testApp.quit();
+    });
+
+    describe('When the application creates a notification with an action result and then quits', () => {
         let toastCards: ElementHandle[] | undefined;
 
         beforeEach(async () => {
-            ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, relaunchNotificationOptions));
+            const {note} = await notifsRemote.createAndAwait(testWindow.identity, relaunchNotificationOptions);
             await delay(Duration.TOAST_DOM_LOADED);
             toastCards = await getToastCards(testApp.identity.uuid, note.id);
             await testApp.quit();
         });
 
-        afterEach(async () => {
-            await notifsRemote.clearAll(testWindow.identity);
-            await testApp.quit();
-        });
-
-        test('A notification event that requires app restart causes the application to application restarts', async () => {
+        test('Clicking the notification restarts the app', async () => {
             toastCards![0].click();
 
             await waitForAppToBeRunning(testApp.identity);
@@ -63,20 +60,24 @@ describe('When an app that uses notification-service is created', () => {
         });
     });
 
-    describe('When the application creates a notification and quits', () => {
+    describe('When the application creates a notification without an action result and then quits', () => {
         let toastCards: ElementHandle[] | undefined;
 
         beforeEach(async () => {
-            ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, nonRelaunchNotificationOptions));
+            const {note} = await notifsRemote.createAndAwait(testWindow.identity, nonRelaunchNotificationOptions);
             await delay(Duration.TOAST_DOM_LOADED);
             toastCards = await getToastCards(testApp.identity.uuid, note.id);
             await testApp.quit();
         });
 
-        test('A notification event that requires app restart doesn\'t cause the application to applicatio', async () => {
+        test('Clicking the notification does not restart the app', async () => {
             toastCards![0].click();
             testWindow = await testApp.getWindow();
-            expect(await testApp.isRunning()).toBeFalsy();
+            await expect(waitForAppToBeRunning(testApp.identity)).rejects.toBeTruthy();
+
+            testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+            await waitForAppToBeRunning(testApp.identity);
+            testWindow = await testApp.getWindow();
         });
     });
 });
