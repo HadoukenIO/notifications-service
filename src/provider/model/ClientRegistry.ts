@@ -9,9 +9,19 @@ import {Inject} from '../common/Injectables';
 import {APIHandler} from './APIHandler';
 import {CollectionMap, Database} from './database/Database';
 
-export type StoredApplication = {
+export type StoredApplication = ProgrammaticApplication | ManifestApplication;
+
+type ProgrammaticApplication = {
+    type: 'programmatic';
     id: string;
-    data: ApplicationOption | string
+    initialOptions: ApplicationOption;
+    parentUuid: string;
+}
+
+type ManifestApplication = {
+    type: 'manifest';
+    id: string;
+    manifestUrl: string;
 }
 
 /**
@@ -43,12 +53,12 @@ export class ClientRegistry {
             if (!running) {
                 try {
                     const collection = this._database.get(CollectionMap.CLIENTS);
-                    const initData = await collection.get(app.uuid);
-                    if (initData && initData.data) {
-                        if (typeof initData.data === 'string') {
-                            await fin.Application.startFromManifest(initData.data);
+                    const storedApplication = await collection.get(app.uuid);
+                    if (storedApplication) {
+                        if (storedApplication.type === 'manifest') {
+                            await fin.Application.startFromManifest(storedApplication.manifestUrl);
                         } else {
-                            await fin.Application.start(initData.data as ApplicationOption);
+                            await fin.Application.start(storedApplication.initialOptions);
                         }
                     } else {
                         throw new Error('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
@@ -84,12 +94,20 @@ export class ClientRegistry {
 
     private onClientConnection(app: Identity): void {
         fin.Application.wrapSync(app).getInfo().then(async (info) => {
+            const isProgrammatic: boolean = !!info.parentUuid;
+            const entry: StoredApplication = isProgrammatic ? {
+                type: 'programmatic',
+                id: app.uuid,
+                initialOptions: info.initialOptions as ApplicationOption,
+                parentUuid: info.parentUuid!
+            } : {
+                type: 'manifest',
+                id: app.uuid,
+                manifestUrl: info.manifestUrl
+            };
             try {
                 const collection = this._database.get(CollectionMap.CLIENTS);
-                await collection.upsert({
-                    id: app.uuid,
-                    data: info.parentUuid ? info.initialOptions as ApplicationOption : info.manifestUrl
-                });
+                await collection.upsert(entry);
             } catch (error) {
                 this.logError(error);
             }
