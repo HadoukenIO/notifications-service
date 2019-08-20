@@ -15,7 +15,7 @@ import {WebWindow, createWebWindow} from './WebWindow';
 const windowOptions: WindowOption = {
     name: 'Notification-Toast',
     url: 'ui/toast.html',
-    autoShow: true,
+    autoShow: false,
     defaultHeight: 135,
     defaultWidth: 300,
     resizable: false,
@@ -93,7 +93,11 @@ export class Toast implements LayoutItem {
         const name = `${windowOptions.name}:${this.id}`;
         this._webWindow = createWebWindow({...windowOptions, name}).then(async (webWindow) => {
             const {window, document} = webWindow;
+            const {virtualScreen} = await fin.System.getMonitorInfo();
+
             this.addListeners();
+            // Show window offscreen so it can render and then hide it
+            await window.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
             await window.hide();
             renderApp(
                 notification,
@@ -110,6 +114,7 @@ export class Toast implements LayoutItem {
     */
     public async show(): Promise<void> {
         const {window: toastWindow} = await this._webWindow;
+        await this._dimensions;
         await toastWindow.show();
         this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
     }
