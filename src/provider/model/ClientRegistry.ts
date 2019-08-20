@@ -92,26 +92,25 @@ export class ClientRegistry {
         }
     }
 
-    private onClientConnection(app: Identity): void {
-        fin.Application.wrapSync(app).getInfo().then(async (info) => {
-            const isProgrammatic: boolean = !!info.parentUuid;
-            const entry: StoredApplication = isProgrammatic ? {
-                type: 'programmatic',
-                id: app.uuid,
-                initialOptions: info.initialOptions as ApplicationOption,
-                parentUuid: info.parentUuid!
-            } : {
-                type: 'manifest',
-                id: app.uuid,
-                manifestUrl: info.manifestUrl
-            };
-            try {
-                const collection = this._database.get(CollectionMap.APPLICATIONS);
-                await collection.upsert(entry);
-            } catch (error) {
-                this.logError(error);
-            }
-        });
+    private async onClientConnection(app: Identity): Promise<void> {
+        const info = await fin.Application.wrapSync(app).getInfo();
+        const isProgrammatic: boolean = !!info.parentUuid;
+        const entry: StoredApplication = isProgrammatic ? {
+            type: 'programmatic',
+            id: app.uuid,
+            initialOptions: info.initialOptions as ApplicationOption,
+            parentUuid: info.parentUuid!
+        } : {
+            type: 'manifest',
+            id: app.uuid,
+            manifestUrl: info.manifestUrl
+        };
+        try {
+            const collection = this._database.get(CollectionMap.APPLICATIONS);
+            await collection.upsert(entry);
+        } catch (error) {
+            this.logError(error);
+        }
     }
 
     private onClientDisconnection(app: Identity): void {

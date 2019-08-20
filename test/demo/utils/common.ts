@@ -2,7 +2,7 @@ import {Identity} from 'hadouken-js-adapter';
 
 import {fin} from './fin';
 import {delay} from './delay';
-import {appStartupTime} from './constants';
+import {Duration} from './delay';
 
 /**
  * Races a given promise against a timeout, and resolves to a `[didTimeout, value?]` tuple indicating
@@ -19,7 +19,7 @@ export function withTimeout<T>(timeoutMs: number, promise: Promise<T>): Promise<
 export async function waitForAppToBeRunning(app: Identity): Promise<void> {
     let timedOut = false;
 
-    [timedOut] = await withTimeout(appStartupTime, new Promise<void>(async (resolve) => {
+    [timedOut] = await withTimeout(Duration.APP_STARTUP_TIME, new Promise<void>(async (resolve) => {
         while (!await fin.Application.wrapSync(app).isRunning() && !timedOut) {
             await delay(100);
         }
