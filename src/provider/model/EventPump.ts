@@ -36,7 +36,7 @@ export class EventPump {
      * @param target Identity of target client.
      * @param event Notification event to be dispatched
      */
-    public async push<T extends Events>(target: Identity, event: Targeted<Transport<T>>): Promise<void> {
+    public push<T extends Events>(target: Identity, event: Targeted<Transport<T>>): void {
         if (event.type !== 'notification-action' || this._clientRegistry.isAppActive(target)) {
             this._apiHandler.dispatchEvent(target, event);
         } else {
@@ -51,7 +51,7 @@ export class EventPump {
      * @param app Identity of target client.
      */
     private dispatchDeferredEvents(app: Identity): void {
-        this._deferredEvents = this._deferredEvents.filter(event => {
+        this._deferredEvents = this._deferredEvents.filter((event) => {
             const shouldDispatch: boolean = event.target.uuid === app.uuid;
             if (shouldDispatch) {
                 this._apiHandler.dispatchEvent(event.target, event.event);

@@ -28,11 +28,11 @@ export class Main {
     private _config = null;
     private readonly _apiHandler: APIHandler<APITopic, Events>;
     private readonly _clientHandler: ClientRegistry;
-    private readonly _database!: Database;
-    private readonly _eventPump!: EventPump;
-    private readonly _notificationCenter!: NotificationCenter;
+    private readonly _database: Database;
+    private readonly _eventPump: EventPump;
+    private readonly _notificationCenter: NotificationCenter;
     private readonly _store: Store;
-    private readonly _toastManager!: ToastManager;
+    private readonly _toastManager: ToastManager;
 
     constructor(
         @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,

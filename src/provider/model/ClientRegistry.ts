@@ -30,11 +30,11 @@ type ManifestApplication = {
  */
 @injectable()
 export class ClientRegistry {
+    public readonly onClientHandshake: Signal<[Identity]> = new Signal();
+
     private readonly _apiHandler: APIHandler<APITopic, Events>;
     private readonly _database: Database;
-
     private _activeClients: Identity[] = [];
-    public readonly onClientHandshake: Signal<[Identity]> = new Signal();
 
     constructor(@inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>, @inject(Inject.DATABASE) database: Database) {
         this._apiHandler = apiHandler;
@@ -52,7 +52,7 @@ export class ClientRegistry {
         fin.Application.wrapSync(app).isRunning().then(async (running) => {
             if (!running) {
                 try {
-                    const collection = this._database.get(CollectionMap.CLIENTS);
+                    const collection = this._database.get(CollectionMap.APPLICATIONS);
                     const storedApplication = await collection.get(app.uuid);
                     if (storedApplication) {
                         if (storedApplication.type === 'manifest') {
@@ -61,7 +61,7 @@ export class ClientRegistry {
                             await fin.Application.start(storedApplication.initialOptions);
                         }
                     } else {
-                        throw new Error('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
+                        console.warn('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
                     }
                 } catch (error) {
                     this.logError(error);
@@ -106,7 +106,7 @@ export class ClientRegistry {
                 manifestUrl: info.manifestUrl
             };
             try {
-                const collection = this._database.get(CollectionMap.CLIENTS);
+                const collection = this._database.get(CollectionMap.APPLICATIONS);
                 await collection.upsert(entry);
             } catch (error) {
                 this.logError(error);

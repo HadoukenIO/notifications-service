@@ -11,13 +11,13 @@ import {Collection} from './Collection';
 export const enum CollectionMap {
     NOTIFICATIONS = 'notifications',
     SETTINGS = 'settings',
-    CLIENTS = 'clients'
+    APPLICATIONS = 'applications'
 }
 
 export type Collections = {
     [CollectionMap.NOTIFICATIONS]: StoredNotification;
     [CollectionMap.SETTINGS]: StoredSetting;
-    [CollectionMap.CLIENTS]: StoredApplication;
+    [CollectionMap.APPLICATIONS]: StoredApplication;
 };
 
 @injectable()
@@ -34,7 +34,7 @@ export class Database extends AsyncInit {
         this._database.version(1).stores({
             [CollectionMap.NOTIFICATIONS]: '&id',
             [CollectionMap.SETTINGS]: '&id',
-            [CollectionMap.CLIENTS]: '&id'
+            [CollectionMap.APPLICATIONS]: '&id'
         });
 
         this.createCollections(this._database.tables);

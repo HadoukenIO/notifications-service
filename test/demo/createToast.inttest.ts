@@ -17,10 +17,7 @@ import {assertHydratedCorrectly} from './utils/hydrateNotification';
 const options: NotificationOptions = {
     body: 'Test Notification Body',
     title: 'Test Notification Title',
-    category: 'Test Notification Category',
-    customData: {testContext: 'testContext'},
-    onSelect: {task: 'Selected'},
-    buttons: []
+    category: 'Test Notification Category'
 };
 
 describe('When calling createNotification with the Notification Center not showing', () => {
