@@ -44,12 +44,12 @@ type InnerTestParam = [
 
 const outerTestParams: OuterTestParam[] = [
     [
-        'When clearing all notification with the center showing',
+        'When clearing all notifications with the Notification Center showing',
         setupWithCenterBookends,
         setupWithCenterNoNotificationsTest
     ],
     [
-        'When clearing all notification without the center showing',
+        'When clearing all notifications without the Notification Center showing',
         setupWithoutCenterBookends,
         setupWithoutCenterNoNotificationsTest
     ]
