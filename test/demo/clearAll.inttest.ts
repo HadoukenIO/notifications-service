@@ -124,11 +124,11 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
         setupNoNotificationsTest();
 
         test('The `notification-closed` event has been fired the expected number of times', async () => {
-            expect(closedListener).toHaveBeenCalledTimes(noteOptions.length);
+            expect(closedListener).toBeCalledTimes(noteOptions.length);
         });
 
-        test('The `notification-action` event has been fired with the expected data', async () => {
-            expect(actionListener).toHaveBeenCalledTimes(expectedResults.filter(result => result !== undefined).length);
+        test('The `notification-action` event has been fired with the expected payload', async () => {
+            expect(actionListener).toBeCalledTimes(expectedResults.filter(result => result !== undefined).length);
 
             for (let i = 0; i < notes.length; i++) {
                 const note = notes[i];
@@ -146,7 +146,7 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
         });
 
         test('No notifications are returned by `getAll`', async () => {
-            expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
+            await expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
         });
     });
 });
