@@ -144,6 +144,10 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
                 }
             }
         });
+
+        test('No notifications are returned by `getAll`', async () => {
+            expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
+        });
     });
 });
 
