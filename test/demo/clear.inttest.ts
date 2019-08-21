@@ -111,6 +111,7 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
     });
 
     afterEach(async () => {
+        // TODO - how do we better do this? we shouldn't rely on clearAll working since that's what we're testing
         await notifsRemote.clearAll(testWindow.identity);
         await testApp.quit();
     });
