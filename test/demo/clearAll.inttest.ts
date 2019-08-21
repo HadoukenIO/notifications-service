@@ -76,9 +76,11 @@ const innerTestParams: InnerTestParam[] = [
         [notificationWithoutOnCloseActionResult, notificationWithOnCloseActionResult1],
         [undefined, {task: 'close-1'}]
     ],
-    ['When two notifications with an `onClose` action result had been created',
+    [
+        'When two notifications with an `onClose` action result had been created',
         [notificationWithOnCloseActionResult1, notificationWithOnCloseActionResult2],
-        [{task: 'close-1'}, {task: 'close-2'}]]
+        [{task: 'close-1'}, {task: 'close-2'}]
+    ]
 ];
 
 describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => void, setupNoNotificationsTest: () => void) => {
