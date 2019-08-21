@@ -30,19 +30,19 @@ const notificationWithOnCloseActionResult2: NotificationOptions = {
     onClose: {task: 'close-2'}
 };
 
-type DescribeParam = [
+type OuterTestParam = [
     string,
     () => void,
     () => void
 ];
 
-type TestParam = [
+type InnerTestParam = [
     string,
     NotificationOptions[],
     (CustomData | undefined)[]
 ];
 
-const describeParams: DescribeParam[] = [
+const outerTestParams: OuterTestParam[] = [
     [
         'When clearing all notification with the center showing',
         setupWithCenterBookends,
@@ -55,7 +55,7 @@ const describeParams: DescribeParam[] = [
     ]
 ];
 
-const testParams: TestParam[] = [
+const innerTestParams: InnerTestParam[] = [
     [
         'When no notifiactions had been created',
         [],
@@ -81,7 +81,7 @@ const testParams: TestParam[] = [
         [{task: 'close-1'}, {task: 'close-2'}]]
 ];
 
-describe.each(describeParams)('%s', (titleParam: string, setupBookends: () => void, setupNoNotificationsTest: () => void) => {
+describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => void, setupNoNotificationsTest: () => void) => {
     let testApp: Application;
     let testWindow: Window;
 
@@ -106,7 +106,7 @@ describe.each(describeParams)('%s', (titleParam: string, setupBookends: () => vo
         await testApp.quit();
     });
 
-    describe.each(testParams)('%s', (titleParam: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
+    describe.each(innerTestParams)('%s', (titleParam: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
         const notes: Notification[] = [];
 
         beforeEach(async () => {
