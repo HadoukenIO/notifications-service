@@ -2,27 +2,25 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {connect, Provider} from 'react-redux';
 
-import {Header} from '../components/Header/Header';
-import {Footer} from '../components/Footer/Footer';
-import {NotificationView} from '../components/NotificationView/NotificationView';
-import {RootState} from '../../store/State';
-import {Store} from '../../store/Store';
-import {RootAction} from '../../store/Actions';
+import {Header} from '../../components/Header/Header';
+import {NotificationView} from '../../components/NotificationView/NotificationView';
+import {RootState} from '../../../store/State';
+import {Store} from '../../../store/Store';
+import {RemoveNotifications, Actionable} from '../../../store/Actions';
+import {GroupingType} from '../../utils/Grouping';
 
-export enum GroupingType {
-    APPLICATION = 'Application',
-    DATE = 'Date'
-}
-
-export interface Actionable {
-    storeDispatch: (action: RootAction) => void;
-}
+import '../../styles/_main.scss';
+import './NotificationCenterApp.scss';
 
 type Props = ReturnType<typeof mapStateToProps> & Actionable;
 
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, storeDispatch} = props;
+    const {notifications, visible, storeDispatch} = props;
+
+    const handleClearAll = () => {
+        storeDispatch(new RemoveNotifications(notifications));
+    };
 
     return (
         <div className='notification-center'>
@@ -30,20 +28,22 @@ export function NotificationCenterApp(props: Props) {
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}
                 storeDispatch={storeDispatch}
+                visible={visible}
+                onClearAll={handleClearAll}
             />
             <NotificationView
                 notifications={notifications}
                 groupBy={groupBy}
                 storeDispatch={storeDispatch}
             />
-            <Footer />
         </div>
     );
 }
 
 const mapStateToProps = (state: RootState, ownProps: Actionable) => ({
+    ...ownProps,
     notifications: state.notifications,
-    ...ownProps
+    visible: state.windowVisible
 });
 
 const Container = connect(mapStateToProps)(NotificationCenterApp);

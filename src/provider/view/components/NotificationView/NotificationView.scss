@@ -1,0 +1,43 @@
+@import '../../styles/_variables.scss';
+@import '../../styles/animations.scss';
+
+.view {
+    height: 100%;
+    user-select: none;
+    background: var(--center-background-color);
+    padding: 10px;
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: var(--accent-color);
+    }
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .group-item-enter {
+        opacity: 0;
+    }
+
+    .group-item-exit {
+        opacity: 0;
+    }
+
+    .group-item-exit-active {
+        animation: fadeIn 300ms ease-in forwards reverse;
+    }
+
+    .group-item-enter-done {
+        opacity: 1;
+    }
+
+    .group-item-enter-active {
+        animation: fadeIn 300ms ease-in forwards;
+    }
+}

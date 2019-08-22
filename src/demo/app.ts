@@ -20,7 +20,23 @@ const normalNote: NotificationOptions = {
 
 const longNote: NotificationOptions = {
     // eslint-disable-next-line max-len
-    body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    body: `
+# H1 Title
+Some text below.
+
+# H2 Title
+Some text below. **Bold**. _Italic_.
+
+- Item 1
+- Item 2
+    - A
+    - B
+- Item 3
+
+> Block quote
+Paragraph: Ut enim ad minim veniam, quis nostrud *exercitation* ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Paragraph: Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
     category: 'Long',
     title: 'Notification Title ',
     icon: 'favicon.ico',

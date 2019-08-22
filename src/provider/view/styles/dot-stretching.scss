@@ -1,0 +1,101 @@
+/**
+ * ==============================================
+ * Dot Stretching
+ * ==============================================
+ */
+
+@import './_variables.scss';
+
+$dotWidth: 10px;
+$dotHeight: 10px;
+$dotRadius: $dotWidth/2;
+
+$dotColor: var(--accent-color);
+$dotBgColor: $dotColor;
+$dotBeforeColor: $dotColor;
+$dotAfterColor: $dotColor;
+
+$dotSpacing: $dotWidth+$dotWidth/2;
+$ratio1: .8;
+$ratio2: .7;
+
+@mixin dot($width: $dotWidth, $height: $dotHeight, $radius: $dotRadius, $bgColor: $dotBgColor, $color: $dotColor) {
+    width: $width;
+    height: $height;
+    border-radius: $radius;
+    background-color: $bgColor;
+    color: $color;
+}
+
+.dot-stretching {
+    position: relative;
+    @include dot;
+
+    transform: scale(1.25, 1.25);
+    animation: dotStretching 2s infinite ease-in;
+
+    &::before,
+    &::after {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: 0;
+    }
+
+    &::before {
+        @include dot($bgColor: $dotBeforeColor);
+
+        animation: dotStretchingBefore 2s infinite ease-in;
+    }
+
+    &::after {
+        @include dot($bgColor: $dotAfterColor);
+
+        animation: dotStretchingAfter 2s infinite ease-in;
+    }
+}
+
+@keyframes dotStretching {
+    0% {
+        transform: scale(1.25, 1.25);
+    }
+
+    50%,
+    60% {
+        transform: scale($ratio1, $ratio1);
+    }
+
+    100% {
+        transform: scale(1.25, 1.25);
+    }
+}
+
+@keyframes dotStretchingBefore {
+    0% {
+        transform: translate(0) scale($ratio2, $ratio2);
+    }
+
+    50%,
+    60% {
+        transform: translate(-20px) scale(1, 1);
+    }
+
+    100% {
+        transform: translate(0) scale($ratio2, $ratio2);
+    }
+}
+
+@keyframes dotStretchingAfter {
+    0% {
+        transform: translate(0) scale($ratio2, $ratio2);
+    }
+
+    50%,
+    60% {
+        transform: translate(20px) scale(1, 1);
+    }
+
+    100% {
+        transform: translate(0) scale($ratio2, $ratio2);
+    }
+}

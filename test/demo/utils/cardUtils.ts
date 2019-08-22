@@ -1,7 +1,8 @@
 import {ElementHandle} from 'puppeteer';
-import * as moment from 'moment';
 
 import {Notification} from '../../../src/client';
+import {getDate} from '../../../src/provider/view/utils/Time';
+import {renderMarkdown} from '../../../src/provider/view/utils/Markdown';
 
 import {promiseMap} from './asyncUtils';
 import {getToastCards} from './toastUtils';
@@ -43,11 +44,11 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
 
     const expectedMetadata: NotificationCardMetadata = {
         title: note.title,
-        body: note.body,
+        body: renderMarkdown(note.body),
         buttons: note.buttons.map(button => ({title: button.title, iconUrl: button.iconUrl || ''})),
         icon: note.icon,
         sourceApp: sourceUuid,
-        timeString: moment(note.date).fromNow()
+        timeString: getDate(note.date)
     };
 
     const actualMetadata: NotificationCardMetadata = await getCardMetadata(noteCards[0]);
@@ -62,16 +63,16 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
  * @param card DOM element that holds the visual representation of a notification
  */
 async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMetadata> {
-    const title = await getPropertyBySelector(card, '.body .title', 'innerHTML');
-    const body = await getPropertyBySelector(card, '.body .text', 'innerHTML');
-    const sourceApp = await getPropertyBySelector(card, '.source .app-name', 'innerHTML');
-    const timeString = await getPropertyBySelector(card, '.time span', 'innerHTML');
-    const icon = (await getPropertyBySelector(card, '.source img', 'src')) || '';
+    const title = await getPropertyBySelector(card, '.content .title', 'innerText');
+    const body = await getPropertyBySelector(card, '.content .text', 'innerHTML') || '';
+    const sourceApp = await getPropertyBySelector(card, '.header .app-name', 'innerText');
+    const timeString = await getPropertyBySelector(card, '.time', 'innerText');
+    const icon = (await getStyleBySelector(card, '.app-icon', 'background-image')) || '';
 
     const buttonElements = await card.$$('.button');
     const buttons = await promiseMap(buttonElements, async (button): Promise<ButtonMetadata> => {
         return {
-            title: await getPropertyBySelector(button, 'span', 'innerHTML'),
+            title: await getPropertyBySelector(button, 'span', 'innerText'),
             iconUrl: (await getPropertyBySelector(button, 'img', 'src')) || ''
         };
     });
@@ -93,4 +94,19 @@ async function getPropertyBySelector(rootElement: ElementHandle, selectorString:
     }
     const propertyHandle = await queryElement.getProperty(property);
     return propertyHandle.jsonValue();
+}
+
+async function getStyleBySelector(rootElement: ElementHandle, selectorString: string, styleAttribute: string): Promise<string | undefined> {
+    const queryElement = await rootElement.$(selectorString);
+    if (!queryElement) {
+        return undefined;
+    }
+
+    const style = await (await queryElement.getProperty('style'));
+    const styleProp = await style.getProperty(styleAttribute);
+    let value: string = await styleProp.jsonValue() || '';
+    // strip url(\"\") from strings
+    value = value.match(/\((.*?)\)/)![1].replace(/('|")/g, '');
+
+    return value;
 }

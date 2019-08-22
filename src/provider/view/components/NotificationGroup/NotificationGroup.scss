@@ -1,0 +1,67 @@
+@import '../../styles/_variables.scss';
+@import '../../styles/animations.scss';
+
+.group {
+    align-self: center;
+    margin-bottom: 10px;
+    position: sticky;
+
+    &>.title {
+        color: var(--primary-text-color);
+        text-transform: capitalize;
+        padding: 6px 0;
+        font-size: 20px;
+        margin-bottom: 5px;
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+
+        span {
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .icon {
+            margin-top: -5px;
+            align-self: center;
+            background: none;
+            color: var(--accent-color);
+        }
+    }
+
+
+    .notifications {
+        list-style: none;
+
+        &>li {
+            list-style: none;
+            margin-bottom: 16px;
+
+            &:last-of-type {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+.item-enter {
+    opacity: 0;
+}
+
+.item-exit {
+    opacity: 0;
+}
+
+.item-enter-done {
+    opacity: 1;
+}
+
+.item-enter-active {
+    animation: grow 300ms ease-in forwards;
+}
+
+.item-exit-active {
+    animation: fadeOutLeft 300ms ease-in;
+    perspective: 1000;
+    pointer-events: none;
+}

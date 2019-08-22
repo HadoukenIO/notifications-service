@@ -2,13 +2,15 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {connect, Provider} from 'react-redux';
 
-import {StoredNotification} from '../../model/StoredNotification';
-import {NotificationCard} from '../components/NotificationCard/NotificationCard';
-import {WindowDimensions} from '../../controller/Layouter';
-import {RootState} from '../../store/State';
-import {Store} from '../../store/Store';
+import {StoredNotification} from '../../../model/StoredNotification';
+import {NotificationCard} from '../../components/NotificationCard/NotificationCard';
+import {WindowDimensions} from '../../../controller/Layouter';
+import {RootState} from '../../../store/State';
+import {Store} from '../../../store/Store';
+import {Actionable} from '../../../store/Actions';
 
-import {Actionable} from './NotificationCenterApp';
+import '../../styles/base.scss';
+import './ToastApp.scss';
 
 interface ToastAppProps extends Actionable {
     notification: StoredNotification;
@@ -40,7 +42,7 @@ export function ToastApp(props: Props) {
 
     return (
         <div id='toast-container' ref={containerRef}>
-            <NotificationCard notification={notification} storeDispatch={storeDispatch} />
+            <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} />
         </div>
     );
 }

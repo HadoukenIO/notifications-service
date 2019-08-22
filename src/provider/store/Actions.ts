@@ -17,6 +17,10 @@ export const enum Action {
     TOGGLE_VISIBILITY = '@@ui/TOGGLE_CENTER_WINDOW',
 }
 
+export interface Actionable {
+    storeDispatch: (action: RootAction) => void;
+}
+
 export class BaseAction<T extends Action> implements ReduxAction<Action> {
     public readonly type: T;
 

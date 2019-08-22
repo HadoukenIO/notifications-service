@@ -1,0 +1,20 @@
+$accent-color: #e6683a;
+$accent-color-highlight: lighten(saturate($accent-color, 40%), 10%);
+
+:root {
+    --accent-color: #{$accent-color};
+    --accent-color-highlight: #{$accent-color-highlight};
+    --center-background-color: #313131;
+    --card-background-color: #484848;
+    --card-border-color: #6E6E6E;
+    --header-color: #121212;
+    --primary-text-color: white;
+    --secondary-text-color: #898989;
+    --secondary-text-color-highlight: #b4b4b4;
+    --body-text-color: #ddd;
+    --strip-background-color: #121212;
+    --dark-text: darken(white, 40%)
+}
+
+
+$window-width: 388px;

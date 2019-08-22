@@ -24,6 +24,6 @@ export async function getToastCards(sourceUuid: string, notificationId: string):
     if (!toastPage) {
         return undefined;
     } else {
-        return toastPage.$$('.notification');
+        return toastPage.$$('.notification-card');
     }
 }

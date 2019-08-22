@@ -1,40 +1,55 @@
 import * as React from 'react';
 
-import {GroupingType, Actionable} from '../../containers/NotificationCenterApp';
+import {GroupingType} from '../../utils/Grouping';
+import {Actionable} from '../../../store/Actions';
+import {CircleButton} from '../CircleButton/CircleButton';
 import {ToggleVisibility} from '../../../store/Actions';
 
-interface HeaderProps extends Actionable {
+import {ClearAllPrompt} from './ClearAllPrompt';
+
+import './Header.scss';
+
+interface Props extends Actionable {
+    visible: boolean;
     groupBy: GroupingType;
     handleGroupBy: (groupBy: GroupingType) => void;
+    onClearAll: () => void;
 }
 
-export function Header(props: HeaderProps): React.ReactElement {
-    const {groupBy, handleGroupBy, storeDispatch} = props;
-
+export function Header(props: Props): React.ReactElement {
+    const {groupBy, visible, handleGroupBy, onClearAll, storeDispatch} = props;
     const handleHideWindow = () => {
         storeDispatch(new ToggleVisibility(false));
     };
 
-    return (
-        <div className='header'>
-            <div className="sort-buttons">
-                <div className="sort-title">Sort By : </div>
+    return (<div className="header">
+        <div className="title">
+            <div>
+                {/* Layoutspace and in the future place filter/settings here */}
+            </div>
+            <CircleButton type="hide" size="large" onClick={handleHideWindow} />
+        </div>
+        <div className="strip">
+            <ul className="options">
+                <li className="detail">
+                    <span>Sort By:</span>
+                </li>
                 {
                     Object.values(GroupingType).map((name, i) => {
-                        const selected = name === groupBy ? 'selected' : null;
+                        const selected = name === groupBy ? 'active' : null;
                         return (
-                            <div
+                            <li
                                 key={i}
                                 className={`sort-button ${selected}`}
                                 onClick={() => handleGroupBy(name)}
                             >
-                                {name}
-                            </div>
+                                <span>{name}</span>
+                            </li>
                         );
                     })
                 }
-            </div>
-            <img id="exit-link" onClick={handleHideWindow} src="image/shapes/arrow.png" alt="" />
+            </ul>
+            <ClearAllPrompt centerVisible={visible} onAccept={onClearAll} />
         </div>
-    );
+    </div>);
 }

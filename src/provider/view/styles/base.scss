@@ -1,0 +1,47 @@
+@import './_variables.scss';
+@import url(https://fonts.googleapis.com/css?family=Nunito);
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    font-family: 'Nunito', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    &#toast-container {
+        padding: 0 !important;
+        margin: 0;
+        overflow: hidden !important;
+        width: 100vw;
+        height: 100vh;
+    }
+}
+
+#react-app {
+    height: 100%;
+}
+
+.accented-text {
+    color: var(--accent-color);
+}
+
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.single-line {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-wrap: none;
+}

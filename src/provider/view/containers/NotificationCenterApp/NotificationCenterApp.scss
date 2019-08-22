@@ -1,0 +1,8 @@
+@import '../../styles/_variables.scss';
+
+.notification-center {
+    width: 388px;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}

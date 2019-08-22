@@ -1,0 +1,212 @@
+@import '../../styles/_variables.scss';
+
+.test {
+    color: orange;
+}
+
+.notification-card {
+    width: 340px;
+    align-self: center;
+    background: var(--card-background-color);
+    border-radius: 7px;
+    overflow: hidden;
+    transition: box-shadow 0.1s ease-in-out;
+    box-shadow: 0px 0px 0px 1px var(--card-border-color);
+    color: white;
+
+    &:hover {
+        transition: box-shadow 0.2s ease-in-out;
+        box-shadow: 0px 0px 0px 2px var(--accent-color);
+    }
+
+    &.loading {
+        pointer-events: none;
+    }
+
+    &.toast .text {
+        max-height: 100px !important;
+    }
+
+    &.toast {
+        box-shadow: none;
+        &:hover{
+            box-shadow: none;
+        }
+    }
+
+    .loading-screen {
+        position: absolute;
+        display: flex;
+        align-items: stretch;
+        align-content: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        top: 0%;
+        left: 0%;
+        background: rgba(0, 0, 0, 0.81);
+
+        &.hidden {
+            display: none;
+        }
+
+        .throbber {
+            margin: auto;
+            display: block;
+        }
+
+        .error {
+            margin: auto;
+            display: block;
+            color: red;
+        }
+    }
+
+    &:hover .actions {
+        display: inline-block !important;
+    }
+
+    &:hover .time {
+        display: none !important;
+    }
+
+    .header {
+        padding: 10px;
+        padding-bottom: 5px;
+        color: white;
+        display: flex;
+        width: 100%;
+        align-content: space-between;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        line-height: 20px;
+        height: 38px;
+
+        &>* {
+            vertical-align: middle;
+        }
+
+        .app-icon {
+            $size: 20px;
+            height: $size;
+            min-width: $size;
+            max-width: $size;
+            display: inline-block;
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-right: 8px;
+        }
+
+        .app-name {
+            text-transform: capitalize;
+            display: inline-block;
+            font-weight: 500;
+            user-select: none;
+            flex: 1 1 150px;
+        }
+
+        .time-close {
+            align-self: flex-end;
+            display: inline-block;
+            flex: 1 1 1;
+            flex-direction: row;
+            color: #898989;
+            padding-left: 8px;
+
+            &>* {
+                vertical-align: middle;
+            }
+
+            .time {
+                display: none;
+                display: inline-block;
+                position: relative;
+                top: -3px;
+                margin-right: 4px;
+            }
+
+            .actions {
+                display: none;
+
+                .icon {
+                    // margin-right: -5px;
+                    $size: 18px;
+                    width: $size;
+                    height: $size;
+
+                    .image {
+                        background-color: var(--card-background-color);
+                    }
+                }
+            }
+        }
+    }
+
+    .content {
+        padding: 0 10px 8px 10px;
+
+        .title {
+            margin-bottom: 4px;
+        }
+    }
+
+    .buttons {
+        max-height: 40px;
+        display: flex;
+        justify-content: space-around;
+        flex-direction: row;
+        border-top: var(--card-border-color) solid 1px;
+
+        .button {
+            display: inline-block;
+            padding: 12px 8px;
+            text-align: center;
+            vertical-align: middle;
+            user-select: none;
+            cursor: pointer;
+            border-right: 1px var(--card-border-color) solid;
+            transition: background-color 0.1s ease-in-out;
+            line-height: 16px;
+            align-content: center;
+            justify-content: center;
+            flex: 1;
+            flex-grow: 1;
+            width: 100%;
+            min-width: 40px;
+
+            &:hover {
+                transition: background-color 0.2s ease-in-out;
+                background-color: var(--accent-color);
+            }
+
+            &:last-of-type {
+                border-right: none;
+            }
+
+            .value {
+                display: flex;
+                align-content: center;
+                justify-content: center;
+
+                &>* {
+                    vertical-align: middle;
+                }
+
+                span {
+                    height: 100%;
+                    text-transform: capitalize;
+                    font-size: 14px;
+                    font-weight: 600;
+                }
+
+                img {
+                    width: 16px;
+                    height: 16px;
+                    min-width: 16px;
+                    margin-right: 6px;
+                }
+            }
+        }
+    }
+}

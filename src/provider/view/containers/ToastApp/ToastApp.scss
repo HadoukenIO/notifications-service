@@ -1,0 +1,16 @@
+@import '../../styles/variables';
+
+#toast-container {
+    background: var(--card-background-color);
+    margin: 0;
+    display: inline-block;
+    user-select: none;
+    cursor: pointer;
+    overflow: hidden !important;
+
+    .toast {
+        .text {
+            max-height: 300px;
+        }
+    }
+}

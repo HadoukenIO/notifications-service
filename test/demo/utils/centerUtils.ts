@@ -4,19 +4,18 @@ import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
-
 const ofBrowser = new OFPuppeteerBrowser();
 export async function getAllCenterCards() {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$('.notification');
+    return centerPage!.$$('.group:not([class*="exit"]) .notification-card:not([class*="exit"])');
 }
 export async function getCenterCardsByApp(sourceUuid: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$(`.notification[data-id*="${sourceUuid}"]`);
+    return centerPage!.$$(`.group:not([class*="exit"]) .notification-card[data-id*="${sourceUuid}"]:not([class*="exit"])`);
 }
 export async function getCenterCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$(`.notification[data-id="${sourceUuid}:${notificationId}"]`);
+    return centerPage!.$$(`.group:not([class*="exit"]) .notification-card[data-id="${sourceUuid}:${notificationId}"]:not([class*="exit"])`);
 }
 
 export async function isCenterShowing(): Promise<boolean> {
