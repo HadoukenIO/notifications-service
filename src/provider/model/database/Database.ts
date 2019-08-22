@@ -27,7 +27,7 @@ export class Database extends AsyncInit {
 
     constructor () {
         super();
-
+        Dexie.delete('notifications-service');
         this._database = new Dexie('notifications-service');
         this._collections = new Map<CollectionMap, Collection<any>>();
 
