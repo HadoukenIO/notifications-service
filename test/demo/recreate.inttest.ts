@@ -13,6 +13,7 @@ import {fin} from './utils/fin';
 import {getToastIdentity} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import {setupWithCenterBookends, setupWithoutCenterBookends} from './common';
 
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',
@@ -35,21 +36,11 @@ describe('When creating a notification with an ID that already exists but differ
 
         let existingNote: Notification;
 
-        beforeAll(async () => {
-            // Toggle the center on/off based on test type
-            if (await isCenterShowing() !== showCenter) {
-                await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-                await delay(Duration.CENTER_TOGGLED);
-            }
-        });
-
-        afterAll(async () => {
-            // Close center when we're done
-            if (await isCenterShowing()) {
-                await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-                await delay(Duration.CENTER_TOGGLED);
-            }
-        });
+        if (showCenter) {
+            setupWithCenterBookends();
+        } else {
+            setupWithoutCenterBookends();
+        }
 
         beforeEach(async () => {
             testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});

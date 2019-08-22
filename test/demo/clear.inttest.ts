@@ -3,13 +3,14 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
 
-import {isCenterShowing, getAllCenterCards, getCenterCardsByNotification} from './utils/centerUtils';
+import {getAllCenterCards, getCenterCardsByNotification} from './utils/centerUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
 import {getAllToastWindows, getToastWindow} from './utils/toastUtils';
 import {Boxed} from './utils/types';
+import {setupWithCenterBookends, setupWithoutCenterBookends} from './common';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -225,33 +226,6 @@ describe('When attempting to clear a notification that does not exist', () => {
         });
     });
 });
-
-function setupWithCenterBookends(): void {
-    beforeAll(async () => {
-        // Ensure center is showing
-        if (!(await isCenterShowing())) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-        }
-    });
-
-    afterAll(async () => {
-        // Close center when we're done
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
-}
-
-function setupWithoutCenterBookends(): void {
-    beforeAll(async () => {
-        // Ensure center is not showing
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
-}
 
 function setupWithCenterClearedNotificationTest(notes: Notification[], indexToClear: number, testApp: Boxed<Application>): void {
     test('The expected card has been removed from the Notification Center', async () => {

@@ -9,6 +9,7 @@ import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
 import {getAllToastWindows} from './utils/toastUtils';
+import {setupWithCenterBookends, setupWithoutCenterBookends} from './common';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -150,33 +151,6 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
         });
     });
 });
-
-function setupWithCenterBookends(): void {
-    beforeAll(async () => {
-        // Ensure center is showing
-        if (!(await isCenterShowing())) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-        }
-    });
-
-    afterAll(async () => {
-        // Close center when we're done
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
-}
-
-function setupWithoutCenterBookends(): void {
-    beforeAll(async () => {
-        // Ensure center is not showing
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
-}
 
 function setupWithCenterNoNotificationsTest(): void {
     test('The Notification Center contains no cards', async () => {
