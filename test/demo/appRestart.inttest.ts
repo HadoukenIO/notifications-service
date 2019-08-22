@@ -54,10 +54,13 @@ describe('When an app that uses notification-service is created', () => {
             await testApp.quit();
         });
 
-        test('Clicking the notification restarts the app', async () => {
+        test('Clicking the notification restarts the application and then the application received the deferred event', async () => {
             toastCards![0].click();
             await waitForAppToBeRunning(testApp.identity);
             expect(await testApp.isRunning()).toBeTruthy();
+
+            testWindow = await testApp.getWindow();
+            expect((await notifsRemote.getReceivedEvents(testWindow.identity)).length).toBeGreaterThan(0);
         });
     });
 
