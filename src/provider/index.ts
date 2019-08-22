@@ -75,7 +75,7 @@ export class Main {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
                     const {notification, source} = storedNotification;
-                    if (notification.onClose) {
+                    if (notification.onClose !== undefined && notification.onClose !== null) {
                         const actionEvent: Targeted<Transport<NotificationActionEvent>> = {
                             target: 'default',
                             type: 'notification-action',
@@ -111,7 +111,7 @@ export class Main {
             } else if (action.type === Action.CLICK_NOTIFICATION) {
                 const {notification, source} = action.notification;
 
-                if (notification.onSelect) {
+                if (notification.onSelect !== undefined && notification.onSelect !== null) {
                     const event: Targeted<Transport<NotificationActionEvent>> = {
                         target: 'default',
                         type: 'notification-action',
