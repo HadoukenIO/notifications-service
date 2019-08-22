@@ -39,7 +39,7 @@ export class ClientRegistry {
     constructor(@inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>, @inject(Inject.DATABASE) database: Database) {
         this._apiHandler = apiHandler;
         this._apiHandler.onConnection.add(this.onClientConnection, this);
-        this._apiHandler.onDisconnection.add(this.onClientDisconnection, this);
+        this._apiHandler.onDisconnection.add(this.removeActiveClient, this);
         this._database = database;
     }
 
@@ -48,26 +48,25 @@ export class ClientRegistry {
      *
      * @param app Identity of target client.
      */
-    public tryLaunchApplication(app: Identity): void {
-        fin.Application.wrapSync(app).isRunning().then(async (running) => {
-            if (!running) {
+    public async tryLaunchApplication(app: Identity): Promise<void> {
+        const isRunning = await fin.Application.wrapSync(app).isRunning();
+        if (!isRunning) {
+            const collection = this._database.get(CollectionMap.APPLICATIONS);
+            const storedApplication = await collection.get(app.uuid);
+            if (storedApplication) {
                 try {
-                    const collection = this._database.get(CollectionMap.APPLICATIONS);
-                    const storedApplication = await collection.get(app.uuid);
-                    if (storedApplication) {
-                        if (storedApplication.type === 'manifest') {
-                            await fin.Application.startFromManifest(storedApplication.manifestUrl);
-                        } else {
-                            await fin.Application.start(storedApplication.initialOptions);
-                        }
+                    if (storedApplication.type === 'manifest') {
+                        await fin.Application.startFromManifest(storedApplication.manifestUrl);
                     } else {
-                        console.warn('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
+                        await fin.Application.start(storedApplication.initialOptions);
                     }
                 } catch (error) {
                     this.logError(error);
                 }
+            } else {
+                console.warn('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
             }
-        });
+        }
     }
 
     /**
@@ -88,7 +87,7 @@ export class ClientRegistry {
 
     public async onRemoveEventListener(eventType: string, sender: Identity): Promise<void> {
         if (eventType === 'notification-action') {
-            this._activeClients = this._activeClients.filter(client => client.uuid !== sender.uuid || client.name !== sender.name);
+            this.removeActiveClient(sender);
         }
     }
 
@@ -105,16 +104,12 @@ export class ClientRegistry {
             id: app.uuid,
             manifestUrl: info.manifestUrl
         };
-        try {
-            const collection = this._database.get(CollectionMap.APPLICATIONS);
-            await collection.upsert(entry);
-        } catch (error) {
-            this.logError(error);
-        }
+        const collection = this._database.get(CollectionMap.APPLICATIONS);
+        await collection.upsert(entry);
     }
 
-    private onClientDisconnection(app: Identity): void {
-        this.onRemoveEventListener('notification-action', app);
+    private removeActiveClient(client: Identity): void {
+        this._activeClients = this._activeClients.filter(activeClient => activeClient.uuid !== client.uuid || activeClient.name !== client.name);
     }
 
     private logError(error: Error): void {
