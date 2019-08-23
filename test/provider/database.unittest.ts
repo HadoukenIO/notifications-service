@@ -41,18 +41,19 @@ describe('Collection Methods', () => {
     });
 
     describe('Get', () => {
-        it('Returns a single record when passed a valid ID', async () => {
-            const note = generateNotification();
-            await collection.upsert(note);
+        let note: StoredNotification;
 
+        beforeEach(async () =>{
+            note = generateNotification();
+            await collection.upsert(note);
+        });
+
+        it('Returns a single record when passed a valid ID', async () => {
             const record = await collection.get(note.id);
             expect(record).toEqual(note);
         });
 
         it('Returns undefined when passed an invalid ID', async () => {
-            const note = generateNotification();
-            await collection.upsert(note);
-
             const record = await collection.get('INVALID ID');
             expect(record).toBeUndefined();
         });
@@ -74,10 +75,14 @@ describe('Collection Methods', () => {
     });
 
     describe('GetMany', () => {
-        it('Returns an array of all records for valid IDs passed in', async () => {
-            const notes = [generateNotification(), generateNotification(), generateNotification()];
-            await collection.upsert(notes);
+        let notes: StoredNotification[];
 
+        beforeEach(async () => {
+            notes = [generateNotification(), generateNotification(), generateNotification()];
+            await collection.upsert(notes);
+        });
+
+        it('Returns an array of all records for valid IDs passed in', async () => {
             const notesToGet = [notes[0], notes[1]];
             const results = await collection.getMany(notesToGet.map(note => note.id));
 
@@ -85,9 +90,6 @@ describe('Collection Methods', () => {
         });
 
         it('Returns an empty array for array of invalid IDs passed in', async () => {
-            const notes = [generateNotification(), generateNotification(), generateNotification()];
-            await collection.upsert(notes);
-
             const notesToGet = ['INVALID', 'INVALID2'];
 
             const results = await collection.getMany(notesToGet);
@@ -95,9 +97,6 @@ describe('Collection Methods', () => {
         });
 
         it('Returns an array of only valid notifications when valid and invalid IDs passed in', async () => {
-            const notes = [generateNotification(), generateNotification(), generateNotification()];
-            await collection.upsert(notes);
-
             const notesToGet = [notes[0], notes[1]];
             const results = await collection.getMany([...notesToGet.map(note => note.id), 'INVALID ID']);
 
@@ -158,15 +157,21 @@ describe('Collection Methods', () => {
     });
 
     describe('Delete', () => {
+        let notes: StoredNotification[];
+
+        beforeEach(()=> {
+            notes = [generateNotification(), generateNotification(), generateNotification()];
+        });
+
         it('Deletes a single record', async () => {
-            const note = generateNotification();
-            await collection.upsert(note);
-            await collection.delete(note.id);
-            expect(await collection.getAll()).toEqual([]);
+            const noteToDelete = generateNotification();
+            await collection.upsert([...notes, noteToDelete]);
+            await collection.delete(noteToDelete.id);
+
+            expect(await collection.getAll()).toEqual(notes);
         });
 
         it('Deletes many records from array', async () => {
-            const notes = [generateNotification(), generateNotification(), generateNotification()];
             await collection.upsert(notes);
             await collection.delete(notes.map(note => note.id));
 
@@ -174,14 +179,21 @@ describe('Collection Methods', () => {
         });
 
         it('Passing in an invalid ID does nothing', async () => {
-            const notes = [generateNotification(), generateNotification(), generateNotification()];
-
             await collection.upsert(notes);
             const preDeleteCollection = await collection.getAll();
             await collection.delete(['INVALID']);
 
             const results = await collection.getAll();
             expect(results).toEqual(preDeleteCollection);
+        });
+
+        it('Deletes valid IDs from an array of valid and invalid IDs', async () => {
+            const notesToDelete = [generateNotification(), generateNotification()];
+            await collection.upsert([...notes, ...notesToDelete]);
+            await collection.delete(['INVALID', ...notesToDelete.map(note => note.id), 'INVALID']);
+
+            const results = await collection.getAll();
+            expect(results).toEqual(notes);
         });
     });
 });
