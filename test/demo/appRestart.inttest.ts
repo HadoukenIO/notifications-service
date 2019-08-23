@@ -62,7 +62,7 @@ describe('When an app that uses notification-service is created', () => {
             expect(await testApp.isRunning()).toBeTruthy();
 
             testWindow = await testApp.getWindow();
-            expect((await notifsRemote.getReceivedEvents(testWindow.identity)).length).toEqual(1);
+            expect(await notifsRemote.getReceivedEvents(testWindow.identity, 'notification-action')).toHaveLength(1);
         });
     });
 

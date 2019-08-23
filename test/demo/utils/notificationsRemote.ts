@@ -6,6 +6,7 @@ import {Events} from '../../../src/client/internal';
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
 type ReceivedEvents = {
+    eventType: string;
     payload: Events;
 }
 
@@ -79,8 +80,9 @@ export async function removeEventListener
     }, eventType, remoteFn);
 }
 
-export async function getReceivedEvents(executionTarget: Identity): Promise<ReceivedEvents[]> {
-    return ofBrowser.executeOnWindow(executionTarget, function() {
+export async function getReceivedEvents(executionTarget: Identity, type: Event['type']): Promise<ReceivedEvents[]> {
+    const events = await ofBrowser.executeOnWindow(executionTarget, function() {
         return this.receivedEvents;
     });
+    return events.filter(event => event.eventType === type);
 }

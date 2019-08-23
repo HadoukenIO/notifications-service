@@ -20,7 +20,7 @@
 
             for (const eventType of eventTypes) {
                 notifications.addEventListener(eventType, (payload) => {
-                    window.receivedEvents.push({payload});
+                    window.receivedEvents.push({eventType, payload});
                 });
             }
         }
