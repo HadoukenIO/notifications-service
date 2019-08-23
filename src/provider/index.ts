@@ -40,6 +40,8 @@ export class Main {
     @inject(Inject.DATABASE)
     private _database!: Database;
 
+    private _centerHideBlocker: Promise<void> | null = null;
+
     public async register(): Promise<void> {
         Object.assign(window, {
             main: this,
@@ -111,6 +113,16 @@ export class Main {
                     };
                     this._apiHandler.dispatchEvent(source, event);
                 }
+            } else if (action.type === Action.TOGGLE_VISIBILITY) {
+                if (action.debounce) {
+                    const blocker = new Promise((res) => setTimeout(res, 1000)).then(() => {
+                        if (this._centerHideBlocker === blocker) {
+                            this._centerHideBlocker = null;
+                        }
+                    });
+
+                    this._centerHideBlocker = blocker;
+                }
             }
         });
 
@@ -135,7 +147,11 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        this._store.dispatch(new ToggleVisibility());
+        if (!(this._centerHideBlocker && !this._store.state.windowVisible)) {
+            this._store.dispatch(new ToggleVisibility());
+        } else {
+            this._centerHideBlocker = null;
+        }
     }
 
     /**
