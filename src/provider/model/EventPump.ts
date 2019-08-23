@@ -10,7 +10,7 @@ import {APIHandler} from './APIHandler';
 import {ClientRegistry} from './ClientRegistry';
 
 type DeferrableEvent = Targeted<Transport<NotificationActionEvent>>;
-type DeferredEvent = {target: Identity, event: DeferrableEvent};
+type DeferredEvent = {targetUuid: string, event: DeferrableEvent};
 
 /**
  * Notification event message handler. EventPump internally handles the events added
@@ -33,17 +33,17 @@ export class EventPump {
      * Type args:
      *   T: Defines the type of event which occured and needs to be passed to the client.
      *
-     * @param target Identity of target client.
+     * @param targetUuid Uuid of target client.
      * @param event Notification event to be dispatched
      */
-    public push<T extends Events>(target: Identity, event: Targeted<Transport<T>>): void {
-        if (event.type !== 'notification-action' || this._clientRegistry.isAppActive(target)) {
-            this._clientRegistry.getAllAppWindows(target.uuid).forEach((window) => {
+    public push<T extends Events>(targetUuid: string, event: Targeted<Transport<T>>): void {
+        if (event.type !== 'notification-action' || this._clientRegistry.isAppActive(targetUuid)) {
+            this._clientRegistry.getAllAppWindows(targetUuid).forEach((window) => {
                 this._apiHandler.dispatchEvent(window, event);
             });
         } else {
-            this._deferredEvents.push({target, event: event as DeferrableEvent});
-            this._clientRegistry.tryLaunchApplication(target);
+            this._deferredEvents.push({targetUuid, event: event as DeferrableEvent});
+            this._clientRegistry.tryLaunchApplication(targetUuid);
         }
     }
 
@@ -54,9 +54,9 @@ export class EventPump {
      */
     private dispatchDeferredEvents(app: Identity): void {
         this._deferredEvents = this._deferredEvents.filter((event) => {
-            const shouldDispatch: boolean = event.target.uuid === app.uuid;
+            const shouldDispatch: boolean = event.targetUuid === app.uuid;
             if (shouldDispatch) {
-                this._apiHandler.dispatchEvent(event.target, event.event);
+                this._apiHandler.dispatchEvent(app, event.event);
             }
             return !shouldDispatch;
         });

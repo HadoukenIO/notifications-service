@@ -46,13 +46,13 @@ export class ClientRegistry {
     /**
      * Launches the app with specified identity if the start-up information about it was stored previously.
      *
-     * @param app Identity of target client.
+     * @param appUuid Uuid of target client.
      */
-    public async tryLaunchApplication(app: Identity): Promise<void> {
-        const isRunning = await fin.Application.wrapSync(app).isRunning();
+    public async tryLaunchApplication(appUuid: string): Promise<void> {
+        const isRunning = await fin.Application.wrapSync({uuid: appUuid}).isRunning();
         if (!isRunning) {
             const collection = this._database.get(CollectionMap.APPLICATIONS);
-            const storedApplication = await collection.get(app.uuid);
+            const storedApplication = await collection.get(appUuid);
             if (storedApplication) {
                 try {
                     if (storedApplication.type === 'manifest') {
@@ -64,7 +64,7 @@ export class ClientRegistry {
                     console.error(error.message);
                 }
             } else {
-                console.warn('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
+                console.warn('Could not find application initialization data for the application with uuid ' + appUuid + ' in the database.');
             }
         }
     }
@@ -72,10 +72,10 @@ export class ClientRegistry {
     /**
      * Decides whether an app is running at the moment.
      *
-     * @param app Identity of the app.
+     * @param appUuid Uuid of the app.
      */
-    public isAppActive(app: Identity): boolean {
-        return this._activeClients.some(client => client.uuid === app.uuid);
+    public isAppActive(appUuid: string): boolean {
+        return this._activeClients.some(client => client.uuid === appUuid);
     }
 
     public getAllAppWindows(uuid: string): Identity[] {

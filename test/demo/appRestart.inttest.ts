@@ -31,16 +31,15 @@ const nonRelaunchNotificationOptions: NotificationOptions = {
 describe('When an app that uses notification-service is created', () => {
     let testApp: Application;
     let testWindow: Window;
-    let testWindowIdentity: Identity;
+    let restartedTestWindow: Window;
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
-        testWindowIdentity = {uuid: testWindow.identity.uuid, name: testWindow.identity.name};
     });
 
     afterEach(async () => {
-        await providerRemote.clearStoredNotifications(testWindowIdentity);
+        await providerRemote.clearStoredNotifications(testWindow.identity);
         if (await testApp.isRunning()) {
             await testApp.quit();
         }
@@ -61,8 +60,8 @@ describe('When an app that uses notification-service is created', () => {
             await waitForAppToBeRunning(testApp.identity);
             expect(await testApp.isRunning()).toBeTruthy();
 
-            testWindow = await testApp.getWindow();
-            expect(await notifsRemote.getReceivedEvents(testWindow.identity, 'notification-action')).toHaveLength(1);
+            restartedTestWindow = await testApp.getWindow();
+            expect(await notifsRemote.getReceivedEvents(restartedTestWindow.identity, 'notification-action')).toHaveLength(1);
         });
     });
 

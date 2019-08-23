@@ -84,7 +84,7 @@ export class Main {
                     type: 'notification-created',
                     notification: mutable(notification)
                 };
-                this._eventPump.push<NotificationCreatedEvent>(source, event);
+                this._eventPump.push<NotificationCreatedEvent>(source.uuid, event);
             } else if (action.type === Action.REMOVE) {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
@@ -94,7 +94,7 @@ export class Main {
                         type: 'notification-closed',
                         notification: mutable(notification)
                     };
-                    this._eventPump.push<NotificationClosedEvent>(source, event);
+                    this._eventPump.push<NotificationClosedEvent>(source.uuid, event);
                 });
             } else if (action.type === Action.CLICK_BUTTON) {
                 const {notification, source} = action.notification;
@@ -110,7 +110,7 @@ export class Main {
                         controlIndex: action.buttonIndex,
                         result: button.onClick
                     };
-                    this._eventPump.push<NotificationActionEvent>(source, event);
+                    this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
             } else if (action.type === Action.CLICK_NOTIFICATION) {
                 const {notification, source} = action.notification;
@@ -123,7 +123,7 @@ export class Main {
                         notification: mutable(notification),
                         result: notification.onSelect
                     };
-                    this._eventPump.push<NotificationActionEvent>(source, event);
+                    this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
             }
         });
