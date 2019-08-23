@@ -1,3 +1,5 @@
+import {Identity} from 'hadouken-js-adapter';
+
 import {Store} from '../../../src/provider/store/Store';
 import {Action} from '../../../src/provider/store/Actions';
 
@@ -6,11 +8,14 @@ import {serviceIdentity} from './constants';
 
 export interface ProviderContext extends BaseWindowContext {
     store: Store;
+    targetWindow: Identity;
 }
 
 const ofBrowser = new OFPuppeteerBrowser<ProviderContext>();
-export async function clearStoredNotifications(): Promise<void> {
-    await ofBrowser.executeOnWindow(serviceIdentity, async function() {
-        await this.store.dispatch({type: Action.REMOVE, notifications: this.store.state.notifications});
-    });
+export async function clearStoredNotifications(windowIdentity: Identity): Promise<void> {
+    await ofBrowser.executeOnWindow<Identity[], void>(serviceIdentity, async function(sourceWindow: Identity) {
+        await this.store.dispatch({type: Action.REMOVE, notifications: this.store.state.notifications.filter((notification) => {
+            return notification.source.uuid === sourceWindow.uuid && notification.source.name === sourceWindow.name;
+        })});
+    }, windowIdentity);
 }

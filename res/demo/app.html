@@ -13,12 +13,15 @@
         const queryParams = new URLSearchParams(location.search);
         if (queryParams.get('registerListeners') === 'true') {
             const eventTypes = [
-                'notification-action'
+                'notification-action',
+                'notification-created',
+                'notification-closed'
+                
             ];
 
             for (const eventType of eventTypes) {
                 notifications.addEventListener(eventType, (payload) => {
-                    window.receivedEvents.push({listenerID: 0, payload});
+                    window.receivedEvents.push({payload});
                 });
             }
         }

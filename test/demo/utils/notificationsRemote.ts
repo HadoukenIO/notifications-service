@@ -6,8 +6,7 @@ import {Events} from '../../../src/client/internal';
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
 type ReceivedEvents = {
-    listenerId: number;
-    payload: any;
+    payload: Events;
 }
 
 export interface NotifsTestContext extends BaseWindowContext {

@@ -38,7 +38,9 @@ export class EventPump {
      */
     public push<T extends Events>(target: Identity, event: Targeted<Transport<T>>): void {
         if (event.type !== 'notification-action' || this._clientRegistry.isAppActive(target)) {
-            this._apiHandler.dispatchEvent(target, event);
+            this._clientRegistry.getAllAppWindows(target.uuid).forEach((window) => {
+                this._apiHandler.dispatchEvent(window, event);
+            });
         } else {
             this._deferredEvents.push({target, event: event as DeferrableEvent});
             this._clientRegistry.tryLaunchApplication(target);

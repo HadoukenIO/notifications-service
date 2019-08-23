@@ -1,6 +1,6 @@
 import 'jest';
 
-import {Application, Window} from 'hadouken-js-adapter';
+import {Application, Window, Identity} from 'hadouken-js-adapter';
 import {ElementHandle} from 'puppeteer';
 
 import {NotificationOptions} from '../../src/client';
@@ -31,14 +31,16 @@ const nonRelaunchNotificationOptions: NotificationOptions = {
 describe('When an app that uses notification-service is created', () => {
     let testApp: Application;
     let testWindow: Window;
+    let testWindowIdentity: Identity;
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
+        testWindowIdentity = {uuid: testWindow.identity.uuid, name: testWindow.identity.name};
     });
 
     afterEach(async () => {
-        await providerRemote.clearStoredNotifications();
+        await providerRemote.clearStoredNotifications(testWindowIdentity);
         if (await testApp.isRunning()) {
             await testApp.quit();
         }
@@ -60,7 +62,7 @@ describe('When an app that uses notification-service is created', () => {
             expect(await testApp.isRunning()).toBeTruthy();
 
             testWindow = await testApp.getWindow();
-            expect((await notifsRemote.getReceivedEvents(testWindow.identity)).length).toBeGreaterThan(0);
+            expect((await notifsRemote.getReceivedEvents(testWindow.identity)).length).toEqual(1);
         });
     });
 
@@ -76,7 +78,7 @@ describe('When an app that uses notification-service is created', () => {
 
         test('Clicking the notification does not restart the app', async () => {
             toastCards![0].click();
-            await expect(waitForAppToBeRunning(testApp.identity)).rejects.toBeTruthy();
+            await expect(waitForAppToBeRunning(testApp.identity)).rejects.toBeDefined();
         });
     });
 });

@@ -61,7 +61,7 @@ export class ClientRegistry {
                         await fin.Application.start(storedApplication.initialOptions);
                     }
                 } catch (error) {
-                    this.logError(error);
+                    console.error(error.message);
                 }
             } else {
                 console.warn('Could not find application initialization data for the application with uuid ' + app.uuid + ' in the database.');
@@ -76,6 +76,12 @@ export class ClientRegistry {
      */
     public isAppActive(app: Identity): boolean {
         return this._activeClients.some(client => client.uuid === app.uuid);
+    }
+
+    public getAllAppWindows(uuid: string): Identity[] {
+        return this._activeClients.filter((client) => {
+            return client.uuid === uuid;
+        });
     }
 
     public async onAddEventListener(eventType: string, sender: Identity): Promise<void> {
@@ -110,13 +116,5 @@ export class ClientRegistry {
 
     private removeActiveClient(client: Identity): void {
         this._activeClients = this._activeClients.filter(activeClient => activeClient.uuid !== client.uuid || activeClient.name !== client.name);
-    }
-
-    private logError(error: Error): void {
-        const e: any = {
-            message: error.message,
-            ...error
-        };
-        console.error(error, e);
     }
 }
