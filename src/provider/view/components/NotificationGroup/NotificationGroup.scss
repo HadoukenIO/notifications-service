@@ -25,7 +25,10 @@
             margin-top: -5px;
             align-self: center;
             background: none;
-            color: var(--accent-color);
+
+            &:hover .image {
+                background-color: var(--accent-color-highlight);
+            }
         }
     }
 
@@ -41,27 +44,27 @@
                 margin-bottom: 0;
             }
         }
+
+        .item-enter {
+            opacity: 0;
+        }
+
+        .item-exit {
+            opacity: 0;
+        }
+
+        .item-enter-done {
+            opacity: 1;
+        }
+
+        .item-enter-active {
+            animation: grow 300ms ease-in forwards;
+        }
+
+        .item-exit-active {
+            animation: fadeOutLeft 300ms ease-in;
+            perspective: 1000;
+            pointer-events: none;
+        }
     }
-}
-
-.item-enter {
-    opacity: 0;
-}
-
-.item-exit {
-    opacity: 0;
-}
-
-.item-enter-done {
-    opacity: 1;
-}
-
-.item-enter-active {
-    animation: grow 300ms ease-in forwards;
-}
-
-.item-exit-active {
-    animation: fadeOutLeft 300ms ease-in;
-    perspective: 1000;
-    pointer-events: none;
 }

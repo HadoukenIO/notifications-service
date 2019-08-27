@@ -19,12 +19,12 @@
         pointer-events: none;
     }
 
-    &.toast .text {
-        max-height: 100px !important;
-    }
-
     &.toast {
         box-shadow: none;
+
+        .text {
+            max-height: $toast-max-height !important;
+        }
 
         &:hover {
             box-shadow: none;
