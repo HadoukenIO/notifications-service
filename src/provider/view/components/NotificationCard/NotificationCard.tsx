@@ -52,7 +52,7 @@ export function NotificationCard(props: Props) {
                 <div className="time-close">
                     <NotificationTime date={data.date} />
                     <div className="actions">
-                        <CircleButton type='close' onClick={handleNotificationClose} />
+                        <CircleButton type='close' onClick={handleNotificationClose} alt="Clear notification" />
                     </div>
                 </div>
             </div>

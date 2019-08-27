@@ -26,7 +26,7 @@ export function NotificationGroup(props: Props) {
         <div className="group">
             <div className="title">
                 <span>{name}</span>
-                <CircleButton type="close" size="small" onClick={handleClearAll} />
+                <CircleButton type="close" size="small" onClick={handleClearAll} alt="Clear notifications" />
             </div>
             <TransitionGroup className="notifications" component="ul">
                 {

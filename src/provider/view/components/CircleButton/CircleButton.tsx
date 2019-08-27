@@ -7,6 +7,7 @@ type IconType = 'accept' | 'cancel' | 'close' | 'hide' | 'pin';
 interface Props {
     onClick?: () => void;
     type: IconType;
+    alt?: string;
     size?: 'small' | 'normal' | 'large';
 }
 
@@ -15,7 +16,7 @@ CircleButton.defaultProps = {
 };
 
 export function CircleButton(props: Props) {
-    const {onClick, type, size} = props;
+    const {onClick, type, size, alt} = props;
 
     const handleClick = (event: React.MouseEvent) => {
         event.stopPropagation();
@@ -26,7 +27,7 @@ export function CircleButton(props: Props) {
     };
 
     return (
-        <div className={`icon ${type} ${size}`} onClick={handleClick}>
+        <div className={`icon ${type} ${size}`} onClick={handleClick} title={alt}>
             <div className="image">
             </div>
         </div>

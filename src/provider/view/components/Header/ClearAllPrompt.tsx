@@ -42,7 +42,11 @@ export function ClearAllPrompt(props: Props) {
     Events are ordered: MouseDown, Blur, MouseUp, Click
     */
     return (
-        <span className="clear detail" onMouseDown={() => setMouseDown(true)} onMouseUp={() => setMouseDown(false)} onClick={() => togglePrompt()}>
+        <span className="clear detail"
+            onMouseDown={() => setMouseDown(true)}
+            onMouseUp={() => setMouseDown(false)}
+            onClick={() => togglePrompt()}
+        >
             Clear all
             <CSSTransition
                 in={clearAllPromptVisible}
@@ -51,8 +55,8 @@ export function ClearAllPrompt(props: Props) {
                 unmountOnExit
             >
                 <div tabIndex={0} className="prompt" ref={divRef} onBlur={handleBlur}>
-                    <CircleButton type="cancel" onClick={() => togglePrompt(false, onCancel)} />
-                    <CircleButton type="accept" onClick={() => togglePrompt(false, onAccept)} />
+                    <CircleButton type="cancel" onClick={() => togglePrompt(false, onCancel)} alt="Cancel" />
+                    <CircleButton type="accept" onClick={() => togglePrompt(false, onAccept)} alt="Accept" />
                 </div>
             </CSSTransition>
         </span>

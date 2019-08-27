@@ -27,7 +27,7 @@ export function Header(props: Props): React.ReactElement {
             <div>
                 {/* Layoutspace and in the future place filter/settings here */}
             </div>
-            <CircleButton type="hide" size="large" onClick={handleHideWindow} />
+            <CircleButton type="hide" size="large" onClick={handleHideWindow} alt="Hide center" />
         </div>
         <div className="strip">
             <ul className="options">
