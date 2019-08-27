@@ -1,5 +1,9 @@
 @import './_variables.scss';
-@import url(https://fonts.googleapis.com/css?family=Nunito);
+
+@font-face {
+    font-family: "Nunito";
+    src: url("../../../../res/provider/ui/fonts/nunito.woff2") format("woff2")
+}
 
 * {
     margin: 0;

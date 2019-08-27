@@ -1,5 +1,5 @@
 @import '../../styles/_variables.scss';
-@import '../../styles//animations.scss';
+@import '../../styles/animations.scss';
 
 [class^="icon-"],
 [class*="icon-"] {
@@ -12,8 +12,8 @@ $arrowDownIcon: url('../../../../../res/provider/ui/image/shapes/ArrowDown.svg')
 $check: url('../../../../../res/provider/ui/image/shapes/Check.svg');
 
 .icon {
-    background-color: var(--strip-background-color);
     $size: 18px;
+    background-color: var(--strip-background-color);
     width: $size;
     height: $size;
     align-self: center;

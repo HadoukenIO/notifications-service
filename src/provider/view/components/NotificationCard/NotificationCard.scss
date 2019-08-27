@@ -1,9 +1,5 @@
 @import '../../styles/_variables.scss';
 
-.test {
-    color: orange;
-}
-
 .notification-card {
     width: 340px;
     align-self: center;
@@ -29,7 +25,8 @@
 
     &.toast {
         box-shadow: none;
-        &:hover{
+
+        &:hover {
             box-shadow: none;
         }
     }
@@ -111,7 +108,7 @@
             display: inline-block;
             flex: 1 1 1;
             flex-direction: row;
-            color: #898989;
+            color: var(--secondary-text-color);
             padding-left: 8px;
 
             &>* {
@@ -130,7 +127,6 @@
                 display: none;
 
                 .icon {
-                    // margin-right: -5px;
                     $size: 18px;
                     width: $size;
                     height: $size;
