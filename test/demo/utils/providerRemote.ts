@@ -8,7 +8,6 @@ import {serviceIdentity} from './constants';
 
 export interface ProviderContext extends BaseWindowContext {
     store: Store;
-    targetWindow: Identity;
 }
 
 const ofBrowser = new OFPuppeteerBrowser<ProviderContext>();

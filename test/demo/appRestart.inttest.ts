@@ -31,7 +31,6 @@ const nonRelaunchNotificationOptions: NotificationOptions = {
 describe('When an app that uses notification-service is created', () => {
     let testApp: Application;
     let testWindow: Window;
-    let restartedTestWindow: Window;
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
@@ -47,6 +46,7 @@ describe('When an app that uses notification-service is created', () => {
 
     describe('When the application creates a notification with an action result and then quits', () => {
         let toastCards: ElementHandle[] | undefined;
+        let restartedTestWindow: Window;
 
         beforeEach(async () => {
             const {note} = await notifsRemote.createAndAwait(testWindow.identity, relaunchNotificationOptions);
