@@ -46,7 +46,6 @@ describe('When an app that uses notification-service is created', () => {
 
     describe('When the application creates a notification with an action result and then quits', () => {
         let toastCards: ElementHandle[] | undefined;
-        let restartedTestWindow: Window;
 
         beforeEach(async () => {
             const {note} = await notifsRemote.createAndAwait(testWindow.identity, relaunchNotificationOptions);
@@ -60,8 +59,7 @@ describe('When an app that uses notification-service is created', () => {
             await waitForAppToBeRunning(testApp.identity);
             expect(await testApp.isRunning()).toBeTruthy();
 
-            restartedTestWindow = await testApp.getWindow();
-            expect(await notifsRemote.getReceivedEvents(restartedTestWindow.identity, 'notification-action')).toHaveLength(1);
+            expect(await notifsRemote.getReceivedEvents((await testApp.getWindow()).identity, 'notification-action')).toHaveLength(1);
         });
     });
 
