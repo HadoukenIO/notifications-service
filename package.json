@@ -48,6 +48,7 @@
     "@types/remote-redux-devtools": "^0.5.3",
     "dexie": "^2.0.4",
     "express": "^4.16.2",
+    "fake-indexeddb": "^2.1.1",
     "hadouken-js-adapter": "^0.39.1",
     "inversify": "^5.0.1",
     "mkdirp": "^0.5.1",
