@@ -9,8 +9,7 @@ import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
 import {getAllToastWindows, getToastWindow} from './utils/toastUtils';
-import {Boxed} from './utils/types';
-import {setupOpenCenterBookends, setupClosedCenterBookends} from './common';
+import {setupCenterBookends} from './common';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -32,13 +31,9 @@ const notificationWithOnCloseActionResult2: NotificationOptions = {
     onClose: {task: 'close-2'}
 };
 
-type SetupEnvironmentBookendsFunction = () => void;
-type SetupClearCallTestFunction = (notes: Notification[], indexToClear: number, testApp: Boxed<Application>) => void;
-
 type EnvironmentTestParam = [
     string,
-    SetupEnvironmentBookendsFunction,
-    SetupClearCallTestFunction
+    'center-open' | 'center-closed',
 ];
 
 type ClearCallTestParam = [
@@ -46,19 +41,6 @@ type ClearCallTestParam = [
     NotificationOptions[],
     number,
     (CustomData | undefined)[]
-];
-
-const environmentTestParams: EnvironmentTestParam[] = [
-    [
-        'When clearing a notification with the Notification Center showing',
-        setupOpenCenterBookends,
-        setupOpenCenterClearedNotificationTest
-    ],
-    [
-        'When clearing a notification without the Notification Center showing',
-        setupClosedCenterBookends,
-        setupClosedCenterClearedNotificationTest
-    ]
 ];
 
 const clearCallTestParams: ClearCallTestParam[] = [
@@ -88,26 +70,24 @@ const clearCallTestParams: ClearCallTestParam[] = [
     ]
 ];
 
-describe.each(environmentTestParams)('%s', (
+describe.each([
+    ['When clearing a notification with the Notification Center open', 'center-open'],
+    ['When clearing a notification with the Notification Center closed', 'center-closed']
+] as EnvironmentTestParam[])('%s', (
     titleParam: string,
-    setupEnvironmentBookends: SetupEnvironmentBookendsFunction,
-    setupClearCallTest: SetupClearCallTestFunction
+    centerState: 'center-open' | 'center-closed',
 ) => {
     let testApp: Application;
     let testWindow: Window;
 
-    const boxedTestApp = {value: testApp!};
-
     let actionListener: jest.Mock<void, [NotificationActionEvent]>;
     let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 
-    setupEnvironmentBookends();
+    setupCenterBookends(centerState);
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
-
-        boxedTestApp.value = testApp;
 
         actionListener = jest.fn<void, [NotificationActionEvent]>();
         closedListener = jest.fn<void, [NotificationClosedEvent]>();
@@ -140,7 +120,29 @@ describe.each(environmentTestParams)('%s', (
             await notifsRemote.clear(testWindow.identity, notes[indexToClear].id);
         });
 
-        setupClearCallTest(notes, indexToClear, boxedTestApp);
+        if (centerState === 'center-open') {
+            test('The expected card has been removed from the Notification Center', async () => {
+                await expect(getAllCenterCards()).resolves.toHaveLength(notes.length - 1);
+
+                await expect(getCenterCardsByNotification(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual([]);
+
+                for (const note of notes.filter((note, index) => index !== indexToClear)) {
+                    await expect(getCenterCardsByNotification(testApp.identity.uuid, note.id)).resolves.toBeTruthy();
+                }
+            });
+        } else {
+            test('The expected toast has been removed', async () => {
+                await delay(Duration.TOAST_CLOSE);
+
+                await expect(getAllToastWindows()).resolves.toHaveLength(notes.length - 1);
+
+                await expect(getToastWindow(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual(undefined);
+
+                for (const note of notes.filter((note, index) => index !== indexToClear)) {
+                    await expect(getToastWindow(testApp.identity.uuid, note.id)).resolves.toBeTruthy();
+                }
+            });
+        }
 
         test('The `notification-closed` event has been fired with the expected payload', async () => {
             const note = notes[indexToClear];
@@ -231,29 +233,3 @@ describe('When attempting to clear a notification that does not exist', () => {
         });
     });
 });
-
-function setupOpenCenterClearedNotificationTest(notes: Notification[], indexToClear: number, testApp: Boxed<Application>): void {
-    test('The expected card has been removed from the Notification Center', async () => {
-        await expect(getAllCenterCards()).resolves.toHaveLength(notes.length - 1);
-
-        await expect(getCenterCardsByNotification(testApp.value.identity.uuid, notes[indexToClear].id)).resolves.toEqual([]);
-
-        for (const note of notes.filter((note, index) => index !== indexToClear)) {
-            await expect(getCenterCardsByNotification(testApp.value.identity.uuid, note.id)).resolves.toBeTruthy();
-        }
-    });
-}
-
-function setupClosedCenterClearedNotificationTest(notes: Notification[], indexToClear: number, testApp: Boxed<Application>): void {
-    test('The expected toast has been removed', async () => {
-        await delay(Duration.TOAST_CLOSE);
-
-        await expect(getAllToastWindows()).resolves.toHaveLength(notes.length - 1);
-
-        await expect(getToastWindow(testApp.value.identity.uuid, notes[indexToClear].id)).resolves.toEqual(undefined);
-
-        for (const note of notes.filter((note, index) => index !== indexToClear)) {
-            await expect(getToastWindow(testApp.value.identity.uuid, note.id)).resolves.toBeTruthy();
-        }
-    });
-}

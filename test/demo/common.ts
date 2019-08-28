@@ -3,6 +3,14 @@ import {isCenterShowing} from './utils/centerUtils';
 import {testManagerIdentity} from './utils/constants';
 import {delay, Duration} from './utils/delay';
 
+export function setupCenterBookends(centerState: 'center-open' | 'center-closed'): void {
+    if (centerState === 'center-open') {
+        setupOpenCenterBookends();
+    } else {
+        setupClosedCenterBookends();
+    }
+}
+
 export function setupOpenCenterBookends(): void {
     beforeAll(async () => {
         // Ensure center is showing
