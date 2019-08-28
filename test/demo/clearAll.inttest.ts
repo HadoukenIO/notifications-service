@@ -31,32 +31,35 @@ const notificationWithOnCloseActionResult2: NotificationOptions = {
     onClose: {task: 'close-2'}
 };
 
-type OuterTestParam = [
+type SetupEnvironmentBookendsFunction = () => void;
+type SetupClearAllCallTestFunction = () => void;
+
+type EnvironmentTestParam = [
     string,
-    () => void,
-    () => void
+    SetupEnvironmentBookendsFunction,
+    SetupClearAllCallTestFunction
 ];
 
-type InnerTestParam = [
+type CallAllCallTestParam = [
     string,
     NotificationOptions[],
     (CustomData | undefined)[]
 ];
 
-const outerTestParams: OuterTestParam[] = [
+const environmentTestParams: EnvironmentTestParam[] = [
     [
         'When clearing all notifications with the Notification Center showing',
         setupOpenCenterBookends,
-        setupWithCenterNoNotificationsTest
+        setupCenterOpenNoNotificationsTest
     ],
     [
         'When clearing all notifications without the Notification Center showing',
         setupClosedCenterBookends,
-        setupWithoutCenterNoNotificationsTest
+        setupCenterClosedNoNotificationsTest
     ]
 ];
 
-const innerTestParams: InnerTestParam[] = [
+const callAllCallTestParam: CallAllCallTestParam[] = [
     [
         'When no notifiactions had been created',
         [],
@@ -84,14 +87,18 @@ const innerTestParams: InnerTestParam[] = [
     ]
 ];
 
-describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => void, setupNoNotificationsTest: () => void) => {
+describe.each(environmentTestParams)('%s', (
+    titleParam: string,
+    setupEnvironmentBookends: SetupEnvironmentBookendsFunction,
+    setupClearAllCallTest: SetupClearAllCallTestFunction
+) => {
     let testApp: Application;
     let testWindow: Window;
 
     let actionListener: jest.Mock<void, [NotificationActionEvent]>;
     let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 
-    setupBookends();
+    setupEnvironmentBookends();
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
@@ -109,7 +116,7 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
         await testApp.quit();
     });
 
-    describe.each(innerTestParams)('%s', (titleParam: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
+    describe.each(callAllCallTestParam)('%s', (titleParam: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
         const notes: Notification[] = [];
 
         beforeEach(async () => {
@@ -122,7 +129,7 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
             await notifsRemote.clearAll(testWindow.identity);
         });
 
-        setupNoNotificationsTest();
+        setupClearAllCallTest();
 
         test('The `notification-closed` event has been fired the expected number of times', async () => {
             expect(closedListener).toBeCalledTimes(noteOptions.length);
@@ -152,13 +159,13 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
     });
 });
 
-function setupWithCenterNoNotificationsTest(): void {
+function setupCenterOpenNoNotificationsTest(): void {
     test('The Notification Center contains no cards', async () => {
         await expect(getAllCenterCards()).resolves.toHaveLength(0);
     });
 }
 
-function setupWithoutCenterNoNotificationsTest(): void {
+function setupCenterClosedNoNotificationsTest(): void {
     test('No toast windows are showing', async () => {
         await delay(Duration.TOAST_CLOSE);
         await expect(getAllToastWindows()).resolves.toHaveLength(0);
