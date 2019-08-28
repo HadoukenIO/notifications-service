@@ -32,22 +32,23 @@ const notificationWithOnCloseActionResult2: NotificationOptions = {
     onClose: {task: 'close-2'}
 };
 
-type SetupTestType = (notes: Notification[], indexToClear: number, testApp: Boxed<Application>) => void;
+type SetupEnvironmentBookendsFunction = () => void;
+type SetupClearCallTestFunction = (notes: Notification[], indexToClear: number, testApp: Boxed<Application>) => void;
 
-type OuterTestParam = [
+type EnvironmentTestParam = [
     string,
-    () => void,
-    SetupTestType
+    SetupEnvironmentBookendsFunction,
+    SetupClearCallTestFunction
 ];
 
-type InnerTestParam = [
+type ClearCallTestParam = [
     string,
     NotificationOptions[],
     number,
     (CustomData | undefined)[]
 ];
 
-const outerTestParams: OuterTestParam[] = [
+const environmentTestParams: EnvironmentTestParam[] = [
     [
         'When clearing a notification with the Notification Center showing',
         setupOpenCenterBookends,
@@ -60,7 +61,7 @@ const outerTestParams: OuterTestParam[] = [
     ]
 ];
 
-const innerTestParams: InnerTestParam[] = [
+const clearCallTestParams: ClearCallTestParam[] = [
     [
         'When clearing a notification, and no others have been created',
         [notificationWithoutOnCloseActionResult],
@@ -87,7 +88,11 @@ const innerTestParams: InnerTestParam[] = [
     ]
 ];
 
-describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => void, setupClearedNotificationTest: SetupTestType) => {
+describe.each(environmentTestParams)('%s', (
+    titleParam: string,
+    setupEnvironmentBookends: SetupEnvironmentBookendsFunction,
+    setupClearCallTest: SetupClearCallTestFunction
+) => {
     let testApp: Application;
     let testWindow: Window;
 
@@ -96,7 +101,7 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
     let actionListener: jest.Mock<void, [NotificationActionEvent]>;
     let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 
-    setupBookends();
+    setupEnvironmentBookends();
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
@@ -117,7 +122,7 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
         await testApp.quit();
     });
 
-    describe.each(innerTestParams)('%s', (
+    describe.each(clearCallTestParams)('%s', (
         titleParam: string,
         noteOptions: NotificationOptions[],
         indexToClear: number,
@@ -135,7 +140,7 @@ describe.each(outerTestParams)('%s', (titleParam: string, setupBookends: () => v
             await notifsRemote.clear(testWindow.identity, notes[indexToClear].id);
         });
 
-        setupClearedNotificationTest(notes, indexToClear, boxedTestApp);
+        setupClearCallTest(notes, indexToClear, boxedTestApp);
 
         test('The `notification-closed` event has been fired with the expected payload', async () => {
             const note = notes[indexToClear];
