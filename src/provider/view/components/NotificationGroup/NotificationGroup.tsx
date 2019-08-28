@@ -40,7 +40,7 @@ export function NotificationGroup(props: Props) {
                                 }}
                                 classNames="item"
                             >
-                                <li key={notification.id}>
+                                <li key={notification.id + notification.notification.date}>
                                     <NotificationCard notification={notification} storeDispatch={storeDispatch} />
                                 </li>
                             </CSSTransition>

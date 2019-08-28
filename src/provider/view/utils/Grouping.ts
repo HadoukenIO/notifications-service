@@ -76,13 +76,7 @@ export function groupNotifications(notifications: StoredNotification[], groupMet
         // If group title already exists just add it to the group
         if (groups.has(groupTitle)) {
             const group = groups.get(groupTitle)!;
-            groups.set(groupTitle, {
-                ...group,
-                notifications: [
-                    ...group.notifications,
-                    currentNotification
-                ]
-            });
+            group.notifications.push(currentNotification);
         } else {
             // Create a new group and add the notification to the group
             let key: string = currentNotification.source.name || currentNotification.source.uuid;
