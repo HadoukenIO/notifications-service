@@ -34,7 +34,7 @@ export enum CardType {
 }
 
 export async function assertDOMMatches(type: CardType, sourceUuid: string, note: Notification): Promise<void> {
-    const noteCards = type === 'center' ? await getCenterCardsByNotification(sourceUuid, note.id): await getToastCards(sourceUuid, note.id);
+    const noteCards = type === 'center' ? await getCenterCardsByNotification(sourceUuid, note.id) : await getToastCards(sourceUuid, note.id);
     if (!noteCards || noteCards.length === 0) {
         return undefined;
     }
@@ -106,7 +106,7 @@ async function getStyleBySelector(rootElement: ElementHandle, selectorString: st
     const styleProp = await style.getProperty(styleAttribute);
     let value: string = await styleProp.jsonValue() || '';
     // strip url(\"\") from strings
-    value = value.match(/\((.*?)\)/)![1].replace(/('|")/g, '');
+    value = value.match(/\(['"](.*?)['"]\)/)![1];
 
     return value;
 }
