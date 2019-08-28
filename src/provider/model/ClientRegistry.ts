@@ -1,4 +1,4 @@
-import {Identity} from 'openfin/_v2/main';
+import {Identity, Application} from 'openfin/_v2/main';
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
 import {injectable, inject} from 'inversify';
 import {Signal} from 'openfin-service-signal';
@@ -35,6 +35,7 @@ export class ClientRegistry {
     private readonly _apiHandler: APIHandler<APITopic, Events>;
     private readonly _database: Database;
     private _activeClients: Identity[] = [];
+    private _startingUpAppUuids: string[] = [];
 
     constructor(@inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>, @inject(Inject.DATABASE) database: Database) {
         this._apiHandler = apiHandler;
@@ -49,18 +50,28 @@ export class ClientRegistry {
      * @param appUuid Uuid of target client.
      */
     public async tryLaunchApplication(appUuid: string): Promise<void> {
+        if (this._startingUpAppUuids.some(startingUuid => startingUuid === appUuid)) {
+            return;
+        }
+        this._startingUpAppUuids.push(appUuid);
         const isRunning = await fin.Application.wrapSync({uuid: appUuid}).isRunning();
         if (!isRunning) {
             const collection = this._database.get(CollectionMap.APPLICATIONS);
             const storedApplication = await collection.get(appUuid);
             if (storedApplication) {
                 try {
+                    let application;
                     if (storedApplication.type === 'manifest') {
-                        await fin.Application.startFromManifest(storedApplication.manifestUrl);
+                        application = await fin.Application.createFromManifest(storedApplication.manifestUrl);
                     } else {
-                        await fin.Application.start(storedApplication.initialOptions);
+                        application = await fin.Application.create(storedApplication.initialOptions);
                     }
+                    await application.addListener('initialized', (event) => {
+                        this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== event.uuid);
+                    });
+                    application.run();
                 } catch (error) {
+                    this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== appUuid);
                     console.error(error.message);
                 }
             } else {
