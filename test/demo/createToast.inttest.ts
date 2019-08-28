@@ -13,7 +13,7 @@ import {assertNotificationStored} from './utils/storageRemote';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {assertHydratedCorrectly} from './utils/hydrateNotification';
-import {setupWithoutCenterBookends} from './common';
+import {setupClosedCenterBookends} from './common';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
@@ -28,7 +28,7 @@ describe('When calling createNotification with the Notification Center not showi
     let createPromise: Promise<Notification>;
     let note: Notification;
 
-    setupWithoutCenterBookends();
+    setupClosedCenterBookends();
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});

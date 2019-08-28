@@ -10,7 +10,7 @@ import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
 import {getAllToastWindows, getToastWindow} from './utils/toastUtils';
 import {Boxed} from './utils/types';
-import {setupWithCenterBookends, setupWithoutCenterBookends} from './common';
+import {setupOpenCenterBookends, setupClosedCenterBookends} from './common';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -50,12 +50,12 @@ type InnerTestParam = [
 const outerTestParams: OuterTestParam[] = [
     [
         'When clearing a notification with the Notification Center showing',
-        setupWithCenterBookends,
+        setupOpenCenterBookends,
         setupWithCenterClearedNotificationTest
     ],
     [
         'When clearing a notification without the Notification Center showing',
-        setupWithoutCenterBookends,
+        setupClosedCenterBookends,
         setupWithoutCenterClearedNotificationTest
     ]
 ];

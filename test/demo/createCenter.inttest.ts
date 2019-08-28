@@ -13,13 +13,13 @@ import {getToastWindow} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {assertHydratedCorrectly} from './utils/hydrateNotification';
-import {setupWithCenterBookends} from './common';
+import {setupOpenCenterBookends} from './common';
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;
     let testWindow: Window;
 
-    setupWithCenterBookends();
+    setupOpenCenterBookends();
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});

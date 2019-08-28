@@ -9,7 +9,7 @@ import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
 import {getAllToastWindows} from './utils/toastUtils';
-import {setupWithCenterBookends, setupWithoutCenterBookends} from './common';
+import {setupOpenCenterBookends, setupClosedCenterBookends} from './common';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -46,12 +46,12 @@ type InnerTestParam = [
 const outerTestParams: OuterTestParam[] = [
     [
         'When clearing all notifications with the Notification Center showing',
-        setupWithCenterBookends,
+        setupOpenCenterBookends,
         setupWithCenterNoNotificationsTest
     ],
     [
         'When clearing all notifications without the Notification Center showing',
-        setupWithoutCenterBookends,
+        setupClosedCenterBookends,
         setupWithoutCenterNoNotificationsTest
     ]
 ];

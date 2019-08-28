@@ -13,7 +13,7 @@ import {fin} from './utils/fin';
 import {getToastIdentity} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
-import {setupWithCenterBookends, setupWithoutCenterBookends} from './common';
+import {setupOpenCenterBookends, setupClosedCenterBookends} from './common';
 
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',
@@ -37,9 +37,9 @@ describe('When creating a notification with an ID that already exists but differ
         let existingNote: Notification;
 
         if (showCenter) {
-            setupWithCenterBookends();
+            setupOpenCenterBookends();
         } else {
-            setupWithoutCenterBookends();
+            setupClosedCenterBookends();
         }
 
         beforeEach(async () => {
