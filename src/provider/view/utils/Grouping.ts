@@ -89,7 +89,7 @@ export function groupNotifications(notifications: StoredNotification[], groupMet
             if (groupMethod === GroupingType.DATE) {
                 const date = new Date(currentNotification.notification.date);
                 key = [
-                    date.getUTCFullYear(),
+                    date.getFullYear(),
                     date.getMonth(),
                     date.getDate()
                 ].join('-');
