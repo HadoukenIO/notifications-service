@@ -51,12 +51,12 @@ const outerTestParams: OuterTestParam[] = [
     [
         'When clearing a notification with the Notification Center showing',
         setupOpenCenterBookends,
-        setupWithCenterClearedNotificationTest
+        setupOpenCenterClearedNotificationTest
     ],
     [
         'When clearing a notification without the Notification Center showing',
         setupClosedCenterBookends,
-        setupWithoutCenterClearedNotificationTest
+        setupClosedCenterClearedNotificationTest
     ]
 ];
 
@@ -227,7 +227,7 @@ describe('When attempting to clear a notification that does not exist', () => {
     });
 });
 
-function setupWithCenterClearedNotificationTest(notes: Notification[], indexToClear: number, testApp: Boxed<Application>): void {
+function setupOpenCenterClearedNotificationTest(notes: Notification[], indexToClear: number, testApp: Boxed<Application>): void {
     test('The expected card has been removed from the Notification Center', async () => {
         await expect(getAllCenterCards()).resolves.toHaveLength(notes.length - 1);
 
@@ -239,7 +239,7 @@ function setupWithCenterClearedNotificationTest(notes: Notification[], indexToCl
     });
 }
 
-function setupWithoutCenterClearedNotificationTest(notes: Notification[], indexToClear: number, testApp: Boxed<Application>): void {
+function setupClosedCenterClearedNotificationTest(notes: Notification[], indexToClear: number, testApp: Boxed<Application>): void {
     test('The expected toast has been removed', async () => {
         await delay(Duration.TOAST_CLOSE);
 
