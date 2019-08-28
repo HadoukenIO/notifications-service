@@ -28,7 +28,7 @@ export function NotificationCenterApp(props: Props) {
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}
                 storeDispatch={storeDispatch}
-                visible={visible}
+                centerVisible={visible}
                 onClearAll={handleClearAll}
             />
             <NotificationView

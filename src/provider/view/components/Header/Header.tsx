@@ -10,14 +10,14 @@ import {ClearAllPrompt} from './ClearAllPrompt';
 import './Header.scss';
 
 interface Props extends Actionable {
-    visible: boolean;
+    centerVisible: boolean;
     groupBy: GroupingType;
     handleGroupBy: (groupBy: GroupingType) => void;
     onClearAll: () => void;
 }
 
 export function Header(props: Props): React.ReactElement {
-    const {groupBy, visible, handleGroupBy, onClearAll, storeDispatch} = props;
+    const {groupBy, centerVisible, handleGroupBy, onClearAll, storeDispatch} = props;
     const handleHideWindow = () => {
         storeDispatch(new ToggleVisibility(false));
     };
@@ -49,7 +49,7 @@ export function Header(props: Props): React.ReactElement {
                     })
                 }
             </ul>
-            <ClearAllPrompt centerVisible={visible} onAccept={onClearAll} />
+            <ClearAllPrompt centerVisible={centerVisible} onAccept={onClearAll} />
         </div>
     </div>);
 }
