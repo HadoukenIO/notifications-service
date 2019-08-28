@@ -8,7 +8,7 @@ import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events
 import {NotificationClosedEvent, NotificationActionEvent, NotificationCreatedEvent} from '../client';
 import {ButtonOptions} from '../client/controls';
 import {Transport, Targeted} from '../client/EventRouter';
-import {ActionTrigger} from '../client/actions';
+import {ActionTrigger, ActionDeclaration} from '../client/actions';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -75,7 +75,7 @@ export class Main {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
                     const {notification, source} = storedNotification;
-                    if (notification.onClose !== undefined && notification.onClose !== null) {
+                    if (notification.onClose !== null) {
                         const actionEvent: Targeted<Transport<NotificationActionEvent>> = {
                             target: 'default',
                             type: 'notification-action',
@@ -94,9 +94,9 @@ export class Main {
                 });
             } else if (action.type === Action.CLICK_BUTTON) {
                 const {notification, source} = action.notification;
-                const button: ButtonOptions = notification.buttons[action.buttonIndex];
+                const button = notification.buttons[action.buttonIndex];
 
-                if (button && button.onClick !== undefined) {
+                if (button.onClick !== null) {
                     const event: Targeted<Transport<NotificationActionEvent>> = {
                         target: 'default',
                         type: 'notification-action',
@@ -111,7 +111,7 @@ export class Main {
             } else if (action.type === Action.CLICK_NOTIFICATION) {
                 const {notification, source} = action.notification;
 
-                if (notification.onSelect !== undefined && notification.onSelect !== null) {
+                if (notification.onSelect !== null) {
                     const event: Targeted<Transport<NotificationActionEvent>> = {
                         target: 'default',
                         type: 'notification-action',
@@ -256,9 +256,14 @@ export class Main {
             icon: payload.icon || '',
             customData: payload.customData !== undefined ? payload.customData : {},
             date: payload.date || Date.now(),
-            onSelect: payload.onSelect || null,
-            onClose: payload.onClose || null,
-            buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, type: 'button', iconUrl: btn.iconUrl || ''})) : []
+            onSelect: this.hydrateAction(payload.onSelect),
+            onClose: this.hydrateAction(payload.onClose),
+            buttons: payload.buttons ? payload.buttons.map(btn => ({
+                ...btn,
+                type: 'button',
+                iconUrl: btn.iconUrl || '',
+                onClick: this.hydrateAction(btn.onClick)
+            })) : []
         };
 
         const storedNotification: StoredNotification = {
@@ -278,6 +283,10 @@ export class Main {
      */
     private generateId(): string {
         return Math.floor((Math.random() * 9 + 1) * 1e8).toString();
+    }
+
+    private hydrateAction(action: ActionDeclaration<never, never> | null | undefined): ActionDeclaration<never, never> | null {
+        return action || null;
     }
 }
 
