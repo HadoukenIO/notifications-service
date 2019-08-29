@@ -83,12 +83,10 @@ export class ClickButton extends BaseAction<Action.CLICK_BUTTON> {
 
 export class ToggleVisibility extends BaseAction<Action.TOGGLE_VISIBILITY> {
     public readonly visible?: boolean;
-    public readonly debounce: boolean;
 
-    constructor(visible?: boolean, debounce?: boolean) {
+    constructor(visible?: boolean) {
         super(Action.TOGGLE_VISIBILITY);
         this.visible = visible;
-        this.debounce = !!debounce;
     }
 }
 
