@@ -10,7 +10,7 @@
  */
 import {ActionDeclaration, NotificationActionResult, ActionTrigger} from './actions';
 import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
-import {ButtonOptions, Control, Button} from './controls';
+import {ButtonOptions, ControlOptions} from './controls';
 import {APITopic, Events, NotificationInternal} from './internal';
 import {EventRouter, Transport} from './EventRouter';
 
@@ -38,7 +38,7 @@ eventHandler.registerDeserializer<NotificationActionEvent>('notification-action'
     const {controlSource, controlIndex, ...rest} = parseEventWithNotification(event);
 
     if (event.trigger === ActionTrigger.CONTROL) {
-        const control: Control = event.notification[controlSource!][controlIndex!];
+        const control = event.notification[controlSource!][controlIndex!];
         return {...rest, control};
     } else {
         return rest;
@@ -156,7 +156,7 @@ export type CustomData = {[key: string]: any};
  * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
  * state of the service.
  */
-export type Notification = Readonly<Required<NotificationOptions> & {buttons: Button[]}>;
+export type Notification = Readonly<Required<NotificationOptions> & {readonly buttons: ReadonlyArray<Readonly<Required<ButtonOptions>>>}>;
 
 /**
  * Event fired for interactions with notification UI elements. It is important to note that applications will only
@@ -216,7 +216,7 @@ export interface NotificationActionEvent<T = CustomData> {
      * }
      * ```
      */
-    control?: Control;
+    control?: Readonly<Required<ControlOptions>>;
 
     /**
      * Application-defined metadata that this event is passing back to the application.
