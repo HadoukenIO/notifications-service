@@ -8,11 +8,9 @@
  *
  * @hidden
  */
-import {DeepRequired} from 'utility-types';
-
 import {ActionDeclaration, NotificationActionResult, ActionTrigger} from './actions';
 import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
-import {ButtonOptions, ControlOptions} from './controls';
+import {ButtonOptions, Control, Button} from './controls';
 import {APITopic, Events, NotificationInternal} from './internal';
 import {EventRouter, Transport} from './EventRouter';
 
@@ -40,7 +38,7 @@ eventHandler.registerDeserializer<NotificationActionEvent>('notification-action'
     const {controlSource, controlIndex, ...rest} = parseEventWithNotification(event);
 
     if (event.trigger === ActionTrigger.CONTROL) {
-        const control: ControlOptions = event.notification[controlSource!][controlIndex!] as ControlOptions;
+        const control: Control = event.notification[controlSource!][controlIndex!];
         return {...rest, control};
     } else {
         return rest;
@@ -158,7 +156,7 @@ export type CustomData = {[key: string]: any};
  * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
  * state of the service.
  */
-export type Notification = Readonly<DeepRequired<NotificationOptions>>;
+export type Notification = Readonly<Required<NotificationOptions> & {buttons: Button[]}>;
 
 /**
  * Event fired for interactions with notification UI elements. It is important to note that applications will only
@@ -218,7 +216,7 @@ export interface NotificationActionEvent<T = CustomData> {
      * }
      * ```
      */
-    control?: Readonly<DeepRequired<ControlOptions>>;
+    control?: Control;
 
     /**
      * Application-defined metadata that this event is passing back to the application.

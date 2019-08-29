@@ -6,7 +6,6 @@ import moment from 'moment';
 
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
 import {NotificationClosedEvent, NotificationActionEvent, NotificationCreatedEvent} from '../client';
-import {ButtonOptions} from '../client/controls';
 import {Transport, Targeted} from '../client/EventRouter';
 import {ActionTrigger, ActionDeclaration} from '../client/actions';
 

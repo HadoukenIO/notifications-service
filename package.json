@@ -65,8 +65,7 @@
     "redux-devtools-cli": "0.0.1-1",
     "reflect-metadata": "^0.1.13",
     "remote-redux-devtools": "^0.5.16",
-    "typescript": "3.4.5",
-    "utility-types": "3.7.0"
+    "typescript": "3.4.5"
   },
   "precommit": {
     "run": [

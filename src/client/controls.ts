@@ -35,6 +35,14 @@ export type PrimaryControlOptions = never;
 export type ControlOptions = PrimaryControlOptions | WithExplicitType<ButtonOptions>;
 
 /**
+ * A fully-hydrated form of {@link ControlOptions}.
+ *
+ * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
+ * state of the service.
+ */
+export type Control = Readonly<Required<ControlOptions>>;
+
+/**
  * Configuration options for constructing a button within a notification.
  */
 export interface ButtonOptions {
@@ -77,3 +85,11 @@ export interface ButtonOptions {
      */
     onClick?: ActionDeclaration<never, never>|null;
 }
+
+/**
+ * A fully-hydrated form of {@link ButtonOptions}.
+ *
+ * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
+ * state of the service.
+ */
+export type Button = Readonly<Required<ButtonOptions>>;
