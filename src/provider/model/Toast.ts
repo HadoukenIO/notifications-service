@@ -1,7 +1,6 @@
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
-import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
-import Bounds from 'openfin/_v2/api/window/bounds';
+import {Bounds, Transition, TransitionOptions} from 'openfin/_v2/shapes';
 import {Signal} from 'openfin-service-signal';
 
 import {DeferredPromise} from '../common/DeferredPromise';

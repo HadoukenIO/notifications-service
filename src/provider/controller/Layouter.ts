@@ -2,10 +2,9 @@ import {Signal} from 'openfin-service-signal';
 import {injectable} from 'inversify';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Rect} from 'openfin/_v2/api/system/monitor';
-import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
 import {MonitorEvent} from 'openfin/_v2/api/events/system';
-import Bounds from 'openfin/_v2/api/window/bounds';
 import {_Window} from 'openfin/_v2/api/window/window';
+import {Bounds, Transition, TransitionOptions} from 'openfin/_v2/shapes';
 
 interface LayouterConfig {
     spacing: number;

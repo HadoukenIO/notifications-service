@@ -1,18 +1,12 @@
 import {TrayIconClicked} from 'openfin/_v2/api/events/application';
 import {Application} from 'openfin/_v2/main';
 import {TrayInfo} from 'openfin/_v2/api/application/application';
-import Bounds from 'openfin/_v2/api/window/bounds';
-
-// TODO: SERVICE-494
-interface TrayIconClickEvent extends TrayIconClicked<'application', 'tray-icon-clicked'> {
-    bounds: Bounds;
-}
 
 export class TrayIcon {
     private _icon!: string;
     private _application: Application;
-    private _leftClickHandler: (event: TrayIconClickEvent) => void = () => {};
-    private _rightClickHandler: (event: TrayIconClickEvent) => void = () => {};
+    private _leftClickHandler: (event: TrayIconClicked<'application', 'tray-icon-clicked'>) => void = () => {};
+    private _rightClickHandler: (event: TrayIconClicked<'application', 'tray-icon-clicked'>) => void = () => {};
 
     constructor(icon: string) {
         this._application = fin.Application.getCurrentSync();
@@ -36,11 +30,11 @@ export class TrayIcon {
         return this._application.getTrayIconInfo();
     }
 
-    public addLeftClickHandler(handler: (event: TrayIconClickEvent) => void): void {
+    public addLeftClickHandler(handler: (event: TrayIconClicked<'application', 'tray-icon-clicked'>) => void): void {
         this._leftClickHandler = handler;
     }
 
-    public addRightClickHandler(handler: (event: TrayIconClickEvent) => void): void {
+    public addRightClickHandler(handler: (event: TrayIconClicked<'application', 'tray-icon-clicked'>) => void): void {
         this._rightClickHandler = handler;
     }
 
@@ -50,9 +44,9 @@ export class TrayIcon {
                 'tray-icon-clicked',
                 (event: TrayIconClicked<string, string>) => {
                     if (event.button === 0) {
-                        this._leftClickHandler(event as TrayIconClickEvent);
+                        this._leftClickHandler(event as TrayIconClicked<'application', 'tray-icon-clicked'>);
                     } else if (event.button === 2) {
-                        this._rightClickHandler(event as TrayIconClickEvent);
+                        this._rightClickHandler(event as TrayIconClicked<'application', 'tray-icon-clicked'>);
                     }
                 }
             );
