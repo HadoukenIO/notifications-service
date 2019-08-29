@@ -113,7 +113,8 @@ def addReleaseChannels() {
 }
 
 def deployToS3() {
-    sh "aws s3 cp ./res/provider ${DIR_BUILD_VERSION}/ --recursive"
+    sh "aws s3 cp ./res/provider ${DIR_BUILD_VERSION}/ --recursive --exclude \"*.svg\""
+    sh "aws s3 cp ./res/provider ${DIR_BUILD_VERSION}/ --recursive --exclude \"*\" --include \"*.svg\" --content-type \"image/svg+xml\""
     sh "aws s3 cp ./dist/provider ${DIR_BUILD_VERSION}/ --recursive"
     sh "aws s3 cp ./dist/client/openfin-${SERVICE_NAME}.js ${DIR_BUILD_VERSION}/"
 
