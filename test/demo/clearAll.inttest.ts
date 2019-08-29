@@ -36,13 +36,13 @@ type EnvironmentTestParam = [
     'center-open' | 'center-closed'
 ];
 
-type CallAllCallTestParam = [
+type ClearAllCallTestParam = [
     string,
     NotificationOptions[],
     (CustomData | undefined)[]
 ];
 
-const callAllCallTestParam: CallAllCallTestParam[] = [
+const clearAllCallTestParam: ClearAllCallTestParam[] = [
     [
         'When no notifiactions had been created',
         [],
@@ -101,7 +101,7 @@ describe.each([
         await testApp.quit();
     });
 
-    describe.each(callAllCallTestParam)('%s', (titleParam: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
+    describe.each(clearAllCallTestParam)('%s', (titleParam: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
         const notes: Notification[] = [];
 
         beforeEach(async () => {
