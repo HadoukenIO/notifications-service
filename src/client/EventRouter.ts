@@ -73,7 +73,7 @@ export class EventRouter<E extends EventSpecification> {
         }
 
         // Need to remove 'target' from event before emitting event
-        const inputEvent: Transport<T> = {type, ...rest} as Transport<T>;
+        const inputEvent: Transport<T> = {type, ...rest} as unknown as Transport<T>;
 
         // Also run through any custom deserializer
         const deserializer = this._deserializers[type];
