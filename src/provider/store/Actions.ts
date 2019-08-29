@@ -15,7 +15,7 @@ export const enum Action {
     CLICK_NOTIFICATION = '@@notifications/CLICK_NOTIFICATION',
     CLICK_BUTTON = '@@notifications/CLICK_BUTTON',
     TOGGLE_VISIBILITY = '@@ui/TOGGLE_CENTER_WINDOW',
-    BLUR_CENTER = '@@notifications/BLUR_CENTER'
+    BLUR_CENTER = '@@ui/BLUR_CENTER'
 }
 
 export class BaseAction<T extends Action> implements ReduxAction<Action> {
