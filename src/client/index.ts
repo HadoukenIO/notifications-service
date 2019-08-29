@@ -11,7 +11,7 @@
 import {ActionDeclaration, NotificationActionResult, ActionTrigger} from './actions';
 import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
-import {APITopic, Events, NotificationInternal} from './internal';
+import {APITopic, Events, NotificationInternal, Omit} from './internal';
 import {EventRouter, Transport} from './EventRouter';
 
 const eventHandler: EventRouter<Events> = getEventRouter();
@@ -156,7 +156,7 @@ export type CustomData = {[key: string]: any};
  * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
  * state of the service.
  */
-export type Notification = Readonly<Required<NotificationOptions> & {readonly buttons: ReadonlyArray<Readonly<Required<ButtonOptions>>>}>;
+export type Notification = Readonly<Required<Omit<NotificationOptions, 'buttons'>> & {readonly buttons: ReadonlyArray<Readonly<Required<ButtonOptions>>>}>;
 
 /**
  * Event fired for interactions with notification UI elements. It is important to note that applications will only
