@@ -7,5 +7,5 @@ export enum Duration {
     TOAST_CREATE = 200,
     TOAST_CLOSE = 600,
     EVENT_PROPAGATED = 100,
-    CENTER_TOGGLED = 300
+    CENTER_TOGGLED = 350
 }

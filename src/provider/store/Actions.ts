@@ -15,6 +15,7 @@ export const enum Action {
     CLICK_NOTIFICATION = '@@notifications/CLICK_NOTIFICATION',
     CLICK_BUTTON = '@@notifications/CLICK_BUTTON',
     TOGGLE_VISIBILITY = '@@ui/TOGGLE_CENTER_WINDOW',
+    BLUR_CENTER = '@@notifications/BLUR_CENTER'
 }
 
 export class BaseAction<T extends Action> implements ReduxAction<Action> {
@@ -91,7 +92,13 @@ export class ToggleVisibility extends BaseAction<Action.TOGGLE_VISIBILITY> {
     }
 }
 
-export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility;
+export class BlurCenter extends BaseAction<Action.BLUR_CENTER> {
+    constructor() {
+        super(Action.BLUR_CENTER);
+    }
+}
+
+export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility|BlurCenter;
 
 export type ActionOf<A> = RootAction extends {type: A} ? RootAction : never;
 export type ActionHandler<A> = (state: RootState, action: ActionOf<A>) => RootState;
@@ -141,13 +148,21 @@ export const ActionHandlers: ActionHandlerMap = {
     },
     [Action.TOGGLE_VISIBILITY]: (state: RootState, action: ToggleVisibility): RootState => {
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
-        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
 
-        storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
-
-        return {
-            ...state,
-            windowVisible
-        };
+        return setCenterVisibility(state, windowVisible);
+    },
+    [Action.BLUR_CENTER]: (state: RootState, action: ToggleVisibility): RootState => {
+        return setCenterVisibility(state, false);
     }
 };
+
+function setCenterVisibility(state: RootState, windowVisible: boolean): RootState {
+    const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
+
+    storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
+
+    return {
+        ...state,
+        windowVisible
+    };
+}

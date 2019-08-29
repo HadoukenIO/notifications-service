@@ -21,6 +21,8 @@ import {mutable} from './store/State';
 import {Store} from './store/Store';
 import {Database} from './model/database/Database';
 
+const BLUR_DEBOUNCE_DURATION: number = 100;
+
 @injectable()
 export class Main {
     private _config = null;
@@ -40,7 +42,7 @@ export class Main {
     @inject(Inject.DATABASE)
     private _database!: Database;
 
-    private _centerHideBlocker: Promise<void> | null = null;
+    private _centerBlurTimerHandle: number | undefined;
 
     public async register(): Promise<void> {
         Object.assign(window, {
@@ -113,16 +115,16 @@ export class Main {
                     };
                     this._apiHandler.dispatchEvent(source, event);
                 }
-            } else if (action.type === Action.TOGGLE_VISIBILITY) {
-                if (action.debounce) {
-                    const blocker = new Promise((res) => setTimeout(res, 1000)).then(() => {
-                        if (this._centerHideBlocker === blocker) {
-                            this._centerHideBlocker = null;
-                        }
-                    });
-
-                    this._centerHideBlocker = blocker;
+            } else if (action.type === Action.BLUR_CENTER) {
+                if (this._centerBlurTimerHandle !== undefined) {
+                    window.clearTimeout(this._centerBlurTimerHandle);
                 }
+
+                const blocker = window.setTimeout(() => {
+                    this._centerBlurTimerHandle = undefined;
+                }, BLUR_DEBOUNCE_DURATION);
+
+                this._centerBlurTimerHandle = blocker;
             }
         });
 
@@ -147,10 +149,8 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        if (!(this._centerHideBlocker && !this._store.state.windowVisible)) {
+        if (this._centerBlurTimerHandle === undefined || this._store.state.windowVisible) {
             this._store.dispatch(new ToggleVisibility());
-        } else {
-            this._centerHideBlocker = null;
         }
     }
 

@@ -5,7 +5,7 @@ import {MonitorEvent} from 'openfin/_v2/api/events/system';
 import {Inject} from '../common/Injectables';
 import {TrayIcon} from '../common/TrayIcon';
 import {WebWindow, createWebWindow} from '../model/WebWindow';
-import {ToggleVisibility} from '../store/Actions';
+import {ToggleVisibility, BlurCenter} from '../store/Actions';
 import {Store} from '../store/Store';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 
@@ -87,7 +87,7 @@ export class NotificationCenter extends AsyncInit {
 
         window.addListener('blurred', async () => {
             if (this.visible) {
-                this._store.dispatch(new ToggleVisibility(false, true));
+                this._store.dispatch(new BlurCenter());
             }
         });
 
