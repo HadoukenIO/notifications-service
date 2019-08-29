@@ -9,7 +9,7 @@ import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
 import {getAllToastWindows} from './utils/toastUtils';
-import {setupCenterBookends} from './common';
+import {setupCenterBookends, CenterState} from './common';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -33,7 +33,7 @@ const notificationWithOnCloseActionResult2: NotificationOptions = {
 
 type EnvironmentTestParam = [
     string,
-    'center-open' | 'center-closed'
+    CenterState
 ];
 
 type ClearAllCallTestParam = [
@@ -75,7 +75,7 @@ describe.each([
     ['When clearing all notifications with the Notification Center closed', 'center-closed']
 ] as EnvironmentTestParam[])('%s', (
     titleParam: string,
-    centerState: 'center-open' | 'center-closed'
+    centerVisibility: CenterState
 ) => {
     let testApp: Application;
     let testWindow: Window;
@@ -83,7 +83,7 @@ describe.each([
     let actionListener: jest.Mock<void, [NotificationActionEvent]>;
     let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 
-    setupCenterBookends(centerState);
+    setupCenterBookends(centerVisibility);
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
@@ -114,7 +114,7 @@ describe.each([
             await notifsRemote.clearAll(testWindow.identity);
         });
 
-        if (centerState === 'center-open') {
+        if (centerVisibility === 'center-open') {
             test('The Notification Center contains no cards', async () => {
                 await expect(getAllCenterCards()).resolves.toHaveLength(0);
             });

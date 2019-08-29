@@ -9,7 +9,7 @@ import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
 import {getAllToastWindows, getToastWindow} from './utils/toastUtils';
-import {setupCenterBookends} from './common';
+import {setupCenterBookends, CenterState} from './common';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -75,7 +75,7 @@ describe.each([
     ['When clearing a notification with the Notification Center closed', 'center-closed']
 ] as EnvironmentTestParam[])('%s', (
     titleParam: string,
-    centerState: 'center-open' | 'center-closed',
+    centerVisibility: CenterState,
 ) => {
     let testApp: Application;
     let testWindow: Window;
@@ -83,7 +83,7 @@ describe.each([
     let actionListener: jest.Mock<void, [NotificationActionEvent]>;
     let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 
-    setupCenterBookends(centerState);
+    setupCenterBookends(centerVisibility);
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
@@ -120,7 +120,7 @@ describe.each([
             await notifsRemote.clear(testWindow.identity, notes[indexToClear].id);
         });
 
-        if (centerState === 'center-open') {
+        if (centerVisibility === 'center-open') {
             test('The expected card has been removed from the Notification Center', async () => {
                 await expect(getAllCenterCards()).resolves.toHaveLength(notes.length - 1);
 

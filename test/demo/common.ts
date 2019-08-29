@@ -3,8 +3,10 @@ import {isCenterShowing} from './utils/centerUtils';
 import {testManagerIdentity} from './utils/constants';
 import {delay, Duration} from './utils/delay';
 
-export function setupCenterBookends(centerState: 'center-open' | 'center-closed'): void {
-    if (centerState === 'center-open') {
+export type CenterState = 'center-open' | 'center-closed'
+
+export function setupCenterBookends(centerVisibility: CenterState): void {
+    if (centerVisibility === 'center-open') {
         setupOpenCenterBookends();
     } else {
         setupClosedCenterBookends();
@@ -16,6 +18,7 @@ export function setupOpenCenterBookends(): void {
         // Ensure center is showing
         if (!(await isCenterShowing())) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+            await delay(Duration.CENTER_TOGGLED);
         }
     });
 
