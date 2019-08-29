@@ -5,19 +5,22 @@ import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastEvent} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
+import {MonitorModel} from '../model/MonitorModel';
 
 import {LayoutStack, Layouter} from './Layouter';
 import {AsyncInit} from './AsyncInit';
 
 @injectable()
 export class ToastManager extends AsyncInit {
-    private _layouter!: Layouter;
-    private _store!: Store;
-    private _toasts: Map<string, Toast> = new Map();
+    private readonly _layouter: Layouter;
+    private readonly _store: Store;
+    private readonly _monitorModel: MonitorModel;
+
+    private readonly _toasts: Map<string, Toast> = new Map();
     private _stack: LayoutStack = {items: [], layoutHeight: 0};
     private _queue: Toast[] = [];
 
-    constructor(@inject(Inject.STORE) store: Store, @inject(Inject.LAYOUTER) layouter: Layouter) {
+    constructor(@inject(Inject.STORE) store: Store, @inject(Inject.LAYOUTER) layouter: Layouter, @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel) {
         super();
 
         this._store = store;
@@ -25,10 +28,13 @@ export class ToastManager extends AsyncInit {
         this.addListeners();
         this._layouter = layouter;
         this._layouter.onLayoutRequired.add(this.onLayoutRequired, this);
+        this._monitorModel = monitorModel;
     }
 
     protected async init() {
         await this._store.initialized;
+        await this._monitorModel.initialized;
+
         this.subscribe();
     }
 
@@ -65,7 +71,7 @@ export class ToastManager extends AsyncInit {
             await new Promise(resolve => setTimeout(resolve, 200));
         }
 
-        const toast: Toast = new Toast(this._store, notification, {
+        const toast: Toast = new Toast(this._store, this._monitorModel, notification, {
             timeout: 10000
         });
 

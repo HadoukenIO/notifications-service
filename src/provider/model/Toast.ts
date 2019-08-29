@@ -10,6 +10,7 @@ import {LayoutItem, WindowDimensions} from '../controller/Layouter';
 
 import {StoredNotification} from './StoredNotification';
 import {WebWindow, createWebWindow} from './WebWindow';
+import {MonitorModel} from './MonitorModel';
 
 const windowOptions: WindowOption = {
     name: 'Notification-Toast',
@@ -80,7 +81,7 @@ export class Toast implements LayoutItem {
         return this._dimensions;
     }
 
-    public constructor(store: Store, notification: StoredNotification, toastOptions: Options) {
+    public constructor(store: Store, monitorModel: MonitorModel, notification: StoredNotification, toastOptions: Options) {
         this._id = notification.id;
         this._options = toastOptions;
         this._position = {top: 0, left: 0};
@@ -92,7 +93,7 @@ export class Toast implements LayoutItem {
         const name = `${windowOptions.name}:${this.id}`;
         this._webWindow = createWebWindow({...windowOptions, name}).then(async (webWindow) => {
             const {window, document} = webWindow;
-            const {virtualScreen} = await fin.System.getMonitorInfo();
+            const {virtualScreen} = monitorModel.monitorInfo;
 
             this.addListeners();
             // Show window offscreen so it can render and then hide it

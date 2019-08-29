@@ -1,10 +1,15 @@
 import {Signal} from 'openfin-service-signal';
-import {injectable} from 'inversify';
+import {injectable, inject} from 'inversify';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
-import {Rect} from 'openfin/_v2/api/system/monitor';
-import {MonitorEvent} from 'openfin/_v2/api/events/system';
+import {Rect, MonitorInfo} from 'openfin/_v2/api/system/monitor';
+import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
+import Bounds from 'openfin/_v2/api/window/bounds';
 import {_Window} from 'openfin/_v2/api/window/window';
-import {Bounds, Transition, TransitionOptions} from 'openfin/_v2/shapes';
+
+import {Inject} from '../common/Injectables';
+import {MonitorModel} from '../model/MonitorModel';
+
+import {AsyncInit} from './AsyncInit';
 
 interface LayouterConfig {
     spacing: number;
@@ -27,27 +32,33 @@ export interface LayoutStack {
 export type WindowDimensions = {height: number, width: number};
 
 @injectable()
-export class Layouter {
+export class Layouter extends AsyncInit {
     private static INTERNAL_CONFIG: Readonly<LayouterConfig> = {
         spacing: 10,
         anchor: {top: 1, left: 1},
         animationTime: 100
     };
 
+    private readonly _monitorModel: MonitorModel;
     private _availableRect!: Required<Rect>;
 
     public onLayoutRequired: Signal<[]> = new Signal();
 
-    constructor() {
-        fin.System.getMonitorInfo().then(monitorInfo => {
-            this._availableRect = monitorInfo.primaryMonitor.availableRect;
-        });
+    constructor(@inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel) {
+        super();
 
-        fin.System.addListener('monitor-info-changed', (async (event: MonitorEvent<string, string>) => {
-            const monitorInfo = await fin.System.getMonitorInfo();
+        this._monitorModel = monitorModel;
+    }
+
+    public async init(): Promise<void> {
+        await this._monitorModel.initialized;
+
+        this._availableRect = this._monitorModel.monitorInfo.primaryMonitor.availableRect;
+
+        this._monitorModel.onMonitorInfoChanged.add((monitorInfo: MonitorInfo) => {
             this._availableRect = monitorInfo.primaryMonitor.availableRect;
             this.onLayoutRequired.emit();
-        }));
+        });
     }
 
     /**

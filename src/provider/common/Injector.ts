@@ -10,6 +10,8 @@ import {APIHandler} from '../model/APIHandler';
 import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
 import {Database} from '../model/database/Database';
+import {FinMonitorModel} from '../model/FinMonitorModel';
+import {MonitorModel} from '../model/MonitorModel';
 
 import {Inject} from './Injectables';
 
@@ -19,10 +21,10 @@ import {Inject} from './Injectables';
 type Types = {
     [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
-    [Inject.LAYOUTER]: Layouter;
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.DATABASE]: Database;
+    [Inject.LAYOUTER]: Layouter;
+    [Inject.MONITOR_MODEL]: MonitorModel;
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
 };
@@ -36,10 +38,10 @@ type Types = {
 const Bindings = {
     [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
-    [Inject.LAYOUTER]: Layouter,
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.DATABASE]: Database,
     [Inject.LAYOUTER]: Layouter,
+    [Inject.MONITOR_MODEL]: FinMonitorModel,
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.STORE]: Store,
     [Inject.TOAST_MANAGER]: ToastManager
 };

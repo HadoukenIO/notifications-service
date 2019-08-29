@@ -8,6 +8,7 @@ import {WebWindow, createWebWindow} from '../model/WebWindow';
 import {ToggleVisibility} from '../store/Actions';
 import {Store} from '../store/Store';
 import {renderApp} from '../view/containers/NotificationCenterApp';
+import {MonitorModel} from '../model/MonitorModel';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -32,14 +33,22 @@ const windowOptions: WindowOption = {
 export class NotificationCenter extends AsyncInit {
     private static readonly WIDTH: number = 388;
 
-    @inject(Inject.STORE)
-    private _store!: Store;
+    private readonly _store: Store;
+    private readonly _monitorModel: MonitorModel;
 
     private _webWindow!: WebWindow;
     private _trayIcon!: TrayIcon;
 
+    public constructor(@inject(Inject.STORE) store: Store, @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel) {
+        super();
+
+        this._store = store;
+        this._monitorModel = monitorModel;
+    }
+
     protected async init() {
         await this._store.initialized;
+        await this._monitorModel.initialized;
 
         // Create notification center app window
         try {
@@ -93,9 +102,10 @@ export class NotificationCenter extends AsyncInit {
                 }
             });
         }
-        fin.System.addListener('monitor-info-changed', ((event: MonitorEvent<string, string>) => {
+
+        this._monitorModel.onMonitorInfoChanged.add(() => {
             this.sizeToFit();
-        }));
+        });
     }
 
     /**
@@ -124,7 +134,7 @@ export class NotificationCenter extends AsyncInit {
         const {window} = this._webWindow;
         const idealWidth = NotificationCenter.WIDTH;
         await this.hideWindow(true);
-        const monitorInfo = await fin.System.getMonitorInfo();
+        const monitorInfo = this._monitorModel.monitorInfo;
         return window.setBounds({
             left: monitorInfo.primaryMonitor.availableRect.right - idealWidth,
             top: 0,
@@ -135,7 +145,7 @@ export class NotificationCenter extends AsyncInit {
 
     private async hideWindowOffscreen() {
         const {window} = this._webWindow;
-        const {virtualScreen, primaryMonitor} = await fin.System.getMonitorInfo();
+        const {virtualScreen, primaryMonitor} = this._monitorModel.monitorInfo;
         const height = primaryMonitor.availableRect.bottom;
         await window.showAt(virtualScreen.left - NotificationCenter.WIDTH * 2, virtualScreen.top - height * 2);
         await window.hide();

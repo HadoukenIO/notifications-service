@@ -9,6 +9,7 @@ enum Injectable {
     API_HANDLER,
     DATABASE,
     LAYOUTER,
+    MONITOR_MODEL,
     NOTIFICATION_CENTER,
     STORE,
     TOAST_MANAGER
