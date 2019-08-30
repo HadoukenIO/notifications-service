@@ -22,8 +22,9 @@ import {Store} from './store/Store';
 import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
+import {Timer} from './utils/Timer';
 
-const BLUR_DEBOUNCE_DURATION: number = 100;
+const POST_BLUR_TOGGLE_BLOCK_DURATION: number = 750;
 
 @injectable()
 export class Main {
@@ -35,6 +36,8 @@ export class Main {
     private readonly _notificationCenter: NotificationCenter;
     private readonly _store: Store;
     private readonly _toastManager: ToastManager;
+
+    private readonly _toggleBlockTimer: Timer;
 
     constructor(
         @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
@@ -52,6 +55,8 @@ export class Main {
         this._notificationCenter = notificationCenter;
         this._store = store;
         this._toastManager = toastManager;
+
+        this._toggleBlockTimer = new Timer(POST_BLUR_TOGGLE_BLOCK_DURATION);
     }
 
     private _centerBlurTimerHandle: number | undefined;
@@ -130,15 +135,7 @@ export class Main {
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
             } else if (action.type === Action.BLUR_CENTER) {
-                if (this._centerBlurTimerHandle !== undefined) {
-                    window.clearTimeout(this._centerBlurTimerHandle);
-                }
-
-                const blocker = window.setTimeout(() => {
-                    this._centerBlurTimerHandle = undefined;
-                }, BLUR_DEBOUNCE_DURATION);
-
-                this._centerBlurTimerHandle = blocker;
+                this._toggleBlockTimer.start();
             }
         });
 
@@ -163,7 +160,7 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        if (this._centerBlurTimerHandle === undefined || this._store.state.windowVisible) {
+        if (this._store.state.windowVisible || !this._toggleBlockTimer.running) {
             this._store.dispatch(new ToggleVisibility());
         }
     }
