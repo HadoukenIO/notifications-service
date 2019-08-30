@@ -149,7 +149,7 @@ export const ActionHandlers: ActionHandlerMap = {
 
         return setCenterVisibility(state, windowVisible);
     },
-    [Action.BLUR_CENTER]: (state: RootState, action: ToggleVisibility): RootState => {
+    [Action.BLUR_CENTER]: (state: RootState, action: BlurCenter): RootState => {
         return setCenterVisibility(state, false);
     }
 };
