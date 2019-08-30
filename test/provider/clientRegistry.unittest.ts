@@ -1,8 +1,6 @@
 import 'jest';
 import 'fake-indexeddb/auto';
 
-import Dexie from 'dexie';
-
 import {Database, CollectionMap} from '../../src/provider/model/database/Database';
 import {APITopic, Events} from '../../src/client/internal';
 import {APIHandler} from '../../src/provider/model/APIHandler';
