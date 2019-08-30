@@ -3,11 +3,12 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
 
-import {isCenterShowing, getAllCenterCards} from './utils/centerUtils';
+import {getAllCenterCards} from './utils/centerUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
+import * as providerRemote from './utils/providerRemote';
 import {getAllToastWindows} from './utils/toastUtils';
 import {setupCenterBookends, CenterState} from './common';
 
@@ -97,7 +98,7 @@ describe.each([
     });
 
     afterEach(async () => {
-        await notifsRemote.clearAll(testWindow.identity);
+        await providerRemote.clearStoredNotifications(testWindow.identity);
         await testApp.quit();
     });
 

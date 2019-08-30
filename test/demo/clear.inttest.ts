@@ -8,6 +8,7 @@ import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
+import * as providerRemote from './utils/providerRemote';
 import {getAllToastWindows, getToastWindow} from './utils/toastUtils';
 import {setupCenterBookends, CenterState} from './common';
 
@@ -97,8 +98,7 @@ describe.each([
     });
 
     afterEach(async () => {
-        // TODO - how do we better do this? we shouldn't rely on clearAll working since that's what we're testing
-        await notifsRemote.clearAll(testWindow.identity);
+        await providerRemote.clearStoredNotifications(testWindow.identity);
         await testApp.quit();
     });
 
