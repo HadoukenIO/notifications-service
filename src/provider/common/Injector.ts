@@ -9,6 +9,8 @@ import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
 import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
+import {EventPump} from '../model/EventPump';
+import {ClientRegistry} from '../model/ClientRegistry';
 import {Database} from '../model/database/Database';
 import {FinMonitorModel} from '../model/FinMonitorModel';
 import {MonitorModel} from '../model/MonitorModel';
@@ -25,7 +27,9 @@ import {FinTrayIcon} from './FinTrayIcon';
 type Types = {
     [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
+    [Inject.CLIENT_REGISTRY]: ClientRegistry;
     [Inject.DATABASE]: Database;
+    [Inject.EVENT_PUMP]: EventPump;
     [Inject.LAYOUTER]: Layouter;
     [Inject.MONITOR_MODEL]: MonitorModel;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
@@ -44,7 +48,9 @@ type Types = {
 const Bindings = {
     [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
+    [Inject.CLIENT_REGISTRY]: ClientRegistry,
     [Inject.DATABASE]: Database,
+    [Inject.EVENT_PUMP]: EventPump,
     [Inject.LAYOUTER]: Layouter,
     [Inject.MONITOR_MODEL]: FinMonitorModel,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
