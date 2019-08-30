@@ -6,6 +6,7 @@ import {Toast, ToastEvent} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
 import {MonitorModel} from '../model/MonitorModel';
+import {WebWindowFactory} from '../model/WebWindow';
 
 import {LayoutStack, Layouter} from './Layouter';
 import {AsyncInit} from './AsyncInit';
@@ -15,12 +16,18 @@ export class ToastManager extends AsyncInit {
     private readonly _layouter: Layouter;
     private readonly _store: Store;
     private readonly _monitorModel: MonitorModel;
+    private readonly _webWindowFactory: WebWindowFactory;
 
     private readonly _toasts: Map<string, Toast> = new Map();
     private _stack: LayoutStack = {items: [], layoutHeight: 0};
     private _queue: Toast[] = [];
 
-    constructor(@inject(Inject.STORE) store: Store, @inject(Inject.LAYOUTER) layouter: Layouter, @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel) {
+    constructor(
+        @inject(Inject.STORE) store: Store,
+        @inject(Inject.LAYOUTER) layouter: Layouter,
+        @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
+        @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
+    ) {
         super();
 
         this._store = store;
@@ -29,6 +36,7 @@ export class ToastManager extends AsyncInit {
         this._layouter = layouter;
         this._layouter.onLayoutRequired.add(this.onLayoutRequired, this);
         this._monitorModel = monitorModel;
+        this._webWindowFactory = webWindowFactory;
     }
 
     protected async init() {
@@ -71,7 +79,7 @@ export class ToastManager extends AsyncInit {
             await new Promise(resolve => setTimeout(resolve, 200));
         }
 
-        const toast: Toast = new Toast(this._store, this._monitorModel, notification, {
+        const toast: Toast = new Toast(this._store, this._monitorModel, this._webWindowFactory, notification, {
             timeout: 10000
         });
 

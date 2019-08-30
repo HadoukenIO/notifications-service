@@ -5,5 +5,5 @@ export interface MonitorModel {
     onMonitorInfoChanged: Signal<[MonitorInfo]>;
     monitorInfo: MonitorInfo;
 
-    initialized: Promise<void>
+    initialized: Promise<this>
 }

@@ -2,9 +2,8 @@ import {Signal} from 'openfin-service-signal';
 import {injectable, inject} from 'inversify';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Rect, MonitorInfo} from 'openfin/_v2/api/system/monitor';
-import {Transition, TransitionOptions} from 'openfin/_v2/api/window/transition';
-import Bounds from 'openfin/_v2/api/window/bounds';
 import {_Window} from 'openfin/_v2/api/window/window';
+import {Bounds, Transition, TransitionOptions} from 'openfin/_v2/shapes';
 
 import {Inject} from '../common/Injectables';
 import {MonitorModel} from '../model/MonitorModel';

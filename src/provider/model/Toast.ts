@@ -1,7 +1,7 @@
+import {Signal} from 'openfin-service-signal';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
-import {Bounds, Transition, TransitionOptions} from 'openfin/_v2/shapes';
-import {Signal} from 'openfin-service-signal';
+import {Transition, TransitionOptions, Bounds} from 'openfin/_v2/shapes';
 
 import {DeferredPromise} from '../common/DeferredPromise';
 import {renderApp} from '../view/containers/ToastApp';
@@ -9,7 +9,7 @@ import {Store} from '../store/Store';
 import {LayoutItem, WindowDimensions} from '../controller/Layouter';
 
 import {StoredNotification} from './StoredNotification';
-import {WebWindow, createWebWindow} from './WebWindow';
+import {WebWindow, WebWindowFactory} from './WebWindow';
 import {MonitorModel} from './MonitorModel';
 
 const windowOptions: WindowOption = {
@@ -81,7 +81,7 @@ export class Toast implements LayoutItem {
         return this._dimensions;
     }
 
-    public constructor(store: Store, monitorModel: MonitorModel, notification: StoredNotification, toastOptions: Options) {
+    public constructor(store: Store, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification, toastOptions: Options) {
         this._id = notification.id;
         this._options = toastOptions;
         this._position = {top: 0, left: 0};
@@ -91,17 +91,16 @@ export class Toast implements LayoutItem {
         this._dimensions = dimensionsDeferredPromise.promise;
 
         const name = `${windowOptions.name}:${this.id}`;
-        this._webWindow = createWebWindow({...windowOptions, name}).then(async (webWindow) => {
-            const {window, document} = webWindow;
+        this._webWindow = webWindowFactory.createWebWindow({...windowOptions, name}).then(async (webWindow) => {
             const {virtualScreen} = monitorModel.monitorInfo;
 
             this.addListeners();
             // Show window offscreen so it can render and then hide it
-            await window.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
-            await window.hide();
+            await webWindow.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
+            await webWindow.hide();
             renderApp(
                 notification,
-                document,
+                webWindow,
                 store,
                 dimensionResolve
             );
@@ -113,36 +112,30 @@ export class Toast implements LayoutItem {
      * Display the toast.
     */
     public async show(): Promise<void> {
-        const {window: toastWindow} = await this._webWindow;
         await this._dimensions;
-        await toastWindow.show();
+        await (await this._webWindow).show();
         this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
     }
 
     public async animate(transitions: Transition, options: TransitionOptions): Promise<void> {
-        const {window} = await this._webWindow;
-        return window.animate(transitions, options);
+        return (await this._webWindow).animate(transitions, options);
     }
 
     public async setTransform(transform: Bounds): Promise<void> {
-        const {window} = await this._webWindow;
-        await window.setBounds(transform);
+        const webWindow = await this._webWindow;
+        await webWindow.setBounds(transform);
     }
 
     /**
      * Close Toast window and perform cleanup.
      */
     public close = async (): Promise<void> => {
-        const {window, document} = await this._webWindow;
-
+        const webWindow = await this._webWindow;
         clearTimeout(this._timeout);
-        document.removeEventListener('mouseenter', this.mouseEnterHandler);
-        document.removeEventListener('mouseleave', this.mouseLeaveHandler);
+        webWindow.onMouseEnter.remove(this.mouseEnterHandler);
+        webWindow.onMouseLeave.remove(this.mouseLeaveHandler);
 
-        // Workaround for race conditions within toast manager. Will address with SERVICE-581.
-        if (window.close) {
-            await window.close();
-        }
+        await webWindow.close();
     }
 
     /**
@@ -164,11 +157,11 @@ export class Toast implements LayoutItem {
      * Listeners to handle events on the toast.
      */
     private async addListeners(): Promise<void> {
-        const {document} = await this._webWindow;
+        const webWindow = await this._webWindow;
 
         // Pause timeout on mouse over window
-        document.addEventListener('mouseenter', this.mouseEnterHandler);
-        document.addEventListener('mouseleave', this.mouseLeaveHandler);
+        webWindow.onMouseEnter.add(this.mouseEnterHandler);
+        webWindow.onMouseLeave.add(this.mouseLeaveHandler);
     }
 
     private timeoutHandler = (): void => {

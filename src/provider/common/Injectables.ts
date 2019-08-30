@@ -12,7 +12,8 @@ enum Injectable {
     MONITOR_MODEL,
     NOTIFICATION_CENTER,
     STORE,
-    TOAST_MANAGER
+    TOAST_MANAGER,
+    WEB_WINDOW_FACTORY
 }
 
 type InjectableMap = {
