@@ -128,16 +128,21 @@ export interface NotificationOptions {
      * application-defined buttons, and the default 'X' close button) will not trigger a
      * {@link ActionTrigger.SELECT|select} action.
      *
-     * If omitted or `null`, applications will not receive a {@link NotificationActionEvent|`notification-action`}
-     * event when the notification is clicked. See {@link Actions} for more details on notification actions, and
-     * receiving interaction events from notifications.
+     * See {@link Actions} for more details on notification actions, and receiving interaction events from
+     * notifications.
      */
     onSelect?: ActionDeclaration<never, never>|null;
 
     /**
-     * An action that will fire when the notification is closed. This can be from user interaction (until future revisions
-     * allow default click behaviour to be overriden, this will be any click anywhere within the notification), or from
-     * the notification being programmaticially removed, such as a call to `clear`.
+     * An {@link NotificationActionResult|action result} to be passed back to the application inside the
+     * {@link NotificationActionEvent|`notification-action`} event fired when the notification is closed.
+     *
+     * This action will be raised regardless of how the notification is closed. This can be from user interaction
+     * (until future revisions allow default click behaviour to be overriden, this will be any click anywhere within
+     * the notification), or from the notification being programmaticially removed, such as a call to `clear`.
+     *
+     * See {@link Actions} for more details on notification actions, and receiving interaction events from
+     * notifications.
      */
     onClose?: ActionDeclaration<never, never>|null;
 }

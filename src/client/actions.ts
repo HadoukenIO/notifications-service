@@ -13,6 +13,10 @@
  * then use the {@link NotificationActionResult|action result} to determine the interaction that occurred and respond
  * appropriately.
  *
+ * If an {@link NotificationActionResult|action result} is not specified for a particular interaction, or it is set to
+ * `null`, the application will not receive a corresponding {@link NotificationActionEvent|`notification-action`} for
+ * that interaction.
+ *
  * For an overview of actions, consider the sample notification below:
  * ```ts
  * import {addEventListener, create} from 'openfin-notifications';
