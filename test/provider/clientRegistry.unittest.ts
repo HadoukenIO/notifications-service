@@ -1,12 +1,14 @@
 import 'jest';
 import 'fake-indexeddb/auto';
 
+import Dexie from 'dexie';
+
 import {Database, CollectionMap} from '../../src/provider/model/database/Database';
 import {APITopic, Events} from '../../src/client/internal';
 import {APIHandler} from '../../src/provider/model/APIHandler';
 import {ClientRegistry, StoredApplication} from '../../src/provider/model/ClientRegistry';
 
-describe('When the same app is attempted to be launched multiple times instantaneously through ClientRegistry', () => {
+describe('When the same app is attempted to be launched multiple times instantaneously through the service', () => {
     const storedApp: StoredApplication = {
         type: 'manifest',
         id: 'cr-test-app',
@@ -41,10 +43,10 @@ describe('When the same app is attempted to be launched multiple times instantan
 
     afterEach(async () => {
         const collection = database.get(CollectionMap.APPLICATIONS);
-        await collection.delete(storedApp.id);
+        await collection.delete((await collection.getAll()).map(app => app.id));
     });
 
-    it('create method should be called only once', async () => {
+    it('Service will only attempt to start the app once', async () => {
         for (let i = 0; i < 10; ++i) {
             await clientRegistry.tryLaunchApplication(storedApp.id);
         }
