@@ -16,6 +16,8 @@ import {FinMonitorModel} from '../model/FinMonitorModel';
 import {MonitorModel} from '../model/MonitorModel';
 import {WebWindowFactory} from '../model/WebWindow';
 import {FinWebWindowFactory} from '../model/FinWebWindow';
+import {Environment} from '../model/Environment';
+import {FinEnvironment} from '../model/FinEnvironment';
 
 import {Inject} from './Injectables';
 import {TrayIcon} from './TrayIcon';
@@ -29,6 +31,7 @@ type Types = {
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
     [Inject.CLIENT_REGISTRY]: ClientRegistry;
     [Inject.DATABASE]: Database;
+    [Inject.ENVIRONMENT]: Environment;
     [Inject.EVENT_PUMP]: EventPump;
     [Inject.LAYOUTER]: Layouter;
     [Inject.MONITOR_MODEL]: MonitorModel;
@@ -50,6 +53,7 @@ const Bindings = {
     [Inject.API_HANDLER]: APIHandler,
     [Inject.CLIENT_REGISTRY]: ClientRegistry,
     [Inject.DATABASE]: Database,
+    [Inject.ENVIRONMENT]: FinEnvironment,
     [Inject.EVENT_PUMP]: EventPump,
     [Inject.LAYOUTER]: Layouter,
     [Inject.MONITOR_MODEL]: FinMonitorModel,

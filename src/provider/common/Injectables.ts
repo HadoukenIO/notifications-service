@@ -9,6 +9,7 @@ enum Injectable {
     API_HANDLER,
     CLIENT_REGISTRY,
     DATABASE,
+    ENVIRONMENT,
     EVENT_PUMP,
     LAYOUTER,
     MONITOR_MODEL,
