@@ -18,26 +18,38 @@ import {StoredNotification} from './model/StoredNotification';
 import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisibility} from './store/Actions';
 import {mutable} from './store/State';
 import {Store} from './store/Store';
+import {EventPump} from './model/EventPump';
+import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
 
 @injectable()
 export class Main {
     private _config = null;
+    private readonly _apiHandler: APIHandler<APITopic, Events>;
+    private readonly _clientHandler: ClientRegistry;
+    private readonly _database: Database;
+    private readonly _eventPump: EventPump;
+    private readonly _notificationCenter: NotificationCenter;
+    private readonly _store: Store;
+    private readonly _toastManager: ToastManager;
 
-    @inject(Inject.API_HANDLER)
-    private _apiHandler!: APIHandler<APITopic, Events>;
-
-    @inject(Inject.STORE)
-    private _store!: Store;
-
-    @inject(Inject.NOTIFICATION_CENTER)
-    private _notificationCenter!: NotificationCenter;
-
-    @inject(Inject.TOAST_MANAGER)
-    private _toastManager!: ToastManager;
-
-    @inject(Inject.DATABASE)
-    private _database!: Database;
+    constructor(
+        @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
+        @inject(Inject.CLIENT_REGISTRY) clientHandler: ClientRegistry,
+        @inject(Inject.DATABASE) database: Database,
+        @inject(Inject.EVENT_PUMP) eventPump: EventPump,
+        @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
+        @inject(Inject.STORE) store: Store,
+        @inject(Inject.TOAST_MANAGER) toastManager: ToastManager
+    ) {
+        this._apiHandler = apiHandler;
+        this._clientHandler = clientHandler;
+        this._database = database;
+        this._eventPump = eventPump;
+        this._notificationCenter = notificationCenter;
+        this._store = store;
+        this._toastManager = toastManager;
+    }
 
     public async register(): Promise<void> {
         Object.assign(window, {
@@ -58,7 +70,9 @@ export class Main {
             [APITopic.CLEAR_NOTIFICATION]: this.clearNotification.bind(this),
             [APITopic.GET_APP_NOTIFICATIONS]: this.fetchAppNotifications.bind(this),
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
-            [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this)
+            [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
+            [APITopic.ADD_EVENT_LISTENER]: this._clientHandler.onAddEventListener.bind(this._clientHandler),
+            [APITopic.REMOVE_EVENT_LISTENER]: this._clientHandler.onRemoveEventListener.bind(this._clientHandler)
         });
 
         this._store.onAction.add(async (action: RootAction): Promise<void> => {
@@ -69,7 +83,7 @@ export class Main {
                     type: 'notification-created',
                     notification: mutable(notification)
                 };
-                this._apiHandler.dispatchEvent<NotificationCreatedEvent>(source, event);
+                this._eventPump.push<NotificationCreatedEvent>(source.uuid, event);
             } else if (action.type === Action.REMOVE) {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
@@ -82,14 +96,14 @@ export class Main {
                             notification: mutable(notification),
                             result: notification.onClose
                         };
-                        this._apiHandler.dispatchEvent<NotificationActionEvent>(source, actionEvent);
+                        this._eventPump.push<NotificationActionEvent>(source.uuid, actionEvent);
                     }
                     const closedEvent: Targeted<Transport<NotificationClosedEvent>> = {
                         target: 'default',
                         type: 'notification-closed',
                         notification: mutable(notification)
                     };
-                    this._apiHandler.dispatchEvent<NotificationClosedEvent>(source, closedEvent);
+                    this._eventPump.push<NotificationClosedEvent>(source.uuid, closedEvent);
                 });
             } else if (action.type === Action.CLICK_BUTTON) {
                 const {notification, source} = action.notification;
@@ -105,7 +119,7 @@ export class Main {
                         controlIndex: action.buttonIndex,
                         result: button.onClick
                     };
-                    this._apiHandler.dispatchEvent(source, event);
+                    this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
             } else if (action.type === Action.CLICK_NOTIFICATION) {
                 const {notification, source} = action.notification;
@@ -118,7 +132,7 @@ export class Main {
                         notification: mutable(notification),
                         result: notification.onSelect
                     };
-                    this._apiHandler.dispatchEvent(source, event);
+                    this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
             }
         });
