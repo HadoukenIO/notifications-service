@@ -2,12 +2,12 @@ import {injectable, inject} from 'inversify';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 import {Inject} from '../common/Injectables';
-import {TrayIcon} from '../common/TrayIcon';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
 import {ToggleVisibility} from '../store/Actions';
 import {Store} from '../store/Store';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
+import {TrayIcon} from '../common/TrayIcon';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -32,22 +32,24 @@ const windowOptions: WindowOption = {
 export class NotificationCenter extends AsyncInit {
     private static readonly WIDTH: number = 388;
 
-    private readonly _store: Store;
     private readonly _monitorModel: MonitorModel;
+    private readonly _store: Store;
+    private readonly _trayIcon: TrayIcon;
     private readonly _webWindowFactory: WebWindowFactory;
 
     private _webWindow!: WebWindow;
-    private _trayIcon!: TrayIcon;
 
     public constructor(
-        @inject(Inject.STORE) store: Store,
         @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
+        @inject(Inject.STORE) store: Store,
+        @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
         @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
     ) {
         super();
 
-        this._store = store;
         this._monitorModel = monitorModel;
+        this._store = store;
+        this._trayIcon = trayIcon;
         this._webWindowFactory = webWindowFactory;
     }
 
@@ -63,8 +65,8 @@ export class NotificationCenter extends AsyncInit {
             throw error;
         }
         await this.hideWindowOffscreen();
-        this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png');
-        this._trayIcon.addLeftClickHandler(() => {
+        this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
+        this._trayIcon.onLeftClick.add(() => {
             this._store.dispatch(new ToggleVisibility());
         });
         await this.sizeToFit();

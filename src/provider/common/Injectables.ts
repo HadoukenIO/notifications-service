@@ -13,6 +13,7 @@ enum Injectable {
     NOTIFICATION_CENTER,
     STORE,
     TOAST_MANAGER,
+    TRAY_ICON,
     WEB_WINDOW_FACTORY
 }
 

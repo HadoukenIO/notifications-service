@@ -16,6 +16,8 @@ import {WebWindowFactory} from '../model/WebWindow';
 import {FinWebWindowFactory} from '../model/FinWebWindow';
 
 import {Inject} from './Injectables';
+import {TrayIcon} from './TrayIcon';
+import {FinTrayIcon} from './FinTrayIcon';
 
 /**
  * For each entry in `Inject`, defines the type that will be injected for that key.
@@ -29,6 +31,7 @@ type Types = {
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
+    [Inject.TRAY_ICON]: TrayIcon;
     [Inject.WEB_WINDOW_FACTORY]: WebWindowFactory;
 };
 
@@ -47,6 +50,7 @@ const Bindings = {
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.STORE]: Store,
     [Inject.TOAST_MANAGER]: ToastManager,
+    [Inject.TRAY_ICON]: FinTrayIcon,
     [Inject.WEB_WINDOW_FACTORY]: FinWebWindowFactory
 };
 
