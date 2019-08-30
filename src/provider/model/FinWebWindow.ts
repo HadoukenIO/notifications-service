@@ -25,9 +25,9 @@ export class FinWebWindowFactory implements WebWindowFactory {
 
         const webWindow = new FinWebWindow(windowV2, document);
 
-        windowV2.addListener('mouseenter', () => webWindow.onMouseEnter.emit());
-        windowV2.addListener('mouseleave', () => webWindow.onMouseLeave.emit());
-        windowV2.addListener('blurred', () => webWindow.onBlurred.emit());
+        await windowV2.addListener('mouseenter', () => webWindow.onMouseEnter.emit());
+        await windowV2.addListener('mouseleave', () => webWindow.onMouseLeave.emit());
+        await windowV2.addListener('blurred', () => webWindow.onBlurred.emit());
 
         return webWindow;
     }
