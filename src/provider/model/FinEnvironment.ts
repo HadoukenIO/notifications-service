@@ -18,7 +18,8 @@ export class FinEnvironment implements Environment {
     public async getApplication(uuid: string): Promise<StoredApplication> {
         const info = await fin.Application.wrapSync({uuid}).getInfo();
         const isProgrammatic: boolean = !!info.parentUuid;
-        const application: StoredApplication = isProgrammatic ? {
+
+        return isProgrammatic ? {
             type: 'programmatic',
             id: uuid,
             initialOptions: info.initialOptions as ApplicationOption,
@@ -28,8 +29,6 @@ export class FinEnvironment implements Environment {
             id: uuid,
             manifestUrl: info.manifestUrl
         };
-
-        return application;
     }
 
     public async startApplication(application: StoredApplication): Promise<void> {
