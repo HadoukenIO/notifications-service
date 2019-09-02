@@ -52,7 +52,7 @@ export class FinEnvironment implements Environment {
             finApplication.run();
         } catch (error) {
             this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== application.id);
-            console.error(error.message);
+            console.error(`Error starting app ${application.id} [${error.message}]`);
         }
     }
 }
