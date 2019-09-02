@@ -5,8 +5,8 @@ import {Signal} from 'openfin-service-signal';
 
 import {DeferredPromise} from '../common/DeferredPromise';
 import {renderApp} from '../view/containers/ToastApp';
-import {Store} from '../store/Store';
 import {LayoutItem, WindowDimensions} from '../controller/Layouter';
+import {ServiceStore} from '../store/ServiceStore';
 
 import {StoredNotification} from './StoredNotification';
 import {WebWindow, createWebWindow} from './WebWindow';
@@ -80,7 +80,7 @@ export class Toast implements LayoutItem {
         return this._dimensions;
     }
 
-    public constructor(store: Store, notification: StoredNotification, toastOptions: Options) {
+    public constructor(store: ServiceStore, notification: StoredNotification, toastOptions: Options) {
         this._id = notification.id;
         this._options = toastOptions;
         this._position = {top: 0, left: 0};

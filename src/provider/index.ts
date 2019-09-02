@@ -16,12 +16,12 @@ import {NotificationCenter} from './controller/NotificationCenter';
 import {ToastManager} from './controller/ToastManager';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
-import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisibility} from './store/Actions';
+import {RootAction, CreateNotification, RemoveNotifications, ToggleVisibility, ClickNotification, ClickButton} from './store/Actions';
 import {mutable} from './store/State';
-import {Store} from './store/Store';
 import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
+import {ServiceStore} from './store/ServiceStore';
 
 @injectable()
 export class Main {
@@ -31,7 +31,7 @@ export class Main {
     private readonly _database: Database;
     private readonly _eventPump: EventPump;
     private readonly _notificationCenter: NotificationCenter;
-    private readonly _store: Store;
+    private readonly _store: ServiceStore;
     private readonly _toastManager: ToastManager;
 
     constructor(
@@ -40,7 +40,7 @@ export class Main {
         @inject(Inject.DATABASE) database: Database,
         @inject(Inject.EVENT_PUMP) eventPump: EventPump,
         @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
-        @inject(Inject.STORE) store: Store,
+        @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TOAST_MANAGER) toastManager: ToastManager
     ) {
         this._apiHandler = apiHandler;
@@ -77,7 +77,7 @@ export class Main {
         });
 
         this._store.onAction.add(async (action: RootAction): Promise<void> => {
-            if (action.type === Action.CREATE) {
+            if (action instanceof CreateNotification) {
                 const {notification, source} = action.notification;
                 const event: Targeted<Transport<NotificationCreatedEvent>> = {
                     target: 'default',
@@ -85,7 +85,7 @@ export class Main {
                     notification: mutable(notification)
                 };
                 this._eventPump.push<NotificationCreatedEvent>(source.uuid, event);
-            } else if (action.type === Action.REMOVE) {
+            } else if (action instanceof RemoveNotifications) {
                 const {notifications} = action;
                 notifications.forEach((storedNotification: StoredNotification) => {
                     const {notification, source} = storedNotification;
@@ -96,7 +96,7 @@ export class Main {
                     };
                     this._eventPump.push<NotificationClosedEvent>(source.uuid, event);
                 });
-            } else if (action.type === Action.CLICK_BUTTON) {
+            } else if (action instanceof ClickButton) {
                 const {notification, source} = action.notification;
                 const button: ButtonOptions = notification.buttons[action.buttonIndex];
 
@@ -112,7 +112,7 @@ export class Main {
                     };
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
-            } else if (action.type === Action.CLICK_NOTIFICATION) {
+            } else if (action instanceof ClickNotification) {
                 const {notification, source} = action.notification;
 
                 if (notification.onSelect) {
