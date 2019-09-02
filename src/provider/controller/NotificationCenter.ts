@@ -105,7 +105,7 @@ export class NotificationCenter extends AsyncInit {
         await this.animateIn();
 
         await window.setAsForeground();
-        // Focus occurs with `setAsForeground` automatically on Windows but not macOS, so do this to make behaviour consistent
+        // Focus occurs with `setAsForeground` automatically on Windows but not macOS, so do this so we always have focus to lose
         await window.focus();
     }
 
