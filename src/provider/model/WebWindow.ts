@@ -11,6 +11,8 @@ export interface WebWindow {
     onMouseLeave: Signal<[]>;
     onBlurred: Signal<[]>;
 
+    document: Document;
+
     show(): Promise<void>;
     showAt(left: number, top: number): Promise<void>;
     hide(): Promise<void>;
@@ -18,6 +20,5 @@ export interface WebWindow {
     animate(transition: Transition, options: TransitionOptions): Promise<void>;
     setBounds(bounds: Bounds): Promise<void>;
     close(): Promise<void>;
-    render(element: React.FunctionComponentElement<any> | React.FunctionComponentElement<any>[]): void;
 }
 

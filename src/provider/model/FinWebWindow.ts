@@ -46,6 +46,10 @@ export class FinWebWindow implements WebWindow {
         this._document = document;
     }
 
+    public get document(): Document {
+        return this._document;
+    }
+
     public async show(): Promise<void> {
         return this._window.show();
     }
@@ -75,9 +79,5 @@ export class FinWebWindow implements WebWindow {
         if (this._window.close) {
             return this._window.close();
         }
-    }
-
-    public render(element: React.FunctionComponentElement<any> | React.FunctionComponentElement<any>[]): void {
-        ReactDOM.render(element, this._document.getElementById('react-app'));
     }
 }
