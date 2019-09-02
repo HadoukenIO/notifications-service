@@ -7,7 +7,7 @@ import * as notifsRemote from './utils/notificationsRemote';
 import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
 import {delay, Duration} from './utils/delay';
 import {createApp} from './utils/spawnRemote';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import {testManagerIdentity, testAppUrlDefault} from './utils/constants';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -31,7 +31,7 @@ describe('Click listeners', () => {
         let testApp: Application;
         let testAppMainWindow: FinWindow;
         beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+            testApp = await createApp(testManagerIdentity, {url: testAppUrlDefault});
             testAppMainWindow = await testApp.getWindow();
         });
 
@@ -47,7 +47,7 @@ describe('Click listeners', () => {
             let note: Notification;
 
             beforeEach(async () => {
-                // Register the listener
+                // Register the listeners
                 createdListener = jest.fn<void, [NotificationCreatedEvent]>();
                 actionListener = jest.fn<void, [NotificationActionEvent]>();
                 closedListener = jest.fn<void, [NotificationClosedEvent]>();
@@ -119,18 +119,7 @@ describe('Click listeners', () => {
 
             describe('When clicking the close button', () => {
                 beforeEach(async () => {
-                    const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
-
-                    // Close button is only visible/clickable when card is hovered
-                    await noteCards[0].hover();
-
-                    // Get a remote handle to the close button DOM element
-                    const closeHandles = await noteCards[0].$$('.close');
-                    expect(closeHandles).toHaveLength(1);
-
-                    // Click on the button and pause momentarily to allow the event to propagate
-                    await closeHandles[0].click();
-                    await delay(Duration.EVENT_PROPAGATED);
+                    await clickNotificationCloseButton(testApp.identity.uuid, note.id);
                 });
 
                 test('The closeListener is called once with the correct metadata the other listeners are not called', async () => {
@@ -156,5 +145,58 @@ describe('Click listeners', () => {
                 });
             });
         });
+
+        describe('With a notification in the center and only a closed listener registered', () => {
+            let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
+            let note: Notification;
+
+            beforeEach(async () => {
+                // Register the listener
+                closedListener = jest.fn<void, [NotificationClosedEvent]>();
+                await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-closed', closedListener);
+
+                // Create the notification
+                note = await notifsRemote.create(testAppMainWindow.identity, defaultNoteOptions);
+
+                // Quick sanity check that there is exactly one notification card with this ID
+                // This is tested more thoroughly in creatNotification tests
+                const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
+                expect(noteCards).toHaveLength(1);
+            });
+
+            afterEach(async () => {
+                // Clean up the leftover notification
+                await notifsRemote.clearAll(testAppMainWindow.identity);
+            });
+
+            describe('When clicking the close button', () => {
+                beforeEach(async () => {
+                    await clickNotificationCloseButton(testApp.identity.uuid, note.id);
+                });
+
+                test('The closeListener is called once with the correct metadata the other listeners are not called', async () => {
+                    expect(closedListener).toHaveBeenCalledTimes(1);
+                    expect(closedListener).toHaveBeenCalledWith({
+                        type: 'notification-closed',
+                        notification: {...note, date: note.date.toJSON()}
+                    });
+                });
+            });
+        });
     });
 });
+
+async function clickNotificationCloseButton(uuid: string, notificationId: string): Promise<void> {
+    const noteCards = await getCenterCardsByNotification(uuid, notificationId);
+
+    // Close button is only visible/clickable when card is hovered
+    await noteCards[0].hover();
+
+    // Get a remote handle to the close button DOM element
+    const closeHandles = await noteCards[0].$$('.close');
+    expect(closeHandles).toHaveLength(1);
+
+    // Click on the button and pause momentarily to allow the event to propagate
+    await closeHandles[0].click();
+    await delay(Duration.EVENT_PROPAGATED);
+}

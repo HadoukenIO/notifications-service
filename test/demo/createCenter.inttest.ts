@@ -11,7 +11,7 @@ import {assertNotificationStored, getStoredNotificationsByApp} from './utils/sto
 import {delay, Duration} from './utils/delay';
 import {getToastWindow} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import {testManagerIdentity, testAppUrlDefault} from './utils/constants';
 import {assertHydratedCorrectly} from './utils/hydrateNotification';
 
 describe('When creating a notification with the center showing', () => {
@@ -34,7 +34,7 @@ describe('When creating a notification with the center showing', () => {
     });
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createApp(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
     });
 

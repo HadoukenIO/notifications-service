@@ -1,6 +1,6 @@
 import 'jest';
 
-import {Application, Window, Identity} from 'hadouken-js-adapter';
+import {Application, Window} from 'hadouken-js-adapter';
 import {ElementHandle} from 'puppeteer';
 
 import {NotificationOptions} from '../../src/client';
@@ -10,7 +10,7 @@ import * as providerRemote from './utils/providerRemote';
 import {delay, Duration} from './utils/delay';
 import {getToastCards} from './utils/toastUtils';
 import {createApp} from './utils/spawnRemote';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import {testManagerIdentity, testAppUrlDefault, testAppUrlListenersOnStartup} from './utils/constants';
 import {waitForAppToBeRunning} from './utils/common';
 
 const relaunchNotificationOptions: NotificationOptions = {
@@ -33,7 +33,7 @@ describe('When an app that uses notification-service is created', () => {
     let testWindow: Window;
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createApp(testManagerIdentity, {url: testAppUrlListenersOnStartup});
         testWindow = await testApp.getWindow();
     });
 
