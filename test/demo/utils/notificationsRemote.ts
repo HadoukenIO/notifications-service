@@ -82,8 +82,3 @@ export async function getReceivedEvents(executionTarget: Identity, type: Event['
     });
     return events.filter(event => event.type === type);
 }
-
-export async function getDomElementById(executionTarget: Identity, id: string): Promise<ElementHandle> {
-    const centerPage = await ofBrowser.getPage(executionTarget);
-    return (await centerPage!.$$(`#${id}`))[0];
-}
