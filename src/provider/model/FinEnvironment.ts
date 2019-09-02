@@ -22,7 +22,7 @@ export class FinEnvironment implements Environment {
         return isProgrammatic ? {
             type: 'programmatic',
             id: uuid,
-            initialOptions: info.initialOptions as ApplicationOption,
+            initialOptions: info.initialOptions as ApplicationOption, // TODO: Use updated type so cast is unecessary [SERVICE-601]
             parentUuid: info.parentUuid!
         } : {
             type: 'manifest',
