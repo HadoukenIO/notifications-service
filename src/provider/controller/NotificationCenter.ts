@@ -103,7 +103,10 @@ export class NotificationCenter extends AsyncInit {
         const {window} = this._webWindow;
         await window.show();
         await this.animateIn();
+
         await window.setAsForeground();
+        // Focus occurs with `setAsForeground` automatically on Windows but not macOS, so do this to make behaviour consistent
+        await window.focus();
     }
 
     /**
