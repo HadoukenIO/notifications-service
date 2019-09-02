@@ -24,7 +24,7 @@ import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
 import {Timer} from './utils/Timer';
 
-const POST_BLUR_TOGGLE_BLOCK_DURATION: number = 750;
+const POST_BLUR_TOGGLE_BLOCK_DURATION = 750;
 
 @injectable()
 export class Main {
@@ -58,8 +58,6 @@ export class Main {
 
         this._toggleBlockTimer = new Timer(POST_BLUR_TOGGLE_BLOCK_DURATION);
     }
-
-    private _centerBlurTimerHandle: number | undefined;
 
     public async register(): Promise<void> {
         Object.assign(window, {
