@@ -18,10 +18,10 @@ import {WebWindowFactory} from '../model/WebWindow';
 import {FinWebWindowFactory} from '../model/FinWebWindow';
 import {Environment} from '../model/Environment';
 import {FinEnvironment} from '../model/FinEnvironment';
+import {TrayIcon} from '../model/TrayIcon';
+import {FinTrayIcon} from '../model/FinTrayIcon';
 
 import {Inject} from './Injectables';
-import {TrayIcon} from './TrayIcon';
-import {FinTrayIcon} from './FinTrayIcon';
 
 /**
  * For each entry in `Inject`, defines the type that will be injected for that key.
