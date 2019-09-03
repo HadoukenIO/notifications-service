@@ -165,22 +165,17 @@ export const ActionHandlers: ActionHandlerMap = {
     [Action.TOGGLE_VISIBILITY]: (state: RootState, action: ToggleVisibility): RootState => {
         const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
 
-        return setCenterVisibility(state, windowVisible);
+        return {
+            ...state,
+            windowVisible
+        };
     },
     [Action.BLUR_CENTER]: (state: RootState, action: BlurCenter): RootState => {
-        return setCenterVisibility(state, false);
+        return {
+            ...state,
+            windowVisible: false
+        };
     }
 };
 
 const toggleFiter = new ToggleFilter();
-
-function setCenterVisibility(state: RootState, windowVisible: boolean): RootState {
-    const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
-
-    storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
-
-    return {
-        ...state,
-        windowVisible
-    };
-}
