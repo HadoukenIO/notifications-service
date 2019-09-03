@@ -96,7 +96,7 @@ export class ToggleVisibility extends CustomAction<Action.TOGGLE_VISIBILITY> {
     }
 
     public async dispatch(store: StoreAPI): Promise<void> {
-        if (toggleFiter.recordToggle(this.source)) {
+        if (toggleFilter.recordToggle(this.source)) {
             await store.dispatch({...this});
         }
     }
@@ -108,7 +108,7 @@ export class BlurCenter extends CustomAction<Action.BLUR_CENTER> {
     }
 
     public async dispatch(store: StoreAPI): Promise<void> {
-        toggleFiter.recordBlur();
+        toggleFilter.recordBlur();
 
         await store.dispatch({...this});
     }
@@ -178,4 +178,4 @@ export const ActionHandlers: ActionHandlerMap = {
     }
 };
 
-const toggleFiter = new ToggleFilter();
+const toggleFilter = new ToggleFilter();
