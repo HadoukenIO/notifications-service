@@ -11,8 +11,8 @@ import {AsyncInit} from './AsyncInit';
 
 @injectable()
 export class ToastManager extends AsyncInit {
-    private _layouter!: Layouter;
-    private _store!: ServiceStore;
+    private readonly _layouter: Layouter;
+    private readonly _store: ServiceStore;
     private _toasts: Map<string, Toast> = new Map();
     private _stack: LayoutStack = {items: [], layoutHeight: 0};
     private _queue: Toast[] = [];
@@ -29,11 +29,6 @@ export class ToastManager extends AsyncInit {
 
     protected async init() {
         await this._store.initialized;
-        this._store.onAction.add(async (action: RootAction): Promise<void> => {
-            if (action instanceof ToggleVisibility && action.visible) {
-                this.closeAll();
-            }
-        });
     }
 
     /**

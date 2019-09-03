@@ -32,11 +32,16 @@ const windowOptions: WindowOption = {
 export class NotificationCenter extends AsyncInit {
     private static readonly WIDTH: number = 388;
 
-    @inject(Inject.STORE)
-    private _store!: ServiceStore;
+    private readonly _store: ServiceStore;
 
     private _webWindow!: WebWindow;
     private _trayIcon!: TrayIcon;
+
+    constructor(@inject(Inject.STORE) store: ServiceStore) {
+        super();
+        this._store = store;
+        this._store.onAction.add(this.onAction, this);
+    }
 
     protected async init() {
         await this._store.initialized;
@@ -56,11 +61,6 @@ export class NotificationCenter extends AsyncInit {
         await this.sizeToFit();
         await this.addListeners();
         renderApp(this._webWindow.document, this._store);
-        this._store.onAction.add(async (action: RootAction): Promise<void> => {
-            if (action instanceof ToggleVisibility) {
-                this.toggleWindow(!!action.visible);
-            }
-        });
     }
 
     /**
@@ -88,6 +88,12 @@ export class NotificationCenter extends AsyncInit {
         fin.System.addListener('monitor-info-changed', ((event: MonitorEvent<string, string>) => {
             this.sizeToFit();
         }));
+    }
+
+    private async onAction(action: RootAction): Promise<void> {
+        if (action instanceof ToggleVisibility) {
+            this.toggleWindow(action.visible || false);
+        }
     }
 
     /**
