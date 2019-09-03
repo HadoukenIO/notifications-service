@@ -16,6 +16,7 @@
         }
     ],
     "runtime": {
+        "arguments": "--security-realm=of-notifications-service",
         "version": "10.66.39.43"
     }
 }

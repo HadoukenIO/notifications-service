@@ -4,7 +4,7 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
 
-import {createApp} from './utils/spawnRemote';
+import {createAppInServiceRealm} from './utils/spawnRemote';
 import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
 import * as notifsRemote from './utils/notificationsRemote';
 import {assertNotificationStored, getStoredNotificationsByApp} from './utils/storageRemote';
@@ -34,7 +34,7 @@ describe('When creating a notification with the center showing', () => {
     });
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
     });
 

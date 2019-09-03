@@ -17,7 +17,7 @@
         }
     },
    "runtime": {
-        "arguments": "--enable-aggressive-domstorage-flushing",
+        "arguments": "--enable-aggressive-domstorage-flushing --security-realm=of-notifications-service",
         "version": "10.66.39.43"
     }
 }

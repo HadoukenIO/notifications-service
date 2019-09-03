@@ -8,7 +8,7 @@ import * as notifsRemote from './utils/notificationsRemote';
 import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
 import {delay, Duration} from './utils/delay';
 import {getToastWindow, getToastCards} from './utils/toastUtils';
-import {createApp} from './utils/spawnRemote';
+import {createAppInServiceRealm} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
@@ -36,7 +36,7 @@ describe('When calling createNotification with the Notification Center not showi
     });
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
 
         ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
