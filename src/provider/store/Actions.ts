@@ -50,7 +50,6 @@ export class CreateNotification extends AsyncAction<RootState> {
         if (existingNotifications.length) {
             await store.dispatch(new RemoveNotifications(existingNotifications));
         }
-        await store.dispatch({...this, reduce: this.reduce.bind(this)});
     }
 }
 

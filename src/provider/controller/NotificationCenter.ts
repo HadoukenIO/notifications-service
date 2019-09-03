@@ -5,7 +5,7 @@ import {MonitorEvent} from 'openfin/_v2/api/events/system';
 import {Inject} from '../common/Injectables';
 import {TrayIcon} from '../common/TrayIcon';
 import {WebWindow, createWebWindow} from '../model/WebWindow';
-import {ToggleVisibility} from '../store/Actions';
+import {ToggleVisibility, RootAction} from '../store/Actions';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 import {ServiceStore} from '../store/ServiceStore';
 
@@ -56,6 +56,11 @@ export class NotificationCenter extends AsyncInit {
         await this.sizeToFit();
         await this.addListeners();
         renderApp(this._webWindow.document, this._store);
+        this._store.onAction.add(async (action: RootAction): Promise<void> => {
+            if (action instanceof ToggleVisibility) {
+                this.toggleWindow(!!action.visible);
+            }
+        });
     }
 
     /**

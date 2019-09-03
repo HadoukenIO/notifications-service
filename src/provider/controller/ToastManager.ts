@@ -29,6 +29,11 @@ export class ToastManager extends AsyncInit {
 
     protected async init() {
         await this._store.initialized;
+        this._store.onAction.add(async (action: RootAction): Promise<void> => {
+            if (action instanceof ToggleVisibility && action.visible) {
+                this.closeAll();
+            }
+        });
     }
 
     /**
