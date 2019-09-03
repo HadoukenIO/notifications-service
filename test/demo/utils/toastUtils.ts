@@ -10,6 +10,11 @@ export function getToastIdentity(sourceUuid: string, notificationId: string): Id
     return {uuid: SERVICE_IDENTITY.uuid, name: `Notification-Toast:${sourceUuid}:${notificationId}`};
 }
 
+export async function getAllToastWindows(): Promise<Window[]> {
+    const childWindows = await fin.Application.wrapSync(SERVICE_IDENTITY).getChildWindows();
+    return childWindows.filter(win => win.identity.name && win.identity.name.startsWith('Notification-Toast:'));
+}
+
 export async function getToastWindow(sourceUuid: string, notificationId: string): Promise<Window | undefined> {
     const toastIdentity = getToastIdentity(sourceUuid, notificationId);
     const childWindows = await fin.Application.wrapSync(SERVICE_IDENTITY).getChildWindows();

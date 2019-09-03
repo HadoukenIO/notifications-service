@@ -13,25 +13,13 @@ import {getToastWindow} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {assertHydratedCorrectly} from './utils/hydrateNotification';
+import {setupOpenCenterBookends} from './common';
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;
     let testWindow: Window;
 
-    beforeAll(async () => {
-        // Ensure center is showing
-        if (!(await isCenterShowing())) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-        }
-    });
-
-    afterAll(async () => {
-        // Close center when we're done
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
+    setupOpenCenterBookends();
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
