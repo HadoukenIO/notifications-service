@@ -3,16 +3,15 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
-
-import {createApp} from './utils/spawnRemote';
-import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
-import * as notifsRemote from './utils/notificationsRemote';
-import {assertNotificationStored, getStoredNotificationsByApp} from './utils/storageRemote';
-import {delay, Duration} from './utils/delay';
-import {getToastWindow} from './utils/toastUtils';
-import {assertDOMMatches, CardType} from './utils/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
-import {assertHydratedCorrectly} from './utils/hydrateNotification';
+import {createApp} from '../utils/int/spawnRemote';
+import {isCenterShowing, getCenterCardsByNotification} from '../utils/int/centerUtils';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/int/storageRemote';
+import {delay, Duration} from '../utils/int/delay';
+import {getToastWindow} from '../utils/int/toastUtils';
+import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
+import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;

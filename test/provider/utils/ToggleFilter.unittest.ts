@@ -1,4 +1,4 @@
-import {useFakeTime, advanceTime} from '../../demo/utils/time';
+import {useFakeTime, advanceTime} from '../../utils/unit/time';
 import {ToggleFilter} from '../../../src/provider/utils/ToggleFilter';
 import {ToggleVisibilitySource} from '../../../src/provider/store/Actions';
 

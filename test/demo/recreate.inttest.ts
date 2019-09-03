@@ -4,15 +4,14 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {WindowEvent} from 'hadouken-js-adapter/out/types/src/api/events/base';
 
 import {NotificationOptions, Notification, NotificationClosedEvent, NotificationCreatedEvent} from '../../src/client';
-
-import {createApp} from './utils/spawnRemote';
-import {isCenterShowing} from './utils/centerUtils';
-import * as notifsRemote from './utils/notificationsRemote';
-import {delay, Duration} from './utils/delay';
-import {fin} from './utils/fin';
-import {getToastIdentity} from './utils/toastUtils';
-import {assertDOMMatches, CardType} from './utils/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import {createApp} from '../utils/int/spawnRemote';
+import {isCenterShowing} from '../utils/int/centerUtils';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import {delay, Duration} from '../utils/int/delay';
+import {fin} from '../utils/int/fin';
+import {getToastIdentity} from '../utils/int/toastUtils';
+import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
+import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',

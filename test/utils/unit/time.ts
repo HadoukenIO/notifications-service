@@ -1,5 +1,3 @@
-import {delay} from './delay';
-
 const MAX_PROMISE_CHAIN_LENGTH = 100;
 
 const realDateNow = Date.now;
@@ -34,6 +32,6 @@ export async function advanceTime(duration: number): Promise<void> {
             jest.advanceTimersByTime(1);
         }
     } else {
-        await delay(duration);
+        await new Promise(res => setTimeout(res, duration));
     }
 }

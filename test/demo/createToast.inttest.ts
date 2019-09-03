@@ -3,16 +3,15 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, Notification} from '../../src/client';
-
-import * as notifsRemote from './utils/notificationsRemote';
-import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
-import {delay, Duration} from './utils/delay';
-import {getToastWindow, getToastCards} from './utils/toastUtils';
-import {createApp} from './utils/spawnRemote';
-import {assertNotificationStored} from './utils/storageRemote';
-import {assertDOMMatches, CardType} from './utils/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
-import {assertHydratedCorrectly} from './utils/hydrateNotification';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import {isCenterShowing, getCenterCardsByNotification} from '../utils/int/centerUtils';
+import {delay, Duration} from '../utils/int/delay';
+import {getToastWindow, getToastCards} from '../utils/int/toastUtils';
+import {createApp} from '../utils/int/spawnRemote';
+import {assertNotificationStored} from '../utils/int/storageRemote';
+import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
+import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
