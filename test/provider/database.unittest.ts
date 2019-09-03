@@ -212,6 +212,7 @@ function generateNotification(notificationOptions?: Partial<NotificationInternal
             date: 1,
             icon: '',
             onSelect: null,
+            onClose: null,
             title: '',
             ...notificationOptions
         },
