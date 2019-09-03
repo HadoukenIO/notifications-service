@@ -36,7 +36,7 @@ export class ToggleFilter {
     }
 
     public recordToggle(source: ToggleVisibilitySource): boolean {
-        if (source === 'api' || source === 'tray') {
+        if (source === ToggleVisibilitySource.API || source === ToggleVisibilitySource.TRAY) {
             const running = this._toggleBlockTimer.running;
 
             // We only want to block a single toggle per-blur, so always clear timer

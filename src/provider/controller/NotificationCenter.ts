@@ -5,7 +5,7 @@ import {MonitorEvent} from 'openfin/_v2/api/events/system';
 import {Inject} from '../common/Injectables';
 import {TrayIcon} from '../common/TrayIcon';
 import {WebWindow, createWebWindow} from '../model/WebWindow';
-import {ToggleVisibility, BlurCenter} from '../store/Actions';
+import {ToggleVisibility, BlurCenter, ToggleVisibilitySource} from '../store/Actions';
 import {Store} from '../store/Store';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 
@@ -51,7 +51,7 @@ export class NotificationCenter extends AsyncInit {
         await this.hideWindowOffscreen();
         this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png');
         this._trayIcon.addLeftClickHandler(() => {
-            this._store.dispatch(new ToggleVisibility('tray'));
+            this._store.dispatch(new ToggleVisibility(ToggleVisibilitySource.TRAY));
         });
         await this.sizeToFit();
         await this.addListeners();

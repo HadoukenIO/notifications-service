@@ -14,8 +14,8 @@ beforeEach(() => {
 });
 
 describe.each([
-    ['an API call', 'api'],
-    ['the tray icon', 'tray']
+    ['an API call', ToggleVisibilitySource.API],
+    ['the tray icon', ToggleVisibilitySource.TRAY]
 ] as TestParam[])('When the Notification Center is toggled by %s', (titleParam: string, source: ToggleVisibilitySource) => {
     test('A toggle following shortly after a blur is ignored', async () => {
         toggleFilter.recordBlur();
@@ -44,7 +44,7 @@ describe.each([
     });
 
     test('A toggle following shortly after a paired toggle of a different source then blur is not ignored', async () => {
-        toggleFilter.recordToggle(source === 'api' ? 'tray' : 'api');
+        toggleFilter.recordToggle(source === ToggleVisibilitySource.API ? ToggleVisibilitySource.TRAY : ToggleVisibilitySource.API);
         await advanceTime(5);
         toggleFilter.recordBlur();
 
@@ -59,5 +59,5 @@ test('When the Notification Center is toggled by an internal button shortly afte
 
     await advanceTime(10);
 
-    expect(toggleFilter.recordToggle('button')).toBe(true);
+    expect(toggleFilter.recordToggle(ToggleVisibilitySource.BUTTON)).toBe(true);
 });

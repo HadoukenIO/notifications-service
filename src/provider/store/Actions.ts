@@ -19,7 +19,11 @@ export const enum Action {
     BLUR_CENTER = '@@ui/BLUR_CENTER'
 }
 
-export type ToggleVisibilitySource = 'api' | 'tray' | 'button';
+export const enum ToggleVisibilitySource {
+    API,
+    TRAY,
+    BUTTON
+}
 
 export class BaseAction<T extends Action> implements ReduxAction<Action> {
     public readonly type: T;
