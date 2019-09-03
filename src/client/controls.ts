@@ -68,12 +68,12 @@ export interface ButtonOptions {
      * The {@link NotificationActionResult} specified here will be returned to the application via a
      * `notification-action` event when the button is clicked.
      *
-     * This field must be specified if the application creating the notification wishes to be informed that the user
-     * has clicked this button. If the button represents a "dismiss" or some other side-effect-free action then
-     * the field may be omitted without consequence. Even if `onClick` is omitted, a `notification-closed` event will
-     * still be raised after the button click.
+     * If omitted or `null`, applications will not receive a {@link NotificationActionEvent|`notification-action`}
+     * event when the button is clicked. This may be appropriate if the button represents a "dismiss" or some other
+     * side-effect-free interaction. Even if `onClick` is omitted or `null`, a `notification-closed` event will still be
+     * raised after the button click.
      *
      * Future versions of the service will allow for greater control over what happens when a button is clicked.
      */
-    onClick?: ActionDeclaration<never, never>;
+    onClick?: ActionDeclaration<never, never>|null;
 }

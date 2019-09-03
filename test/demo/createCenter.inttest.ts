@@ -4,7 +4,7 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
 import {createApp} from '../utils/int/spawnRemote';
-import {isCenterShowing, getCenterCardsByNotification} from '../utils/int/centerUtils';
+import {getCenterCardsByNotification} from '../utils/int/centerUtils';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/int/storageRemote';
 import {delay, Duration} from '../utils/int/delay';
@@ -12,25 +12,13 @@ import {getToastWindow} from '../utils/int/toastUtils';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
+import {setupOpenCenterBookends} from '../utils/int/common';
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;
     let testWindow: Window;
 
-    beforeAll(async () => {
-        // Ensure center is showing
-        if (!(await isCenterShowing())) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-        }
-    });
-
-    afterAll(async () => {
-        // Close center when we're done
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
+    setupOpenCenterBookends();
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});

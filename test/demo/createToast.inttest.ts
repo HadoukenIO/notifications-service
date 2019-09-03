@@ -4,7 +4,7 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, Notification} from '../../src/client';
 import * as notifsRemote from '../utils/int/notificationsRemote';
-import {isCenterShowing, getCenterCardsByNotification} from '../utils/int/centerUtils';
+import {getCenterCardsByNotification} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
 import {getToastWindow, getToastCards} from '../utils/int/toastUtils';
 import {createApp} from '../utils/int/spawnRemote';
@@ -12,6 +12,7 @@ import {assertNotificationStored} from '../utils/int/storageRemote';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
+import {setupClosedCenterBookends} from '../utils/int/common';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
@@ -26,13 +27,7 @@ describe('When calling createNotification with the Notification Center not showi
     let createPromise: Promise<Notification>;
     let note: Notification;
 
-    beforeAll(async () => {
-        // Ensure center is not showing
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
+    setupClosedCenterBookends();
 
     beforeEach(async () => {
         testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
