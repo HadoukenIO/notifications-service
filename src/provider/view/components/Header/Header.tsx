@@ -12,7 +12,7 @@ export function Header(props: HeaderProps): React.ReactElement {
     const {groupBy, handleGroupBy, storeDispatch} = props;
 
     const handleHideWindow = () => {
-        storeDispatch(new ToggleVisibility(false));
+        storeDispatch(new ToggleVisibility('button', false));
     };
 
     return (

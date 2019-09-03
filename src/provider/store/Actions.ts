@@ -5,6 +5,7 @@ import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
 import {CollectionMap} from '../model/database/Database';
 import {SettingsMap} from '../model/StoredSetting';
+import {ToggleFilter} from '../utils/ToggleFilter';
 
 import {RootState} from './State';
 import {StoreAPI} from './Store';
@@ -17,6 +18,8 @@ export const enum Action {
     TOGGLE_VISIBILITY = '@@ui/TOGGLE_CENTER_WINDOW',
     BLUR_CENTER = '@@ui/BLUR_CENTER'
 }
+
+export type ToggleVisibilitySource = 'api' | 'tray' | 'button';
 
 export class BaseAction<T extends Action> implements ReduxAction<Action> {
     public readonly type: T;
@@ -81,18 +84,33 @@ export class ClickButton extends BaseAction<Action.CLICK_BUTTON> {
     }
 }
 
-export class ToggleVisibility extends BaseAction<Action.TOGGLE_VISIBILITY> {
+export class ToggleVisibility extends CustomAction<Action.TOGGLE_VISIBILITY> {
+    public readonly source: ToggleVisibilitySource;
     public readonly visible?: boolean;
 
-    constructor(visible?: boolean) {
+    constructor(source: ToggleVisibilitySource, visible?: boolean) {
         super(Action.TOGGLE_VISIBILITY);
+
+        this.source = source;
         this.visible = visible;
+    }
+
+    public async dispatch(store: StoreAPI): Promise<void> {
+        if (toggleFiter.recordToggle(this.source)) {
+            await store.dispatch({...this});
+        }
     }
 }
 
-export class BlurCenter extends BaseAction<Action.BLUR_CENTER> {
+export class BlurCenter extends CustomAction<Action.BLUR_CENTER> {
     constructor() {
         super(Action.BLUR_CENTER);
+    }
+
+    public async dispatch(store: StoreAPI): Promise<void> {
+        toggleFiter.recordBlur();
+
+        await store.dispatch({...this});
     }
 }
 
@@ -153,6 +171,8 @@ export const ActionHandlers: ActionHandlerMap = {
         return setCenterVisibility(state, false);
     }
 };
+
+const toggleFiter = new ToggleFilter();
 
 function setCenterVisibility(state: RootState, windowVisible: boolean): RootState {
     const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
