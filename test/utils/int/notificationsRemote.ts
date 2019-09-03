@@ -1,5 +1,4 @@
 import {Identity} from 'openfin/_v2/main';
-import {ElementHandle} from 'puppeteer';
 
 import {NotificationOptions, Notification} from '../../../src/client';
 import {Events} from '../../../src/client/internal';
