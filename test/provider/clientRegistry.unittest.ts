@@ -14,7 +14,7 @@ import {PartiallyWritable} from '../types';
 
 jest.mock('../../src/provider/model/APIHandler');
 
-describe('When attemping to launch an app through the client registry', () => {
+describe('When attempting to launch an app through the client registry', () => {
     const storedApp: StoredApplication = {
         type: 'manifest',
         id: 'cr-test-app',
