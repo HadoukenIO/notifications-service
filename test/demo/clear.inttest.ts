@@ -6,7 +6,7 @@ import {ActionTrigger} from '../../src/client/actions';
 import {getAllCenterCards, getCenterCardsByNotification} from './utils/centerUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {delay, Duration} from './utils/delay';
-import {createApp} from './utils/spawnRemote';
+import {createAppInServiceRealm} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
 import * as providerRemote from './utils/providerRemote';
 import {getAllToastWindows, getToastWindow} from './utils/toastUtils';
@@ -87,7 +87,7 @@ describe.each([
     setupCenterBookends(centerVisibility);
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
 
         actionListener = jest.fn<void, [NotificationActionEvent]>();
@@ -190,7 +190,7 @@ describe('When attempting to clear a notification that does not exist', () => {
     let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
 
         closedListener = jest.fn<void, [NotificationClosedEvent]>();
