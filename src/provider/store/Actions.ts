@@ -4,7 +4,6 @@ import {StoredNotification} from '../model/StoredNotification';
 import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
 import {CollectionMap} from '../model/database/Database';
-import {SettingsMap} from '../model/StoredSetting';
 import {ToggleFilter} from '../utils/ToggleFilter';
 
 import {RootState} from './State';
@@ -15,8 +14,9 @@ export const enum Action {
     REMOVE = '@@notifications/REMOVE',
     CLICK_NOTIFICATION = '@@notifications/CLICK_NOTIFICATION',
     CLICK_BUTTON = '@@notifications/CLICK_BUTTON',
-    TOGGLE_VISIBILITY = '@@ui/TOGGLE_CENTER_WINDOW',
-    BLUR_CENTER = '@@ui/BLUR_CENTER'
+    TOGGLE_VISIBILITY = '@@ui/TOGGLE_VISIBILITY',
+    BLUR_CENTER = '@@ui/BLUR_CENTER',
+    TOGGLE_LOCK_CENTER = '@@ui/TOGGLE_LOCK_CENTER'
 }
 
 export const enum ToggleVisibilitySource {
@@ -112,13 +112,20 @@ export class BlurCenter extends CustomAction<Action.BLUR_CENTER> {
     }
 
     public async dispatch(store: StoreAPI): Promise<void> {
-        toggleFilter.recordBlur();
-
-        await store.dispatch({...this});
+        if (!store.state.windowLocked) {
+            toggleFilter.recordBlur();
+            await store.dispatch({...this});
+        }
     }
 }
 
-export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility|BlurCenter;
+export class ToggleLockCenter extends BaseAction<Action.TOGGLE_LOCK_CENTER> {
+    constructor() {
+        super(Action.TOGGLE_LOCK_CENTER);
+    }
+}
+
+export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility|BlurCenter|ToggleLockCenter;
 
 export type ActionOf<A> = RootAction extends {type: A} ? RootAction : never;
 export type ActionHandler<A> = (state: RootState, action: ActionOf<A>) => RootState;
@@ -178,6 +185,12 @@ export const ActionHandlers: ActionHandlerMap = {
         return {
             ...state,
             windowVisible: false
+        };
+    },
+    [Action.TOGGLE_LOCK_CENTER]: (state: RootState, action: ToggleLockCenter): RootState => {
+        return {
+            ...state,
+            windowLocked: !state.windowLocked
         };
     }
 };

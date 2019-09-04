@@ -3,6 +3,7 @@ import {StoredNotification} from '../model/StoredNotification';
 export type RootState = Readonly<{
     notifications: StoredNotification[];
     windowVisible: boolean;
+    windowLocked: boolean;
 }>;
 
 export type Immutable<T> = {

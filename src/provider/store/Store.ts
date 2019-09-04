@@ -26,7 +26,8 @@ export interface StoreAPI {
 export class Store extends AsyncInit implements StoreAPI {
     private static INITIAL_STATE: RootState = {
         notifications: [],
-        windowVisible: false
+        windowVisible: false,
+        windowLocked: false
     };
 
     public readonly onAction: Signal<[RootAction], Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
