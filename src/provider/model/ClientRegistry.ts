@@ -56,7 +56,7 @@ export class ClientRegistry {
     }
 
     /**
-     * Decides whether an app ready to receive `notification-action` events
+     * Decides whether an app is ready to receive `notification-action` events
      *
      * @param appUuid Uuid of the app.
      */
