@@ -14,12 +14,12 @@ export const enum Action {
     REMOVE = '@@notifications/REMOVE',
     CLICK_NOTIFICATION = '@@notifications/CLICK_NOTIFICATION',
     CLICK_BUTTON = '@@notifications/CLICK_BUTTON',
-    TOGGLE_VISIBILITY = '@@ui/TOGGLE_VISIBILITY',
+    TOGGLE_CENTER_VISIBILITY = '@@ui/TOGGLE_CENTER_VISIBILITY',
     BLUR_CENTER = '@@ui/BLUR_CENTER',
     TOGGLE_LOCK_CENTER = '@@ui/TOGGLE_LOCK_CENTER'
 }
 
-export const enum ToggleVisibilitySource {
+export const enum ToggleCenterVisibilitySource {
     API,
     TRAY,
     BUTTON
@@ -88,12 +88,12 @@ export class ClickButton extends BaseAction<Action.CLICK_BUTTON> {
     }
 }
 
-export class ToggleVisibility extends CustomAction<Action.TOGGLE_VISIBILITY> {
-    public readonly source: ToggleVisibilitySource;
+export class ToggleCenterVisibility extends CustomAction<Action.TOGGLE_CENTER_VISIBILITY> {
+    public readonly source: ToggleCenterVisibilitySource;
     public readonly visible?: boolean;
 
-    constructor(source: ToggleVisibilitySource, visible?: boolean) {
-        super(Action.TOGGLE_VISIBILITY);
+    constructor(source: ToggleCenterVisibilitySource, visible?: boolean) {
+        super(Action.TOGGLE_CENTER_VISIBILITY);
 
         this.source = source;
         this.visible = visible;
@@ -112,7 +112,7 @@ export class BlurCenter extends CustomAction<Action.BLUR_CENTER> {
     }
 
     public async dispatch(store: StoreAPI): Promise<void> {
-        if (!store.state.windowLocked) {
+        if (!store.state.centerLocked) {
             toggleFilter.recordBlur();
             await store.dispatch({...this});
         }
@@ -125,7 +125,7 @@ export class ToggleLockCenter extends BaseAction<Action.TOGGLE_LOCK_CENTER> {
     }
 }
 
-export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility|BlurCenter|ToggleLockCenter;
+export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleCenterVisibility|BlurCenter|ToggleLockCenter;
 
 export type ActionOf<A> = RootAction extends {type: A} ? RootAction : never;
 export type ActionHandler<A> = (state: RootState, action: ActionOf<A>) => RootState;
@@ -173,24 +173,24 @@ export const ActionHandlers: ActionHandlerMap = {
             notifications: state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1)
         };
     },
-    [Action.TOGGLE_VISIBILITY]: (state: RootState, action: ToggleVisibility): RootState => {
-        const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
+    [Action.TOGGLE_CENTER_VISIBILITY]: (state: RootState, action: ToggleCenterVisibility): RootState => {
+        const centerVisible = (action.visible !== undefined) ? action.visible : !state.centerVisible;
 
         return {
             ...state,
-            windowVisible
+            centerVisible: centerVisible
         };
     },
     [Action.BLUR_CENTER]: (state: RootState, action: BlurCenter): RootState => {
         return {
             ...state,
-            windowVisible: false
+            centerVisible: false
         };
     },
     [Action.TOGGLE_LOCK_CENTER]: (state: RootState, action: ToggleLockCenter): RootState => {
         return {
             ...state,
-            windowLocked: !state.windowLocked
+            centerLocked: !state.centerLocked
         };
     }
 };
