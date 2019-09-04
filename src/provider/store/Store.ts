@@ -51,14 +51,12 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         return this._currentState;
     }
 
-    protected async init(): Promise<void> {}
-
     public async dispatch(action: A): Promise<void> {
         if (action instanceof AsyncAction) {
             // Action has custom dispatch logic
             await action.dispatch(this);
         }
-        this.reduceAndEmit(action);
+        this.reduceAndSignal(action);
     }
 
     public subscribe(listener: Listener<S>) {
@@ -72,11 +70,13 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         };
     }
 
+    protected async init(): Promise<void> {}
+
     protected setState(state: S): void {
         this._currentState = state;
     }
 
-    private async reduceAndEmit(action: A) {
+    private async reduceAndSignal(action: A) {
         // emit signal last
         this.reduce(action);
         await this.onAction.emit(action);
@@ -86,7 +86,4 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         this._currentState = action.reduce(this.state);
         this._listeners.forEach(listener => listener(() => this.getState()));
     }
-
-    private replaceReducer(nextReducer: Reducer<S>): void {}
-    private [Symbol.observable](): void {}
 }

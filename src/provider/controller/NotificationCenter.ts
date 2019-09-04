@@ -92,7 +92,7 @@ export class NotificationCenter extends AsyncInit {
 
     private async onAction(action: RootAction): Promise<void> {
         if (action instanceof ToggleVisibility) {
-            this.toggleWindow(action.visible || false);
+            this.toggleWindow(this._store.state.windowVisible);
         }
     }
 
