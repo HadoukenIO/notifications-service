@@ -65,7 +65,7 @@ export class ToastManager extends AsyncInit {
     public async create(notification: StoredNotification): Promise<void> {
         const state = this._store.state;
 
-        if (state.windowVisible) {
+        if (state.centerVisible) {
             return;
         }
 
@@ -125,7 +125,7 @@ export class ToastManager extends AsyncInit {
             this.removeToasts(...action.notifications);
         }
 
-        if (action.type === Action.TOGGLE_VISIBILITY) {
+        if (action.type === Action.TOGGLE_CENTER_VISIBILITY) {
             this.closeAll();
         }
     }
@@ -181,7 +181,7 @@ export class ToastManager extends AsyncInit {
     private subscribe(): void {
         // Notification Center Window open
         this._store.watchForChange(
-            state => state.windowVisible,
+            state => state.centerVisible,
             (previous: boolean, visible: boolean) => {
                 if (visible) {
                     this.closeAll();

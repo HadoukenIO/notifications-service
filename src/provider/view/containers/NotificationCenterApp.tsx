@@ -45,7 +45,7 @@ export function NotificationCenterApp(props: Props) {
 
 const mapStateToProps = (state: RootState, ownProps: Actionable) => ({
     notifications: state.notifications,
-    windowLocked: state.windowLocked,
+    windowLocked: state.centerLocked,
     ...ownProps
 });
 

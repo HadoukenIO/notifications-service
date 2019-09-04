@@ -3,7 +3,7 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 import {Inject} from '../common/Injectables';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
-import {ToggleVisibility, ToggleVisibilitySource, BlurCenter} from '../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
 import {Store} from '../store/Store';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
@@ -67,7 +67,7 @@ export class NotificationCenter extends AsyncInit {
         await this.hideWindowOffscreen();
         this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
         this._trayIcon.onLeftClick.add(() => {
-            this._store.dispatch(new ToggleVisibility(ToggleVisibilitySource.TRAY));
+            this._store.dispatch(new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY));
         });
         await this.sizeToFit();
         await this.addListeners();
@@ -82,7 +82,7 @@ export class NotificationCenter extends AsyncInit {
     private subscribe(): void {
         // Window visibility
         this._store.watchForChange(
-            state => state.windowVisible,
+            state => state.centerVisible,
             (_, value) => this.toggleWindow(value)
         );
     }
@@ -92,7 +92,7 @@ export class NotificationCenter extends AsyncInit {
      */
     public get visible(): boolean {
         const state = this._store.state;
-        return state.windowVisible;
+        return state.centerVisible;
     }
 
     /**

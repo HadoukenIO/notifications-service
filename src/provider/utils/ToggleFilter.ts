@@ -1,4 +1,4 @@
-import {ToggleVisibilitySource} from '../store/Actions';
+import {ToggleCenterVisibilitySource} from '../store/Actions';
 
 import {Timer} from './Timer';
 
@@ -35,8 +35,8 @@ export class ToggleFilter {
         }
     }
 
-    public recordToggle(source: ToggleVisibilitySource): boolean {
-        if (source === ToggleVisibilitySource.API || source === ToggleVisibilitySource.TRAY) {
+    public recordToggle(source: ToggleCenterVisibilitySource): boolean {
+        if (source === ToggleCenterVisibilitySource.API || source === ToggleCenterVisibilitySource.TRAY) {
             const running = this._toggleBlockTimer.running;
 
             // We only want to block a single toggle per-blur, so always clear timer
