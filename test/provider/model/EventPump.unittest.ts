@@ -29,7 +29,7 @@ describe('When pushing an event', () => {
         } as Targeted<Transport<NotificationClosedEvent>>;
 
         test('When one window is open, that window receives the event', () => {
-            mockClientRegistry.getAllAppWindows.mockImplementation((uuid: string) => {
+            mockClientRegistry.getConnectedWindowsByApp.mockImplementation((uuid: string) => {
                 return uuid === mockUuid ? [mockWindow1] : [];
             });
 
@@ -40,7 +40,7 @@ describe('When pushing an event', () => {
         });
 
         test('When multiple windows are open, all windows receive the event', () => {
-            mockClientRegistry.getAllAppWindows.mockImplementation((uuid: string) => {
+            mockClientRegistry.getConnectedWindowsByApp.mockImplementation((uuid: string) => {
                 return uuid === mockUuid ? [mockWindow1, mockWindow2] : [];
             });
 
@@ -52,14 +52,14 @@ describe('When pushing an event', () => {
         });
 
         test('When the app is not running, the event is discarded', () => {
-            mockClientRegistry.getAllAppWindows.mockReturnValue([]);
+            mockClientRegistry.getConnectedWindowsByApp.mockReturnValue([]);
 
             eventPump.push<NotificationClosedEvent>(mockUuid, mockNotificationClosedEvent);
 
             expect(mockApiHandler.dispatchEvent).toBeCalledTimes(0);
 
             // Start the app, and check the event is still not dispatched
-            mockClientRegistry.getAllAppWindows.mockImplementation((uuid: string) => {
+            mockClientRegistry.getConnectedWindowsByApp.mockImplementation((uuid: string) => {
                 return uuid === mockUuid ? [mockWindow1] : [];
             });
             mockClientRegistry.onAppActionReady.emit(mockWindow1);
@@ -74,7 +74,7 @@ describe('When pushing an event', () => {
         } as Targeted<Transport<NotificationActionEvent>>;
 
         test('When one window is open and the app is action-ready, that window receives the event', () => {
-            mockClientRegistry.getAllAppWindows.mockImplementation((uuid: string) => {
+            mockClientRegistry.getConnectedWindowsByApp.mockImplementation((uuid: string) => {
                 return uuid === mockUuid ? [mockWindow1] : [];
             });
 
@@ -89,7 +89,7 @@ describe('When pushing an event', () => {
         });
 
         test('When multiple windows are open, and the app is action-ready. all windows receive the event', () => {
-            mockClientRegistry.getAllAppWindows.mockImplementation((uuid: string) => {
+            mockClientRegistry.getConnectedWindowsByApp.mockImplementation((uuid: string) => {
                 return uuid === mockUuid ? [mockWindow1, mockWindow2] : [];
             });
 
@@ -105,7 +105,7 @@ describe('When pushing an event', () => {
         });
 
         test('When the app is running, but not action ready, and the event queued until the app is action-ready', () => {
-            mockClientRegistry.getAllAppWindows.mockReturnValue([]);
+            mockClientRegistry.getConnectedWindowsByApp.mockReturnValue([]);
             mockClientRegistry.isAppActionReady.mockReturnValue(false);
 
             eventPump.push<NotificationActionEvent>(mockUuid, mockNotificationActionEvent);
@@ -123,7 +123,7 @@ describe('When pushing an event', () => {
         });
 
         test('When the app is not running, the app will be started, the event will be queued until the app starts and is action-ready', () => {
-            mockClientRegistry.getAllAppWindows.mockReturnValue([]);
+            mockClientRegistry.getConnectedWindowsByApp.mockReturnValue([]);
             mockClientRegistry.isAppActionReady.mockReturnValue(false);
 
             eventPump.push<NotificationActionEvent>(mockUuid, mockNotificationActionEvent);
@@ -131,7 +131,7 @@ describe('When pushing an event', () => {
             expect(mockApiHandler.dispatchEvent).toBeCalledTimes(0);
 
             // Start the app, and check the event is dispatched
-            mockClientRegistry.getAllAppWindows.mockImplementation((uuid: string) => {
+            mockClientRegistry.getConnectedWindowsByApp.mockImplementation((uuid: string) => {
                 return uuid === mockUuid ? [mockWindow1] : [];
             });
             mockClientRegistry.isAppActionReady.mockImplementation((uuid: string) => {
