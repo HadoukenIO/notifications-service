@@ -6,13 +6,13 @@ import {WindowEvent} from 'hadouken-js-adapter/out/types/src/api/events/base';
 import {NotificationOptions, Notification, NotificationClosedEvent, NotificationCreatedEvent} from '../../src/client';
 
 import {createAppInServiceRealm} from './utils/spawnRemote';
-import {isCenterShowing} from './utils/centerUtils';
 import * as notifsRemote from './utils/notificationsRemote';
 import {delay, Duration} from './utils/delay';
 import {fin} from './utils/fin';
 import {getToastIdentity} from './utils/toastUtils';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import {setupCenterBookends, CenterState as CenterVisibility} from './common';
 
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',
@@ -29,27 +29,13 @@ const secondOptions: NotificationOptions = {
 };
 
 describe('When creating a notification with an ID that already exists but different options', () => {
-    describe.each([true, false])('Center showing: %p', showCenter => {
+    describe.each(['center-open', 'center-closed'] as CenterVisibility[])('Center showing: %s', centerVisibility => {
         let testApp: Application;
         let testWindow: Window;
 
         let existingNote: Notification;
 
-        beforeAll(async () => {
-            // Toggle the center on/off based on test type
-            if (await isCenterShowing() !== showCenter) {
-                await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-                await delay(Duration.CENTER_TOGGLED);
-            }
-        });
-
-        afterAll(async () => {
-            // Close center when we're done
-            if (await isCenterShowing()) {
-                await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-                await delay(Duration.CENTER_TOGGLED);
-            }
-        });
+        setupCenterBookends(centerVisibility);
 
         beforeEach(async () => {
             testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
@@ -108,7 +94,7 @@ describe('When creating a notification with an ID that already exists but differ
         });
 
         // Extra tests for toasts only when the center is hidden
-        if (!showCenter) {
+        if (centerVisibility === 'center-closed') {
             describe('When the existing notification has an active toast', () => {
                 let finOpenListener: jest.Mock<void, [WindowEvent<'system', 'window-created'>]>;
                 let finCloseListener: jest.Mock<void, [WindowEvent<'system', 'window-closed'>]>;

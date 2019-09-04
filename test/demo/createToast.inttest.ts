@@ -13,6 +13,7 @@ import {assertNotificationStored} from './utils/storageRemote';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {assertHydratedCorrectly} from './utils/hydrateNotification';
+import {setupClosedCenterBookends} from './common';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
@@ -27,13 +28,7 @@ describe('When calling createNotification with the Notification Center not showi
     let createPromise: Promise<Notification>;
     let note: Notification;
 
-    beforeAll(async () => {
-        // Ensure center is not showing
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
+    setupClosedCenterBookends();
 
     beforeEach(async () => {
         testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
