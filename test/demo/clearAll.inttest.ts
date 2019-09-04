@@ -2,14 +2,14 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
-import {getAllCenterCards} from '../utils/int/centerUtils';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 import {delay, Duration} from '../utils/int/delay';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
-import {getAllToastWindows} from '../utils/int/toastUtils';
 import {setupCenterBookends, CenterState} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
+import {getCenterCardsByApp} from '../utils/int/centerUtils';
+import {getToastWindowsByApp} from '../utils/int/toastUtils';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -116,12 +116,12 @@ describe.each([
 
         if (centerVisibility === 'center-open') {
             test('The Notification Center contains no cards', async () => {
-                await expect(getAllCenterCards()).resolves.toHaveLength(0);
+                await expect(getCenterCardsByApp(testApp.identity.uuid)).resolves.toHaveLength(0);
             });
         } else {
             test('No toast windows are showing', async () => {
                 await delay(Duration.TOAST_CLOSE);
-                await expect(getAllToastWindows()).resolves.toHaveLength(0);
+                await expect(getToastWindowsByApp(testApp.identity.uuid)).resolves.toHaveLength(0);
             });
         }
 

@@ -2,12 +2,12 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
-import {getAllCenterCards, getCenterCardsByNotification} from '../utils/int/centerUtils';
+import {getCenterCardsByNotification, getCenterCardsByApp} from '../utils/int/centerUtils';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 import {delay, Duration} from '../utils/int/delay';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
-import {getAllToastWindows, getToastWindow} from '../utils/int/toastUtils';
+import {getToastWindow, getToastWindowsByApp} from '../utils/int/toastUtils';
 import {setupCenterBookends, CenterState} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
@@ -121,7 +121,7 @@ describe.each([
 
         if (centerVisibility === 'center-open') {
             test('The expected card has been removed from the Notification Center', async () => {
-                await expect(getAllCenterCards()).resolves.toHaveLength(notes.length - 1);
+                await expect(getCenterCardsByApp(testApp.identity.uuid)).resolves.toHaveLength(notes.length - 1);
 
                 await expect(getCenterCardsByNotification(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual([]);
 
@@ -133,7 +133,7 @@ describe.each([
             test('The expected toast has been removed', async () => {
                 await delay(Duration.TOAST_CLOSE);
 
-                await expect(getAllToastWindows()).resolves.toHaveLength(notes.length - 1);
+                await expect(getToastWindowsByApp(testApp.identity.uuid)).resolves.toHaveLength(notes.length - 1);
 
                 await expect(getToastWindow(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual(undefined);
 
