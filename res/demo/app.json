@@ -16,7 +16,6 @@
         }
     ],
     "runtime": {
-        "arguments": "--v=1 --enable-crash-reporting",
         "version": "10.66.39.43"
     },
     "shortcut": {}

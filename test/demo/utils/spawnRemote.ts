@@ -3,6 +3,7 @@ import {createApp as createAppRemote, createWindow as createWindowRemote} from '
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 import {fin} from './fin';
+import {serviceRealm} from './constants';
 
 interface SpawnEnabledContext extends BaseWindowContext {
     createWindow: CreateWindowType,
@@ -19,6 +20,17 @@ export async function createApp(executionTarget: Identity, ...spawnArgs: Paramet
         return remoteApp.identity;
     }, ...spawnArgs);
     return fin.Application.wrapSync(identity);
+}
+
+/**
+ * A helper function that wraps `createApp` to spawn a new application in the same security realm as the provider.
+ *
+ * @param executionTarget The remote window that will run the spawn code.
+ * @param options The options for the created app. These are the same options as `createApp` but any given values
+ * for `realm` or `enableMesh` will be ignored.
+ */
+export async function createAppInServiceRealm(executionTarget: Identity, options: Parameters<CreateAppType>[0]): Promise<Application> {
+    return createApp(executionTarget, {...options, ...{realm: serviceRealm, enableMesh: true}});
 }
 
 export async function createWindow(executionTarget: Identity, ...spawnArgs: Parameters<CreateWindowType>): Promise<Window> {
