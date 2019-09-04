@@ -4,7 +4,6 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {WindowEvent} from 'hadouken-js-adapter/out/types/src/api/events/base';
 
 import {NotificationOptions, Notification, NotificationClosedEvent, NotificationCreatedEvent} from '../../src/client';
-import {createApp} from '../utils/int/spawnRemote';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {delay, Duration} from '../utils/int/delay';
 import {fin} from '../utils/int/fin';
@@ -12,6 +11,7 @@ import {getToastIdentity} from '../utils/int/toastUtils';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',
@@ -37,7 +37,7 @@ describe('When creating a notification with an ID that already exists but differ
         setupCenterBookends(centerVisibility);
 
         beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+            testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
             testWindow = await testApp.getWindow();
 
             // Quick sanity check that there is not already a notification with that ID

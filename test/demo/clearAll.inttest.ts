@@ -5,11 +5,11 @@ import {ActionTrigger} from '../../src/client/actions';
 import {getAllCenterCards} from '../utils/int/centerUtils';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 import {delay, Duration} from '../utils/int/delay';
-import {createApp} from '../utils/int/spawnRemote';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {getAllToastWindows} from '../utils/int/toastUtils';
 import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
@@ -86,7 +86,7 @@ describe.each([
     setupCenterBookends(centerVisibility);
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
 
         actionListener = jest.fn<void, [NotificationActionEvent]>();

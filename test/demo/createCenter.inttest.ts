@@ -3,7 +3,6 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
-import {createApp} from '../utils/int/spawnRemote';
 import {getCenterCardsByNotification} from '../utils/int/centerUtils';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/int/storageRemote';
@@ -13,6 +12,7 @@ import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
 import {setupOpenCenterBookends} from '../utils/int/common';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;
@@ -21,7 +21,7 @@ describe('When creating a notification with the center showing', () => {
     setupOpenCenterBookends();
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
     });
 
