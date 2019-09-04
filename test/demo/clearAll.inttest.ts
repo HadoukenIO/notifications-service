@@ -4,7 +4,7 @@ import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationAc
 import {ActionTrigger} from '../../src/client/actions';
 
 import {getCenterCardsByApp} from './utils/centerUtils';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import {testManagerIdentity, testAppUrlDefault} from './utils/constants';
 import {delay, Duration} from './utils/delay';
 import {createAppInServiceRealm} from './utils/spawnRemote';
 import * as notifsRemote from './utils/notificationsRemote';
@@ -87,7 +87,7 @@ describe.each([
     setupCenterBookends(centerVisibility);
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
 
         actionListener = jest.fn<void, [NotificationActionEvent]>();
