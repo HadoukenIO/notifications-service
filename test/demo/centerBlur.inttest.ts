@@ -3,7 +3,7 @@ import {Application, Window} from 'hadouken-js-adapter';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
 import {createApp} from '../utils/int/spawnRemote';
-import {isCenterShowing} from '../utils/int/centerUtils';
+import {isCenterShowing, getCenterCloseButton} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
 import {getDomElementById} from '../utils/int/dom';
 
@@ -49,5 +49,14 @@ describe('When the Notification Center is open', () => {
 
         await delay(Duration.EVENT_PROPAGATED);
         await expect(isCenterShowing()).resolves.toBe(false);
+    });
+
+    test('The Notificiation Center is closed when its close button is clicked', async () => {
+        const closeButton = await getCenterCloseButton();
+
+        await closeButton.click();
+
+        await delay(Duration.EVENT_PROPAGATED);
+        expect(isCenterShowing()).resolves.toBe(false);
     });
 });
