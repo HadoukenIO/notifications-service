@@ -89,42 +89,44 @@ describe('When querying windows', () => {
         expect(clientRegistry.getConnectedWindowsByApp(mockUuid1)).toEqual([mockApp1Window1]);
     });
 
-    test('When querying if an app is action-ready, the expected value is returned', () => {
+    test('Apps start not action-ready', () => {
         expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(false);
-        expect(clientRegistry.isAppActionReady(mockUuid2)).toBe(false);
+    });
 
-        // One app becomes action-ready
+    test('When a window adds an action listener, its app, and only its app, becomes action-ready', () => {
         clientRegistry.onAddEventListener('notification-action', mockApp1Window1);
+
         expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(true);
-        expect(clientRegistry.isAppActionReady(mockUuid2)).toBe(false);
-
-        // Second app becomes action-ready
-        clientRegistry.onAddEventListener('notification-action', mockApp2Window1);
-        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(true);
-        expect(clientRegistry.isAppActionReady(mockUuid2)).toBe(true);
-
-        // First app adds another action-ready window
-        clientRegistry.onAddEventListener('notification-action', mockApp1Window2);
-        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(true);
-        expect(clientRegistry.isAppActionReady(mockUuid2)).toBe(true);
-
-        // First app's first window becomes non-action-ready
-        clientRegistry.onRemoveEventListener('notification-action', mockApp1Window1);
-        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(true);
-        expect(clientRegistry.isAppActionReady(mockUuid2)).toBe(true);
-
-        // First app's second window becomes non-action-ready
-        clientRegistry.onRemoveEventListener('notification-action', mockApp1Window2);
-        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(false);
-        expect(clientRegistry.isAppActionReady(mockUuid2)).toBe(true);
-
-        // Seconds app's window becomes non-action-ready
-        clientRegistry.onRemoveEventListener('notification-action', mockApp2Window1);
-        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(false);
         expect(clientRegistry.isAppActionReady(mockUuid2)).toBe(false);
     });
 
-    test('When querying if an app is action-ready, non-action listeners are ignored', () => {
+    test('When a window removes its action listener, and it is an app\'s only window, the app becomes not action-ready', () => {
+        clientRegistry.onAddEventListener('notification-action', mockApp1Window1);
+        clientRegistry.onRemoveEventListener('notification-action', mockApp1Window1);
+
+        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(false);
+    });
+
+    test('When two windows of the same app add an action listener, and then one removes its action listener, the app stays action-ready', () => {
+        clientRegistry.onAddEventListener('notification-action', mockApp1Window1);
+        clientRegistry.onAddEventListener('notification-action', mockApp1Window2);
+
+        clientRegistry.onRemoveEventListener('notification-action', mockApp1Window1);
+
+        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(true);
+    });
+
+    test('When two windows of the same app add an action listener, and then both removes their action listener, the app becomes not action-ready', () => {
+        clientRegistry.onAddEventListener('notification-action', mockApp1Window1);
+        clientRegistry.onAddEventListener('notification-action', mockApp1Window2);
+
+        clientRegistry.onRemoveEventListener('notification-action', mockApp1Window1);
+        clientRegistry.onRemoveEventListener('notification-action', mockApp1Window2);
+
+        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(false);
+    });
+
+    test('When a window adds a non-action listener, the app stays not action-ready', () => {
         clientRegistry.onAddEventListener('notification-closed', mockApp1Window1);
 
         expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(false);
