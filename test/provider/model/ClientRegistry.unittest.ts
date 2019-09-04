@@ -86,7 +86,7 @@ describe('When querying windows', () => {
     test('When querying windows for a given app, the expected connected windows are returned', () => {
         mockApiHandler.getClientConnections.mockReturnValue([mockApp1Window1, mockApp2Window1]);
 
-        expect(clientRegistry.getAllAppWindows(mockUuid1)).toEqual([mockApp1Window1]);
+        expect(clientRegistry.getConnectedWindowsByApp(mockUuid1)).toEqual([mockApp1Window1]);
     });
 
     test('When querying if an app is action-ready, the expected value is returned', () => {

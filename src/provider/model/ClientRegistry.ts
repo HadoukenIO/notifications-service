@@ -64,7 +64,7 @@ export class ClientRegistry {
         return this._actionReadyWindows.some(client => client.uuid === appUuid);
     }
 
-    public getAllAppWindows(uuid: string): Identity[] {
+    public getConnectedWindowsByApp(uuid: string): Identity[] {
         return this._apiHandler.getClientConnections().filter((client: Identity) => client.uuid === uuid);
     }
 
