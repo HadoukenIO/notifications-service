@@ -7,7 +7,7 @@ import {ToggleVisibility} from '../store/Actions';
 import {Store} from '../store/Store';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
-import {TrayIcon} from '../common/TrayIcon';
+import {TrayIcon} from '../model/TrayIcon';
 
 import {AsyncInit} from './AsyncInit';
 

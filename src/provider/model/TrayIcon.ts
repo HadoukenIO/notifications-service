@@ -5,7 +5,7 @@ export interface TrayIcon {
     onLeftClick: Signal<[]>;
     onRightClick: Signal<[]>;
 
-    setIcon(url: string): void;
+    setIcon(url: string): Promise<void>;
 
     getInfo(): Promise<TrayInfo>;
 }

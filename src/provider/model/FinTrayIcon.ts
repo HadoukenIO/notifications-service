@@ -22,8 +22,8 @@ export class FinTrayIcon implements TrayIcon {
         this.addListeners();
     }
 
-    public setIcon(url: string) {
-        this._application.setTrayIcon(url);
+    public async setIcon(url: string): Promise<void> {
+        return this._application.setTrayIcon(url);
     }
 
     /**

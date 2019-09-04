@@ -6,7 +6,7 @@ import {Notification, NotificationOptions, NotificationCreatedEvent, Notificatio
 import * as notifsRemote from './utils/notificationsRemote';
 import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
 import {delay, Duration} from './utils/delay';
-import {createApp} from './utils/spawnRemote';
+import {createAppInServiceRealm} from './utils/spawnRemote';
 import {testManagerIdentity, testAppUrlDefault} from './utils/constants';
 
 const defaultNoteOptions: NotificationOptions = {
@@ -14,6 +14,7 @@ const defaultNoteOptions: NotificationOptions = {
     title: 'Test Notification Title',
     category: 'Test Notification Category',
     onSelect: {task: 'select'},
+    onClose: {task: 'close'},
     buttons: [
         {title: 'Button 1', onClick: {task: 'click'}}
     ]
@@ -31,7 +32,7 @@ describe('Click listeners', () => {
         let testApp: Application;
         let testAppMainWindow: FinWindow;
         beforeEach(async () => {
-            testApp = await createApp(testManagerIdentity, {url: testAppUrlDefault});
+            testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
             testAppMainWindow = await testApp.getWindow();
         });
 
@@ -41,6 +42,7 @@ describe('Click listeners', () => {
         });
 
         describe('With a notification in the center and all three listener types registered', () => {
+            let eventOrdering: string[];
             let createdListener: jest.Mock<void, [NotificationCreatedEvent]>;
             let actionListener: jest.Mock<void, [NotificationActionEvent]>;
             let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
@@ -48,9 +50,10 @@ describe('Click listeners', () => {
 
             beforeEach(async () => {
                 // Register the listeners
-                createdListener = jest.fn<void, [NotificationCreatedEvent]>();
-                actionListener = jest.fn<void, [NotificationActionEvent]>();
-                closedListener = jest.fn<void, [NotificationClosedEvent]>();
+                eventOrdering = [];
+                createdListener = jest.fn<void, [NotificationCreatedEvent]>().mockImplementation(() => eventOrdering.push('created'));
+                actionListener = jest.fn<void, [NotificationActionEvent]>().mockImplementation(() => eventOrdering.push('action'));
+                closedListener = jest.fn<void, [NotificationClosedEvent]>().mockImplementation(() => eventOrdering.push('closed'));
                 await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-created', createdListener);
                 await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-action', actionListener);
                 await notifsRemote.addEventListener(testAppMainWindow.identity, 'notification-closed', closedListener);
@@ -123,15 +126,25 @@ describe('Click listeners', () => {
                 });
 
                 test('The closeListener is called once with the correct metadata the other listeners are not called', async () => {
+                    expect(actionListener).toHaveBeenCalledTimes(1);
+                    expect(actionListener).toHaveBeenCalledWith({
+                        type: 'notification-action',
+                        notification: {...note, date: note.date.toJSON()},
+                        trigger: 'close',
+                        result: {task: 'close'}
+                    });
+
                     expect(closedListener).toHaveBeenCalledTimes(1);
                     expect(closedListener).toHaveBeenCalledWith({
                         type: 'notification-closed',
                         notification: {...note, date: note.date.toJSON()}
                     });
 
-                    // No 'action', or additional 'created', events
+                    // Action event fired before closed event
+                    expect(eventOrdering).toEqual(['created', 'action', 'closed']);
+
+                    // No additional 'created' events
                     expect(createdListener).toHaveBeenCalledTimes(1);
-                    expect(actionListener).toHaveBeenCalledTimes(0);
                 });
 
                 test('The notification is cleared and no longer appears in the center or when calling getAll', async () => {

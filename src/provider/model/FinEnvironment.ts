@@ -18,18 +18,17 @@ export class FinEnvironment implements Environment {
     public async getApplication(uuid: string): Promise<StoredApplication> {
         const info = await fin.Application.wrapSync({uuid}).getInfo();
         const isProgrammatic: boolean = !!info.parentUuid;
-        const application: StoredApplication = isProgrammatic ? {
+
+        return isProgrammatic ? {
             type: 'programmatic',
             id: uuid,
-            initialOptions: info.initialOptions as ApplicationOption,
+            initialOptions: info.initialOptions as ApplicationOption, // TODO: Use updated type so cast is unecessary [SERVICE-601]
             parentUuid: info.parentUuid!
         } : {
             type: 'manifest',
             id: uuid,
             manifestUrl: info.manifestUrl
         };
-
-        return application;
     }
 
     public async startApplication(application: StoredApplication): Promise<void> {
@@ -52,7 +51,7 @@ export class FinEnvironment implements Environment {
             finApplication.run();
         } catch (error) {
             this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== application.id);
-            console.error(error.message);
+            console.error(`Error starting app ${application.id} [${error.message}]`);
         }
     }
 }

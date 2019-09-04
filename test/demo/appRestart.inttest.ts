@@ -9,8 +9,8 @@ import * as notifsRemote from './utils/notificationsRemote';
 import * as providerRemote from './utils/providerRemote';
 import {delay, Duration} from './utils/delay';
 import {getToastCards} from './utils/toastUtils';
-import {createApp} from './utils/spawnRemote';
-import {testManagerIdentity, testAppUrlDefault, testAppUrlListenersOnStartup} from './utils/constants';
+import {createAppInServiceRealm} from './utils/spawnRemote';
+import {testManagerIdentity, testAppUrlListenersOnStartup} from './utils/constants';
 import {waitForAppToBeRunning} from './utils/common';
 
 const relaunchNotificationOptions: NotificationOptions = {
@@ -33,7 +33,7 @@ describe('When an app that uses notification-service is created', () => {
     let testWindow: Window;
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: testAppUrlListenersOnStartup});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlListenersOnStartup});
         testWindow = await testApp.getWindow();
     });
 

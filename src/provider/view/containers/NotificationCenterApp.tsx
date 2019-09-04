@@ -55,7 +55,10 @@ const Container = connect(mapStateToProps)(NotificationCenterApp);
  * @param store The store to retrieve data from.
  */
 export function renderApp(webWindow: WebWindow, store: Store): void {
-    webWindow.render(<Provider store={store['_store']}>
-        <Container storeDispatch={store.dispatch.bind(store)} />
-    </Provider>);
+    ReactDOM.render(
+        <Provider store={store['_store']}>
+            <Container storeDispatch={store.dispatch.bind(store)} />
+        </Provider>,
+        webWindow.document.getElementById('react-app')
+    );
 }
