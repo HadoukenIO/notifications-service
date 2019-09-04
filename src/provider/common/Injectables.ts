@@ -9,11 +9,15 @@ enum Injectable {
     API_HANDLER,
     CLIENT_REGISTRY,
     DATABASE,
+    ENVIRONMENT,
     EVENT_PUMP,
     LAYOUTER,
+    MONITOR_MODEL,
     NOTIFICATION_CENTER,
     STORE,
-    TOAST_MANAGER
+    TOAST_MANAGER,
+    TRAY_ICON,
+    WEB_WINDOW_FACTORY
 }
 
 type InjectableMap = {
