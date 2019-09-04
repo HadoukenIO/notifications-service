@@ -13,7 +13,7 @@ import {NotificationActionResult, ActionTrigger} from './actions';
 
 import {NotificationOptions, Notification, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
 
-type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+export type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
 
 /**
  * The identity of the main application window of the service provider

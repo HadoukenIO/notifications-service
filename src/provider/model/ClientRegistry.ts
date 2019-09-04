@@ -1,5 +1,4 @@
-import {Identity, Application} from 'openfin/_v2/main';
-import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
+import {Identity} from 'openfin/_v2/main';
 import {injectable, inject} from 'inversify';
 import {Signal} from 'openfin-service-signal';
 
@@ -8,21 +7,7 @@ import {Inject} from '../common/Injectables';
 
 import {APIHandler} from './APIHandler';
 import {CollectionMap, Database} from './database/Database';
-
-export type StoredApplication = ProgrammaticApplication | ManifestApplication;
-
-type ProgrammaticApplication = {
-    type: 'programmatic';
-    id: string;
-    initialOptions: ApplicationOption;
-    parentUuid: string;
-}
-
-type ManifestApplication = {
-    type: 'manifest';
-    id: string;
-    manifestUrl: string;
-}
+import {Environment, StoredApplication} from './Environment';
 
 /**
  * Client registry is responsible for keeping track of active clients, storing information about them
@@ -34,14 +19,21 @@ export class ClientRegistry {
 
     private readonly _apiHandler: APIHandler<APITopic, Events>;
     private readonly _database: Database;
-    private _activeClients: Identity[] = [];
-    private _startingUpAppUuids: string[] = [];
+    private readonly _environment: Environment;
 
-    constructor(@inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>, @inject(Inject.DATABASE) database: Database) {
+    private _activeClients: Identity[] = [];
+
+    constructor(
+        @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
+        @inject(Inject.DATABASE) database: Database,
+        @inject(Inject.ENVIRONMENT) environment: Environment
+    ) {
         this._apiHandler = apiHandler;
         this._apiHandler.onConnection.add(this.onClientConnection, this);
         this._apiHandler.onDisconnection.add(this.removeActiveClient, this);
+
         this._database = database;
+        this._environment = environment;
     }
 
     /**
@@ -50,30 +42,13 @@ export class ClientRegistry {
      * @param appUuid Uuid of target client.
      */
     public async tryLaunchApplication(appUuid: string): Promise<void> {
-        if (this._startingUpAppUuids.some(startingUuid => startingUuid === appUuid)) {
-            return;
-        }
-        this._startingUpAppUuids.push(appUuid);
-        const isRunning = await fin.Application.wrapSync({uuid: appUuid}).isRunning();
+        const isRunning = await this._environment.isApplicationRunning(appUuid);
+
         if (!isRunning) {
             const collection = this._database.get(CollectionMap.APPLICATIONS);
             const storedApplication = await collection.get(appUuid);
             if (storedApplication) {
-                try {
-                    let application;
-                    if (storedApplication.type === 'manifest') {
-                        application = await fin.Application.createFromManifest(storedApplication.manifestUrl);
-                    } else {
-                        application = await fin.Application.create(storedApplication.initialOptions);
-                    }
-                    await application.addListener('initialized', (event) => {
-                        this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== event.uuid);
-                    });
-                    application.run();
-                } catch (error) {
-                    this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== appUuid);
-                    console.error(error.message);
-                }
+                await this._environment.startApplication(storedApplication);
             } else {
                 console.warn('Could not find application initialization data for the application with uuid ' + appUuid + ' in the database.');
             }
@@ -109,20 +84,10 @@ export class ClientRegistry {
     }
 
     private async onClientConnection(app: Identity): Promise<void> {
-        const info = await fin.Application.wrapSync(app).getInfo();
-        const isProgrammatic: boolean = !!info.parentUuid;
-        const entry: StoredApplication = isProgrammatic ? {
-            type: 'programmatic',
-            id: app.uuid,
-            initialOptions: info.initialOptions as ApplicationOption,
-            parentUuid: info.parentUuid!
-        } : {
-            type: 'manifest',
-            id: app.uuid,
-            manifestUrl: info.manifestUrl
-        };
+        const application: StoredApplication = await this._environment.getApplication(app.uuid);
+
         const collection = this._database.get(CollectionMap.APPLICATIONS);
-        await collection.upsert(entry);
+        await collection.upsert(application);
     }
 
     private removeActiveClient(client: Identity): void {

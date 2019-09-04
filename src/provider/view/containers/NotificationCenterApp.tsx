@@ -8,6 +8,7 @@ import {NotificationView} from '../components/NotificationView/NotificationView'
 import {RootState} from '../../store/State';
 import {RootAction} from '../../store/Actions';
 import {ServiceStore} from '../../store/ServiceStore';
+import {WebWindow} from '../../model/WebWindow';
 
 export enum GroupingType {
     APPLICATION = 'Application',
@@ -50,14 +51,14 @@ const Container = connect(mapStateToProps)(NotificationCenterApp);
 
 /**
  * Render the Notification Center app in the given window.
- * @param document The window.document to render to.
+ * @param webWindow The web window to render to
  * @param store The store to retrieve data from.
  */
-export function renderApp(document: Document, store: ServiceStore): void {
+export function renderApp(webWindow: WebWindow, store: ServiceStore): void {
     ReactDOM.render(
         <Provider store={store as any}>
             <Container storeDispatch={store.dispatch.bind(store)} />
         </Provider>,
-        document.getElementById('react-app')
+        webWindow.document.getElementById('react-app')
     );
 }

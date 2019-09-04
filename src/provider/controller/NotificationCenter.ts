@@ -1,13 +1,13 @@
 import {injectable, inject} from 'inversify';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
-import {MonitorEvent} from 'openfin/_v2/api/events/system';
 
 import {Inject} from '../common/Injectables';
-import {TrayIcon} from '../common/TrayIcon';
-import {WebWindow, createWebWindow} from '../model/WebWindow';
+import {WebWindow, WebWindowFactory} from '../model/WebWindow';
 import {ToggleVisibility, RootAction} from '../store/Actions';
-import {renderApp} from '../view/containers/NotificationCenterApp';
 import {ServiceStore} from '../store/ServiceStore';
+import {renderApp} from '../view/containers/NotificationCenterApp';
+import {MonitorModel} from '../model/MonitorModel';
+import {TrayIcon} from '../model/TrayIcon';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -32,35 +32,47 @@ const windowOptions: WindowOption = {
 export class NotificationCenter extends AsyncInit {
     private static readonly WIDTH: number = 388;
 
+    private readonly _monitorModel: MonitorModel;
     private readonly _store: ServiceStore;
+    private readonly _trayIcon: TrayIcon;
+    private readonly _webWindowFactory: WebWindowFactory;
 
     private _webWindow!: WebWindow;
-    private _trayIcon!: TrayIcon;
 
-    constructor(@inject(Inject.STORE) store: ServiceStore) {
+    public constructor(
+        @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
+        @inject(Inject.STORE) store: ServiceStore,
+        @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
+        @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
+    ) {
         super();
+
+        this._monitorModel = monitorModel;
         this._store = store;
         this._store.onAction.add(this.onAction, this);
+        this._trayIcon = trayIcon;
+        this._webWindowFactory = webWindowFactory;
     }
 
     protected async init() {
         await this._store.initialized;
+        await this._monitorModel.initialized;
 
         // Create notification center app window
         try {
-            this._webWindow = await createWebWindow(windowOptions);
+            this._webWindow = await this._webWindowFactory.createWebWindow(windowOptions);
         } catch (error) {
             console.error('Notification Center window could not be created!', error.message);
             throw error;
         }
         await this.hideWindowOffscreen();
-        this._trayIcon = new TrayIcon('https://openfin.co/favicon-32x32.png');
-        this._trayIcon.addLeftClickHandler(() => {
+        this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
+        this._trayIcon.onLeftClick.add(() => {
             this._store.dispatch(new ToggleVisibility());
         });
         await this.sizeToFit();
         await this.addListeners();
-        renderApp(this._webWindow.document, this._store);
+        renderApp(this._webWindow, this._store);
     }
 
     /**
@@ -75,19 +87,19 @@ export class NotificationCenter extends AsyncInit {
      * Add listeners to the window.
      */
     private async addListeners(): Promise<void> {
-        const {window} = this._webWindow;
         const hideOnBlur = false;
 
         if (hideOnBlur) {
-            window.addListener('blurred', async () => {
+            this._webWindow.onBlurred.add(async () => {
                 if (this.visible) {
                     this._store.dispatch(new ToggleVisibility(false));
                 }
             });
         }
-        fin.System.addListener('monitor-info-changed', ((event: MonitorEvent<string, string>) => {
+
+        this._monitorModel.onMonitorInfoChanged.add(() => {
             this.sizeToFit();
-        }));
+        });
     }
 
     private async onAction(action: RootAction): Promise<void> {
@@ -100,10 +112,9 @@ export class NotificationCenter extends AsyncInit {
      * Show the window.
      */
     public async showWindow(): Promise<void> {
-        const {window} = this._webWindow;
-        await window.show();
+        await this._webWindow.show();
         await this.animateIn();
-        await window.setAsForeground();
+        await this._webWindow.setAsForeground();
     }
 
     /**
@@ -119,11 +130,10 @@ export class NotificationCenter extends AsyncInit {
      * Sets the window dimensions in shape of a side bar
      */
     public async sizeToFit(): Promise<void> {
-        const {window} = this._webWindow;
         const idealWidth = NotificationCenter.WIDTH;
         await this.hideWindow(true);
-        const monitorInfo = await fin.System.getMonitorInfo();
-        return window.setBounds({
+        const monitorInfo = this._monitorModel.monitorInfo;
+        return this._webWindow.setBounds({
             left: monitorInfo.primaryMonitor.availableRect.right - idealWidth,
             top: 0,
             width: idealWidth,
@@ -132,11 +142,10 @@ export class NotificationCenter extends AsyncInit {
     }
 
     private async hideWindowOffscreen() {
-        const {window} = this._webWindow;
-        const {virtualScreen, primaryMonitor} = await fin.System.getMonitorInfo();
+        const {virtualScreen, primaryMonitor} = this._monitorModel.monitorInfo;
         const height = primaryMonitor.availableRect.bottom;
-        await window.showAt(virtualScreen.left - NotificationCenter.WIDTH * 2, virtualScreen.top - height * 2);
-        await window.hide();
+        await this._webWindow.showAt(virtualScreen.left - NotificationCenter.WIDTH * 2, virtualScreen.top - height * 2);
+        await this._webWindow.hide();
     }
 
     /**
@@ -156,9 +165,7 @@ export class NotificationCenter extends AsyncInit {
      * @param duration Animation duration.
      */
     private async animateIn(duration: number = 300): Promise<void> {
-        const {window} = this._webWindow;
-
-        window.animate(
+        this._webWindow.animate(
             {
                 opacity: {
                     opacity: 1,
@@ -177,9 +184,7 @@ export class NotificationCenter extends AsyncInit {
      * @param duration Animation duration.
      */
     private async animateOut(duration: number = 400): Promise<void> {
-        const {window} = this._webWindow;
-
-        window.animate(
+        this._webWindow.animate(
             {
                 opacity: {
                     opacity: 0,

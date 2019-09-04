@@ -7,6 +7,7 @@ import {NotificationCard} from '../components/NotificationCard/NotificationCard'
 import {WindowDimensions} from '../../controller/Layouter';
 import {RootState} from '../../store/State';
 import {ServiceStore} from '../../store/ServiceStore';
+import {WebWindow} from '../../model/WebWindow';
 
 import {Actionable} from './NotificationCenterApp';
 
@@ -53,7 +54,7 @@ const Container = connect(mapStateToProps)(ToastApp);
 
 export function renderApp(
     notification: StoredNotification,
-    document: Document,
+    webWindow: WebWindow,
     store: ServiceStore,
     setWindowSize: (dim: WindowDimensions) => void
 ) {
@@ -61,6 +62,6 @@ export function renderApp(
         <Provider store={store as any}>
             <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
-        document.getElementById('react-app')
+        webWindow.document.getElementById('react-app')
     );
 }
