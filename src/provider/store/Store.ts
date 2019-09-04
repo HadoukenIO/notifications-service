@@ -47,16 +47,12 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         return this._currentState;
     }
 
-    public getState(): S {
-        return this._currentState;
-    }
-
     public async dispatch(action: A): Promise<void> {
         if (action instanceof AsyncAction) {
             // Action has custom dispatch logic
             await action.dispatch(this);
         }
-        this.reduceAndSignal(action);
+        return this.reduceAndSignal(action);
     }
 
     public subscribe(listener: Listener<S>) {
@@ -76,10 +72,14 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         this._currentState = state;
     }
 
-    private async reduceAndSignal(action: A) {
+    private getState(): S {
+        return this._currentState;
+    }
+
+    private reduceAndSignal(action: A): Promise<void> {
         // emit signal last
         this.reduce(action);
-        await this.onAction.emit(action);
+        return this.onAction.emit(action);
     }
 
     private reduce(action: A): void {
