@@ -154,56 +154,5 @@
         flex-direction: row;
         border-top: var(--card-border-color) solid 1px;
 
-        .button {
-            display: inline-block;
-            padding: 12px 8px;
-            text-align: center;
-            vertical-align: middle;
-            user-select: none;
-            cursor: pointer;
-            border-right: 1px var(--card-border-color) solid;
-            transition: background-color 0.1s ease-in-out;
-            line-height: 16px;
-            align-content: center;
-            justify-content: center;
-            flex: 1;
-            flex-grow: 1;
-            width: 100%;
-            min-width: 40px;
-
-            &:hover {
-                transition: background-color 0.2s ease-in-out;
-                background-color: var(--accent-color);
-                text-shadow: #111 2px 1px 2px;
-            }
-
-            &:last-of-type {
-                border-right: none;
-            }
-
-            .value {
-                display: flex;
-                align-content: center;
-                justify-content: center;
-
-                &>* {
-                    vertical-align: middle;
-                }
-
-                span {
-                    height: 100%;
-                    text-transform: capitalize;
-                    font-size: 14px;
-                    font-weight: 600;
-                }
-
-                img {
-                    width: 16px;
-                    height: 16px;
-                    min-width: 16px;
-                    margin-right: 6px;
-                }
-            }
-        }
     }
 }
