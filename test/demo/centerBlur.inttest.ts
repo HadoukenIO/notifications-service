@@ -2,7 +2,7 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
-import {createApp} from '../utils/int/spawnRemote';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 import {isCenterShowing, getCenterCloseButton} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
 import {getDomElementById} from '../utils/int/dom';
@@ -20,7 +20,7 @@ describe('When the Notification Center is open', () => {
     });
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
 
         // Ensure center is showing
@@ -35,7 +35,7 @@ describe('When the Notification Center is open', () => {
         await testApp.quit();
     });
 
-    test('The Notification Center is closed when it loses focus', async () => {
+    test.only('The Notification Center is closed when it loses focus', async () => {
         await testWindow.focus();
         await delay(Duration.EVENT_PROPAGATED);
         await expect(isCenterShowing()).resolves.toBe(false);
