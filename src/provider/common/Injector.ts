@@ -9,7 +9,17 @@ import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
 import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
 import {Store} from '../store/Store';
+import {EventPump} from '../model/EventPump';
+import {ClientRegistry} from '../model/ClientRegistry';
 import {Database} from '../model/database/Database';
+import {FinMonitorModel} from '../model/FinMonitorModel';
+import {MonitorModel} from '../model/MonitorModel';
+import {WebWindowFactory} from '../model/WebWindow';
+import {FinWebWindowFactory} from '../model/FinWebWindow';
+import {Environment} from '../model/Environment';
+import {FinEnvironment} from '../model/FinEnvironment';
+import {TrayIcon} from '../model/TrayIcon';
+import {FinTrayIcon} from '../model/FinTrayIcon';
 
 import {Inject} from './Injectables';
 
@@ -19,12 +29,17 @@ import {Inject} from './Injectables';
 type Types = {
     [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
-    [Inject.LAYOUTER]: Layouter;
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
+    [Inject.CLIENT_REGISTRY]: ClientRegistry;
     [Inject.DATABASE]: Database;
+    [Inject.ENVIRONMENT]: Environment;
+    [Inject.EVENT_PUMP]: EventPump;
+    [Inject.LAYOUTER]: Layouter;
+    [Inject.MONITOR_MODEL]: MonitorModel;
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.STORE]: Store;
     [Inject.TOAST_MANAGER]: ToastManager;
+    [Inject.TRAY_ICON]: TrayIcon;
+    [Inject.WEB_WINDOW_FACTORY]: WebWindowFactory;
 };
 
 /**
@@ -36,12 +51,17 @@ type Types = {
 const Bindings = {
     [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
-    [Inject.LAYOUTER]: Layouter,
-    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
+    [Inject.CLIENT_REGISTRY]: ClientRegistry,
     [Inject.DATABASE]: Database,
+    [Inject.ENVIRONMENT]: FinEnvironment,
+    [Inject.EVENT_PUMP]: EventPump,
     [Inject.LAYOUTER]: Layouter,
+    [Inject.MONITOR_MODEL]: FinMonitorModel,
+    [Inject.NOTIFICATION_CENTER]: NotificationCenter,
     [Inject.STORE]: Store,
-    [Inject.TOAST_MANAGER]: ToastManager
+    [Inject.TOAST_MANAGER]: ToastManager,
+    [Inject.TRAY_ICON]: FinTrayIcon,
+    [Inject.WEB_WINDOW_FACTORY]: FinWebWindowFactory
 };
 
 type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);

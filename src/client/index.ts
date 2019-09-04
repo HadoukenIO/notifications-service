@@ -11,7 +11,7 @@
 import {ActionDeclaration, NotificationActionResult, ActionTrigger} from './actions';
 import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
-import {APITopic, Events, NotificationInternal} from './internal';
+import {APITopic, Events, NotificationInternal, Omit} from './internal';
 import {EventRouter, Transport} from './EventRouter';
 
 const eventHandler: EventRouter<Events> = getEventRouter();
@@ -38,7 +38,7 @@ eventHandler.registerDeserializer<NotificationActionEvent>('notification-action'
     const {controlSource, controlIndex, ...rest} = parseEventWithNotification(event);
 
     if (event.trigger === ActionTrigger.CONTROL) {
-        const control: ControlOptions = event.notification[controlSource!][controlIndex!] as ControlOptions;
+        const control = event.notification[controlSource!][controlIndex!];
         return {...rest, control};
     } else {
         return rest;
@@ -128,11 +128,23 @@ export interface NotificationOptions {
      * application-defined buttons, and the default 'X' close button) will not trigger a
      * {@link ActionTrigger.SELECT|select} action.
      *
-     * If omitted or `null`, applications will not receive a {@link NotificationActionEvent|`notification-action`}
-     * event when the notification is clicked. See {@link Actions} for more details on notification actions, and
-     * receiving interaction events from notifications.
+     * See {@link Actions} for more details on notification actions, and receiving interaction events from
+     * notifications.
      */
     onSelect?: ActionDeclaration<never, never>|null;
+
+    /**
+     * An {@link NotificationActionResult|action result} to be passed back to the application inside the
+     * {@link NotificationActionEvent|`notification-action`} event fired when the notification is closed.
+     *
+     * This action will be raised regardless of how the notification is closed. This can be from user interaction
+     * (until future revisions allow default click behaviour to be overriden, this will be any click anywhere within
+     * the notification), or from the notification being programmaticially removed, such as a call to `clear`.
+     *
+     * See {@link Actions} for more details on notification actions, and receiving interaction events from
+     * notifications.
+     */
+    onClose?: ActionDeclaration<never, never>|null;
 }
 
 /**
@@ -149,7 +161,7 @@ export type CustomData = {[key: string]: any};
  * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
  * state of the service.
  */
-export type Notification = Readonly<Required<NotificationOptions>>;
+export type Notification = Readonly<Required<Omit<NotificationOptions, 'buttons'>> & {readonly buttons: ReadonlyArray<Readonly<Required<ButtonOptions>>>}>;
 
 /**
  * Event fired for interactions with notification UI elements. It is important to note that applications will only
@@ -209,7 +221,7 @@ export interface NotificationActionEvent<T = CustomData> {
      * }
      * ```
      */
-    control?: Readonly<ControlOptions>;
+    control?: Readonly<Required<ControlOptions>>;
 
     /**
      * Application-defined metadata that this event is passing back to the application.
@@ -273,7 +285,11 @@ export function addEventListener<E extends Events>(eventType: E['type'], listene
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
+    const count = eventEmitter.listenerCount(eventType);
     eventEmitter.addListener(eventType, listener);
+    if (count === 0 && eventEmitter.listenerCount(eventType) === 1) {
+        tryServiceDispatch(APITopic.ADD_EVENT_LISTENER, eventType);
+    }
 }
 
 export function removeEventListener(eventType: 'notification-action', listener: (event: NotificationActionEvent) => void): void;
@@ -293,7 +309,11 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
+    const count = eventEmitter.listenerCount(eventType);
     eventEmitter.removeListener(eventType, listener);
+    if (count === 1 && eventEmitter.listenerCount(eventType) === 0) {
+        tryServiceDispatch(APITopic.REMOVE_EVENT_LISTENER, eventType);
+    }
 }
 
 /**

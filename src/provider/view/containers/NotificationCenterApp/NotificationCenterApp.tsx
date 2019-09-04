@@ -8,6 +8,7 @@ import {RootState} from '../../../store/State';
 import {Store} from '../../../store/Store';
 import {RemoveNotifications, Actionable} from '../../../store/Actions';
 import {GroupingType} from '../../utils/Grouping';
+import {WebWindow} from '../../../model/WebWindow';
 
 import '../../styles/_main.scss';
 import './NotificationCenterApp.scss';
@@ -50,14 +51,14 @@ const Container = connect(mapStateToProps)(NotificationCenterApp);
 
 /**
  * Render the Notification Center app in the given window.
- * @param document The window.document to render to.
+ * @param webWindow The web window to render to
  * @param store The store to retrieve data from.
  */
-export function renderApp(document: Document, store: Store): void {
+export function renderApp(webWindow: WebWindow, store: Store): void {
     ReactDOM.render(
         <Provider store={store['_store']}>
             <Container storeDispatch={store.dispatch.bind(store)} />
         </Provider>,
-        document.getElementById('react-app')
+        webWindow.document.getElementById('react-app')
     );
 }

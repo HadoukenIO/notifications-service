@@ -8,11 +8,12 @@ import * as notifsRemote from './utils/notificationsRemote';
 import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
 import {delay, Duration} from './utils/delay';
 import {getToastWindow, getToastCards} from './utils/toastUtils';
-import {createApp} from './utils/spawnRemote';
+import {createAppInServiceRealm} from './utils/spawnRemote';
 import {assertNotificationStored} from './utils/storageRemote';
 import {assertDOMMatches, CardType} from './utils/cardUtils';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 import {assertHydratedCorrectly} from './utils/hydrateNotification';
+import {setupClosedCenterBookends} from './common';
 
 const options: NotificationOptions = {
     body: 'Test Notification Body',
@@ -27,16 +28,10 @@ describe('When calling createNotification with the Notification Center not showi
     let createPromise: Promise<Notification>;
     let note: Notification;
 
-    beforeAll(async () => {
-        // Ensure center is not showing
-        if (await isCenterShowing()) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-            await delay(Duration.CENTER_TOGGLED);
-        }
-    });
+    setupClosedCenterBookends();
 
     beforeEach(async () => {
-        testApp = await createApp(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
 
         ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
