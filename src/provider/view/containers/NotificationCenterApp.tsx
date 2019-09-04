@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {connect, Provider} from 'react-redux';
+import {Store} from 'redux';
 
 import {Header} from '../components/Header/Header';
 import {Footer} from '../components/Footer/Footer';
@@ -56,7 +57,7 @@ const Container = connect(mapStateToProps)(NotificationCenterApp);
  */
 export function renderApp(webWindow: WebWindow, store: ServiceStore): void {
     ReactDOM.render(
-        <Provider store={store as any}>
+        <Provider store={store as unknown as Store<RootState>}>
             <Container storeDispatch={store.dispatch.bind(store)} />
         </Provider>,
         webWindow.document.getElementById('react-app')

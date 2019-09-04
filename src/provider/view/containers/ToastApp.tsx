@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import {Store} from 'redux';
 import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../model/StoredNotification';
@@ -8,6 +9,8 @@ import {WindowDimensions} from '../../controller/Layouter';
 import {RootState} from '../../store/State';
 import {ServiceStore} from '../../store/ServiceStore';
 import {WebWindow} from '../../model/WebWindow';
+import {APIAction} from '../../model/APIHandler';
+import {RootAction} from '../../store/Actions';
 
 import {Actionable} from './NotificationCenterApp';
 
@@ -59,7 +62,7 @@ export function renderApp(
     setWindowSize: (dim: WindowDimensions) => void
 ) {
     ReactDOM.render(
-        <Provider store={store as any}>
+        <Provider store={store as unknown as Store<RootState>}>
             <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')
