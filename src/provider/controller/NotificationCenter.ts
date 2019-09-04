@@ -99,15 +99,11 @@ export class NotificationCenter extends AsyncInit {
      * Add listeners to the window.
      */
     private async addListeners(): Promise<void> {
-        const hideOnBlur = false;
-
-        if (hideOnBlur) {
-            this._webWindow.onBlurred.add(async () => {
-                if (this.visible) {
-                    this._store.dispatch(new BlurCenter());
-                }
-            });
-        }
+        this._webWindow.onBlurred.add(() => {
+            if (this.visible) {
+                this._store.dispatch(new BlurCenter());
+            }
+        });
 
         this._monitorModel.onMonitorInfoChanged.add(() => {
             this.sizeToFit();
