@@ -55,7 +55,7 @@ function makeNoteOfType(index: number) {
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
 
-    document.title = `${fin.Window.me.uuid}`;
+    document.title = fin.Window.me.uuid;
 
     function logMessage(msg: string) {
         const logEntry = document.createElement('div');
