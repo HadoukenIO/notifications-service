@@ -8,7 +8,7 @@ addSpawnListeners();
 
 const receivedEvents: Events[] = [];
 
-// Mount createWindow and createApp on the window to be used by puppeteer
+// Mount functions and objects used by puppeteer
 Object.assign(window, {createWindow, createApp, notifications: ofnotes, receivedEvents});
 
 const normalNote: NotificationOptions = {
