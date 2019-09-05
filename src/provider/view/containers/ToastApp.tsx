@@ -9,8 +9,6 @@ import {WindowDimensions} from '../../controller/Layouter';
 import {RootState} from '../../store/State';
 import {ServiceStore} from '../../store/ServiceStore';
 import {WebWindow} from '../../model/WebWindow';
-import {APIAction} from '../../model/APIHandler';
-import {RootAction} from '../../store/Actions';
 
 import {Actionable} from './NotificationCenterApp';
 
