@@ -9,6 +9,7 @@ import {Inject} from '../common/Injectables';
 import {MonitorModel} from '../model/MonitorModel';
 
 import {AsyncInit} from './AsyncInit';
+import {LayoutStack} from './LayoutStack';
 
 interface LayouterConfig {
     spacing: number;
@@ -19,13 +20,8 @@ interface LayouterConfig {
 export interface LayoutItem {
     animate(transitions: Transition, options: TransitionOptions): Promise<void>;
     setTransform(transform: Bounds): Promise<void>;
-    readonly dimensions: Promise<WindowDimensions>;
+    readonly dimensions: WindowDimensions|null;
     position: PointTopLeft;
-}
-
-export interface LayoutStack {
-    items: LayoutItem[];
-    layoutHeight: number;
 }
 
 export type WindowDimensions = {height: number, width: number};
@@ -112,27 +108,36 @@ export class Layouter extends AsyncInit {
     }
 
     /**
-     * Layout a given stack of Layoutable items
+     * Layout a given stack of Layoutable items. Toast positions are calculated and assigned synchronously.
+     *
      * @param stack Target layoutable item stack
      */
-    public async layout(stack: LayoutStack): Promise<void> {
-        // eslint-disable-next-line prefer-const
-        let {top, left} = this.spawnPosition;
-        let prev: number;
-        stack.layoutHeight = 0;
+    public layout(stack: LayoutStack): void {
+        const {spacing, direction} = this;
+        const {top, left} = this.spawnPosition;
+        const promises: Promise<void>[] = [];
+        let currentPosition: number = top;
+
         for (const item of stack.items) {
-            const {height} = await item.dimensions;
-            prev = top;
-            top = top + height * this.direction + this.spacing;
-            const newPosition: PointTopLeft = {
-                top: (this.direction <= 0) ? top : prev,
-                left: left
-            };
-            item.position = newPosition;
-            this.moveItem(item, item.position);
-            // update stack height.
-            stack.layoutHeight += height + Layouter.INTERNAL_CONFIG.spacing;
+            const dimensions = item.dimensions;
+
+            if (dimensions) {
+                const deltaPosition = (dimensions.height * direction) + spacing;
+                const newPosition: PointTopLeft = {
+                    top: currentPosition + (direction <= 0 ? deltaPosition : 0),
+                    left
+                };
+                currentPosition += deltaPosition;
+                item.position = newPosition;
+
+                promises.push(this.moveItem(item, item.position));
+            } else {
+                // Should never happen, toasts should remain in queue until they are initialised
+                console.warn(`An uninitialised toast is in the stack: ${item.id}`);
+            }
         }
+
+        stack.updateHeight(Math.abs(currentPosition - top));
     }
 
     /**
@@ -174,7 +179,7 @@ export class Layouter extends AsyncInit {
      */
     public async removeItem(item: LayoutItem): Promise<void> {
         const direction: number = (this.anchor.top >= 0) ? 1 : 0;
-        const {height} = await item.dimensions;
+        const height = item.dimensions ? item.dimensions.height : 0;
         const config: LayouterConfig = Layouter.INTERNAL_CONFIG;
         const bounds: Bounds = await this.calculateItemBounds(item);
 
@@ -192,7 +197,7 @@ export class Layouter extends AsyncInit {
                 }
             },
             {
-                interrupt: false,
+                interrupt: true,
                 tween: 'linear'
             }
         );
@@ -203,8 +208,8 @@ export class Layouter extends AsyncInit {
      * @param item Target layoutable item
      */
     public async setInitialTransform(item: LayoutItem): Promise<void> {
-        const dimensions: WindowDimensions = await item.dimensions;
-        const spawnTransform: Bounds = await this.calculateItemBounds(item, this.spawnPosition, {width: dimensions.width, height: 0});
+        const width: number = item.dimensions!.width;
+        const spawnTransform: Bounds = await this.calculateItemBounds(item, this.spawnPosition, {width, height: 0});
         item.position = this.spawnPosition;
 
         await item.setTransform(spawnTransform);
@@ -216,9 +221,9 @@ export class Layouter extends AsyncInit {
      * @param queue queue to check the items.
      */
     public async getFittingItems(stack: LayoutStack, queue: LayoutItem[]): Promise<LayoutItem[]> {
-        let availableHeight: number = this.availableHeight - stack.layoutHeight;
+        let availableHeight: number = this.availableHeight - stack.height;
         const fittingItems: LayoutItem[] = [];
-        while (queue.length > 0) {
+        while (queue.length > 0 && queue[0].dimensions) {
             const {height} = await queue[0].dimensions;
             if (height + Layouter.INTERNAL_CONFIG.spacing < availableHeight) {
                 availableHeight -= height;
@@ -237,10 +242,11 @@ export class Layouter extends AsyncInit {
      * @param dimensions Dimension of the window.
      */
     private async calculateItemBounds(item: LayoutItem, position?: PointTopLeft, dimensions?: WindowDimensions): Promise<Required<Bounds>> {
-        const {width, height} = dimensions || await item.dimensions;
+        const {width, height} = dimensions || item.dimensions || {width: 0, height: 0};
         // eslint-disable-next-line prefer-const
         let {top, left} = position || item.position;
         left = left - width * ((this.anchor.left > 0) ? 1 : 0);
+
         return {
             top,
             left,

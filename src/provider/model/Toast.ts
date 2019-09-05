@@ -12,6 +12,12 @@ import {StoredNotification} from './StoredNotification';
 import {WebWindow, WebWindowFactory} from './WebWindow';
 import {MonitorModel} from './MonitorModel';
 
+export enum ToastEvent {
+    PAUSE,
+    UNPAUSE,
+    CLOSED
+}
+
 const windowOptions: WindowOption = {
     name: 'Notification-Toast',
     url: 'ui/toast.html',
@@ -33,36 +39,22 @@ const windowOptions: WindowOption = {
     }
 };
 
-/** Margin to other toasts and the window edge. */
-interface Margin {
-    horizontal: number;
-    vertical: number;
-}
-
-interface Options {
-    timeout: number;
-}
-
-export enum ToastEvent {
-    PAUSE = 'pause',
-    UNPAUSE = 'unpause',
-    CLOSED = 'closed'
-}
-
 export class Toast implements LayoutItem {
     public static readonly onToastEvent: Signal<[ToastEvent, string]> = new Signal();
 
+    /**
+     * Time in milliseconds until a toast closes.
+     *
+     * Timeout will be reset when user mouses-over any toast in the stack.
+     */
+    private static TIMEOUT: number = 10000;
+
     private _webWindow: Readonly<Promise<WebWindow>>;
-    private _options: Options;
-    private _timeout!: number;
-    private _dimensions!: Promise<WindowDimensions>;
+    private _timeout: number;
+    private _dimensions: WindowDimensions|null;
+    private _ready: DeferredPromise<void>;
     private _id: string;
     private _position: PointTopLeft;
-
-    public static margin: Margin = {
-        horizontal: 10,
-        vertical: 10
-    };
 
     /** Id of the notification this Toast represents. */
     public get id(): string {
@@ -77,44 +69,61 @@ export class Toast implements LayoutItem {
         this._position = value;
     }
 
-    public get dimensions(): Promise<WindowDimensions> {
+    public get ready(): Promise<void> {
+        return this._ready.promise;
+    }
+
+    /**
+     * Size of the toast window.
+     *
+     * Note: Must only be used after `ready` resolves, will be `null` before that point.
+     */
+    public get dimensions(): WindowDimensions|null {
         return this._dimensions;
     }
 
-    public constructor(store: Store, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification, toastOptions: Options) {
+    public constructor(store: Store, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification) {
         this._id = notification.id;
-        this._options = toastOptions;
         this._position = {top: 0, left: 0};
-        // Wait for the React component to render and then get the dimensions of it to resize the window.
-        const dimensionsDeferredPromise = new DeferredPromise<WindowDimensions>();
-        const dimensionResolve = dimensionsDeferredPromise.resolve;
-        this._dimensions = dimensionsDeferredPromise.promise;
+        this._timeout = 0;
+        this._ready = new DeferredPromise<void>();
+        this._dimensions = null;
+        this._webWindow = this.init(store, monitorModel, webWindowFactory, notification);
+    }
 
+    private async init(store: Store, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification): Promise<WebWindow> {
+        // Create and prepare a window for the toast
         const name = `${windowOptions.name}:${this.id}`;
-        this._webWindow = webWindowFactory.createWebWindow({...windowOptions, name}).then(async (webWindow) => {
-            const {virtualScreen} = monitorModel.monitorInfo;
+        const webWindow: WebWindow = await webWindowFactory.createWebWindow({...windowOptions, name});
+        webWindow.onMouseEnter.add(this.mouseEnterHandler);
+        webWindow.onMouseLeave.add(this.mouseLeaveHandler);
 
-            this.addListeners();
-            // Show window offscreen so it can render and then hide it
-            await webWindow.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
-            await webWindow.hide();
-            renderApp(
-                notification,
-                webWindow,
-                store,
-                dimensionResolve
-            );
-            return webWindow;
-        });
+        // Show window offscreen so it can render and then hide it
+        const {virtualScreen} = monitorModel.monitorInfo;
+        await webWindow.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
+        await webWindow.hide();
+
+        // Wait for the React component to render and then get the dimensions of it to resize the window.
+        renderApp(
+            notification,
+            webWindow,
+            store,
+            (size: WindowDimensions) => {
+                this._dimensions = size;
+                this._ready.resolve();
+            }
+        );
+
+        return webWindow;
     }
 
     /**
      * Display the toast.
-    */
+     */
     public async show(): Promise<void> {
         await this._dimensions;
         await (await this._webWindow).show();
-        this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
+        this.unfreeze();
     }
 
     public async animate(transitions: Transition, options: TransitionOptions): Promise<void> {
@@ -122,57 +131,47 @@ export class Toast implements LayoutItem {
     }
 
     public async setTransform(transform: Bounds): Promise<void> {
-        const webWindow = await this._webWindow;
-        await webWindow.setBounds(transform);
+        await (await this._webWindow).setBounds(transform);
     }
 
     /**
      * Close Toast window and perform cleanup.
      */
-    public close = async (): Promise<void> => {
+    public async close(): Promise<void> {
+        this.freeze();
+
         const webWindow = await this._webWindow;
-        clearTimeout(this._timeout);
         webWindow.onMouseEnter.remove(this.mouseEnterHandler);
         webWindow.onMouseLeave.remove(this.mouseLeaveHandler);
 
-        await webWindow.close();
+        return webWindow.close();
     }
 
     /**
      * Freeze the toast in place and remove timeouts.
-     * @param stopMovement If true the toasts movement will be stopped.
      */
-    public freeze = async (stopMovement: boolean = false): Promise<void> => {
-        clearTimeout(this._timeout!);
+    public async freeze(): Promise<void> {
+        clearTimeout(this._timeout);
+        this._timeout = 0;
     }
 
     /**
      * Unfreeze the toast. This moves & resets timeout.
      */
-    public unfreeze = async (): Promise<void> => {
-        this._timeout = window.setTimeout(this.timeoutHandler, this._options.timeout);
-    }
-
-    /**
-     * Listeners to handle events on the toast.
-     */
-    private async addListeners(): Promise<void> {
-        const webWindow = await this._webWindow;
-
-        // Pause timeout on mouse over window
-        webWindow.onMouseEnter.add(this.mouseEnterHandler);
-        webWindow.onMouseLeave.add(this.mouseLeaveHandler);
+    public async unfreeze(): Promise<void> {
+        this._timeout = window.setTimeout(this.timeoutHandler, Toast.TIMEOUT);
     }
 
     private timeoutHandler = (): void => {
+        this._timeout = 0;
         Toast.onToastEvent.emit(ToastEvent.CLOSED, this.id);
-    }
+    };
 
-    private mouseEnterHandler = async (): Promise<void> => {
+    private mouseEnterHandler = (): void => {
         Toast.onToastEvent.emit(ToastEvent.PAUSE, this.id);
     };
 
-    private mouseLeaveHandler = async (): Promise<void> => {
+    private mouseLeaveHandler = (): void => {
         Toast.onToastEvent.emit(ToastEvent.UNPAUSE, this.id);
     };
 }

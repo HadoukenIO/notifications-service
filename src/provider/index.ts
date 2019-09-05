@@ -58,7 +58,9 @@ export class Main {
             store: this._store,
             center: this._notificationCenter,
             toast: this._toastManager,
-            database: this._database
+            database: this._database,
+            client: this._clientHandler,
+            eventPump: this._eventPump
         });
 
         // Wait for creation of any injected components that require async initialization
