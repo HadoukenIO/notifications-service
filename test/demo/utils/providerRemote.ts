@@ -14,7 +14,7 @@ const ofBrowser = new OFPuppeteerBrowser<ProviderContext>();
 export async function clearStoredNotifications(windowIdentity: Identity): Promise<void> {
     await ofBrowser.executeOnWindow<Identity[], void>(serviceIdentity, async function(sourceWindow: Identity) {
         this.store.state.notifications.filter((notification) => {
-            return notification.source.uuid === sourceWindow.uuid && notification.source.name === sourceWindow.name;
+            return notification.source.uuid === sourceWindow.uuid;
         }).forEach(n => {
             this.main.clearNotification({id: n.id}, sourceWindow);
         });
