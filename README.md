@@ -29,7 +29,7 @@ Integrating the Notifications Service within an application is done by declaring
 ### Manifest Declaration
 To ensure the service is running, you must declare it in your application config.
 
-```
+```json
 "services":
 [
    {"name": "notifications"}
@@ -37,7 +37,7 @@ To ensure the service is running, you must declare it in your application config
 ```
 During development, you can add a URL for specifying a custom location or a specific version:
 
-```
+```json
 "services":
 [
    {
@@ -54,11 +54,11 @@ npm install openfin-notifications
 ```
 
 The client library is also available as a resource which can be included via `<script>` tag:
-```
+```html
 <script src="https://cdn.openfin.co/services/openfin/notifications/<VERSION>/openfin-notifications.js"></script>
 ```
 This will expose the global variable `notifications` with the API methods documented in the link below.  Example:
-```
+```js
 const notifications = await notifications.getAll();
 ```
 
