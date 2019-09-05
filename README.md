@@ -19,7 +19,7 @@ This project consist of 3 parts:
 ### Features
 * Create notifications
 * Clear and dismiss notifications
-* Attach handlers for create and close events, and notification interactions
+* Attach handlers for when notifications are created, closed, and interacted with
 * Persist notifications in the Notification Center
 
 ## Getting Started
