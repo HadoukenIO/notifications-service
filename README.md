@@ -13,7 +13,7 @@ This project consist of 3 parts:
 
 ### Dependencies
 - OpenFin version for applications using Notifications >= 9.61.38.41
-- OpenFin version used in the Notifications service = 10.66.39.43
+- OpenFin version used in the Notifications Service = 10.66.39.43
 - RVM >= 4.7
 
 ### Features
@@ -24,7 +24,7 @@ This project consist of 3 parts:
 
 ## Getting Started
 
-Integrating the Notifications service within an application is done in two steps - adding the service to the application manifest, and importing the API:
+Integrating the Notifications Service within an application is done in two steps - adding the service to the application manifest, and importing the API:
 
 ### Manifest Declaration
 To ensure the service is running, you must declare it in your application config.
