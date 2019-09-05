@@ -1,5 +1,3 @@
-import 'jest';
-
 import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationActionEvent, Notification} from '../../src/client';
