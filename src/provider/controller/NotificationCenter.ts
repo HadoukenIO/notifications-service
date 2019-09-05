@@ -25,7 +25,9 @@ const windowOptions: WindowOption = {
     alwaysOnTop: true,
     icon: 'ui/favicon.ico',
     showTaskbarIcon: false,
-    opacity: 0
+    opacity: 0,
+    // @ts-ignore
+    backgroundThrottling: true
 };
 
 @injectable()
