@@ -71,6 +71,11 @@ export class NotificationCenter extends AsyncInit {
         });
         await this.sizeToFit();
         await this.addListeners();
+
+        if (this._store.state.centerVisible) {
+            this.showWindow();
+        }
+
         renderApp(this._webWindow, this._store);
         this.subscribe();
     }
@@ -132,7 +137,7 @@ export class NotificationCenter extends AsyncInit {
     /**
      * Sets the window dimensions in shape of a side bar
      */
-    public async sizeToFit(): Promise<void> {
+    private async sizeToFit(): Promise<void> {
         const idealWidth = NotificationCenter.WIDTH;
         await this.hideWindow(true);
         const monitorInfo = this._monitorModel.monitorInfo;
