@@ -22,10 +22,6 @@ export function NotificationGroup(props: Props) {
         storeDispatch(new RemoveNotifications(notifications));
     };
 
-    const handleCloseNotification = (notification: StoredNotification) => {
-        storeDispatch(new RemoveNotifications([notification]));
-    };
-
     return (
         <div className="group">
             <div className="title">
@@ -45,7 +41,7 @@ export function NotificationGroup(props: Props) {
                                 classNames="item"
                             >
                                 <li key={notification.id + notification.notification.date}>
-                                    <NotificationCard notification={notification} storeDispatch={storeDispatch} onDismiss={handleCloseNotification} />
+                                    <NotificationCard notification={notification} storeDispatch={storeDispatch} />
                                 </li>
                             </CSSTransition>
                         );

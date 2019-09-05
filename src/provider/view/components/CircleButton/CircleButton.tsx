@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import './CircleButton.scss';
 
-type IconType = 'accept' | 'cancel' | 'close' | 'hide' | 'pin';
+type IconType = 'accept' | 'cancel' | 'close' | 'hide' | 'pin' | 'dismiss';
 
 interface Props {
     onClick?: () => void;

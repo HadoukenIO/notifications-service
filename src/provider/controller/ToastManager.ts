@@ -80,7 +80,8 @@ export class ToastManager extends AsyncInit {
         }
 
         const toast: Toast = new Toast(this._store, this._monitorModel, this._webWindowFactory, notification, {
-            timeout: 10000
+            timeout: 10000,
+            onDismiss: this.deleteToast.bind(this)
         });
 
         this._toasts.set(id, toast);

@@ -3,7 +3,7 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Transition, TransitionOptions, Bounds} from 'openfin/_v2/shapes';
 
-import {renderApp} from '../view/containers/ToastApp/ToastApp';
+import {renderApp, RenderOptions} from '../view/containers/ToastApp/ToastApp';
 import {DeferredPromise} from '../common/DeferredPromise';
 import {Store} from '../store/Store';
 import {LayoutItem, WindowDimensions} from '../controller/Layouter';
@@ -41,6 +41,7 @@ interface Margin {
 
 interface Options {
     timeout: number;
+    onDismiss: (toast: Toast) => Promise<void>;
 }
 
 export enum ToastEvent {
@@ -98,12 +99,15 @@ export class Toast implements LayoutItem {
             // Show window offscreen so it can render and then hide it
             await webWindow.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
             await webWindow.hide();
-            renderApp(
+            const renderOptions: RenderOptions = {
                 notification,
                 webWindow,
                 store,
-                dimensionResolve
-            );
+                setWindowSize: dimensionResolve,
+                onDismiss: () => this._options.onDismiss(this)
+            };
+
+            renderApp(renderOptions);
             return webWindow;
         });
     }
