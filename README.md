@@ -12,8 +12,8 @@ This project consist of 3 parts:
 3. The Notifications Demo App, demonstrating the different features of OpenFin Notifications
 
 ### Dependencies
-- OpenFin version for applications using Notifications >= 9.61.38.41
-- OpenFin version used in the Notifications Service = 10.66.39.43
+- OpenFin version for applications using the Notifications Service >= 9.61.38.41
+- OpenFin version used by the Notifications Provider = 10.66.39.43
 - RVM >= 4.7
 
 ### Features
