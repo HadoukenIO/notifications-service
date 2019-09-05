@@ -16,7 +16,7 @@ export async function clearStoredNotifications(windowIdentity: Identity): Promis
         this.store.state.notifications.filter((notification) => {
             return notification.source.uuid === sourceWindow.uuid;
         }).forEach(n => {
-            this.main.clearNotification({id: n.id}, sourceWindow);
+            this.main.clearNotification({id: n.notification.id}, sourceWindow);
         });
     }, windowIdentity);
 }
