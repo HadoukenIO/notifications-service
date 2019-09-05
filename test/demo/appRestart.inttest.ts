@@ -1,4 +1,5 @@
 import 'jest';
+import 'reflect-metadata';
 
 import {Application, Window, Identity} from 'hadouken-js-adapter';
 import {ElementHandle} from 'puppeteer';

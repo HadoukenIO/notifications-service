@@ -26,10 +26,6 @@ export abstract class AsyncAction<S> extends Action<S> {
     public abstract async dispatch(api: StoreAPI<S, Action<S>>): Promise<void>;
 }
 
-export interface Reducer<S> {
-    reduce(state: S): S;
-}
-
 type Listener<S> = (getState: () => S) => void;
 
 export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI<S, A> {

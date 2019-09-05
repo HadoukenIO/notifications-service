@@ -1,20 +1,20 @@
 import {Identity} from 'hadouken-js-adapter';
 
-import {Store} from '../../../src/provider/store/Store';
-import {Action} from '../../../src/provider/store/Actions';
+import {ServiceStore} from '../../../src/provider/store/ServiceStore';
+import {RemoveNotifications} from '../../../src/provider/store/Actions';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 import {serviceIdentity} from './constants';
 
 export interface ProviderContext extends BaseWindowContext {
-    store: Store;
+    store: ServiceStore;
 }
 
 const ofBrowser = new OFPuppeteerBrowser<ProviderContext>();
 export async function clearStoredNotifications(windowIdentity: Identity): Promise<void> {
     await ofBrowser.executeOnWindow<Identity[], void>(serviceIdentity, async function(sourceWindow: Identity) {
-        await this.store.dispatch({type: Action.REMOVE, notifications: this.store.state.notifications.filter((notification) => {
+        await this.store.dispatch(new RemoveNotifications(this.store.state.notifications.filter((notification) => {
             return notification.source.uuid === sourceWindow.uuid && notification.source.name === sourceWindow.name;
-        })});
+        })));
     }, windowIdentity);
 }
