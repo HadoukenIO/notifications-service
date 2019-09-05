@@ -4,6 +4,7 @@ import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../../model/StoredNotification';
 import {NotificationCard} from '../../components/NotificationCard/NotificationCard';
+import {TearOut} from '../../components/Wrappers/TearOut';
 import {WindowDimensions} from '../../../controller/Layouter';
 import {RootState} from '../../../store/State';
 import {Store} from '../../../store/Store';
@@ -22,29 +23,11 @@ type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 
 export function ToastApp(props: Props) {
     const {notification, setWindowSize, storeDispatch} = props;
-    const containerRef = React.useRef<HTMLDivElement>(null);
-
-    // Get the size of the container ref
-    const updateWindowDimensions = () => {
-        if (containerRef && containerRef.current) {
-            const {width, height} = containerRef.current.getBoundingClientRect();
-            if (width && height) {
-                setWindowSize({width, height});
-            }
-        }
-    };
-
-    React.useEffect(() => {
-        if (containerRef.current === null) {
-            return;
-        }
-        updateWindowDimensions();
-    });
 
     return (
-        <div id='toast-container' ref={containerRef}>
+        <TearOut onSize={setWindowSize}>
             <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} />
-        </div>
+        </TearOut>
     );
 }
 
