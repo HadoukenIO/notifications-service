@@ -15,6 +15,7 @@ import './NotificationCard.scss';
 interface Props extends Actionable {
     notification: StoredNotification;
     isToast?: boolean;
+    onDismiss: (notification: StoredNotification) => void;
 }
 
 NotificationCard.defaultProps = {
@@ -22,12 +23,12 @@ NotificationCard.defaultProps = {
 };
 
 export function NotificationCard(props: Props) {
-    const {notification, storeDispatch, isToast} = props;
+    const {notification, storeDispatch, isToast, onDismiss} = props;
     const data = notification.notification;
     const [loading, setLoading] = React.useState(false);
 
     const handleNotificationClose = () => {
-        storeDispatch(new RemoveNotifications([notification]));
+        onDismiss(notification);
     };
 
     const handleButtonClick = (buttonIndex: number) => {

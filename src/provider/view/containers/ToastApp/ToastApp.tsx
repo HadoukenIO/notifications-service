@@ -8,7 +8,7 @@ import {TearOut} from '../../components/Wrappers/TearOut';
 import {WindowDimensions} from '../../../controller/Layouter';
 import {RootState} from '../../../store/State';
 import {Store} from '../../../store/Store';
-import {Actionable} from '../../../store/Actions';
+import {Actionable, RemoveNotifications} from '../../../store/Actions';
 import {WebWindow} from '../../../model/WebWindow';
 
 import '../../styles/base.scss';
@@ -24,9 +24,13 @@ type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 export function ToastApp(props: Props) {
     const {notification, setWindowSize, storeDispatch} = props;
 
+    const handleDismissToast = () => {
+        storeDispatch(new RemoveNotifications([notification]));
+    };
+
     return (
         <TearOut onSize={setWindowSize}>
-            <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} />
+            <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} onDismiss={handleDismissToast} />
         </TearOut>
     );
 }
