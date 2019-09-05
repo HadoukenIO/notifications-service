@@ -62,6 +62,8 @@ export function renderApp(
     setWindowSize: (dim: WindowDimensions) => void
 ) {
     ReactDOM.render(
+        // Replace redux store with service store implementation.
+        // This will resolve the interface incompatibility issues.
         <Provider store={store as unknown as Store<RootState>}>
             <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
