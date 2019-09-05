@@ -29,10 +29,10 @@ export abstract class AsyncAction<S> extends Action<S> {
 type Listener<S> = (getState: () => S) => void;
 
 export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI<S, A> {
-    private _currentState: S;
-    private _listeners: Listener<S>[] = [];
-
     public readonly onAction: Signal<[A], Promise<void>, Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
+
+    private _currentState: S;
+    private readonly _listeners: Listener<S>[] = [];
 
     constructor(initialState: S) {
         super();

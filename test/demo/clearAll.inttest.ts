@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import 'jest';
 
 import {Application, Window} from 'hadouken-js-adapter';
 
