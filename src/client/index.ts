@@ -23,7 +23,8 @@ function parseEventWithNotification<T extends {notification: NotificationInterna
         ...event,
         notification: {
             ...notification,
-            date: new Date(notification.date)
+            date: new Date(notification.date),
+            expiration: notification.expiration !== null ? new Date(notification.expiration) : null
         }
     };
 }
@@ -113,6 +114,13 @@ export interface NotificationOptions {
     date?: Date;
 
     /**
+     * The expiration date and time of the notification. If specified, the notification will be removed at this time,
+     * or as soon as possible after. If no expiration is specified, the notification will never expire, and will
+     * persist until it is closed.
+     */
+    expiration?: Date|null;
+
+    /**
      * A list of buttons to display below the notification text.
      *
      * Notifications support up to four buttons. Attempting to add more than four will result in the notification
@@ -132,6 +140,20 @@ export interface NotificationOptions {
      * notifications.
      */
     onSelect?: ActionDeclaration<never, never>|null;
+
+    /**
+     * An {@link NotificationActionResult|action result} to be passed back to the application inside the
+     * {@link NotificationActionEvent|`notification-action`} event fired when the notification the expires.
+     *
+     * This action will be raised if an `expiration` is specified for the notification, when the notification is
+     * removed due to expiration. This action will never be raised if not `expiration` is specified. Note that this
+     * action does not exclude a close action being raised. If and when the notification expires, both this and any
+     * close action will be raised.
+     *
+     * See {@link Actions} for more details on notification actions, and receiving interaction events from
+     * notifications.
+     */
+    onExpired?: ActionDeclaration<never, never>|null;
 
     /**
      * An {@link NotificationActionResult|action result} to be passed back to the application inside the
@@ -344,8 +366,16 @@ export async function create(options: NotificationOptions): Promise<Notification
         throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
     }
 
-    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {...options, date: options.date && options.date.valueOf()});
-    return {...response, date: new Date(response.date)};
+    if (options.expiration !== undefined && options.expiration !== null && !(options.date instanceof Date)) {
+        throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
+    }
+
+    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {
+        ...options,
+        date: options.date && options.date.valueOf(),
+        expiration: options.expiration && options.expiration.valueOf()
+    });
+    return {...response, date: new Date(response.date), expiration: response.expiration !== null ? new Date(response.expiration) : null};
 }
 
 /**
@@ -382,7 +412,7 @@ export async function clear(id: string): Promise<boolean> {
 export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
     const response = await tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
-    return response.map(note => ({...note, date: new Date(note.date)}));
+    return response.map(note => ({...note, date: new Date(note.date), expiration: note.expiration !== null ? new Date(note.expiration) : null}));
 }
 
 /**

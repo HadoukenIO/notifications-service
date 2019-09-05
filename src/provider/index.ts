@@ -269,7 +269,9 @@ export class Main {
             icon: payload.icon || '',
             customData: payload.customData !== undefined ? payload.customData : {},
             date: payload.date || Date.now(),
+            expiration: payload.expiration !== undefined ? payload.expiration : null,
             onSelect: this.hydrateAction(payload.onSelect),
+            onExpired: this.hydrateAction(payload.onExpired),
             onClose: this.hydrateAction(payload.onClose),
             buttons: payload.buttons ? payload.buttons.map(btn => ({
                 ...btn,

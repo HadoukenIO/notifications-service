@@ -19,7 +19,7 @@ export async function create(executionTarget: Identity, options: NotificationOpt
         return {...note, date: note.date.toJSON()};
     }, options);
     // And then manually un-stringify it
-    return {...result, date: new Date(result.date)};
+    return {...result, date: new Date(result.date), expiration: result.expiration !== null ? new Date(result.expiration) : null};
 }
 
 export async function createAndAwait(executionTarget: Identity, options: NotificationOptions) {
@@ -44,7 +44,7 @@ export async function getAll(executionTarget: Identity) {
         return notes.map(note => ({...note, date: note.date.toJSON()}));
     });
     // And then manually un-stringify it
-    return result.map(note => ({...note, date: new Date(note.date)}));
+    return result.map(note => ({...note, date: new Date(note.date), expiration: note.expiration !== null ? new Date(note.expiration) : null}));
 }
 
 export async function clearAll(executionTarget: Identity) {

@@ -18,6 +18,7 @@ export function assertHydratedCorrectly(options: NotificationOptions, fullNote: 
         title: options.title,
         icon: options.icon || '',
         customData: options.customData !== undefined ? options.customData : {},
+        expiration: options.expiration !== undefined && options.expiration !== null ? new Date(options.expiration) : null,
         buttons: options.buttons ? options.buttons.map(btn => ({...btn, iconUrl: btn.iconUrl || ''})) : []
     };
     expect(fullNote).toMatchObject(expectedValues);
