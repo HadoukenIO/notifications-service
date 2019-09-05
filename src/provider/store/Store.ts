@@ -68,10 +68,6 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         this._currentState = state;
     }
 
-    private getState(): S {
-        return this._currentState;
-    }
-
     private reduceAndSignal(action: A): Promise<void> {
         // emit signal last
         this.reduce(action);
@@ -80,6 +76,11 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
 
     private reduce(action: A): void {
         this._currentState = action.reduce(this.state);
-        this._listeners.forEach(listener => listener(() => this.getState()));
+        this._listeners.forEach(listener => listener(() => this._currentState));
+    }
+
+    /* intended to be used by react-redux only */
+    private getState(): S {
+        return this._currentState;
     }
 }
