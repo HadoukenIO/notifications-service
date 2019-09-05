@@ -26,8 +26,7 @@ This project consist of 3 parts:
 
 Integrating the Notifications service within an application is done in two steps - adding the service to the application manifest, and importing the API:
 
-### Manifest declaration
-
+### Manifest Declaration
 To ensure the service is running, you must declare it in your application config.
 
 ```
@@ -50,7 +49,6 @@ During development, you can add a URL for specifying a custom location or a spec
 Refer to the [Desktop Services documentation](https://developers.openfin.co/docs/desktop-services) for details on managing service location/version within production environments.
 
 ### Import the Client API
-
 ```bash
 npm install openfin-notifications
 ```
@@ -67,7 +65,6 @@ const notifications = await notifications.getAll();
 The client module exports a set of functions, documented in the [API docs](https://cdn.openfin.co/docs/services/notifications/stable/api/).
 
 ### Usage
-
 An in-depth usage guide and additional documentation will be published in due course.
 
 ## Running Locally
