@@ -2,7 +2,7 @@
 
 
 ## Overview
-OpenFin Notifications Service provide developers with a uniform way to create, display and organize desktop notifications as well as responding to notification events.
+OpenFin Notifications provides developers with a uniform way to create, display and organize desktop notifications as well as responding to notification events.
 
 Notifications will be displayed as toasts as well as being listed and organized in a Notification Center. The Notification Center can be accessed by clicking on the Notifications icon in the system tray.
 
@@ -13,7 +13,7 @@ This project consist of 3 parts:
 
 ### Dependencies
 - OpenFin version for applications using Notifications >= 9.61.38.41
-- OpenFin version used in the Notifications Service = 10.66.39.43
+- OpenFin version used in the Notifications service = 10.66.39.43
 - RVM >= 4.7
 
 ### Features
@@ -24,7 +24,7 @@ This project consist of 3 parts:
 
 ## Getting Started
 
-Integrating the Notifications Service within an application is done in two steps - adding the service to the application manifest, and importing the API:
+Integrating the Notifications service within an application is done in two steps - adding the service to the application manifest, and importing the API:
 
 ### Manifest declaration
 
@@ -97,7 +97,7 @@ npm test
 This will run unit tests followed by the integration tests. These steps can also be run individually via `npm run test:unit` and `npm run test:int`. When running the tests separately in this way, both test runners support some optional arguments. Append `--help` to either of the above `npm run` commands to see the available options.
 
 ### Deployment
-Staging and production builds are managed via the Jenkinsfile build script. This will build the project as usual (except with the `--mode production` argument) and then deploy the client and provider to their respective locations. The demo application exists only within this repo and is not deployed.
+Staging and production builds are managed via the Jenkinsfile build script. This will build the project as usual (except with the `--mode production` argument) and then deploy the client and provider to their respective locations. The demo application exists only within this repository and is not deployed.
 
 The service client is deployed as an NPM module, so that it can be included as a dependency in any application that wishes to integrate the service.
 
@@ -119,4 +119,4 @@ https://openfin.co/licensing/
 ## Support
 
 This is an open source project and all are encouraged to contribute.
-Please enter an issue in the repo for any questions or problems. Alternatively, please contact us at support@openfin.co.
+Please enter an issue in the repository for any questions or problems. Alternatively, please contact us at support@openfin.co.
