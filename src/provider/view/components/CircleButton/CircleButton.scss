@@ -17,6 +17,8 @@ $minus: url('../../../../../res/provider/ui/image/shapes/Minus.svg');
     background-color: var(--strip-background-color);
     width: $size;
     height: $size;
+    min-width: $size;
+    min-height: $size;
     align-self: center;
     display: inline-block;
     align-content: center;
@@ -83,7 +85,7 @@ $minus: url('../../../../../res/provider/ui/image/shapes/Minus.svg');
 
     &.close {
         &:hover {
-            background-color: #CB7070;
+            background-color: rgb(233, 128, 128);
         }
     }
 

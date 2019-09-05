@@ -25,7 +25,10 @@ export function NotificationGroup(props: Props) {
     return (
         <div className="group">
             <div className="title">
-                <span>{name}</span>
+                <span className="app">
+                    <span className="name single-line">jfidw dw dwdwd wdw dwd wdwdwdw sajfhjshajfjhahfau {name}</span>
+                    <span className="count">2323{notifications.length}</span>
+                </span>
                 <CircleButton type="close" size="small" onClick={handleClearAll} alt="Clear notifications" />
             </div>
             <TransitionGroup className="notifications" component="ul">
