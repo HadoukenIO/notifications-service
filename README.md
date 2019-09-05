@@ -2,7 +2,7 @@
 
 
 ## Overview
-OpenFin Notifications provides developers with a uniform way to create, display and organize desktop notifications as well as responding to notification events.
+The OpenFin Notifications Service provides developers with a uniform way to create, display and organize desktop notifications as well as responding to notification events.
 
 Notifications will be displayed as toasts as well as being listed and organized in a Notification Center. The Notification Center can be accessed by clicking on the Notifications icon in the system tray.
 
