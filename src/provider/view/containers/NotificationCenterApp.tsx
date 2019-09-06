@@ -1,13 +1,14 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {connect, Provider} from 'react-redux';
+import {Store} from 'redux';
 
 import {Header} from '../components/Header/Header';
 import {Footer} from '../components/Footer/Footer';
 import {NotificationView} from '../components/NotificationView/NotificationView';
 import {RootState} from '../../store/State';
-import {Store} from '../../store/Store';
 import {RootAction} from '../../store/Actions';
+import {ServiceStore} from '../../store/ServiceStore';
 import {WebWindow} from '../../model/WebWindow';
 
 export enum GroupingType {
@@ -54,9 +55,11 @@ const Container = connect(mapStateToProps)(NotificationCenterApp);
  * @param webWindow The web window to render to
  * @param store The store to retrieve data from.
  */
-export function renderApp(webWindow: WebWindow, store: Store): void {
+export function renderApp(webWindow: WebWindow, store: ServiceStore): void {
     ReactDOM.render(
-        <Provider store={store['_store']}>
+        // Replace redux store with service store implementation.
+        // This will resolve the interface incompatibility issues.
+        <Provider store={store as unknown as Store<RootState>}>
             <Container storeDispatch={store.dispatch.bind(store)} />
         </Provider>,
         webWindow.document.getElementById('react-app')

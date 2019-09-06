@@ -7,8 +7,7 @@ import {NotificationCenter} from '../controller/NotificationCenter';
 import {ToastManager} from '../controller/ToastManager';
 import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
-import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
-import {Store} from '../store/Store';
+import {ServiceStore} from '../store/ServiceStore';
 import {EventPump} from '../model/EventPump';
 import {ClientRegistry} from '../model/ClientRegistry';
 import {Database} from '../model/database/Database';
@@ -27,7 +26,6 @@ import {Inject} from './Injectables';
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
-    [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
     [Inject.CLIENT_REGISTRY]: ClientRegistry;
     [Inject.DATABASE]: Database;
@@ -36,7 +34,7 @@ type Types = {
     [Inject.LAYOUTER]: Layouter;
     [Inject.MONITOR_MODEL]: MonitorModel;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
-    [Inject.STORE]: Store;
+    [Inject.STORE]: ServiceStore;
     [Inject.TOAST_MANAGER]: ToastManager;
     [Inject.TRAY_ICON]: TrayIcon;
     [Inject.WEB_WINDOW_FACTORY]: WebWindowFactory;
@@ -49,7 +47,6 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
-    [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
     [Inject.CLIENT_REGISTRY]: ClientRegistry,
     [Inject.DATABASE]: Database,
@@ -58,7 +55,7 @@ const Bindings = {
     [Inject.LAYOUTER]: Layouter,
     [Inject.MONITOR_MODEL]: FinMonitorModel,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
-    [Inject.STORE]: Store,
+    [Inject.STORE]: ServiceStore,
     [Inject.TOAST_MANAGER]: ToastManager,
     [Inject.TRAY_ICON]: FinTrayIcon,
     [Inject.WEB_WINDOW_FACTORY]: FinWebWindowFactory
