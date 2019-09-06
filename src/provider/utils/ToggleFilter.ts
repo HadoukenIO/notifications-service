@@ -52,7 +52,7 @@ export class ToggleFilter {
                 return false;
             }
         } else {
-            // An internal button won't be associated with a blur, so ignore timers
+            // ToggleFilter won't see a blur following an internal button press, so ignore timers
             return true;
         }
     }
