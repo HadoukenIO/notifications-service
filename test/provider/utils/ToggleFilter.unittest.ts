@@ -1,10 +1,10 @@
 import {useFakeTime, advanceTime} from '../../utils/unit/time';
 import {ToggleFilter} from '../../../src/provider/utils/ToggleFilter';
-import {ToggleVisibilitySource} from '../../../src/provider/store/Actions';
+import {ToggleCenterVisibilitySource} from '../../../src/provider/store/Actions';
 
 let toggleFilter: ToggleFilter;
 
-type TestParam = [string, ToggleVisibilitySource];
+type TestParam = [string, ToggleCenterVisibilitySource];
 
 beforeEach(() => {
     jest.resetAllMocks();
@@ -14,9 +14,9 @@ beforeEach(() => {
 });
 
 describe.each([
-    ['an API call', ToggleVisibilitySource.API],
-    ['the tray icon', ToggleVisibilitySource.TRAY]
-] as TestParam[])('When the Notification Center is toggled by %s', (titleParam: string, source: ToggleVisibilitySource) => {
+    ['an API call', ToggleCenterVisibilitySource.API],
+    ['the tray icon', ToggleCenterVisibilitySource.TRAY]
+] as TestParam[])('When the Notification Center is toggled by %s', (titleParam: string, source: ToggleCenterVisibilitySource) => {
     test('A toggle following shortly after a blur is ignored', async () => {
         toggleFilter.recordBlur();
 
@@ -44,7 +44,7 @@ describe.each([
     });
 
     test('A toggle following shortly after a paired toggle of a different source then blur is not ignored', async () => {
-        toggleFilter.recordToggle(source === ToggleVisibilitySource.API ? ToggleVisibilitySource.TRAY : ToggleVisibilitySource.API);
+        toggleFilter.recordToggle(source === ToggleCenterVisibilitySource.API ? ToggleCenterVisibilitySource.TRAY : ToggleCenterVisibilitySource.API);
         await advanceTime(5);
         toggleFilter.recordBlur();
 
@@ -59,5 +59,5 @@ test('When the Notification Center is toggled by an internal button shortly afte
 
     await advanceTime(10);
 
-    expect(toggleFilter.recordToggle(ToggleVisibilitySource.BUTTON)).toBe(true);
+    expect(toggleFilter.recordToggle(ToggleCenterVisibilitySource.BUTTON)).toBe(true);
 });

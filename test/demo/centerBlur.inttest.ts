@@ -35,7 +35,7 @@ describe('When the Notification Center is open', () => {
         await testApp.quit();
     });
 
-    test.only('The Notification Center is closed when it loses focus', async () => {
+    test('The Notification Center is closed when it loses focus', async () => {
         await testWindow.focus();
         await delay(Duration.EVENT_PROPAGATED);
         await expect(isCenterShowing()).resolves.toBe(false);

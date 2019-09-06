@@ -1,5 +1,3 @@
-import {Action as ReduxAction} from 'redux';
-
 import {StoredNotification} from '../model/StoredNotification';
 import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
@@ -7,17 +5,7 @@ import {CollectionMap} from '../model/database/Database';
 import {ToggleFilter} from '../utils/ToggleFilter';
 
 import {RootState} from './State';
-import {StoreAPI} from './Store';
-
-export const enum Action {
-    CREATE = '@@notifications/CREATE',
-    REMOVE = '@@notifications/REMOVE',
-    CLICK_NOTIFICATION = '@@notifications/CLICK_NOTIFICATION',
-    CLICK_BUTTON = '@@notifications/CLICK_BUTTON',
-    TOGGLE_CENTER_VISIBILITY = '@@ui/TOGGLE_CENTER_VISIBILITY',
-    BLUR_CENTER = '@@ui/BLUR_CENTER',
-    TOGGLE_LOCK_CENTER = '@@ui/TOGGLE_LOCK_CENTER'
-}
+import {StoreAPI, AsyncAction, Action} from './Store';
 
 export const enum ToggleCenterVisibilitySource {
     API,
@@ -25,117 +13,16 @@ export const enum ToggleCenterVisibilitySource {
     BUTTON
 }
 
-export class BaseAction<T extends Action> implements ReduxAction<Action> {
-    public readonly type: T;
-
-    constructor(type: T) {
-        this.type = type;
-    }
-}
-
-export abstract class CustomAction<T extends Action> extends BaseAction<T> {
-    public abstract async dispatch(store: StoreAPI): Promise<void>;
-}
-
-export class CreateNotification extends CustomAction<Action.CREATE> {
+export class CreateNotification extends AsyncAction<RootState> {
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
-        super(Action.CREATE);
+        super();
         this.notification = notification;
     }
 
-    public async dispatch(store: StoreAPI): Promise<void> {
-        const notification = this.notification;
-
-        // First remove any existing notifications with this ID, to ensure ID uniqueness
-        // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
-        const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
-        if (existingNotifications.length) {
-            await store.dispatch(new RemoveNotifications(existingNotifications));
-        }
-        await store.dispatch({...this});
-    }
-}
-
-export class RemoveNotifications extends BaseAction<Action.REMOVE> {
-    public readonly notifications: StoredNotification[];
-
-    constructor(notifications: StoredNotification[]) {
-        super(Action.REMOVE);
-
-        this.notifications = notifications;
-    }
-}
-
-export class ClickNotification extends BaseAction<Action.CLICK_NOTIFICATION> {
-    public readonly notification: StoredNotification;
-
-    constructor(notifications: StoredNotification) {
-        super(Action.CLICK_NOTIFICATION);
-        this.notification = notifications;
-    }
-}
-
-export class ClickButton extends BaseAction<Action.CLICK_BUTTON> {
-    public readonly notification: StoredNotification;
-    public readonly buttonIndex: number;
-
-    constructor(notification: StoredNotification, buttonIndex: number) {
-        super(Action.CLICK_BUTTON);
-        this.notification = notification;
-        this.buttonIndex = buttonIndex;
-    }
-}
-
-export class ToggleCenterVisibility extends CustomAction<Action.TOGGLE_CENTER_VISIBILITY> {
-    public readonly source: ToggleCenterVisibilitySource;
-    public readonly visible?: boolean;
-
-    constructor(source: ToggleCenterVisibilitySource, visible?: boolean) {
-        super(Action.TOGGLE_CENTER_VISIBILITY);
-
-        this.source = source;
-        this.visible = visible;
-    }
-
-    public async dispatch(store: StoreAPI): Promise<void> {
-        if (toggleFilter.recordToggle(this.source)) {
-            await store.dispatch({...this});
-        }
-    }
-}
-
-export class BlurCenter extends CustomAction<Action.BLUR_CENTER> {
-    constructor() {
-        super(Action.BLUR_CENTER);
-    }
-
-    public async dispatch(store: StoreAPI): Promise<void> {
-        if (!store.state.centerLocked) {
-            toggleFilter.recordBlur();
-            await store.dispatch({...this});
-        }
-    }
-}
-
-export class ToggleLockCenter extends BaseAction<Action.TOGGLE_LOCK_CENTER> {
-    constructor() {
-        super(Action.TOGGLE_LOCK_CENTER);
-    }
-}
-
-export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleCenterVisibility|BlurCenter|ToggleLockCenter;
-
-export type ActionOf<A> = RootAction extends {type: A} ? RootAction : never;
-export type ActionHandler<A> = (state: RootState, action: ActionOf<A>) => RootState;
-export type ActionHandlerMap<T extends Action = Action> = {
-    [K in T]?: ActionHandler<K>;
-};
-
-export const ActionHandlers: ActionHandlerMap = {
-    [Action.CREATE]: (state: RootState, action: CreateNotification): RootState => {
-        const {notification} = action;
+    public reduce(state: RootState): RootState {
+        const {notification} = this;
 
         const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         database.get(CollectionMap.NOTIFICATIONS).upsert(notification);
@@ -158,9 +45,30 @@ export const ActionHandlers: ActionHandlerMap = {
             ...state,
             notifications
         };
-    },
-    [Action.REMOVE]: (state: RootState, action: RemoveNotifications): RootState => {
-        const {notifications} = action;
+    }
+
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+        const notification = this.notification;
+
+        // First remove any existing notifications with this ID, to ensure ID uniqueness
+        // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
+        const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
+        if (existingNotifications.length) {
+            await store.dispatch(new RemoveNotifications(existingNotifications));
+        }
+    }
+}
+
+export class RemoveNotifications extends Action<RootState> {
+    public readonly notifications: StoredNotification[];
+
+    constructor(notifications: StoredNotification[]) {
+        super();
+        this.notifications = notifications;
+    }
+
+    public reduce(state: RootState): RootState {
+        const {notifications} = this;
         const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
             return n.id;
@@ -172,27 +80,75 @@ export const ActionHandlers: ActionHandlerMap = {
             ...state,
             notifications: state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1)
         };
-    },
-    [Action.TOGGLE_CENTER_VISIBILITY]: (state: RootState, action: ToggleCenterVisibility): RootState => {
-        const centerVisible = (action.visible !== undefined) ? action.visible : !state.centerVisible;
+    }
+}
 
-        return {
-            ...state,
-            centerVisible: centerVisible
-        };
-    },
-    [Action.BLUR_CENTER]: (state: RootState, action: BlurCenter): RootState => {
+export class ClickNotification extends Action<RootState> {
+    public readonly notification: StoredNotification;
+
+    constructor(notifications: StoredNotification) {
+        super();
+        this.notification = notifications;
+    }
+}
+
+export class ClickButton extends Action<RootState> {
+    public readonly notification: StoredNotification;
+    public readonly buttonIndex: number;
+
+    constructor(notification: StoredNotification, buttonIndex: number) {
+        super();
+        this.notification = notification;
+        this.buttonIndex = buttonIndex;
+    }
+}
+
+export class ToggleCenterVisibility extends Action<RootState> {
+    public readonly source: ToggleCenterVisibilitySource;
+    public readonly visible?: boolean;
+
+    constructor(source: ToggleCenterVisibilitySource, visible?: boolean) {
+        super();
+        this.source = source;
+        this.visible = visible;
+    }
+
+    public reduce(state: RootState): RootState {
+        if (toggleFilter.recordToggle(this.source)) {
+            const centerVisible = (this.visible !== undefined) ? this.visible : !state.centerVisible;
+
+            return {
+                ...state,
+                centerVisible
+            };
+        } else {
+            return state;
+        }
+    }
+}
+
+export class BlurCenter extends Action<RootState> {
+    public reduce(state: RootState): RootState {
+        toggleFilter.recordBlur();
+
         return {
             ...state,
             centerVisible: false
         };
-    },
-    [Action.TOGGLE_LOCK_CENTER]: (state: RootState, action: ToggleLockCenter): RootState => {
+    }
+}
+
+export class ToggleLockCenter extends Action<RootState> {
+    public reduce(state: RootState): RootState {
+        toggleFilter.recordBlur();
+
         return {
             ...state,
             centerLocked: !state.centerLocked
         };
     }
-};
+}
 
 const toggleFilter = new ToggleFilter();
+
+export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleCenterVisibility | BlurCenter | ToggleLockCenter;
