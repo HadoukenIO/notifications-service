@@ -17,13 +17,13 @@ export abstract class Action<S> {
         this.type = type;
     }
 
+    public async dispatch(store: StoreAPI<S, Action<S>>): Promise<void> {
+        await store.dispatch(this);
+    }
+
     public reduce(state: S): S {
         return state;
     }
-}
-
-export abstract class AsyncAction<S> extends Action<S> {
-    public abstract async dispatch(api: StoreAPI<S, Action<S>>): Promise<void>;
 }
 
 type Listener<S> = (getState: () => S) => void;
@@ -39,15 +39,18 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         this._currentState = initialState;
     }
 
+    public get API(): StoreAPI<S, A> {
+        return {
+            state: this.state,
+            dispatch: this.dispatch.bind(this)
+        };
+    }
+
     public get state(): S {
         return this._currentState;
     }
 
     public async dispatch(action: A): Promise<void> {
-        if (action instanceof AsyncAction) {
-            // Action has custom dispatch logic
-            await action.dispatch(this);
-        }
         return this.reduceAndSignal(action);
     }
 

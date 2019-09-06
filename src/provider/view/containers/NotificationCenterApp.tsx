@@ -7,7 +7,7 @@ import {Header} from '../components/Header/Header';
 import {Footer} from '../components/Footer/Footer';
 import {NotificationView} from '../components/NotificationView/NotificationView';
 import {RootState} from '../../store/State';
-import {RootAction} from '../../store/Actions';
+import {Actionable} from '../../store/Actions';
 import {ServiceStore} from '../../store/ServiceStore';
 import {WebWindow} from '../../model/WebWindow';
 
@@ -16,27 +16,23 @@ export enum GroupingType {
     DATE = 'Date'
 }
 
-export interface Actionable {
-    storeDispatch: (action: RootAction) => void;
-}
-
 type Props = ReturnType<typeof mapStateToProps> & Actionable;
 
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, storeDispatch} = props;
+    const {notifications, storeAPI} = props;
 
     return (
         <div className='notification-center'>
             <Header
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}
-                storeDispatch={storeDispatch}
+                storeAPI={storeAPI}
             />
             <NotificationView
                 notifications={notifications}
                 groupBy={groupBy}
-                storeDispatch={storeDispatch}
+                storeAPI={storeAPI}
             />
             <Footer />
         </div>
@@ -60,7 +56,7 @@ export function renderApp(webWindow: WebWindow, store: ServiceStore): void {
         // Replace redux store with service store implementation.
         // This will resolve the interface incompatibility issues.
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeDispatch={store.dispatch.bind(store)} />
+            <Container storeAPI={store.API} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

@@ -92,7 +92,7 @@ export class NotificationCenter extends AsyncInit {
         if (hideOnBlur) {
             this._webWindow.onBlurred.add(async () => {
                 if (this.visible) {
-                    this._store.dispatch(new ToggleVisibility(false));
+                    new ToggleVisibility(false).dispatch(this._store);
                 }
             });
         }

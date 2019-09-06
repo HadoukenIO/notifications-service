@@ -21,6 +21,7 @@ import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
 import {ServiceStore} from './store/ServiceStore';
+import {Action} from './store/Store';
 
 @injectable()
 export class Main {
@@ -148,7 +149,8 @@ export class Main {
     private async createNotification(payload: CreatePayload, sender: ProviderIdentity): Promise<NotificationInternal> {
         // Explicitly create the identity object to avoid storing other unneeded info from ProviderIdentity
         const notification = this.hydrateNotification(payload, {uuid: sender.uuid, name: sender.name});
-        this._store.dispatch(new CreateNotification(notification));
+        new CreateNotification(notification).dispatch(this._store);
+
         return mutable(notification.notification);
     }
 

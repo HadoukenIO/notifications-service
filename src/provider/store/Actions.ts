@@ -5,9 +5,19 @@ import {CollectionMap} from '../model/database/Database';
 import {SettingsMap} from '../model/StoredSetting';
 
 import {RootState} from './State';
-import {StoreAPI, AsyncAction, Action} from './Store';
+import {StoreAPI, Action} from './Store';
 
-export class CreateNotification extends AsyncAction<RootState> {
+export interface Actionable {
+    storeAPI: StoreAPI<RootState, RootAction>;
+}
+
+export const enum ToggleCenterVisibilitySource {
+    API,
+    TRAY,
+    BUTTON
+}
+
+export class CreateNotification extends Action<RootState> {
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
@@ -50,6 +60,7 @@ export class CreateNotification extends AsyncAction<RootState> {
         if (existingNotifications.length) {
             await store.dispatch(new RemoveNotifications(existingNotifications));
         }
+        super.dispatch(store);
     }
 }
 

@@ -2,8 +2,9 @@ import * as React from 'react';
 import moment from 'moment';
 
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
-import {GroupingType as GroupingType, Actionable} from '../../containers/NotificationCenterApp';
+import {GroupingType as GroupingType} from '../../containers/NotificationCenterApp';
 import {StoredNotification} from '../../../model/StoredNotification';
+import {Actionable} from '../../../store/Actions';
 
 interface NotificationViewProps extends Actionable {
     notifications: StoredNotification[];
