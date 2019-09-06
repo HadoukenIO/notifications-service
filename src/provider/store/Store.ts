@@ -79,7 +79,7 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         this._listeners.forEach(listener => listener(() => this._currentState));
     }
 
-    /* intended to be used by react-redux only */
+    // intended to be used by react-redux only
     private getState(): S {
         return this._currentState;
     }

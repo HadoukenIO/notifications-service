@@ -6,7 +6,7 @@ import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 import {serviceIdentity} from './constants';
 
 export interface ProviderContext extends BaseWindowContext {
-    main: any;
+    main: {clearNotification: (payload: {id: string}, identity: Identity) => Promise<boolean>}
     store: ServiceStore;
 }
 
