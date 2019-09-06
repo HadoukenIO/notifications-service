@@ -93,7 +93,7 @@ export class NotificationCenter extends AsyncInit {
      */
     private async addListeners(): Promise<void> {
         this._webWindow.onBlurred.add(() => {
-            if (this.visible) {
+            if (this.visible && !this._store.state.centerLocked) {
                 this._store.dispatch(new BlurCenter());
             }
         });

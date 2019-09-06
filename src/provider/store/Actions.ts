@@ -133,7 +133,7 @@ export class BlurCenter extends AsyncAction<RootState> {
     public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
         // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
         // properly [SERVICE-614]
-        if (toggleFilter.recordBlur() && !store.state.centerLocked) {
+        if (toggleFilter.recordBlur()) {
             await store.dispatch({...this, reduce: this.conditionalReduce.bind(this)});
         }
     }
