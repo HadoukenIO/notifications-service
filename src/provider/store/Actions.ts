@@ -103,7 +103,7 @@ export class ClickButton extends Action<RootState> {
     }
 }
 
-export class ToggleCenterVisibility extends Action<RootState> {
+export class ToggleCenterVisibility extends AsyncAction<RootState> {
     public readonly source: ToggleCenterVisibilitySource;
     public readonly visible?: boolean;
 
@@ -113,32 +113,36 @@ export class ToggleCenterVisibility extends Action<RootState> {
         this.visible = visible;
     }
 
-    public reduce(state: RootState): RootState {
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
         if (toggleFilter.recordToggle(this.source)) {
-            const centerVisible = (this.visible !== undefined) ? this.visible : !state.centerVisible;
-
-            return {
-                ...state,
-                centerVisible
-            };
-        } else {
-            return state;
+            await store.dispatch({...this, reduce: this.conditionalReduce.bind(this)});
         }
+    }
+
+    private conditionalReduce(state: RootState): RootState {
+        const centerVisible = (this.visible !== undefined) ? this.visible : !state.centerVisible;
+
+        return {
+            ...state,
+            centerVisible
+        };
     }
 }
 
-export class BlurCenter extends Action<RootState> {
-    public reduce(state: RootState): RootState {
+export class BlurCenter extends AsyncAction<RootState> {
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
         // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
         // properly [SERVICE-614]
-        if (toggleFilter.recordBlur() && !state.centerLocked) {
-            return {
-                ...state,
-                centerVisible: false
-            };
-        } else {
-            return state;
+        if (toggleFilter.recordBlur() && !store.state.centerLocked) {
+            await store.dispatch({...this, reduce: this.conditionalReduce.bind(this)});
         }
+    }
+
+    private conditionalReduce(state: RootState): RootState {
+        return {
+            ...state,
+            centerVisible: false
+        };
     }
 }
 
