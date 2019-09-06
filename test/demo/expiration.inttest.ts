@@ -10,7 +10,6 @@ import {defaultTestAppUrl, testManagerIdentity} from './utils/constants';
 import * as notifsRemote from './utils/notificationsRemote';
 import * as providerRemote from './utils/providerRemote';
 import {delay, Duration} from './utils/delay';
-import {setupOpenCenterBookends} from './common';
 
 let testApp: Application;
 let testWindow: _Window;
