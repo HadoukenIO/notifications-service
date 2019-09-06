@@ -3,7 +3,7 @@ import {injectable, inject} from 'inversify';
 import {Store} from '../store/Store';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
-import {RemoveNotifications, RootAction, CreateNotification} from '../store/Actions';
+import {RemoveNotifications, RootAction, CreateNotification, ExpireNotification} from '../store/Actions';
 import {RootState} from '../store/State';
 
 import {AsyncInit} from './AsyncInit';
@@ -69,7 +69,7 @@ export class ExpirationController extends AsyncInit {
             this._nextExpiration = null;
         }
 
-        await this._store.dispatch(new RemoveNotifications([storedNotificaiton]));
+        await this._store.dispatch(new ExpireNotification(storedNotificaiton));
 
         await this.scheduleEarliestExpiry(Date.now());
     }

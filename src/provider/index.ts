@@ -16,7 +16,7 @@ import {ToastManager} from './controller/ToastManager';
 import {ExpirationController} from './controller/ExpirationController';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
-import {RootAction, CreateNotification, RemoveNotifications, ToggleVisibility, ClickNotification, ClickButton} from './store/Actions';
+import {RootAction, CreateNotification, RemoveNotifications, ToggleVisibility, ClickNotification, ClickButton, ExpireNotification} from './store/Actions';
 import {mutable} from './store/State';
 import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
@@ -139,6 +139,20 @@ export class Main {
                     };
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
+            } else if (action instanceof ExpireNotification) {
+                const {notification, source} = action.notification;
+
+                if (notification.onExpired !== null) {
+                    const event: Targeted<Transport<NotificationActionEvent>> = {
+                        target: 'default',
+                        type: 'notification-action',
+                        trigger: ActionTrigger.EXPIRE,
+                        notification: mutable(notification),
+                        result: notification.onExpired
+                    };
+                    this._eventPump.push<NotificationActionEvent>(source.uuid, event);
+                }
+                this._store.dispatch(new RemoveNotifications([action.notification]));
             }
         });
 

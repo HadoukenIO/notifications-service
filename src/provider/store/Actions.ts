@@ -118,4 +118,13 @@ export class ToggleVisibility extends Action<RootState> {
     }
 }
 
+export class ExpireNotification extends Action<RootState> {
+    public readonly notification: StoredNotification;
+
+    constructor(notification: StoredNotification) {
+        super();
+        this.notification = notification;
+    }
+}
+
 export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleVisibility;
