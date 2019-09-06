@@ -1,5 +1,3 @@
-import {Action as ReduxAction} from 'redux';
-
 import {StoredNotification} from '../model/StoredNotification';
 import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
@@ -7,99 +5,18 @@ import {CollectionMap} from '../model/database/Database';
 import {SettingsMap} from '../model/StoredSetting';
 
 import {RootState} from './State';
-import {StoreAPI} from './Store';
+import {StoreAPI, AsyncAction, Action} from './Store';
 
-export const enum Action {
-    CREATE = '@@notifications/CREATE',
-    REMOVE = '@@notifications/REMOVE',
-    CLICK_NOTIFICATION = '@@notifications/CLICK_NOTIFICATION',
-    CLICK_BUTTON = '@@notifications/CLICK_BUTTON',
-    TOGGLE_VISIBILITY = '@@ui/TOGGLE_CENTER_WINDOW',
-}
-
-export class BaseAction<T extends Action> implements ReduxAction<Action> {
-    public readonly type: T;
-
-    constructor(type: T) {
-        this.type = type;
-    }
-}
-
-export abstract class CustomAction<T extends Action> extends BaseAction<T> {
-    public abstract async dispatch(store: StoreAPI): Promise<void>;
-}
-
-export class CreateNotification extends CustomAction<Action.CREATE> {
+export class CreateNotification extends AsyncAction<RootState> {
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
-        super(Action.CREATE);
+        super();
         this.notification = notification;
     }
 
-    public async dispatch(store: StoreAPI): Promise<void> {
-        const notification = this.notification;
-
-        // First remove any existing notifications with this ID, to ensure ID uniqueness
-        // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
-        const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
-        if (existingNotifications.length) {
-            await store.dispatch(new RemoveNotifications(existingNotifications));
-        }
-        await store.dispatch({...this});
-    }
-}
-
-export class RemoveNotifications extends BaseAction<Action.REMOVE> {
-    public readonly notifications: StoredNotification[];
-
-    constructor(notifications: StoredNotification[]) {
-        super(Action.REMOVE);
-
-        this.notifications = notifications;
-    }
-}
-
-export class ClickNotification extends BaseAction<Action.CLICK_NOTIFICATION> {
-    public readonly notification: StoredNotification;
-
-    constructor(notifications: StoredNotification) {
-        super(Action.CLICK_NOTIFICATION);
-        this.notification = notifications;
-    }
-}
-
-export class ClickButton extends BaseAction<Action.CLICK_BUTTON> {
-    public readonly notification: StoredNotification;
-    public readonly buttonIndex: number;
-
-    constructor(notification: StoredNotification, buttonIndex: number) {
-        super(Action.CLICK_BUTTON);
-        this.notification = notification;
-        this.buttonIndex = buttonIndex;
-    }
-}
-
-export class ToggleVisibility extends BaseAction<Action.TOGGLE_VISIBILITY> {
-    public readonly visible?: boolean;
-
-    constructor(visible?: boolean) {
-        super(Action.TOGGLE_VISIBILITY);
-        this.visible = visible;
-    }
-}
-
-export type RootAction = CreateNotification|RemoveNotifications|ClickNotification|ClickButton|ToggleVisibility;
-
-export type ActionOf<A> = RootAction extends {type: A} ? RootAction : never;
-export type ActionHandler<A> = (state: RootState, action: ActionOf<A>) => RootState;
-export type ActionHandlerMap<T extends Action = Action> = {
-    [K in T]?: ActionHandler<K>;
-};
-
-export const ActionHandlers: ActionHandlerMap = {
-    [Action.CREATE]: (state: RootState, action: CreateNotification): RootState => {
-        const {notification} = action;
+    public reduce(state: RootState): RootState {
+        const {notification} = this;
 
         const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         database.get(CollectionMap.NOTIFICATIONS).upsert(notification);
@@ -122,9 +39,30 @@ export const ActionHandlers: ActionHandlerMap = {
             ...state,
             notifications
         };
-    },
-    [Action.REMOVE]: (state: RootState, action: RemoveNotifications): RootState => {
-        const {notifications} = action;
+    }
+
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+        const notification = this.notification;
+
+        // First remove any existing notifications with this ID, to ensure ID uniqueness
+        // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
+        const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
+        if (existingNotifications.length) {
+            await store.dispatch(new RemoveNotifications(existingNotifications));
+        }
+    }
+}
+
+export class RemoveNotifications extends Action<RootState> {
+    public readonly notifications: StoredNotification[];
+
+    constructor(notifications: StoredNotification[]) {
+        super();
+        this.notifications = notifications;
+    }
+
+    public reduce(state: RootState): RootState {
+        const {notifications} = this;
         const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
             return n.id;
@@ -136,9 +74,39 @@ export const ActionHandlers: ActionHandlerMap = {
             ...state,
             notifications: state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1)
         };
-    },
-    [Action.TOGGLE_VISIBILITY]: (state: RootState, action: ToggleVisibility): RootState => {
-        const windowVisible = (action.visible !== undefined) ? action.visible : !state.windowVisible;
+    }
+}
+
+export class ClickNotification extends Action<RootState> {
+    public readonly notification: StoredNotification;
+
+    constructor(notifications: StoredNotification) {
+        super();
+        this.notification = notifications;
+    }
+}
+
+export class ClickButton extends Action<RootState> {
+    public readonly notification: StoredNotification;
+    public readonly buttonIndex: number;
+
+    constructor(notification: StoredNotification, buttonIndex: number) {
+        super();
+        this.notification = notification;
+        this.buttonIndex = buttonIndex;
+    }
+}
+
+export class ToggleVisibility extends Action<RootState> {
+    public readonly visible?: boolean;
+
+    constructor(visible?: boolean) {
+        super();
+        this.visible = visible;
+    }
+
+    public reduce(state: RootState): RootState {
+        const windowVisible = (this.visible !== undefined) ? this.visible : !state.windowVisible;
         const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
 
         storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
@@ -148,4 +116,6 @@ export const ActionHandlers: ActionHandlerMap = {
             windowVisible
         };
     }
-};
+}
+
+export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleVisibility;

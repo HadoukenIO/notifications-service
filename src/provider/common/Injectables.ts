@@ -5,7 +5,6 @@
  * `Injector.ts`. These mappings can be programmatically overridden by calling the methods of the {@link Injector} util.
  */
 enum Injectable {
-    ACTION_HANDLER_MAP,
     API_HANDLER,
     CLIENT_REGISTRY,
     DATABASE,
