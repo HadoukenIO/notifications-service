@@ -129,12 +129,16 @@ export class ToggleCenterVisibility extends Action<RootState> {
 
 export class BlurCenter extends Action<RootState> {
     public reduce(state: RootState): RootState {
-        toggleFilter.recordBlur();
-
-        return {
-            ...state,
-            centerVisible: false
-        };
+        // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
+        // properly [SERVICE-614]
+        if (toggleFilter.recordBlur() && !state.centerLocked) {
+            return {
+                ...state,
+                centerVisible: false
+            };
+        } else {
+            return state;
+        }
     }
 }
 

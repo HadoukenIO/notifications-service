@@ -25,13 +25,15 @@ export class ToggleFilter {
         this._blurBlockTimer = new Timer(POST_TOGGLE_BLUR_BLOCK_DURATION);
     }
 
-    public recordBlur(): void {
+    public recordBlur(): boolean {
         if (this._blurBlockTimer.running) {
             // Blur occured shortly after an unblocked interaction, so ignore
             this._blurBlockTimer.clear();
+            return false;
         } else {
             // Blur was the first event in a blur/toggle pair, so start times to temporarily block toggles
             this._toggleBlockTimer.start();
+            return true;
         }
     }
 
