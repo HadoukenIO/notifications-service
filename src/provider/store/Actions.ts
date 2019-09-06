@@ -144,8 +144,6 @@ export class BlurCenter extends Action<RootState> {
 
 export class ToggleLockCenter extends Action<RootState> {
     public reduce(state: RootState): RootState {
-        toggleFilter.recordBlur();
-
         return {
             ...state,
             centerLocked: !state.centerLocked
