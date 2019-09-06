@@ -121,6 +121,7 @@ export class Main {
                     };
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
+                this._store.dispatch(new RemoveNotifications([action.notification]));
             } else if (action instanceof ClickNotification) {
                 const {notification, source} = action.notification;
 
@@ -134,6 +135,7 @@ export class Main {
                     };
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
+                this._store.dispatch(new RemoveNotifications([action.notification]));
             }
         });
 
