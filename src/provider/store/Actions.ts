@@ -11,12 +11,6 @@ export interface Actionable {
     storeAPI: StoreAPI<RootState, RootAction>;
 }
 
-export const enum ToggleCenterVisibilitySource {
-    API,
-    TRAY,
-    BUTTON
-}
-
 export class CreateNotification extends Action<RootState> {
     public readonly notification: StoredNotification;
 
