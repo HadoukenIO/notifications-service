@@ -30,10 +30,11 @@ export class ExpirationController extends AsyncInit {
     }
 
     private async onAction(action: RootAction): Promise<void> {
+        // Intentionally don't await, as though this may trigger expiration, we treat that as a 'background' process
         if (action instanceof CreateNotification) {
-            await this.addNotification(action.notification);
+            this.addNotification(action.notification);
         } else if (action instanceof RemoveNotifications) {
-            await this.removeNotifications(action.notifications);
+            this.removeNotifications(action.notifications);
         }
     }
 
