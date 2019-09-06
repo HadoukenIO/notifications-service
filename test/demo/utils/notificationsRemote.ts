@@ -14,11 +14,24 @@ const ofBrowser = new OFPuppeteerBrowser<NotifsTestContext>();
 
 export async function create(executionTarget: Identity, options: NotificationOptions) {
     const result = await ofBrowser.executeOnWindow(executionTarget, async function(optionsRemote: NotificationOptions) {
+        // Manually un-stringify Dates, as puppeteer will not do so on the runner-to-remote journey
+        const date =
+            (optionsRemote.date !== undefined) ?
+                new Date(optionsRemote.date) :
+                optionsRemote.date;
+        const expiration =
+            (optionsRemote.expiration !== undefined && optionsRemote.expiration !== null) ?
+                new Date(optionsRemote.expiration) :
+                optionsRemote.date;
+
+        optionsRemote = {...optionsRemote, date, expiration};
+
         const note = await this.notifications.create(optionsRemote);
-        // We need to manually stringify the date object as puppeteer fails to do so
-        return {...note, date: note.date.toJSON()};
+
+        // We need to manually stringify Dates object as puppeteer fails to do so on the remote-to-runner journey
+        return {...note, date: note.date.toJSON(), expiration: note.expiration !== null ? note.expiration.toJSON() : null};
     }, options);
-    // And then manually un-stringify it
+    // And then manually un-stringify them
     return {...result, date: new Date(result.date), expiration: result.expiration !== null ? new Date(result.expiration) : null};
 }
 

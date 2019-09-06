@@ -366,7 +366,7 @@ export async function create(options: NotificationOptions): Promise<Notification
         throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
     }
 
-    if (options.expiration !== undefined && options.expiration !== null && !(options.date instanceof Date)) {
+    if (options.expiration !== undefined && options.expiration !== null && !(options.expiration instanceof Date)) {
         throw new Error('Invalid arguments passed to create: "expiration" must be null or a valid Date object');
     }
 
