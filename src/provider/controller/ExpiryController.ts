@@ -30,7 +30,6 @@ export class ExpiryController extends AsyncInit {
     }
 
     private async onAction(action: RootAction): Promise<void> {
-        // Intentionally don't await, as though this may trigger expiry, we treat that as a 'background' process
         if (action instanceof CreateNotification) {
             this.addNotification(action.notification);
         } else if (action instanceof RemoveNotifications) {
@@ -38,44 +37,44 @@ export class ExpiryController extends AsyncInit {
         }
     }
 
-    private async addNotification(note: StoredNotification): Promise<void> {
+    private addNotification(note: StoredNotification): void {
         if (note.notification.expiry !== null) {
             if (this._nextExpiry === null || note.notification.expiry < this._nextExpiry.note.notification.expiry!) {
                 const now = Date.now();
 
                 if (note.notification.expiry <= now) {
-                    await this.expireNotification(note, now);
+                    this.expireNotification(note, now);
                 } else {
                     if (this._nextExpiry !== null) {
                         window.clearTimeout(this._nextExpiry.timerHandler);
                     }
 
-                    await this.scheduleExpiry(note, now);
+                    this.scheduleExpiry(note, now);
                 }
             }
         }
     }
 
-    private async removeNotifications(notes: StoredNotification[]): Promise<void> {
+    private removeNotifications(notes: StoredNotification[]): void {
         if (this._nextExpiry && notes.some(note => this._nextExpiry!.note.id === note.id)) {
             window.clearTimeout(this._nextExpiry.timerHandler);
             this._nextExpiry = null;
 
-            await this.scheduleEarliestExpiry(Date.now());
+            this.scheduleEarliestExpiry(Date.now());
         }
     }
 
-    private async expireNotification(storedNotificaiton: StoredNotification, now: number): Promise<void> {
+    private expireNotification(storedNotificaiton: StoredNotification, now: number): void {
         if (this._nextExpiry && this._nextExpiry.note.id === storedNotificaiton.id) {
             this._nextExpiry = null;
         }
 
-        await this._store.dispatch(new ExpireNotification(storedNotificaiton));
+        this._store.dispatch(new ExpireNotification(storedNotificaiton));
 
-        await this.scheduleEarliestExpiry(Date.now());
+        this.scheduleEarliestExpiry(now);
     }
 
-    private async scheduleEarliestExpiry(now: number): Promise<void> {
+    private scheduleEarliestExpiry(now: number): void {
         const earliestExpiry = this._store.state.notifications.reduce((
             earliest: StoredNotification|null,
             current: StoredNotification
@@ -95,7 +94,7 @@ export class ExpiryController extends AsyncInit {
 
         if (earliestExpiry !== null) {
             if (earliestExpiry.notification.expiry! <= now) {
-                await this.expireNotification(earliestExpiry, now);
+                this.expireNotification(earliestExpiry, now);
             } else {
                 this.scheduleExpiry(earliestExpiry, now);
             }
