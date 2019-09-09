@@ -4,14 +4,13 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {ElementHandle} from 'puppeteer';
 
 import {NotificationOptions} from '../../src/client';
-
-import * as notifsRemote from './utils/notificationsRemote';
-import * as providerRemote from './utils/providerRemote';
-import {delay, Duration} from './utils/delay';
-import {getToastCards} from './utils/toastUtils';
-import {createAppInServiceRealm} from './utils/spawnRemote';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
-import {waitForAppToBeRunning} from './utils/common';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import * as providerRemote from '../utils/int/providerRemote';
+import {delay, Duration} from '../utils/int/delay';
+import {getToastCards} from '../utils/int/toastUtils';
+import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {waitForAppToBeRunning} from '../utils/int/common';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const relaunchNotificationOptions: NotificationOptions = {
     body: 'Test Notification Body',

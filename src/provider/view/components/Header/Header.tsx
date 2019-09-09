@@ -1,18 +1,24 @@
 import * as React from 'react';
 
+import {DevelopmentOnly} from '../DevelopmentOnly';
 import {GroupingType, Actionable} from '../../containers/NotificationCenterApp';
-import {ToggleVisibility} from '../../../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleLockCenter} from '../../../store/Actions';
 
 interface HeaderProps extends Actionable {
     groupBy: GroupingType;
     handleGroupBy: (groupBy: GroupingType) => void;
+    centerLocked: boolean;
+}
+
+interface LockProps extends Actionable {
+    centerLocked: boolean;
 }
 
 export function Header(props: HeaderProps): React.ReactElement {
-    const {groupBy, handleGroupBy, storeDispatch} = props;
+    const {groupBy, handleGroupBy, centerLocked, storeDispatch} = props;
 
     const handleHideWindow = () => {
-        storeDispatch(new ToggleVisibility(false));
+        storeDispatch(new ToggleCenterVisibility(ToggleCenterVisibilitySource.BUTTON, false));
     };
 
     return (
@@ -35,6 +41,19 @@ export function Header(props: HeaderProps): React.ReactElement {
                 }
             </div>
             <img id="exit-link" onClick={handleHideWindow} src="image/shapes/arrow.png" alt="" />
+            <DevelopmentOnly>
+                <Lock centerLocked={centerLocked} storeDispatch={storeDispatch} />
+            </DevelopmentOnly>
         </div>
     );
+}
+
+function Lock(props: LockProps): React.ReactElement {
+    const {storeDispatch, centerLocked} = props;
+
+    const handleLockWindow = () => {
+        storeDispatch(new ToggleLockCenter());
+    };
+
+    return <a id="lock-link" onClick={handleLockWindow}>{centerLocked ? '🔒' : '🔓'}</a>;
 }

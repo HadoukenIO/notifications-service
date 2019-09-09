@@ -4,15 +4,14 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {WindowEvent} from 'hadouken-js-adapter/out/types/src/api/events/base';
 
 import {NotificationOptions, Notification, NotificationClosedEvent, NotificationCreatedEvent} from '../../src/client';
-
-import {createAppInServiceRealm} from './utils/spawnRemote';
-import * as notifsRemote from './utils/notificationsRemote';
-import {delay, Duration} from './utils/delay';
-import {fin} from './utils/fin';
-import {getToastIdentity} from './utils/toastUtils';
-import {assertDOMMatches, CardType} from './utils/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
-import {setupCenterBookends, CenterState as CenterVisibility} from './common';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import {delay, Duration} from '../utils/int/delay';
+import {fin} from '../utils/int/fin';
+import {getToastIdentity} from '../utils/int/toastUtils';
+import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
+import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const firstOptions: NotificationOptions = {
     id: 'duplicate-test-1',
@@ -29,7 +28,7 @@ const secondOptions: NotificationOptions = {
 };
 
 describe('When creating a notification with an ID that already exists but different options', () => {
-    describe.each(['center-open', 'center-closed'] as CenterVisibility[])('Center showing: %s', centerVisibility => {
+    describe.each(['center-open', 'center-closed'] as CenterState[])('Center showing: %s', centerVisibility => {
         let testApp: Application;
         let testWindow: Window;
 

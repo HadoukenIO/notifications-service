@@ -13,7 +13,8 @@ import {Store} from './Store';
 export class ServiceStore extends Store<RootState, RootAction> {
     private static INITIAL_STATE: RootState = {
         notifications: [],
-        windowVisible: false
+        centerVisible: false,
+        centerLocked: false
     };
 
     private readonly _database: Database;
