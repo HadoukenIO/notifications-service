@@ -260,8 +260,9 @@ export interface NotificationActionEvent<T = CustomData> {
 /**
  * Event fired whenever the notification has been closed.
  *
- * This event is fired regardless of how the notification was closed - i.e.: via a call to `clear`/`clearAll`, or by a
- * user clicking either the notification itself, the notification's close button, or a button on the notification.
+ * This event is fired regardless of how the notification was closed - i.e.: via a call to `clear`/`clearAll`, the
+ * notification expiring, or by a user clicking either the notification itself, the notification's close button, or
+ * a button on the notification.
  *
  * @event
  */
