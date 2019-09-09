@@ -1,12 +1,13 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import {Store} from 'redux';
 import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../model/StoredNotification';
 import {NotificationCard} from '../components/NotificationCard/NotificationCard';
 import {WindowDimensions} from '../../controller/Layouter';
 import {RootState} from '../../store/State';
-import {Store} from '../../store/Store';
+import {ServiceStore} from '../../store/ServiceStore';
 import {WebWindow} from '../../model/WebWindow';
 
 import {Actionable} from './NotificationCenterApp';
@@ -52,9 +53,16 @@ const mapStateToProps = (state: RootState, ownProps: ToastAppProps) => ({
 
 const Container = connect(mapStateToProps)(ToastApp);
 
-export function renderApp(notification: StoredNotification, webWindow: WebWindow, store: Store, setWindowSize: (dim: WindowDimensions) => void) {
+export function renderApp(
+    notification: StoredNotification,
+    webWindow: WebWindow,
+    store: ServiceStore,
+    setWindowSize: (dim: WindowDimensions) => void
+) {
     ReactDOM.render(
-        <Provider store={store['_store']}>
+        // Replace redux store with service store implementation.
+        // This will resolve the interface incompatibility issues.
+        <Provider store={store as unknown as Store<RootState>}>
             <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')

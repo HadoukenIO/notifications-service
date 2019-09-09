@@ -3,8 +3,8 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 import {Inject} from '../common/Injectables';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
-import {ToggleVisibility} from '../store/Actions';
-import {Store} from '../store/Store';
+import {ToggleVisibility, RootAction} from '../store/Actions';
+import {ServiceStore} from '../store/ServiceStore';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
 import {TrayIcon} from '../model/TrayIcon';
@@ -35,7 +35,7 @@ export class NotificationCenter extends AsyncInit {
     private static readonly WIDTH: number = 388;
 
     private readonly _monitorModel: MonitorModel;
-    private readonly _store: Store;
+    private readonly _store: ServiceStore;
     private readonly _trayIcon: TrayIcon;
     private readonly _webWindowFactory: WebWindowFactory;
 
@@ -43,7 +43,7 @@ export class NotificationCenter extends AsyncInit {
 
     public constructor(
         @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
-        @inject(Inject.STORE) store: Store,
+        @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
         @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
     ) {
@@ -51,6 +51,7 @@ export class NotificationCenter extends AsyncInit {
 
         this._monitorModel = monitorModel;
         this._store = store;
+        this._store.onAction.add(this.onAction, this);
         this._trayIcon = trayIcon;
         this._webWindowFactory = webWindowFactory;
     }
@@ -74,19 +75,6 @@ export class NotificationCenter extends AsyncInit {
         await this.sizeToFit();
         await this.addListeners();
         renderApp(this._webWindow, this._store);
-        this.subscribe();
-    }
-
-    /**
-     * Subscribe to the store.
-     * Perform all watching for state change in here.
-     */
-    private subscribe(): void {
-        // Window visibility
-        this._store.watchForChange(
-            state => state.windowVisible,
-            (_, value) => this.toggleWindow(value)
-        );
     }
 
     /**
@@ -114,6 +102,12 @@ export class NotificationCenter extends AsyncInit {
         this._monitorModel.onMonitorInfoChanged.add(() => {
             this.sizeToFit();
         });
+    }
+
+    private async onAction(action: RootAction): Promise<void> {
+        if (action instanceof ToggleVisibility) {
+            this.toggleWindow(this._store.state.windowVisible);
+        }
     }
 
     /**
