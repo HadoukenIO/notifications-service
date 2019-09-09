@@ -3,7 +3,7 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 import {ElementHandle} from 'puppeteer';
 
-import {NotificationOptions} from '../../src/client';
+import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent} from '../../src/client';
 
 import * as notifsRemote from './utils/notificationsRemote';
 import * as providerRemote from './utils/providerRemote';
@@ -22,12 +22,20 @@ const notificationOptions: NotificationOptions = {
 };
 
 describe('When an app that uses notification-service is created', () => {
+    let eventOrdering: string[];
+    let actionListener: jest.Mock<void, [NotificationActionEvent]>;
+    let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
     let testApp: Application;
     let testWindow: Window;
 
     beforeEach(async () => {
+        eventOrdering = [];
+        actionListener = jest.fn<void, [NotificationActionEvent]>().mockImplementation(() => eventOrdering.push('action'));
+        closedListener = jest.fn<void, [NotificationClosedEvent]>().mockImplementation(() => eventOrdering.push('closed'));
         testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
         testWindow = await testApp.getWindow();
+        await notifsRemote.addEventListener(testWindow.identity, 'notification-action', actionListener);
+        await notifsRemote.addEventListener(testWindow.identity, 'notification-closed', closedListener);
     });
 
     afterEach(async () => {
@@ -49,8 +57,7 @@ describe('When an app that uses notification-service is created', () => {
         test('Clicking the notification should close the notification card after notification action is dispatched.', async () => {
             toastCards![0].click();
             await delay(Duration.EVENT_PROPAGATED);
-            expect(await notifsRemote.getReceivedEvents((await testApp.getWindow()).identity, 'notification-action')).toHaveLength(1);
-            expect(await notifsRemote.getReceivedEvents((await testApp.getWindow()).identity, 'notification-closed')).toHaveLength(1);
+            expect(eventOrdering).toEqual(['action', 'closed']);
         });
     });
 });
