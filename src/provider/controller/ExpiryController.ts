@@ -32,18 +32,20 @@ export class ExpiryController extends AsyncInit {
 
     private async onAction(action: RootAction): Promise<void> {
         if (action instanceof CreateNotification) {
-            this.addNotification(action.notification);
+            await this.addNotification(action.notification);
         } else if (action instanceof RemoveNotifications) {
             this.removeNotifications(action.notifications);
         }
     }
 
-    private addNotification(note: StoredNotification): void {
+    private async addNotification(note: StoredNotification): Promise<void> {
         if (!this._nextExpiry || this.expiresBefore(note, this._nextExpiry.note)) {
             const now = Date.now();
 
             if (note.notification.expiry! <= now) {
-                this.expireNotification(note, now);
+                // Note that this is the only case where we want to await - in all other circumstances, even if a store dispatch is triggered,
+                // it will be for an unrelated notification, so regard as something happening 'in the background'
+                await this.expireNotification(note, now);
             } else {
                 this.clearExpiry();
                 this.scheduleExpiry(note, now);
@@ -58,14 +60,16 @@ export class ExpiryController extends AsyncInit {
         }
     }
 
-    private expireNotification(storedNotificaiton: StoredNotification, now: number): void {
+    private expireNotification(storedNotificaiton: StoredNotification, now: number): Promise<void> {
         if (this._nextExpiry && this._nextExpiry.note.id === storedNotificaiton.id) {
             this._nextExpiry = null;
         }
 
-        this._store.dispatch(new ExpireNotification(storedNotificaiton));
+        const promise = this._store.dispatch(new ExpireNotification(storedNotificaiton));
 
         this.scheduleEarliestExpiry(now);
+
+        return promise;
     }
 
     private scheduleEarliestExpiry(now: number): void {
