@@ -146,7 +146,7 @@ export interface NotificationOptions {
      * {@link NotificationActionEvent|`notification-action`} event fired when the notification the expires.
      *
      * This action will be raised if an `expiry` is specified for the notification, when the notification is removed
-     * due to expiry. This action will never be raised if not `expiry` is specified. Note that this action does not
+     * due to expiring. This action will never be raised if not `expiry` is specified. Note that this action does not
      * exclude a close action being raised. If and when the notification expires, both this and any close action will
      * be raised.
      *
