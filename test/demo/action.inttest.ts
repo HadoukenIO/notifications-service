@@ -8,7 +8,7 @@ import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent} f
 import * as notifsRemote from './utils/notificationsRemote';
 import * as providerRemote from './utils/providerRemote';
 import {delay, Duration} from './utils/delay';
-import {getToastCards} from './utils/toastUtils';
+import {getToastCards, getToastButtons} from './utils/toastUtils';
 import {createAppInServiceRealm} from './utils/spawnRemote';
 import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
 
@@ -18,7 +18,7 @@ const notificationOptions: NotificationOptions = {
     category: 'Test Notification Category',
     customData: {testContext: 'testContext'},
     onSelect: {task: 'Selected'},
-    buttons: []
+    buttons: [{title: 'testButton', onClick: {btn: 'testAction'}}]
 };
 
 describe('When an app that uses notification-service is created', () => {
@@ -46,18 +46,37 @@ describe('When an app that uses notification-service is created', () => {
     });
 
     describe('When the application creates a notification', () => {
-        let toastCards: ElementHandle[] | undefined;
-
+        let noteId: string;
         beforeEach(async () => {
             const {note} = await notifsRemote.createAndAwait(testWindow.identity, notificationOptions);
+            noteId = note.id;
             await delay(Duration.TOAST_DOM_LOADED);
-            toastCards = await getToastCards(testApp.identity.uuid, note.id);
         });
 
-        test('Clicking the notification should close the notification card after notification action is dispatched.', async () => {
-            toastCards![0].click();
-            await delay(Duration.EVENT_PROPAGATED);
-            expect(eventOrdering).toEqual(['action', 'closed']);
+        describe('When the notification body is clicked', () => {
+            let toastCards: ElementHandle[] | undefined;
+            beforeEach(async () => {
+                toastCards = await getToastCards(testApp.identity.uuid, noteId);
+            });
+
+            test('Notification card should be closed after the action is dispatched.', async () => {
+                toastCards![0].click();
+                await delay(Duration.EVENT_PROPAGATED);
+                expect(eventOrdering).toEqual(['action', 'closed']);
+            });
+        });
+
+        describe('When a button in notification is clicked', () => {
+            let toastButtons: ElementHandle[] | undefined;
+            beforeEach(async () => {
+                toastButtons = await getToastButtons(testApp.identity.uuid, noteId);
+            });
+
+            test('Notification card should be closed after the action is dispatched.', async () => {
+                toastButtons![0].click();
+                await delay(Duration.EVENT_PROPAGATED);
+                expect(eventOrdering).toEqual(['action', 'closed']);
+            });
         });
     });
 });
