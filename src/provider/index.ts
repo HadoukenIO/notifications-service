@@ -43,7 +43,7 @@ export class Main {
         @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TOAST_MANAGER) toastManager: ToastManager,
-        @inject(Inject.EXPIRATION_CONTROLLER) expiryController: ExpiryController
+        @inject(Inject.EXPIRY_CONTROLLER) expiryController: ExpiryController
     ) {
         this._apiHandler = apiHandler;
         this._clientHandler = clientHandler;

@@ -32,7 +32,7 @@ type Types = {
     [Inject.DATABASE]: Database;
     [Inject.ENVIRONMENT]: Environment;
     [Inject.EVENT_PUMP]: EventPump;
-    [Inject.EXPIRATION_CONTROLLER]: ExpiryController;
+    [Inject.EXPIRY_CONTROLLER]: ExpiryController;
     [Inject.LAYOUTER]: Layouter;
     [Inject.MONITOR_MODEL]: MonitorModel;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
@@ -54,7 +54,7 @@ const Bindings = {
     [Inject.DATABASE]: Database,
     [Inject.ENVIRONMENT]: FinEnvironment,
     [Inject.EVENT_PUMP]: EventPump,
-    [Inject.EXPIRATION_CONTROLLER]: ExpiryController,
+    [Inject.EXPIRY_CONTROLLER]: ExpiryController,
     [Inject.LAYOUTER]: Layouter,
     [Inject.MONITOR_MODEL]: FinMonitorModel,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
