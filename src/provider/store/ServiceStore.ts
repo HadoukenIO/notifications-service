@@ -1,9 +1,11 @@
-import {injectable, inject} from 'inversify';
+import {injectable} from 'inversify';
 
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Database, CollectionMap} from '../model/database/Database';
 import {Collection} from '../model/database/Collection';
+import {Injector} from '../common/Injector';
+import {StoredApplication} from '../model/Environment';
 
 import {RootAction} from './Actions';
 import {RootState} from './State';
@@ -13,17 +15,18 @@ import {Store} from './Store';
 export class ServiceStore extends Store<RootState, RootAction> {
     private static INITIAL_STATE: RootState = {
         notifications: [],
+        clients: new Map(),
         windowVisible: false
     };
 
-    private readonly _database: Database;
+    private _database!: Database;
 
-    constructor(@inject(Inject.DATABASE) database: Database) {
+    constructor() {
         super(ServiceStore.INITIAL_STATE);
-        this._database = database;
     }
 
     protected async init(): Promise<void> {
+        this._database = Injector.get(Inject.DATABASE) as Database;
         await this._database.initialized;
         this.setState(await this.getInitialState());
     }
@@ -32,6 +35,9 @@ export class ServiceStore extends Store<RootState, RootAction> {
         const notificationCollection: Collection<StoredNotification> = this._database.get(CollectionMap.NOTIFICATIONS);
         const notifications: StoredNotification[] = await notificationCollection.getAll();
 
-        return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications});
+        const clientsCollection: Collection<StoredApplication> = this._database.get(CollectionMap.APPLICATIONS);
+        const clients: StoredApplication[] = await clientsCollection.getAll();
+
+        return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications, clients});
     }
 }

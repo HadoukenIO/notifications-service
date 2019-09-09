@@ -82,15 +82,6 @@ export class Injector {
                 container.bind(Inject[key]).toConstantValue(Bindings[key]);
             }
         });
-        Object.keys(Bindings).forEach(k => {
-            const key: Keys = k as any;
-            const proto = (Bindings[key] as Function).prototype;
-
-            if (proto && proto.hasOwnProperty('init')) {
-                const instance = (container.get(Inject[key]) as AsyncInit);
-                promises.push(instance.delayedInit());
-            }
-        });
 
         Injector._initialized = Promise.all(promises).then(() => {});
         return container;
@@ -98,6 +89,27 @@ export class Injector {
 
     public static get initialized(): Promise<void> {
         return this._initialized;
+    }
+
+    public static async init(): Promise<void> {
+        const container: Container = Injector._container;
+        const promises: Promise<unknown>[] = [];
+
+        Object.keys(Bindings).forEach(k => {
+            const key: Keys = k as any;
+            const proto = (Bindings[key] as Function).prototype;
+
+            if (proto && proto.hasOwnProperty('init')) {
+                const instance = (container.get(Inject[key]) as AsyncInit);
+                if (instance.delayedInit) {
+                    promises.push(instance.delayedInit());
+                }
+            }
+        });
+
+        Injector._initialized = Promise.all(promises).then();
+
+        return Injector._initialized;
     }
 
     public static rebind<K extends Keys>(type: typeof Inject[K]): inversify.BindingToSyntax<Types[K]> {

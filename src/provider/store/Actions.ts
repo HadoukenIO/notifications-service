@@ -1,8 +1,5 @@
 import {StoredNotification} from '../model/StoredNotification';
-import {Injector} from '../common/Injector';
-import {Inject} from '../common/Injectables';
-import {CollectionMap} from '../model/database/Database';
-import {SettingsMap} from '../model/StoredSetting';
+import {StoredApplication} from '../model/Environment';
 
 import {RootState} from './State';
 import {StoreAPI, AsyncAction, Action} from './Store';
@@ -17,9 +14,6 @@ export class CreateNotification extends AsyncAction<RootState> {
 
     public reduce(state: RootState): RootState {
         const {notification} = this;
-
-        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
-        database.get(CollectionMap.NOTIFICATIONS).upsert(notification);
 
         const notifications: StoredNotification[] = state.notifications.slice();
 
@@ -63,12 +57,9 @@ export class RemoveNotifications extends Action<RootState> {
 
     public reduce(state: RootState): RootState {
         const {notifications} = this;
-        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
             return n.id;
         });
-
-        database.get(CollectionMap.NOTIFICATIONS).delete(idsToRemove);
 
         return {
             ...state,
@@ -107,9 +98,6 @@ export class ToggleVisibility extends Action<RootState> {
 
     public reduce(state: RootState): RootState {
         const windowVisible = (this.visible !== undefined) ? this.visible : !state.windowVisible;
-        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
-
-        storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
 
         return {
             ...state,
@@ -118,4 +106,23 @@ export class ToggleVisibility extends Action<RootState> {
     }
 }
 
-export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleVisibility;
+export class RegisterClient extends Action<RootState> {
+    public readonly clientInfo: StoredApplication;
+
+    constructor(info: StoredApplication) {
+        super();
+        this.clientInfo = info;
+    }
+
+    public reduce(state: RootState): RootState {
+        const info = this.clientInfo;
+        const map = new Map(state.clients);
+        map.set(info.id, info);
+        return {
+            ...state,
+            clients: map
+        };
+    }
+}
+
+export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleVisibility | RegisterClient;

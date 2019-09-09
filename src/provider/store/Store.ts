@@ -1,3 +1,4 @@
+import {unmanaged} from 'inversify';
 import {Signal, Aggregators} from 'openfin-service-signal';
 
 import {AsyncInit} from '../controller/AsyncInit';
@@ -34,7 +35,7 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
     private _currentState: S;
     private readonly _listeners: Listener<S>[] = [];
 
-    constructor(initialState: S) {
+    constructor(@unmanaged() initialState: S) {
         super();
         this._currentState = initialState;
     }

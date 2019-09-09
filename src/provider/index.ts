@@ -62,7 +62,7 @@ export class Main {
         });
 
         // Wait for creation of any injected components that require async initialization
-        await Injector.initialized;
+        await Injector.init();
 
         // Current API
         this._apiHandler.registerListeners<API>({
