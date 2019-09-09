@@ -19,20 +19,20 @@ export async function create(executionTarget: Identity, options: NotificationOpt
             (optionsRemote.date !== undefined) ?
                 new Date(optionsRemote.date) :
                 optionsRemote.date;
-        const expiration =
-            (optionsRemote.expiration !== undefined && optionsRemote.expiration !== null) ?
-                new Date(optionsRemote.expiration) :
+        const expiry =
+            (optionsRemote.expiry !== undefined && optionsRemote.expiry !== null) ?
+                new Date(optionsRemote.expiry) :
                 optionsRemote.date;
 
-        optionsRemote = {...optionsRemote, date, expiration};
+        optionsRemote = {...optionsRemote, date, expiry};
 
         const note = await this.notifications.create(optionsRemote);
 
         // We need to manually stringify Dates object as puppeteer fails to do so on the remote-to-runner journey
-        return {...note, date: note.date.toJSON(), expiration: note.expiration !== null ? note.expiration.toJSON() : null};
+        return {...note, date: note.date.toJSON(), expiry: note.expiry !== null ? note.expiry.toJSON() : null};
     }, options);
     // And then manually un-stringify them
-    return {...result, date: new Date(result.date), expiration: result.expiration !== null ? new Date(result.expiration) : null};
+    return {...result, date: new Date(result.date), expiry: result.expiry !== null ? new Date(result.expiry) : null};
 }
 
 export async function createAndAwait(executionTarget: Identity, options: NotificationOptions) {
@@ -57,7 +57,7 @@ export async function getAll(executionTarget: Identity) {
         return notes.map(note => ({...note, date: note.date.toJSON()}));
     });
     // And then manually un-stringify it
-    return result.map(note => ({...note, date: new Date(note.date), expiration: note.expiration !== null ? new Date(note.expiration) : null}));
+    return result.map(note => ({...note, date: new Date(note.date), expiry: note.expiry !== null ? new Date(note.expiry) : null}));
 }
 
 export async function clearAll(executionTarget: Identity) {

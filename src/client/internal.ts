@@ -57,14 +57,14 @@ export type TransportMemberMappings<T> =
     T extends Notification ? NotificationInternal :
     T;
 
-export interface CreatePayload extends Omit<NotificationOptions, 'date' | 'expiration'> {
+export interface CreatePayload extends Omit<NotificationOptions, 'date' | 'expiry'> {
     date?: number;
-    expiration?: number | null;
+    expiry?: number | null;
 }
 
-export interface NotificationInternal extends Omit<Notification, 'date' | 'expiration'> {
+export interface NotificationInternal extends Omit<Notification, 'date' | 'expiry'> {
     date: number;
-    expiration: number | null;
+    expiry: number | null;
 }
 
 export interface ClearPayload {

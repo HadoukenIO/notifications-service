@@ -13,7 +13,7 @@ import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
 import {NotificationCenter} from './controller/NotificationCenter';
 import {ToastManager} from './controller/ToastManager';
-import {ExpirationController} from './controller/ExpirationController';
+import {ExpiryController} from './controller/ExpiryController';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
 import {RootAction, CreateNotification, RemoveNotifications, ToggleVisibility, ClickNotification, ClickButton, ExpireNotification} from './store/Actions';
@@ -33,7 +33,7 @@ export class Main {
     private readonly _notificationCenter: NotificationCenter;
     private readonly _store: ServiceStore;
     private readonly _toastManager: ToastManager;
-    private readonly _expirationController: ExpirationController;
+    private readonly _expiryController: ExpiryController;
 
     constructor(
         @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
@@ -43,7 +43,7 @@ export class Main {
         @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TOAST_MANAGER) toastManager: ToastManager,
-        @inject(Inject.EXPIRATION_CONTROLLER) expirationController: ExpirationController
+        @inject(Inject.EXPIRATION_CONTROLLER) expiryController: ExpiryController
     ) {
         this._apiHandler = apiHandler;
         this._clientHandler = clientHandler;
@@ -52,7 +52,7 @@ export class Main {
         this._notificationCenter = notificationCenter;
         this._store = store;
         this._toastManager = toastManager;
-        this._expirationController = expirationController;
+        this._expiryController = expiryController;
     }
 
     public async register(): Promise<void> {
@@ -63,7 +63,7 @@ export class Main {
             center: this._notificationCenter,
             toast: this._toastManager,
             database: this._database,
-            expirationController: this._expirationController
+            expiryController: this._expiryController
         });
 
         // Wait for creation of any injected components that require async initialization
@@ -288,7 +288,7 @@ export class Main {
             icon: payload.icon || '',
             customData: payload.customData !== undefined ? payload.customData : {},
             date: payload.date || Date.now(),
-            expiration: payload.expiration !== undefined ? payload.expiration : null,
+            expiry: payload.expiry !== undefined ? payload.expiry : null,
             onSelect: this.hydrateAction(payload.onSelect),
             onExpired: this.hydrateAction(payload.onExpired),
             onClose: this.hydrateAction(payload.onClose),

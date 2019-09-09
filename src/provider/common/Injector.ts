@@ -19,7 +19,7 @@ import {Environment} from '../model/Environment';
 import {FinEnvironment} from '../model/FinEnvironment';
 import {TrayIcon} from '../model/TrayIcon';
 import {FinTrayIcon} from '../model/FinTrayIcon';
-import {ExpirationController} from '../controller/ExpirationController';
+import {ExpiryController} from '../controller/ExpiryController';
 
 import {Inject} from './Injectables';
 
@@ -32,7 +32,7 @@ type Types = {
     [Inject.DATABASE]: Database;
     [Inject.ENVIRONMENT]: Environment;
     [Inject.EVENT_PUMP]: EventPump;
-    [Inject.EXPIRATION_CONTROLLER]: ExpirationController;
+    [Inject.EXPIRATION_CONTROLLER]: ExpiryController;
     [Inject.LAYOUTER]: Layouter;
     [Inject.MONITOR_MODEL]: MonitorModel;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
@@ -54,7 +54,7 @@ const Bindings = {
     [Inject.DATABASE]: Database,
     [Inject.ENVIRONMENT]: FinEnvironment,
     [Inject.EVENT_PUMP]: EventPump,
-    [Inject.EXPIRATION_CONTROLLER]: ExpirationController,
+    [Inject.EXPIRATION_CONTROLLER]: ExpiryController,
     [Inject.LAYOUTER]: Layouter,
     [Inject.MONITOR_MODEL]: FinMonitorModel,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
