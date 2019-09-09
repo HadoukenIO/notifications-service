@@ -93,7 +93,7 @@ test('When a notification is created with an expiry and a expiry action, an acti
     expectTimeSoonAfter(eventLog[1].time, expiry.getTime());
 });
 
-test('When two notifications are created with different expirys, the notifications are expired in the correct order', async () => {
+test('When two notifications are created with different expiries, the notifications are expired in the correct order', async () => {
     const earlyExpiry = future(seconds(5));
     const lateExpiry = future(seconds(10));
 
@@ -116,7 +116,7 @@ test('When two notifications are created with different expirys, the notificatio
     expectTimeSoonAfter(eventLog[1].time, lateExpiry.getTime());
 });
 
-test('When two notifications are created with the same expirys, the notifications are expired simultaneously', async () => {
+test('When two notifications are created with the same expiries, the notifications are expired simultaneously', async () => {
     const expiry = future(seconds(5));
 
     await notifsRemote.createAndAwait(testWindow.identity, {
