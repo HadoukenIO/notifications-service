@@ -79,6 +79,19 @@ ul {
     border-radius: 3px;
 }
 
+#lock-link {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    cursor: pointer;
+    opacity: 0;
+    z-index: 100000;
+}
+
+#lock-link:hover {
+    opacity: 1;
+}
+
 .fade {
     position: absolute;
     pointer-events: none;

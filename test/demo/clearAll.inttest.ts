@@ -2,15 +2,14 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
-
-import {getCenterCardsByApp} from './utils/centerUtils';
-import {testManagerIdentity, testAppUrlDefault} from './utils/constants';
-import {delay, Duration} from './utils/delay';
-import {createAppInServiceRealm} from './utils/spawnRemote';
-import * as notifsRemote from './utils/notificationsRemote';
-import * as providerRemote from './utils/providerRemote';
-import {getToastWindowsByApp} from './utils/toastUtils';
-import {setupCenterBookends, CenterState} from './common';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
+import {delay, Duration} from '../utils/int/delay';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import * as providerRemote from '../utils/int/providerRemote';
+import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
+import {getCenterCardsByApp} from '../utils/int/centerUtils';
+import {getToastWindowsByApp} from '../utils/int/toastUtils';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
     body: 'Test Notification Body',
