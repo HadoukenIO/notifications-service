@@ -136,6 +136,9 @@ test('When two notifications are created with the same expiries, the notificatio
     expectTimeSoonAfter(eventLog[1].time, expiry.getTime());
 });
 
+// TODO: [SERVICE-619]
+test.todo('When the provider is started and there are notifications with expiries in the past, they are expired on startup');
+
 function expectTimeSoonAfter(actualTime: number, expectedTime: number): void {
     expect(actualTime - expectedTime).toBeGreaterThan(0);
     expect(actualTime - expectedTime).toBeLessThan(Duration.EVENT_PROPAGATED);
