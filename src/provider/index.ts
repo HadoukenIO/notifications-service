@@ -30,29 +30,29 @@ export class Main {
     private readonly _clientHandler: ClientRegistry;
     private readonly _database: Database;
     private readonly _eventPump: EventPump;
+    private readonly _expiryController: ExpiryController;
     private readonly _notificationCenter: NotificationCenter;
     private readonly _store: ServiceStore;
     private readonly _toastManager: ToastManager;
-    private readonly _expiryController: ExpiryController;
 
     constructor(
         @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
         @inject(Inject.CLIENT_REGISTRY) clientHandler: ClientRegistry,
         @inject(Inject.DATABASE) database: Database,
         @inject(Inject.EVENT_PUMP) eventPump: EventPump,
+        @inject(Inject.EXPIRY_CONTROLLER) expiryController: ExpiryController,
         @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
         @inject(Inject.STORE) store: ServiceStore,
-        @inject(Inject.TOAST_MANAGER) toastManager: ToastManager,
-        @inject(Inject.EXPIRY_CONTROLLER) expiryController: ExpiryController
+        @inject(Inject.TOAST_MANAGER) toastManager: ToastManager
     ) {
         this._apiHandler = apiHandler;
         this._clientHandler = clientHandler;
         this._database = database;
         this._eventPump = eventPump;
+        this._expiryController = expiryController;
         this._notificationCenter = notificationCenter;
         this._store = store;
         this._toastManager = toastManager;
-        this._expiryController = expiryController;
     }
 
     public async register(): Promise<void> {
