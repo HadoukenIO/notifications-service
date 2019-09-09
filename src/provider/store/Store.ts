@@ -39,7 +39,7 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         this._currentState = initialState;
     }
 
-    public get API(): StoreAPI<S, A> {
+    public get api(): StoreAPI<S, A> {
         return {
             state: this.state,
             dispatch: this.dispatch.bind(this)

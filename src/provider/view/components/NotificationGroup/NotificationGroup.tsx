@@ -13,9 +13,9 @@ export interface NotificationGroupProps extends Actionable {
 }
 
 export function NotificationGroup(props: NotificationGroupProps) {
-    const {notifications, storeAPI} = props;
+    const {notifications, storeApi} = props;
     const handleClearAll = () => {
-        new RemoveNotifications(notifications).dispatch(storeAPI);
+        new RemoveNotifications(notifications).dispatch(storeApi);
     };
     return (
         <div className="group">
@@ -30,7 +30,7 @@ export function NotificationGroup(props: NotificationGroupProps) {
                     notifications.map((notification, i) => {
                         return (
                             <li key={i + notification.id}>
-                                <NotificationCard notification={notification} storeAPI={storeAPI} />
+                                <NotificationCard notification={notification} storeApi={storeApi} />
                             </li>
                         );
                     })

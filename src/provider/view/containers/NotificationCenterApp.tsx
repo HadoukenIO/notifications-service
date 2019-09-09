@@ -20,19 +20,19 @@ type Props = ReturnType<typeof mapStateToProps> & Actionable;
 
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, storeAPI} = props;
+    const {notifications, storeApi} = props;
 
     return (
         <div className='notification-center'>
             <Header
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}
-                storeAPI={storeAPI}
+                storeApi={storeApi}
             />
             <NotificationView
                 notifications={notifications}
                 groupBy={groupBy}
-                storeAPI={storeAPI}
+                storeApi={storeApi}
             />
             <Footer />
         </div>
@@ -56,7 +56,7 @@ export function renderApp(webWindow: WebWindow, store: ServiceStore): void {
         // Replace redux store with service store implementation.
         // This will resolve the interface incompatibility issues.
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeAPI={store.API} />
+            <Container storeApi={store.api} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

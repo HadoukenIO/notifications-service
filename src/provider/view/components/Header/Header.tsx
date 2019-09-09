@@ -9,10 +9,10 @@ interface HeaderProps extends Actionable {
 }
 
 export function Header(props: HeaderProps): React.ReactElement {
-    const {groupBy, handleGroupBy, storeAPI} = props;
+    const {groupBy, handleGroupBy, storeApi} = props;
 
     const handleHideWindow = () => {
-        new ToggleVisibility(false).dispatch(storeAPI);
+        new ToggleVisibility(false).dispatch(storeApi);
     };
 
     return (

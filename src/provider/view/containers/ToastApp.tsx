@@ -19,7 +19,7 @@ interface ToastAppProps extends Actionable {
 type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 
 export function ToastApp(props: Props) {
-    const {notification, setWindowSize, storeAPI} = props;
+    const {notification, setWindowSize, storeApi: storeApi} = props;
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     // Get the size of the container ref
@@ -41,7 +41,7 @@ export function ToastApp(props: Props) {
 
     return (
         <div id='toast-container' ref={containerRef}>
-            <NotificationCard notification={notification} storeAPI={storeAPI} />
+            <NotificationCard notification={notification} storeApi={storeApi} />
         </div>
     );
 }
@@ -62,7 +62,7 @@ export function renderApp(
         // Replace redux store with service store implementation.
         // This will resolve the interface incompatibility issues.
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeAPI={store.API} notification={notification} setWindowSize={setWindowSize} />
+            <Container storeApi={store.api} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

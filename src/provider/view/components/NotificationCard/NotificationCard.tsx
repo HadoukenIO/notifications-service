@@ -11,21 +11,21 @@ interface NotificationCardProps extends Actionable {
 }
 
 export function NotificationCard(props: NotificationCardProps) {
-    const {notification, storeAPI} = props;
+    const {notification, storeApi} = props;
     const data = notification.notification;
 
     const handleNotificationClose = () => {
-        new RemoveNotifications([notification]).dispatch(storeAPI);
+        new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
     const handleButtonClick = (buttonIndex: number) => {
-        new ClickButton(notification, buttonIndex).dispatch(storeAPI);
+        new ClickButton(notification, buttonIndex).dispatch(storeApi);
     };
 
     const handleNotificationClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
-        new ClickNotification(notification).dispatch(storeAPI);
+        new ClickNotification(notification).dispatch(storeApi);
     };
 
     return (

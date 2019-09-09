@@ -8,7 +8,7 @@ import {RootState} from './State';
 import {StoreAPI, Action} from './Store';
 
 export interface Actionable {
-    storeAPI: StoreAPI<RootState, RootAction>;
+    storeApi: StoreAPI<RootState, RootAction>;
 }
 
 export class CreateNotification extends Action<RootState> {
