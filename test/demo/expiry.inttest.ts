@@ -1,7 +1,7 @@
 import {Application} from 'hadouken-js-adapter';
 import {_Window} from 'hadouken-js-adapter/out/types/src/api/window/window';
 
-import {NotificationClosedEvent, NotificationOptions, NotificationActionEvent} from '../../src/client';
+import {NotificationClosedEvent, NotificationOptions, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
 import {Events} from '../../src/client/internal';
 
@@ -10,6 +10,7 @@ import {defaultTestAppUrl, testManagerIdentity} from './utils/constants';
 import * as notifsRemote from './utils/notificationsRemote';
 import * as providerRemote from './utils/providerRemote';
 import {delay, Duration} from './utils/delay';
+import {waitForAppToBeRunning} from './utils/common';
 
 let testApp: Application;
 let testWindow: _Window;
@@ -134,6 +135,40 @@ test('When two notifications are created with the same expiries, the notificatio
 
     expectTimeSoonAfter(eventLog[0].time, expiry.getTime());
     expectTimeSoonAfter(eventLog[1].time, expiry.getTime());
+});
+
+describe('When a notification with an expiry is created by an app that then quits', () => {
+    let note: Notification;
+
+    beforeEach(async () => {
+        const expiry = future(seconds(5));
+
+        note = (await notifsRemote.createAndAwait(testWindow.identity, {
+            ...options,
+            expiry,
+            onExpired: {task: 'expired'}
+        })).note;
+
+        await testApp.quit();
+    });
+
+    test('The app is restarted, and the app receives the `onExpired` result', async () => {
+        await delay(seconds(5));
+
+        await waitForAppToBeRunning(testApp.identity);
+        expect(await testApp.isRunning()).toBe(true);
+
+        await delay(Duration.EVENT_PROPAGATED);
+
+        const receivedActionEvents = await notifsRemote.getReceivedEvents((await testApp.getWindow()).identity, 'notification-action');
+
+        expect(receivedActionEvents).toEqual([{
+            type: 'notification-action',
+            notification: note,
+            trigger: ActionTrigger.EXPIRE,
+            result: {task: 'expired'}
+        }]);
+    });
 });
 
 // TODO: [SERVICE-619]
