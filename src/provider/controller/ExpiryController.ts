@@ -44,7 +44,7 @@ export class ExpiryController extends AsyncInit {
         if (note.notification.expires !== null && (!this._nextExpiry || this.expiresBefore(note, this._nextExpiry.note))) {
             const now = Date.now();
 
-            if (note.notification.expires! <= now) {
+            if (note.notification.expires <= now) {
                 this.expireNotification(note, now);
             } else {
                 this.clearExpiry();
