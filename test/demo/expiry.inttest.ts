@@ -5,7 +5,7 @@ import {NotificationClosedEvent, NotificationOptions, NotificationActionEvent, N
 import {ActionTrigger} from '../../src/client/actions';
 import {Events} from '../../src/client/internal';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
-import {defaultTestAppUrl, testManagerIdentity} from '../utils/int/constants';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {delay, Duration} from '../utils/int/delay';
@@ -27,7 +27,7 @@ const options: NotificationOptions = {
 beforeEach(async () => {
     jest.resetAllMocks();
 
-    testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+    testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
     testWindow = await testApp.getWindow();
 
     eventLog = [];
