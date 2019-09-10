@@ -3,8 +3,8 @@ import {injectable, inject} from 'inversify';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastEvent} from '../model/Toast';
-import {Action, RootAction} from '../store/Actions';
-import {Store} from '../store/Store';
+import {RootAction, CreateNotification, RemoveNotifications, ToggleCenterVisibility} from '../store/Actions';
+import {ServiceStore} from '../store/ServiceStore';
 import {MonitorModel} from '../model/MonitorModel';
 import {WebWindowFactory} from '../model/WebWindow';
 
@@ -14,7 +14,7 @@ import {AsyncInit} from './AsyncInit';
 @injectable()
 export class ToastManager extends AsyncInit {
     private readonly _layouter: Layouter;
-    private readonly _store: Store;
+    private readonly _store: ServiceStore;
     private readonly _monitorModel: MonitorModel;
     private readonly _webWindowFactory: WebWindowFactory;
 
@@ -23,7 +23,7 @@ export class ToastManager extends AsyncInit {
     private _queue: Toast[] = [];
 
     constructor(
-        @inject(Inject.STORE) store: Store,
+        @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.LAYOUTER) layouter: Layouter,
         @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
         @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
@@ -42,8 +42,6 @@ export class ToastManager extends AsyncInit {
     protected async init() {
         await this._store.initialized;
         await this._monitorModel.initialized;
-
-        this.subscribe();
     }
 
     /**
@@ -65,7 +63,7 @@ export class ToastManager extends AsyncInit {
     public async create(notification: StoredNotification): Promise<void> {
         const state = this._store.state;
 
-        if (state.windowVisible) {
+        if (state.centerVisible) {
             return;
         }
 
@@ -117,15 +115,15 @@ export class ToastManager extends AsyncInit {
     }
 
     private async onAction(action: RootAction): Promise<void> {
-        if (action.type === Action.CREATE) {
+        if (action instanceof CreateNotification) {
             this.create(action.notification);
         }
 
-        if (action.type === Action.REMOVE) {
+        if (action instanceof RemoveNotifications) {
             this.removeToasts(...action.notifications);
         }
 
-        if (action.type === Action.TOGGLE_VISIBILITY) {
+        if (action instanceof ToggleCenterVisibility) {
             this.closeAll();
         }
     }
@@ -172,22 +170,6 @@ export class ToastManager extends AsyncInit {
     private async closeToast(toast: Toast): Promise<void> {
         await this._layouter.removeItem(toast);
         toast.close();
-    }
-
-    /**
-     * Subscribe to the store.
-     * Perform all watching for state change in here.
-     */
-    private subscribe(): void {
-        // Notification Center Window open
-        this._store.watchForChange(
-            state => state.windowVisible,
-            (previous: boolean, visible: boolean) => {
-                if (visible) {
-                    this.closeAll();
-                }
-            }
-        );
     }
 
     /**

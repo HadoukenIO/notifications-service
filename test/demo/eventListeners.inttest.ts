@@ -2,12 +2,11 @@ import 'jest';
 import {Application, Window as FinWindow} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions, NotificationCreatedEvent, NotificationActionEvent, NotificationClosedEvent} from '../../src/client';
-
-import * as notifsRemote from './utils/notificationsRemote';
-import {getCenterCardsByNotification, isCenterShowing} from './utils/centerUtils';
-import {delay, Duration} from './utils/delay';
-import {createAppInServiceRealm} from './utils/spawnRemote';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import {getCenterCardsByNotification, isCenterShowing} from '../utils/int/centerUtils';
+import {delay, Duration} from '../utils/int/delay';
+import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',

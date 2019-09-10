@@ -3,6 +3,11 @@ import {Identity} from 'hadouken-js-adapter';
 import {fin} from './fin';
 import {delay} from './delay';
 import {Duration} from './delay';
+import * as notifsRemote from './notificationsRemote';
+import {isCenterShowing} from './centerUtils';
+import {testManagerIdentity} from './constants';
+
+export type CenterState = 'center-open' | 'center-closed'
 
 /**
  * Races a given promise against a timeout, and resolves to a `[didTimeout, value?]` tuple indicating
@@ -33,4 +38,40 @@ export async function waitForAppToBeRunning(app: Identity): Promise<void> {
 
     // Additional delay to ensure app window is ready for puppeteer connection
     await delay(500);
+}
+
+export function setupCenterBookends(centerVisibility: CenterState): void {
+    if (centerVisibility === 'center-open') {
+        setupOpenCenterBookends();
+    } else {
+        setupClosedCenterBookends();
+    }
+}
+
+export function setupOpenCenterBookends(): void {
+    beforeAll(async () => {
+        // Ensure center is showing
+        if (!(await isCenterShowing())) {
+            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+            await delay(Duration.CENTER_TOGGLED);
+        }
+    });
+
+    afterAll(async () => {
+        // Close center when we're done
+        if (await isCenterShowing()) {
+            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+            await delay(Duration.CENTER_TOGGLED);
+        }
+    });
+}
+
+export function setupClosedCenterBookends(): void {
+    beforeAll(async () => {
+        // Ensure center is not showing
+        if (await isCenterShowing()) {
+            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+            await delay(Duration.CENTER_TOGGLED);
+        }
+    });
 }
