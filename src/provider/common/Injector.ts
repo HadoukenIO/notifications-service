@@ -5,6 +5,7 @@ import {APITopic, Events} from '../../client/internal';
 import {AsyncInit} from '../controller/AsyncInit';
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {ToastManager} from '../controller/ToastManager';
+import {Persistor} from '../controller/Persistor';
 import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
 import {ServiceStore} from '../store/ServiceStore';
@@ -21,6 +22,7 @@ import {TrayIcon} from '../model/TrayIcon';
 import {FinTrayIcon} from '../model/FinTrayIcon';
 
 import {Inject} from './Injectables';
+import {DeferredPromise} from './DeferredPromise';
 
 /**
  * For each entry in `Inject`, defines the type that will be injected for that key.
@@ -35,6 +37,7 @@ type Types = {
     [Inject.MONITOR_MODEL]: MonitorModel;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
     [Inject.STORE]: ServiceStore;
+    [Inject.PERSISTOR]: Persistor;
     [Inject.TOAST_MANAGER]: ToastManager;
     [Inject.TRAY_ICON]: TrayIcon;
     [Inject.WEB_WINDOW_FACTORY]: WebWindowFactory;
@@ -55,6 +58,7 @@ const Bindings = {
     [Inject.LAYOUTER]: Layouter,
     [Inject.MONITOR_MODEL]: FinMonitorModel,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
+    [Inject.PERSISTOR]: Persistor,
     [Inject.STORE]: ServiceStore,
     [Inject.TOAST_MANAGER]: ToastManager,
     [Inject.TRAY_ICON]: FinTrayIcon,
@@ -67,29 +71,9 @@ type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);
  * Wrapper around inversify that allows more concise injection
  */
 export class Injector {
-    private static _initialized: Promise<void>;
-
-    private static _container: Container = (() => {
-        const container = new Container();
-        const promises: Promise<unknown>[] = [];
-
-        Object.keys(Bindings).forEach(k => {
-            const key: Keys = k as any;
-
-            if (typeof Bindings[key] === 'function') {
-                container.bind(Inject[key]).to(Bindings[key] as any).inSingletonScope();
-            } else {
-                container.bind(Inject[key]).toConstantValue(Bindings[key]);
-            }
-        });
-
-        Injector._initialized = Promise.all(promises).then(() => {});
-        return container;
-    })();
-
-    public static get initialized(): Promise<void> {
-        return this._initialized;
-    }
+    private static _initialized: DeferredPromise = new DeferredPromise();
+    private static _ready: boolean = false;
+    private static _container: Container = Injector.createContainer();
 
     public static async init(): Promise<void> {
         const container: Container = Injector._container;
@@ -107,13 +91,19 @@ export class Injector {
             }
         });
 
-        Injector._initialized = Promise.all(promises).then();
+        await Promise.all(promises);
+        Injector._ready = true;
+        Injector._initialized.resolve();
 
-        return Injector._initialized;
+        return Injector._initialized.promise;
+    }
+
+    public static get initialized(): Promise<void> {
+        return Injector._initialized.promise;
     }
 
     public static rebind<K extends Keys>(type: typeof Inject[K]): inversify.BindingToSyntax<Types[K]> {
-        return Injector._container.rebind<Types[K]>(Bindings[type] as inversify.Newable<Types[K]>);
+        return Injector._container.rebind<Types[K]>(type);
     }
 
     /**
@@ -124,6 +114,9 @@ export class Injector {
      * @param type Identifier of the type/value to extract from the injector
      */
     public static get<K extends Keys>(type: typeof Inject[K]): Types[K] {
+        if (!Injector._ready) {
+            throw new Error('Injector not initialised');
+        }
         return Injector._container.get<Types[K]>(type);
     }
 
@@ -138,5 +131,21 @@ export class Injector {
         const value = Injector._container.resolve<T>(type);
 
         return value;
+    }
+
+    private static createContainer(): Container {
+        const container = new Container();
+
+        Object.keys(Bindings).forEach(k => {
+            const key: Keys = k as any;
+
+            if (typeof Bindings[key] === 'function') {
+                container.bind(Inject[key]).to(Bindings[key] as any).inSingletonScope();
+            } else {
+                container.bind(Inject[key]).toConstantValue(Bindings[key]);
+            }
+        });
+
+        return container;
     }
 }

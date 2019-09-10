@@ -13,6 +13,7 @@ enum Injectable {
     LAYOUTER,
     MONITOR_MODEL,
     NOTIFICATION_CENTER,
+    PERSISTOR,
     STORE,
     TOAST_MANAGER,
     TRAY_ICON,

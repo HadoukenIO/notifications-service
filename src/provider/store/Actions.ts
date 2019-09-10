@@ -106,23 +106,23 @@ export class ToggleVisibility extends Action<RootState> {
     }
 }
 
-export class RegisterClient extends Action<RootState> {
-    public readonly clientInfo: StoredApplication;
+export class RegisterApplication extends Action<RootState> {
+    public readonly application: StoredApplication;
 
     constructor(info: StoredApplication) {
         super();
-        this.clientInfo = info;
+        this.application = info;
     }
 
     public reduce(state: RootState): RootState {
-        const info = this.clientInfo;
-        const map = new Map(state.registry);
+        const info = this.application;
+        const map = new Map(state.applications);
         map.set(info.id, info);
         return {
             ...state,
-            registry: map
+            applications: map
         };
     }
 }
 
-export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleVisibility | RegisterClient;
+export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleVisibility | RegisterApplication;

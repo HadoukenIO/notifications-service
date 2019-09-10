@@ -35,7 +35,7 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
     private _currentState: S;
     private readonly _listeners: Listener<S>[] = [];
 
-    constructor(@unmanaged() initialState: S) {
+    constructor(initialState: S) {
         super();
         this._currentState = initialState;
     }

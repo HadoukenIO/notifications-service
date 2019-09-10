@@ -3,7 +3,7 @@ import {StoredApplication} from '../model/Environment';
 
 export type RootState = Readonly<{
     notifications: StoredNotification[];
-    registry: ReadonlyMap<string, StoredApplication>;
+    applications: ReadonlyMap<string, StoredApplication>;
     windowVisible: boolean;
 }>;
 

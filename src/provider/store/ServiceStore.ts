@@ -1,10 +1,9 @@
-import {injectable} from 'inversify';
+import {injectable, inject} from 'inversify';
 
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Database, CollectionMap} from '../model/database/Database';
 import {Collection} from '../model/database/Collection';
-import {Injector} from '../common/Injector';
 import {StoredApplication} from '../model/Environment';
 
 import {RootAction} from './Actions';
@@ -15,18 +14,18 @@ import {Store} from './Store';
 export class ServiceStore extends Store<RootState, RootAction> {
     private static INITIAL_STATE: RootState = {
         notifications: [],
-        registry: new Map<string, StoredApplication>(),
+        applications: new Map<string, StoredApplication>(),
         windowVisible: false
     };
 
     private _database!: Database;
 
-    constructor() {
+    constructor(@inject(Inject.DATABASE) database: Database) {
         super(ServiceStore.INITIAL_STATE);
+        this._database = database;
     }
 
     protected async init(): Promise<void> {
-        this._database = Injector.get(Inject.DATABASE) as Database;
         await this._database.initialized;
         this.setState(await this.getInitialState());
     }

@@ -5,7 +5,7 @@ import {Signal} from 'openfin-service-signal';
 import {APITopic, Events} from '../../client/internal';
 import {Inject} from '../common/Injectables';
 import {ServiceStore} from '../store/ServiceStore';
-import {RegisterClient} from '../store/Actions';
+import {RegisterApplication} from '../store/Actions';
 
 import {APIHandler} from './APIHandler';
 import {Environment, StoredApplication} from './Environment';
@@ -46,7 +46,7 @@ export class ClientRegistry {
         const isRunning = await this._environment.isApplicationRunning(appUuid);
 
         if (!isRunning) {
-            const storedApplication = this._store.state.registry.get(appUuid);
+            const storedApplication = this._store.state.applications.get(appUuid);
             if (storedApplication) {
                 await this._environment.startApplication(storedApplication);
             } else {
@@ -85,7 +85,7 @@ export class ClientRegistry {
 
     private async onClientConnection(app: Identity): Promise<void> {
         const application: StoredApplication = await this._environment.getApplication(app.uuid);
-        this._store.dispatch(new RegisterClient(application));
+        this._store.dispatch(new RegisterApplication(application));
     }
 
     private removeActiveClient(client: Identity): void {
