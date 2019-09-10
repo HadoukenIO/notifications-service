@@ -3,10 +3,10 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {PointTopLeft} from 'openfin/_v2/api/system/point';
 import {Transition, TransitionOptions, Bounds} from 'openfin/_v2/shapes';
 
-import {renderApp} from '../view/containers/ToastApp/ToastApp';
+import {renderApp, RenderOptions} from '../view/containers/ToastApp/ToastApp';
 import {DeferredPromise} from '../common/DeferredPromise';
-import {Store} from '../store/Store';
 import {LayoutItem, WindowDimensions} from '../controller/Layouter';
+import {ServiceStore} from '../store/ServiceStore';
 
 import {StoredNotification} from './StoredNotification';
 import {WebWindow, WebWindowFactory} from './WebWindow';
@@ -41,6 +41,7 @@ interface Margin {
 
 interface Options {
     timeout: number;
+    onDismiss: (toast: Toast) => Promise<void>;
 }
 
 export enum ToastEvent {
@@ -81,7 +82,13 @@ export class Toast implements LayoutItem {
         return this._dimensions;
     }
 
-    public constructor(store: Store, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification, toastOptions: Options) {
+    public constructor(
+        store: ServiceStore,
+        monitorModel: MonitorModel,
+        webWindowFactory: WebWindowFactory,
+        notification: StoredNotification,
+        toastOptions: Options
+    ) {
         this._id = notification.id;
         this._options = toastOptions;
         this._position = {top: 0, left: 0};
@@ -98,12 +105,15 @@ export class Toast implements LayoutItem {
             // Show window offscreen so it can render and then hide it
             await webWindow.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
             await webWindow.hide();
-            renderApp(
+            const renderOptions: RenderOptions = {
                 notification,
                 webWindow,
                 store,
-                dimensionResolve
-            );
+                setWindowSize: dimensionResolve,
+                onDismiss: () => this._options.onDismiss(this)
+            };
+
+            renderApp(renderOptions);
             return webWindow;
         });
     }

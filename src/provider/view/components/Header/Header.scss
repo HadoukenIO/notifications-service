@@ -5,6 +5,14 @@
     color: var(--primary-text-color);
     user-select: none;
 
+    #lock-link {
+        visibility: hidden;
+    }
+
+    &:hover #lock-link {
+        visibility: visible;
+    }
+
     .title {
         height: 50px;
         padding: 10px 20px;

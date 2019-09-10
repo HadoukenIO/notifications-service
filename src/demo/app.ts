@@ -1,7 +1,7 @@
 import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
 
 import * as ofnotes from '../client/index';
-import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll} from '../client/index';
+import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll, toggleNotificationCenter} from '../client/index';
 
 addSpawnListeners();
 
@@ -108,6 +108,10 @@ fin.desktop.main(async () => {
         getAll().then((notifications) => {
             logMessage(`${notifications.length} notifications received from the Notification Center`);
         });
+    });
+
+    document.getElementById('toggleNotificationCenter')!.addEventListener('click', () => {
+        toggleNotificationCenter();
     });
 
     addEventListener('notification-created', (event: NotificationCreatedEvent) => {

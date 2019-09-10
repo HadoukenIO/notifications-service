@@ -66,9 +66,11 @@ export function getGroupTitle(notification: StoredNotification, groupingType: Gr
  * @param groupMethod Grouping type to use for sorting.
  */
 export function groupNotifications(notifications: StoredNotification[], groupMethod: GroupingType): Map<string, Group> {
+    // Sort notifications by date, this also causes the most recent group to be first
+    notifications.sort((a: StoredNotification, b: StoredNotification) =>
+        b.notification.date.valueOf() - a.notification.date.valueOf());
     // Reduce the notifications array into a Map of notifications grouped by their title
-    // Notifications are already in chronological order so we can just reduce from the right
-    const groupMap = notifications.reduceRight((groups: Map<string, Group>, currentNotification: StoredNotification) => {
+    const groupMap = notifications.reduce((groups: Map<string, Group>, currentNotification: StoredNotification) => {
         const groupTitle = getGroupTitle(currentNotification, groupMethod);
         // If group title already exists just add it to the group
         if (groups.has(groupTitle)) {

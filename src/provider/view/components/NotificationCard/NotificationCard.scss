@@ -130,9 +130,23 @@
                     $size: 18px;
                     width: $size;
                     height: $size;
+                    margin-right: 5px;
+                    background-color: var(--secondary-text-color);
 
                     .image {
                         background-color: var(--card-background-color);
+                    }
+
+                    &.dismiss:hover {
+                        background-color: var(--secondary-text-color-highlight);
+                    }
+
+                    &.close:hover {
+                        background-color: #CB7070;
+                    }
+
+                    &:last-of-type {
+                        margin-right: 0;
                     }
                 }
             }

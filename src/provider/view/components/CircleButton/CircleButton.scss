@@ -10,12 +10,15 @@
 $closeIcon: url('../../../../../res/provider/ui/image/shapes/Close.svg');
 $arrowDownIcon: url('../../../../../res/provider/ui/image/shapes/ArrowDown.svg');
 $check: url('../../../../../res/provider/ui/image/shapes/Check.svg');
+$minus: url('../../../../../res/provider/ui/image/shapes/Minus.svg');
 
 .icon {
     $size: 18px;
     background-color: var(--strip-background-color);
     width: $size;
     height: $size;
+    min-width: $size;
+    min-height: $size;
     align-self: center;
     display: inline-block;
     align-content: center;
@@ -81,10 +84,17 @@ $check: url('../../../../../res/provider/ui/image/shapes/Check.svg');
     }
 
     &.close {
-        background-color: var(--secondary-text-color);
-
         &:hover {
-            background-color: var(--secondary-text-color-highlight);
+            background-color: rgb(233, 128, 128);
+        }
+    }
+
+    &.dismiss {
+        .image {
+            -webkit-mask: $minus;
+            -webkit-mask-position: center center;
+            -webkit-mask-size: 70%;
+            -webkit-mask-repeat: no-repeat;
         }
     }
 
@@ -107,5 +117,4 @@ $check: url('../../../../../res/provider/ui/image/shapes/Check.svg');
     &:active {
         animation: clickShrink 100ms ease-in-out;
     }
-
 }

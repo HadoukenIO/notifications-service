@@ -15,7 +15,7 @@ import './NotificationCard.scss';
 interface Props extends Actionable {
     notification: StoredNotification;
     isToast?: boolean;
-    onDismiss: (notification: StoredNotification) => void;
+    onDismiss?: () => void;
 }
 
 NotificationCard.defaultProps = {
@@ -28,7 +28,13 @@ export function NotificationCard(props: Props) {
     const [loading, setLoading] = React.useState(false);
 
     const handleNotificationClose = () => {
-        onDismiss(notification);
+        storeDispatch(new RemoveNotifications([notification]));
+    };
+
+    const handleNotificationDismiss = () => {
+        if (isToast && onDismiss) {
+            onDismiss();
+        }
     };
 
     const handleButtonClick = (buttonIndex: number) => {
@@ -53,7 +59,10 @@ export function NotificationCard(props: Props) {
                 <div className="time-close">
                     <NotificationTime date={data.date} />
                     <div className="actions">
-                        <CircleButton type='close' onClick={handleNotificationClose} alt="Clear notification" />
+                        {isToast &&
+                            <CircleButton type="dismiss" onClick={handleNotificationDismiss} alt="Dismiss toast" />
+                        }
+                        <CircleButton type="close" onClick={handleNotificationClose} alt="Clear notification" />
                     </div>
                 </div>
             </div>

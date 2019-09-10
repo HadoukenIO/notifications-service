@@ -22,19 +22,18 @@ export function NotificationGroup(props: Props) {
         storeDispatch(new RemoveNotifications(notifications));
     };
 
-    const handleCloseNotification = (notification: StoredNotification) => {
-        storeDispatch(new RemoveNotifications([notification]));
-    };
-
     return (
         <div className="group">
             <div className="title">
-                <span>{name}</span>
+                <span className="app">
+                    <span className="name single-line">{name}</span>
+                    <span className="count">{notifications.length}</span>
+                </span>
                 <CircleButton type="close" size="small" onClick={handleClearAll} alt="Clear notifications" />
             </div>
             <TransitionGroup className="notifications" component="ul">
                 {
-                    notifications.map((notification, i) => {
+                    notifications.map((notification) => {
                         return (
                             <CSSTransition
                                 key={notification.id}
@@ -45,7 +44,7 @@ export function NotificationGroup(props: Props) {
                                 classNames="item"
                             >
                                 <li key={notification.id + notification.notification.date}>
-                                    <NotificationCard notification={notification} storeDispatch={storeDispatch} onDismiss={handleCloseNotification} />
+                                    <NotificationCard notification={notification} storeDispatch={storeDispatch} />
                                 </li>
                             </CSSTransition>
                         );
