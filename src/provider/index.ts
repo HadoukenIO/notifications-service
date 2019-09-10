@@ -16,7 +16,7 @@ import {ToastManager} from './controller/ToastManager';
 import {ExpiryController} from './controller/ExpiryController';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
-import {RootAction, CreateNotification, RemoveNotifications, ToggleVisibility, ClickNotification, ClickButton, ExpireNotification} from './store/Actions';
+import {RootAction, CreateNotification, RemoveNotifications, ClickNotification, ClickButton, ToggleCenterVisibility, ToggleCenterVisibilitySource, ExpireNotification} from './store/Actions';
 import {mutable} from './store/State';
 import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
@@ -177,7 +177,7 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        this._store.dispatch(new ToggleVisibility());
+        this._store.dispatch(new ToggleCenterVisibility(ToggleCenterVisibilitySource.API));
     }
 
     /**

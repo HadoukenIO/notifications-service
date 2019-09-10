@@ -4,13 +4,12 @@ import {_Window} from 'hadouken-js-adapter/out/types/src/api/window/window';
 import {NotificationClosedEvent, NotificationOptions, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
 import {Events} from '../../src/client/internal';
-
-import {createAppInServiceRealm} from './utils/spawnRemote';
-import {defaultTestAppUrl, testManagerIdentity} from './utils/constants';
-import * as notifsRemote from './utils/notificationsRemote';
-import * as providerRemote from './utils/providerRemote';
-import {delay, Duration} from './utils/delay';
-import {waitForAppToBeRunning} from './utils/common';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
+import {defaultTestAppUrl, testManagerIdentity} from '../utils/int/constants';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import * as providerRemote from '../utils/int/providerRemote';
+import {delay, Duration} from '../utils/int/delay';
+import {waitForAppToBeRunning} from '../utils/int/common';
 
 let testApp: Application;
 let testWindow: _Window;

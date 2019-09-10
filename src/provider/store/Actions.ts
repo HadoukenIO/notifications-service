@@ -2,10 +2,18 @@ import {StoredNotification} from '../model/StoredNotification';
 import {Injector} from '../common/Injector';
 import {Inject} from '../common/Injectables';
 import {CollectionMap} from '../model/database/Database';
-import {SettingsMap} from '../model/StoredSetting';
+import {ToggleFilter} from '../utils/ToggleFilter';
 
 import {RootState} from './State';
 import {StoreAPI, AsyncAction, Action} from './Store';
+
+export const enum ToggleCenterVisibilitySource {
+    API,
+    TRAY,
+    BUTTON
+}
+
+export type RootAction = BlurCenter | ClickButton | ClickNotification | CreateNotification | RemoveNotifications | ToggleCenterVisibility | ToggleLockCenter;
 
 export class CreateNotification extends AsyncAction<RootState> {
     public readonly notification: StoredNotification;
@@ -97,23 +105,54 @@ export class ClickButton extends Action<RootState> {
     }
 }
 
-export class ToggleVisibility extends Action<RootState> {
+export class ToggleCenterVisibility extends AsyncAction<RootState> {
+    public readonly source: ToggleCenterVisibilitySource;
     public readonly visible?: boolean;
 
-    constructor(visible?: boolean) {
+    constructor(source: ToggleCenterVisibilitySource, visible?: boolean) {
         super();
+        this.source = source;
         this.visible = visible;
     }
 
-    public reduce(state: RootState): RootState {
-        const windowVisible = (this.visible !== undefined) ? this.visible : !state.windowVisible;
-        const storage = Injector.get<'DATABASE'>(Inject.DATABASE);
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+        if (toggleFilter.recordToggle(this.source)) {
+            await store.dispatch({...this, reduce: this.conditionalReduce.bind(this)});
+        }
+    }
 
-        storage.get(CollectionMap.SETTINGS).upsert({id: SettingsMap.WINDOW_VISIBLE, value: windowVisible});
+    private conditionalReduce(state: RootState): RootState {
+        const centerVisible = (this.visible !== undefined) ? this.visible : !state.centerVisible;
 
         return {
             ...state,
-            windowVisible
+            centerVisible
+        };
+    }
+}
+
+export class BlurCenter extends AsyncAction<RootState> {
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+        // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
+        // properly [SERVICE-614]
+        if (toggleFilter.recordBlur()) {
+            await store.dispatch({...this, reduce: this.conditionalReduce.bind(this)});
+        }
+    }
+
+    private conditionalReduce(state: RootState): RootState {
+        return {
+            ...state,
+            centerVisible: false
+        };
+    }
+}
+
+export class ToggleLockCenter extends Action<RootState> {
+    public reduce(state: RootState): RootState {
+        return {
+            ...state,
+            centerLocked: !state.centerLocked
         };
     }
 }
@@ -127,4 +166,4 @@ export class ExpireNotification extends Action<RootState> {
     }
 }
 
-export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleVisibility;
+const toggleFilter = new ToggleFilter();
