@@ -53,6 +53,8 @@ test('When a notification is created with an expiry, the notification is removed
     await delay(seconds(5));
     await delay(Duration.EVENT_PROPAGATED);
 
+    await expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
+
     expect(closedListener).toBeCalledTimes(1);
     expectTimeSoonAfter(eventLog[0].time, expires.getTime());
 });
@@ -62,6 +64,7 @@ test('When a notification is created with an expiry in the past, the notificatio
 
     await delay(Duration.EVENT_PROPAGATED);
 
+    await expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
     expect(closedListener).toBeCalledTimes(1);
 });
 
@@ -116,6 +119,29 @@ test('When two notifications are created with different expiries, the notificati
     expectTimeSoonAfter(eventLog[1].time, lateExpires.getTime());
 });
 
+test('When two notifications are created with different expiries, in reverse expiry order, the notifications are expired in the correct order', async () => {
+    const earlyExpires = future(seconds(5));
+    const lateExpires = future(seconds(10));
+
+    const lateNote = (await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        expires: lateExpires
+    })).note;
+
+    const earlyNote = (await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        expires: earlyExpires
+    })).note;
+
+    await delay(seconds(10));
+    await delay(Duration.EVENT_PROPAGATED);
+
+    expect(eventLog.map((entry) => entry.event.notification.id)).toEqual([earlyNote.id, lateNote.id]);
+
+    expectTimeSoonAfter(eventLog[0].time, earlyExpires.getTime());
+    expectTimeSoonAfter(eventLog[1].time, lateExpires.getTime());
+});
+
 test('When two notifications are created with the same expiries, the notifications are expired simultaneously', async () => {
     const expires = future(seconds(5));
 
@@ -134,6 +160,85 @@ test('When two notifications are created with the same expiries, the notificatio
 
     expectTimeSoonAfter(eventLog[0].time, expires.getTime());
     expectTimeSoonAfter(eventLog[1].time, expires.getTime());
+});
+
+test('When a notification is removed before it expires, the notification does not expire', async () => {
+    const note = (await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        expires: future(seconds(5)),
+        onExpire: {task: 'expired'}
+    })).note;
+
+    await notifsRemote.clear(testWindow.identity, note.id);
+
+    expect(closedListener).toBeCalledTimes(1);
+
+    await delay(seconds(5));
+    await delay(Duration.EVENT_PROPAGATED);
+
+    expect(actionListener).toBeCalledTimes(0);
+    expect(closedListener).toBeCalledTimes(1);
+});
+
+test('When a notification is recreated with a later expiry, the expiry time is changed', async () => {
+    const note = (await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        expires: future(seconds(5))
+    })).note;
+
+    const laterExpiry = future(seconds(10));
+
+    await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        id: note.id,
+        expires: laterExpiry
+    });
+
+    await delay(seconds(10));
+    await delay(Duration.EVENT_PROPAGATED);
+
+    expect(closedListener).toBeCalledTimes(2);
+    expectTimeSoonAfter(eventLog[1].time, laterExpiry.getTime());
+});
+
+test('When a notification is recreated with an earlier expiry, the expiry time is changed', async () => {
+    const note = (await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        expires: future(seconds(10))
+    })).note;
+
+    const earlierExpiry = future(seconds(5));
+
+    await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        id: note.id,
+        expires: earlierExpiry
+    });
+
+    await delay(seconds(5));
+    await delay(Duration.EVENT_PROPAGATED);
+
+    expect(closedListener).toBeCalledTimes(2);
+    expectTimeSoonAfter(eventLog[1].time, earlierExpiry.getTime());
+});
+
+test('When a notification is recreated with no expiry, the  notification does not expire', async () => {
+    const originalNote = (await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        expires: future(seconds(5))
+    })).note;
+
+    const recreatedNote = (await notifsRemote.createAndAwait(testWindow.identity, {
+        ...options,
+        id: originalNote.id,
+        expires: null
+    })).note;
+
+    await delay(seconds(5));
+    await delay(Duration.EVENT_PROPAGATED);
+
+    await expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([{...recreatedNote, expires: null}]);
+    expect(closedListener).toBeCalledTimes(1);
 });
 
 describe('When a notification with an expiry is created by an app that then quits', () => {
