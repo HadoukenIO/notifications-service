@@ -64,10 +64,6 @@ export class ClientRegistry {
         return this._actionReadyWindows.some(client => client.uuid === appUuid);
     }
 
-    public getConnectedWindowsByApp(uuid: string): Identity[] {
-        return this._apiHandler.getClientConnections().filter((client: Identity) => client.uuid === uuid);
-    }
-
     public async onAddEventListener(eventType: Events['type'], sender: Identity): Promise<void> {
         if (eventType === 'notification-action') {
             const actionReady = this.isAppActionReady(sender.uuid);

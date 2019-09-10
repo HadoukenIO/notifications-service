@@ -38,7 +38,9 @@ export class EventPump {
      */
     public push<T extends Events>(targetUuid: string, event: Targeted<Transport<T>>): void {
         if (event.type !== 'notification-action' || this._clientRegistry.isAppActionReady(targetUuid)) {
-            this._clientRegistry.getConnectedWindowsByApp(targetUuid).forEach((window) => {
+            const connectedAppWindows = this._apiHandler.getClientConnections().filter((client: Identity) => client.uuid === targetUuid);
+
+            connectedAppWindows.forEach((window) => {
                 this._apiHandler.dispatchEvent(window, event);
             });
         } else {
