@@ -8,14 +8,16 @@ import {RootState} from '../store/State';
 
 import {AsyncInit} from './AsyncInit';
 
+type ScheduledExpiry = {
+    note: StoredNotification;
+    timerHandle: number;
+}
+
 @injectable()
 export class ExpiryController extends AsyncInit {
     private readonly _store: Store<RootState, RootAction>;
 
-    private _nextExpiry: {
-        note: StoredNotification,
-        timerHandler: number
-    } | null = null;
+    private _nextExpiry: ScheduledExpiry | null = null;
 
     public constructor(@inject(Inject.STORE) store: Store<RootState, RootAction>) {
         super();
@@ -84,7 +86,7 @@ export class ExpiryController extends AsyncInit {
 
     private clearExpiry(): void {
         if (this._nextExpiry) {
-            window.clearTimeout(this._nextExpiry.timerHandler);
+            window.clearTimeout(this._nextExpiry.timerHandle);
             this._nextExpiry = null;
         }
     }
@@ -92,7 +94,7 @@ export class ExpiryController extends AsyncInit {
     private scheduleExpiry(note: StoredNotification, now: number): void {
         this._nextExpiry = {
             note,
-            timerHandler: window.setTimeout(() => {
+            timerHandle: window.setTimeout(() => {
                 this.expireNotification(note, note.notification.expiry!);
             }, note.notification.expiry! - now)
         };
