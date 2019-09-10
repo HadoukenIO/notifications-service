@@ -46,7 +46,7 @@ export class ClientRegistry {
         const isRunning = await this._environment.isApplicationRunning(appUuid);
 
         if (!isRunning) {
-            const storedApplication = this._store.state.clients.get(appUuid);
+            const storedApplication = this._store.state.registry.get(appUuid);
             if (storedApplication) {
                 await this._environment.startApplication(storedApplication);
             } else {

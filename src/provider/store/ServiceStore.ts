@@ -15,7 +15,7 @@ import {Store} from './Store';
 export class ServiceStore extends Store<RootState, RootAction> {
     private static INITIAL_STATE: RootState = {
         notifications: [],
-        clients: new Map(),
+        registry: new Map<string, StoredApplication>(),
         windowVisible: false
     };
 

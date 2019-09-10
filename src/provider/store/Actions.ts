@@ -116,11 +116,11 @@ export class RegisterClient extends Action<RootState> {
 
     public reduce(state: RootState): RootState {
         const info = this.clientInfo;
-        const map = new Map(state.clients);
+        const map = new Map(state.registry);
         map.set(info.id, info);
         return {
             ...state,
-            clients: map
+            registry: map
         };
     }
 }
