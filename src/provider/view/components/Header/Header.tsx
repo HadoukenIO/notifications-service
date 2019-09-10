@@ -38,7 +38,7 @@ export function Header(props: Props): React.ReactElement {
             <div className="strip">
                 <ul className="options">
                     <li className="detail">
-                        <span>Sort By:</span>
+                        <span>Group By:</span>
                     </li>
                     {
                         Object.values(GroupingType).map((name, i) => {
