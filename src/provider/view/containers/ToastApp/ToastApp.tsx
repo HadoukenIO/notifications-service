@@ -1,15 +1,16 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {connect, Provider} from 'react-redux';
+import {Store} from 'redux';
 
 import {StoredNotification} from '../../../model/StoredNotification';
 import {NotificationCard} from '../../components/NotificationCard/NotificationCard';
 import {TearOut} from '../../components/Wrappers/TearOut';
 import {WindowDimensions} from '../../../controller/Layouter';
 import {RootState} from '../../../store/State';
-import {Store} from '../../../store/Store';
-import {Actionable, RemoveNotifications} from '../../../store/Actions';
+import {Actionable} from '../../../store/Actions';
 import {WebWindow} from '../../../model/WebWindow';
+import {ServiceStore} from '../../../store/ServiceStore';
 
 import '../../styles/base.scss';
 import './ToastApp.scss';
@@ -41,7 +42,7 @@ const Container = connect(mapStateToProps)(ToastApp);
 export interface RenderOptions {
     notification: StoredNotification;
     webWindow: WebWindow;
-    store: Store;
+    store: ServiceStore;
     setWindowSize: (dim: WindowDimensions) => void;
     onDismiss: () => Promise<void>;
 }
@@ -50,7 +51,7 @@ export function renderApp(options: RenderOptions) {
     const {notification, webWindow, store, setWindowSize, onDismiss} = options;
 
     ReactDOM.render(
-        <Provider store={store['_store']}>
+        <Provider store={store as unknown as Store<RootState>}>
             <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} onDismiss={onDismiss} />
         </Provider>,
         webWindow.document.getElementById('react-app')

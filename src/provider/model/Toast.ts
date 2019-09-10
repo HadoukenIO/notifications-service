@@ -5,8 +5,8 @@ import {Transition, TransitionOptions, Bounds} from 'openfin/_v2/shapes';
 
 import {renderApp, RenderOptions} from '../view/containers/ToastApp/ToastApp';
 import {DeferredPromise} from '../common/DeferredPromise';
-import {Store} from '../store/Store';
 import {LayoutItem, WindowDimensions} from '../controller/Layouter';
+import {ServiceStore} from '../store/ServiceStore';
 
 import {StoredNotification} from './StoredNotification';
 import {WebWindow, WebWindowFactory} from './WebWindow';
@@ -82,7 +82,13 @@ export class Toast implements LayoutItem {
         return this._dimensions;
     }
 
-    public constructor(store: Store, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification, toastOptions: Options) {
+    public constructor(
+        store: ServiceStore,
+        monitorModel: MonitorModel,
+        webWindowFactory: WebWindowFactory,
+        notification: StoredNotification,
+        toastOptions: Options
+    ) {
         this._id = notification.id;
         this._options = toastOptions;
         this._position = {top: 0, left: 0};
