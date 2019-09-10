@@ -1,7 +1,7 @@
 import {Application, Window} from 'hadouken-js-adapter';
 
 import * as notifsRemote from '../utils/int/notificationsRemote';
-import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 import {isCenterShowing, getCenterCloseButton} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
@@ -20,7 +20,7 @@ describe('When the Notification Center is open', () => {
     });
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
 
         // Ensure center is showing
