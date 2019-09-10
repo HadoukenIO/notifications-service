@@ -37,23 +37,23 @@
             }
 
             .count {
-                flex: 0 -1 0;
+                color: var(--center-background-color);
+                background: var(--accent-color);
                 display: inline-block;
-                align-self: flex-end;
+                flex: 0 -1 0;
                 flex-direction: row;
+                align-self: flex-end;
                 position: relative;
+                min-width: 18px;
+                top: -6px;
+                height: 16px;
+                margin-left: 6px;
                 text-align: center;
                 line-height: 12px;
                 font-size: 14px;
                 padding: 3px;
-                margin-left: 4px;
                 font-weight: 600;
-                color: var(--center-background-color);
-                background: var(--accent-color);
                 border-radius: 100px;
-                min-width: 18px;
-                height: 16px;
-                top: -6px;
             }
         }
 
