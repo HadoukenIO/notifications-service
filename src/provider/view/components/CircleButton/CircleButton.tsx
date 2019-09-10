@@ -2,13 +2,26 @@ import * as React from 'react';
 
 import './CircleButton.scss';
 
-type IconType = 'accept' | 'cancel' | 'close' | 'hide' | 'pin' | 'dismiss';
+enum IconType {
+    accept = 'accept',
+    cancel = 'cancel',
+    close = 'close',
+    hide = 'hide',
+    pin = 'pin',
+    dismiss = 'dismiss'
+}
+
+enum Size {
+    small = 'small',
+    normal = 'normal',
+    large = 'large'
+}
 
 interface Props {
     onClick?: () => void;
-    type: IconType;
+    type: IconType[keyof IconType];
     alt?: string;
-    size?: 'small' | 'normal' | 'large';
+    size?: Size[keyof Size];
 }
 
 CircleButton.defaultProps = {
