@@ -12,6 +12,7 @@ import {PartiallyWritable} from './types';
 
 jest.mock('../src/provider/model/APIHandler');
 jest.mock('../src/provider/model/ClientRegistry');
+jest.mock('../src/provider/model/database/Database');
 
 export function createMockEnvironment(): jest.Mocked<Environment> {
     return {
