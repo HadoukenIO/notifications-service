@@ -145,10 +145,9 @@ export interface NotificationOptions {
      * An {@link NotificationActionResult|action result} to be passed back to the application inside the
      * {@link NotificationActionEvent|`notification-action`} event fired when the notification the expires.
      *
-     * This action will be raised if an `expiry` is specified for the notification, when the notification is removed
-     * due to expiring. This action will never be raised if not `expiry` is specified. Note that this action does not
-     * exclude a close action being raised. If and when the notification expires, both this and any close action will
-     * be raised.
+     * If an `expiry` is specified for the notification, this action will be raised when the notification expires. If
+     * an `expiry` is not specified for the notification, this action will never be raised. Note that if an `onClose`
+     * action result is also specified, both actions will be raised if and when the notification expires.
      *
      * See {@link Actions} for more details on notification actions, and receiving interaction events from
      * notifications.
@@ -161,7 +160,8 @@ export interface NotificationOptions {
      *
      * This action will be raised regardless of how the notification is closed. This can be from user interaction
      * (until future revisions allow default click behaviour to be overriden, this will be any click anywhere within
-     * the notification), or from the notification being programmaticially removed, such as a call to `clear`.
+     * the notification), the notification expiring, or from the notification being programmaticially removed, such as
+     * a call to `clear`.
      *
      * See {@link Actions} for more details on notification actions, and receiving interaction events from
      * notifications.
