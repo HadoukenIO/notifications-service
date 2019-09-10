@@ -5,6 +5,7 @@ import {Database, CollectionMap} from '../../src/provider/model/database/Databas
 import {StoredNotification} from '../../src/provider/model/StoredNotification';
 import {NotificationInternal} from '../../src/client/internal';
 import {Collection} from '../../src/provider/model/database/Collection';
+import {assertNotificationStored} from '../utils/int/storageRemote';
 
 let database: Database;
 let collection: Collection<StoredNotification>;
@@ -13,6 +14,21 @@ let generatedNotificationCount: number = 0;
 beforeAll(async () => {
     database = await new Database().delayedInit();
     collection = database.get(CollectionMap.NOTIFICATIONS);
+});
+
+test.only('fooo', async () => {
+    const fun2 = async () => {
+        console.log('baz');
+    };
+
+    const fun1 = async () => {
+        await fun2();
+        console.log('bar');
+    };
+
+    const prom = fun1();
+    console.log('foo');
+    await prom;
 });
 
 describe('Database Methods', () => {
