@@ -10,7 +10,8 @@ const style: React.CSSProperties = {
     margin: '0',
     display: 'inline-block',
     userSelect: 'none',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    overflow: 'hidden! important'
 };
 
 export function TearOut(props: React.PropsWithChildren<Props>) {
