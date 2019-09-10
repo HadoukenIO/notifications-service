@@ -41,10 +41,10 @@ export class ExpiryController extends AsyncInit {
     }
 
     private addNotification(note: StoredNotification): void {
-        if (note.notification.expiry !== null && (!this._nextExpiry || this.expiresBefore(note, this._nextExpiry.note))) {
+        if (note.notification.expires !== null && (!this._nextExpiry || this.expiresBefore(note, this._nextExpiry.note))) {
             const now = Date.now();
 
-            if (note.notification.expiry! <= now) {
+            if (note.notification.expires! <= now) {
                 this.expireNotification(note, now);
             } else {
                 this.clearExpiry();
@@ -76,7 +76,7 @@ export class ExpiryController extends AsyncInit {
         }, null);
 
         if (earliestExpiry !== null) {
-            if (earliestExpiry.notification.expiry! <= now) {
+            if (earliestExpiry.notification.expires! <= now) {
                 this.expireNotification(earliestExpiry, now);
             } else {
                 this.scheduleExpiry(earliestExpiry, now);
@@ -95,13 +95,13 @@ export class ExpiryController extends AsyncInit {
         this._nextExpiry = {
             note,
             timerHandle: window.setTimeout(() => {
-                this.expireNotification(note, note.notification.expiry!);
-            }, note.notification.expiry! - now)
+                this.expireNotification(note, note.notification.expires!);
+            }, note.notification.expires! - now)
         };
     }
 
     private expiresBefore(testNote: StoredNotification, referenceNote: StoredNotification | null) {
-        if (testNote.notification.expiry === null) {
+        if (testNote.notification.expires === null) {
             return false;
         }
 
@@ -109,6 +109,6 @@ export class ExpiryController extends AsyncInit {
             return true;
         }
 
-        return testNote.notification.expiry < referenceNote.notification.expiry!;
+        return testNote.notification.expires < referenceNote.notification.expires!;
     }
 }

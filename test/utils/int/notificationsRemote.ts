@@ -19,20 +19,20 @@ export async function create(executionTarget: Identity, options: NotificationOpt
             (optionsRemote.date !== undefined) ?
                 new Date(optionsRemote.date) :
                 optionsRemote.date;
-        const expiry =
-            (optionsRemote.expiry !== undefined && optionsRemote.expiry !== null) ?
-                new Date(optionsRemote.expiry) :
+        const expires =
+            (optionsRemote.expires !== undefined && optionsRemote.expires !== null) ?
+                new Date(optionsRemote.expires) :
                 optionsRemote.date;
 
-        optionsRemote = {...optionsRemote, date, expiry};
+        optionsRemote = {...optionsRemote, date, expires};
 
         const note = await this.notifications.create(optionsRemote);
 
         // We need to manually stringify Date objects as puppeteer fails to do so on the remote-to-runner journey
-        return {...note, date: note.date.toJSON(), expiry: note.expiry !== null ? note.expiry.toJSON() : null};
+        return {...note, date: note.date.toJSON(), expires: note.expires !== null ? note.expires.toJSON() : null};
     }, options);
     // And then manually un-stringify them
-    return {...result, date: new Date(result.date), expiry: result.expiry !== null ? new Date(result.expiry) : null};
+    return {...result, date: new Date(result.date), expires: result.expires !== null ? new Date(result.expires) : null};
 }
 
 export async function createAndAwait(executionTarget: Identity, options: NotificationOptions) {
@@ -54,10 +54,10 @@ export async function getAll(executionTarget: Identity) {
     const result = await ofBrowser.executeOnWindow(executionTarget, async function() {
         const notes = await this.notifications.getAll();
         // We need to manually stringify Date objects as puppeteer fails to do so on the remote-to-runner journey
-        return notes.map(note => ({...note, date: note.date.toJSON(), expiry: note.expiry !== null ? note.expiry.toJSON() : null}));
+        return notes.map(note => ({...note, date: note.date.toJSON(), expires: note.expires !== null ? note.expires.toJSON() : null}));
     });
     // And then manually un-stringify them
-    return result.map(note => ({...note, date: new Date(note.date), expiry: note.expiry !== null ? new Date(note.expiry) : null}));
+    return result.map(note => ({...note, date: new Date(note.date), expires: note.expires !== null ? new Date(note.expires) : null}));
 }
 
 export async function clearAll(executionTarget: Identity) {
@@ -94,13 +94,13 @@ export async function getReceivedEvents(executionTarget: Identity, type: Events[
         return this.receivedEvents.map(event => ({...event, notification: {
             ...event.notification,
             date: event.notification.date.toJSON(),
-            expiry: event.notification.expiry !== null ? event.notification.expiry.toJSON() : null
+            expires: event.notification.expires !== null ? event.notification.expires.toJSON() : null
         }}));
     });
     // And then manually un-stringify them
     return events.filter(event => event.type === type).map(event => ({...event, notification: {
         ...event.notification,
         date: new Date(event.notification.date),
-        expiry: event.notification.expiry !== null ? new Date(event.notification.expiry) : null
+        expires: event.notification.expires !== null ? new Date(event.notification.expires) : null
     }}));
 }

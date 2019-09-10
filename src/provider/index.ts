@@ -142,13 +142,13 @@ export class Main {
             } else if (action instanceof ExpireNotification) {
                 const {notification, source} = action.notification;
 
-                if (notification.onExpired !== null) {
+                if (notification.onExpire !== null) {
                     const event: Targeted<Transport<NotificationActionEvent>> = {
                         target: 'default',
                         type: 'notification-action',
                         trigger: ActionTrigger.EXPIRE,
                         notification: mutable(notification),
-                        result: notification.onExpired
+                        result: notification.onExpire
                     };
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
@@ -288,9 +288,9 @@ export class Main {
             icon: payload.icon || '',
             customData: payload.customData !== undefined ? payload.customData : {},
             date: payload.date || Date.now(),
-            expiry: payload.expiry !== undefined ? payload.expiry : null,
+            expires: payload.expires !== undefined ? payload.expires : null,
             onSelect: this.hydrateAction(payload.onSelect),
-            onExpired: this.hydrateAction(payload.onExpired),
+            onExpire: this.hydrateAction(payload.onExpire),
             onClose: this.hydrateAction(payload.onClose),
             buttons: payload.buttons ? payload.buttons.map(btn => ({
                 ...btn,

@@ -35,7 +35,7 @@ export async function assertNotificationStored(source: Identity, note: Notificat
 
     const expectedStoredNote: StoredNotification = {
         id: storedId,
-        notification: {...note, date: note.date.valueOf(), expiry: note.expiry !== null ? note.expiry.valueOf() : null},
+        notification: {...note, date: note.date.valueOf(), expires: note.expires !== null ? note.expires.valueOf() : null},
         source
     };
     const actualStoredNote = await getStoredNotification(storedId);
