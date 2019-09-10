@@ -147,12 +147,12 @@ test('When two notifications are created with the same expiries, the notificatio
 
     await notifsRemote.createAndAwait(testWindow.identity, {
         ...options,
-        expires: expires
+        expires
     });
 
     await notifsRemote.createAndAwait(testWindow.identity, {
         ...options,
-        expires: expires
+        expires
     });
 
     await delay(seconds(5));
