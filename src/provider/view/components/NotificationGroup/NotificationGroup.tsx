@@ -26,14 +26,14 @@ export function NotificationGroup(props: Props) {
         <div className="group">
             <div className="title">
                 <span className="app">
-                    <span className="name single-line">jfidw dw dwdwd wdw dwd wdwdwdw sajfhjshajfjhahfau {name}</span>
-                    <span className="count">2323{notifications.length}</span>
+                    <span className="name single-line">{name}</span>
+                    <span className="count">{notifications.length}</span>
                 </span>
                 <CircleButton type="close" size="small" onClick={handleClearAll} alt="Clear notifications" />
             </div>
             <TransitionGroup className="notifications" component="ul">
                 {
-                    notifications.map((notification, i) => {
+                    notifications.map((notification) => {
                         return (
                             <CSSTransition
                                 key={notification.id}
