@@ -4,13 +4,12 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {ElementHandle} from 'puppeteer';
 
 import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent} from '../../src/client';
-
-import * as notifsRemote from './utils/notificationsRemote';
-import * as providerRemote from './utils/providerRemote';
-import {delay, Duration} from './utils/delay';
-import {getToastCards, getToastButtons} from './utils/toastUtils';
-import {createAppInServiceRealm} from './utils/spawnRemote';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import * as providerRemote from '../utils/int/providerRemote';
+import {delay, Duration} from '../utils/int/delay';
+import {getToastCards, getToastButtons} from '../utils/int/toastUtils';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 
 const notificationOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -32,7 +31,7 @@ describe('When an app that uses notification-service is created', () => {
         eventOrdering = [];
         actionListener = jest.fn<void, [NotificationActionEvent]>().mockImplementation(() => eventOrdering.push('action'));
         closedListener = jest.fn<void, [NotificationClosedEvent]>().mockImplementation(() => eventOrdering.push('closed'));
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
         await notifsRemote.addEventListener(testWindow.identity, 'notification-action', actionListener);
         await notifsRemote.addEventListener(testWindow.identity, 'notification-closed', closedListener);
