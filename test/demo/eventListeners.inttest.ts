@@ -88,7 +88,7 @@ describe('Click listeners', () => {
                 await delay(Duration.EVENT_PROPAGATED);
 
                 // Listener was triggered twice with the correct data
-                //  (once for notification-action and once for notification-action triggered by notification-closed events)
+                // (once for notification-action and once for notification-action triggered by notification-closed events)
                 expect(actionListener).toHaveBeenCalledTimes(2);
                 expect(actionListener).toHaveBeenCalledWith({
                     type: 'notification-action',
