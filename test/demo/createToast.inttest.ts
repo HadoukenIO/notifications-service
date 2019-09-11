@@ -9,7 +9,7 @@ import {delay, Duration} from '../utils/int/delay';
 import {getToastWindow, getToastCards} from '../utils/int/toastUtils';
 import {assertNotificationStored} from '../utils/int/storageRemote';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
 import {setupClosedCenterBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
@@ -30,7 +30,7 @@ describe('When calling createNotification with the Notification Center not showi
     setupClosedCenterBookends();
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
 
         ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
