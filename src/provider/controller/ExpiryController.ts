@@ -55,18 +55,7 @@ export class ExpiryController extends AsyncInit {
             if (this._nextExpiry && note.notification.expires >= this._nextExpiry.note.notification.expires) {
                 this._unscheduledNotifications.insert(note);
             } else {
-                const now = Date.now();
-
-                if (note.notification.expires <= now) {
-                    this.expireNotification(note, now);
-                } else {
-                    if (this._nextExpiry) {
-                        this._unscheduledNotifications.insert(this._nextExpiry.note);
-                    }
-
-                    this.clearExpiry();
-                    this.scheduleExpiry(note, now);
-                }
+                this.scheduleExpiry(note, Date.now());
             }
         }
     }
@@ -76,8 +65,28 @@ export class ExpiryController extends AsyncInit {
         expiringNotificationsToRemove.forEach((note) => this._unscheduledNotifications.remove(note));
 
         if (this._nextExpiry && expiringNotificationsToRemove.some(note => note.id === this._nextExpiry!.note.id)) {
-            this.clearExpiry();
+            window.clearTimeout(this._nextExpiry.timerHandle);
+            this._nextExpiry = null;
+
             this.scheduleEarliestExpiry(Date.now());
+        }
+    }
+
+    private scheduleExpiry(note: ExpiringNotification, now: number): void {
+        if (note.notification.expires <= now) {
+            this.expireNotification(note, now);
+        } else {
+            if (this._nextExpiry) {
+                window.clearTimeout(this._nextExpiry.timerHandle);
+                this._unscheduledNotifications.insert(this._nextExpiry.note);
+            }
+
+            this._nextExpiry = {
+                note,
+                timerHandle: window.setTimeout(() => {
+                    this.expireNotification(note, note.notification.expires!);
+                }, note.notification.expires - now)
+            };
         }
     }
 
@@ -95,28 +104,8 @@ export class ExpiryController extends AsyncInit {
         const earliestExpiry = this._unscheduledNotifications.empty() ? null : this._unscheduledNotifications.pop();
 
         if (earliestExpiry !== null) {
-            if (earliestExpiry.notification.expires <= now) {
-                this.expireNotification(earliestExpiry, now);
-            } else {
-                this.scheduleExpiry(earliestExpiry, now);
-            }
+            this.scheduleExpiry(earliestExpiry, now);
         }
-    }
-
-    private clearExpiry(): void {
-        if (this._nextExpiry) {
-            window.clearTimeout(this._nextExpiry.timerHandle);
-            this._nextExpiry = null;
-        }
-    }
-
-    private scheduleExpiry(note: ExpiringNotification, now: number): void {
-        this._nextExpiry = {
-            note,
-            timerHandle: window.setTimeout(() => {
-                this.expireNotification(note, note.notification.expires!);
-            }, note.notification.expires - now)
-        };
     }
 }
 
