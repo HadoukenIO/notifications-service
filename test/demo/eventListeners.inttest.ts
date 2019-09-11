@@ -87,8 +87,9 @@ describe('Click listeners', () => {
                 await noteCards[0].click();
                 await delay(Duration.EVENT_PROPAGATED);
 
-                // Listener was triggered once with the correct data
-                expect(actionListener).toHaveBeenCalledTimes(1);
+                // Listener was triggered twice with the correct data
+                // (once for notification-action and once for notification-action triggered by notification-closed events)
+                expect(actionListener).toHaveBeenCalledTimes(2);
                 expect(actionListener).toHaveBeenCalledWith({
                     type: 'notification-action',
                     notification: {...note, date: note.date.toJSON()},
@@ -108,8 +109,8 @@ describe('Click listeners', () => {
                 await buttonHandles[0].click();
                 await delay(Duration.EVENT_PROPAGATED);
 
-                // control triggered with correct metadata
-                expect(actionListener).toHaveBeenCalledTimes(1);
+                // control triggered with correct metadata followed by a notification-action triggered by notification-closed event.
+                expect(actionListener).toHaveBeenCalledTimes(2);
                 expect(actionListener).toHaveBeenCalledWith({
                     type: 'notification-action',
                     notification: {...note, date: note.date.toJSON()},
