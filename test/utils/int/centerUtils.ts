@@ -8,15 +8,15 @@ const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Cent
 const ofBrowser = new OFPuppeteerBrowser();
 export async function getAllCenterCards() {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$('.group:not([class*="exit"]) .notification-card:not([class*="exit"])');
+    return centerPage!.$$('.group:not([class*="exit"]) li:not([class*="exit"]) .notification-card');
 }
 export async function getCenterCardsByApp(sourceUuid: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$(`.group:not([class*="exit"]) .notification-card[data-id*="${sourceUuid}"]:not([class*="exit"])`);
+    return centerPage!.$$(`.group:not([class*="exit"]) li:not([class*="exit"]) .notification-card[data-id*="${sourceUuid}"]`);
 }
 export async function getCenterCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$(`.group:not([class*="exit"]) .notification-card[data-id="${sourceUuid}:${notificationId}"]:not([class*="exit"])`);
+    return centerPage!.$$(`.group:not([class*="exit"]) li:not([class*="exit"]) .notification-card[data-id="${sourceUuid}:${notificationId}"]`);
 }
 
 export async function getCenterCloseButton(): Promise<ElementHandle> {
