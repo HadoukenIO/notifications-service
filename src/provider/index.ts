@@ -152,7 +152,6 @@ export class Main {
                     };
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
-                this._store.dispatch(new RemoveNotifications([action.notification]));
             }
         });
 

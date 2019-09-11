@@ -98,6 +98,7 @@ export class ExpiryController extends AsyncInit {
         }
 
         this._store.dispatch(new ExpireNotification(storedNotificaiton));
+        this._store.dispatch(new RemoveNotifications([storedNotificaiton]));
         this.scheduleEarliestExpiry(now);
     }
 
