@@ -167,7 +167,7 @@ export enum ActionTrigger {
     CLOSE = 'close',
 
     /**
-     * The notification was expired
+     * The notification expired
      */
     EXPIRE = 'expire',
 
