@@ -5,7 +5,6 @@ import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {RemoveNotifications, RootAction, CreateNotification, ExpireNotification} from '../store/Actions';
 import {RootState} from '../store/State';
-import {OrderedList} from '../utils/OrderedList';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -28,7 +27,6 @@ interface ScheduledExpiry {
 export class ExpiryController extends AsyncInit {
     private readonly _store: Store<RootState, RootAction>;
 
-    private _unscheduledNotifications!: OrderedList<ExpiringNotification>;
     private _nextExpiry: ScheduledExpiry | null = null;
 
     public constructor(@inject(Inject.STORE) store: Store<RootState, RootAction>) {
@@ -40,8 +38,6 @@ export class ExpiryController extends AsyncInit {
 
     protected async init(): Promise<void> {
         await this._store.initialized;
-
-        this._unscheduledNotifications = new OrderedList(this._store.state.notifications.filter(doesExpire), compareNotifications);
 
         this.scheduleEarliestExpiry(Date.now());
     }
@@ -56,9 +52,7 @@ export class ExpiryController extends AsyncInit {
 
     private addNotification(note: StoredNotification): void {
         if (doesExpire(note)) {
-            if (this._nextExpiry && note.notification.expires >= this._nextExpiry.note.notification.expires) {
-                this._unscheduledNotifications.insert(note);
-            } else {
+            if (!this._nextExpiry || note.notification.expires < this._nextExpiry.note.notification.expires) {
                 this.scheduleExpiry(note, Date.now());
             }
         }
@@ -66,7 +60,6 @@ export class ExpiryController extends AsyncInit {
 
     private removeNotifications(notes: StoredNotification[]): void {
         const expiringNotificationsToRemove = notes.filter(doesExpire);
-        expiringNotificationsToRemove.forEach((note) => this._unscheduledNotifications.remove(note));
 
         if (this._nextExpiry && expiringNotificationsToRemove.some(note => note.id === this._nextExpiry!.note.id)) {
             window.clearTimeout(this._nextExpiry.timerHandle);
@@ -82,13 +75,12 @@ export class ExpiryController extends AsyncInit {
         } else {
             if (this._nextExpiry) {
                 window.clearTimeout(this._nextExpiry.timerHandle);
-                this._unscheduledNotifications.insert(this._nextExpiry.note);
             }
 
             this._nextExpiry = {
                 note,
                 timerHandle: window.setTimeout(() => {
-                    this.expireNotification(note, note.notification.expires!);
+                    this.expireNotification(note, note.notification.expires);
                 }, note.notification.expires - now)
             };
         }
@@ -100,12 +92,11 @@ export class ExpiryController extends AsyncInit {
         }
 
         this._store.dispatch(new ExpireNotification(storedNotificaiton));
-
         this.scheduleEarliestExpiry(now);
     }
 
     private scheduleEarliestExpiry(now: number): void {
-        const earliestExpiry = this._unscheduledNotifications.empty() ? null : this._unscheduledNotifications.pop();
+        const earliestExpiry = this._store.state.notifications.reduce(earliestReducer, null);
 
         if (earliestExpiry !== null) {
             this.scheduleExpiry(earliestExpiry, now);
@@ -117,12 +108,10 @@ function doesExpire(note: StoredNotification): note is ExpiringNotification {
     return note.notification.expires !== null;
 }
 
-function compareNotifications(note1: ExpiringNotification, note2: ExpiringNotification): number {
-    const expiryDifference = note1.notification.expires - note2.notification.expires;
-
-    if (expiryDifference === 0) {
-        return note1.id < note2.id ? -1 : note1.id > note2.id ? 1 : 0;
+function earliestReducer(earliest: ExpiringNotification | null, current: StoredNotification): ExpiringNotification | null {
+    if (current.notification.expires !== null && (!earliest || current.notification.expires < earliest.notification.expires)) {
+        return current as ExpiringNotification;
     } else {
-        return expiryDifference;
+        return earliest;
     }
 }
