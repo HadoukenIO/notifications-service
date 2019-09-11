@@ -20,7 +20,7 @@ export async function getCenterCardsByNotification(sourceUuid: string, notificat
 }
 
 export async function getCenterCloseButton(): Promise<ElementHandle> {
-    return getDomElementById(CENTER_IDENTITY, 'exit-link');
+    return getDomElementById(CENTER_IDENTITY, 'hide-center');
 }
 
 export async function isCenterShowing(): Promise<boolean> {

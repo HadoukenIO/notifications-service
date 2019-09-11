@@ -22,6 +22,7 @@ interface Props {
     type: IconType[keyof IconType];
     alt?: string;
     size?: Size[keyof Size];
+    id?: string;
 }
 
 CircleButton.defaultProps = {
@@ -29,7 +30,7 @@ CircleButton.defaultProps = {
 };
 
 export function CircleButton(props: Props) {
-    const {onClick, type, size, alt} = props;
+    const {onClick, type, size, alt, id} = props;
 
     const handleClick = (event: React.MouseEvent) => {
         event.stopPropagation();
@@ -40,7 +41,7 @@ export function CircleButton(props: Props) {
     };
 
     return (
-        <div className={`icon ${type} ${size}`} onClick={handleClick} title={alt}>
+        <div id={id} className={`icon ${type} ${size}`} onClick={handleClick} title={alt}>
             <div className="image">
             </div>
         </div>

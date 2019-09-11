@@ -33,7 +33,7 @@ export function Header(props: Props): React.ReactElement {
                         <Lock centerLocked={centerLocked} storeDispatch={storeDispatch} />
                     </DevelopmentOnly>
                 </div>
-                <CircleButton type="hide" size="large" onClick={handleHideWindow} alt="Hide center" />
+                <CircleButton id="hide-center" type="hide" size="large" onClick={handleHideWindow} alt="Hide center" />
             </div>
             <div className="strip">
                 <ul className="options">
