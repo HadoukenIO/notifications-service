@@ -15,7 +15,7 @@ type ExpiringNotification = {
     }
 } & StoredNotification;
 
-type ScheduledExpiry = {
+interface ScheduledExpiry {
     note: ExpiringNotification;
     timerHandle: number;
 }
