@@ -20,6 +20,10 @@ interface ScheduledExpiry {
     timerHandle: number;
 }
 
+/**
+ * Handles the expiry of notifications that have specified an `expires` time. Fires an `ExpireNotification` action when
+ * a notification has expired.
+ */
 @injectable()
 export class ExpiryController extends AsyncInit {
     private readonly _store: Store<RootState, RootAction>;
