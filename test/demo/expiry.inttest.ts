@@ -57,6 +57,8 @@ test('When a notification is created with an expiry, the notification is removed
 
     expect(closedListener).toBeCalledTimes(1);
     expectTimeSoonAfter(eventLog[0].time, expires.getTime());
+
+    expect(actionListener).toBeCalledTimes(0);
 });
 
 test('When a notification is created with an expiry in the past, the notification is removed immediately', async () => {
@@ -65,7 +67,9 @@ test('When a notification is created with an expiry in the past, the notificatio
     await delay(Duration.EVENT_PROPAGATED);
 
     await expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
+
     expect(closedListener).toBeCalledTimes(1);
+    expect(actionListener).toBeCalledTimes(0);
 });
 
 test('When a notification is created with an expiry and an expiry action, an action event is received when it expires', async () => {
