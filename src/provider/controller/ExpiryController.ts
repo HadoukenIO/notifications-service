@@ -115,7 +115,7 @@ export class ExpiryController extends AsyncInit {
             note,
             timerHandle: window.setTimeout(() => {
                 this.expireNotification(note, note.notification.expires!);
-            }, note.notification.expires! - now)
+            }, note.notification.expires - now)
         };
     }
 }
