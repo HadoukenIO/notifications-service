@@ -222,7 +222,7 @@ test('When a notification is recreated with an earlier expiry, the expiry time i
     expectTimeSoonAfter(eventLog[1].time, earlierExpiry.getTime());
 });
 
-test('When a notification is recreated with no expiry, the  notification does not expire', async () => {
+test('When a notification is recreated with no expiry, the notification does not expire', async () => {
     const originalNote = (await notifsRemote.createAndAwait(testWindow.identity, {
         ...options,
         expires: future(seconds(5))
