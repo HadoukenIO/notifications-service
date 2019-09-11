@@ -17,21 +17,6 @@ beforeAll(async () => {
     collection = database.get(CollectionMap.NOTIFICATIONS);
 });
 
-test.only('fooo', async () => {
-    const fun2 = async () => {
-        console.log('baz');
-    };
-
-    const fun1 = async () => {
-        await fun2();
-        console.log('bar');
-    };
-
-    const prom = fun1();
-    console.log('foo');
-    await prom;
-});
-
 describe('Database Methods', () => {
     describe('Get', () => {
         test('Returns a collection when given a valid name', async () => {
