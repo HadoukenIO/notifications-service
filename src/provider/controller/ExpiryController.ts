@@ -5,6 +5,7 @@ import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {RemoveNotifications, RootAction, CreateNotification, ExpireNotification} from '../store/Actions';
 import {RootState} from '../store/State';
+import {Injector} from '../common/Injector';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -33,13 +34,18 @@ export class ExpiryController extends AsyncInit {
         super();
 
         this._store = store;
+
         this._store.onAction.add(this.onAction, this);
     }
 
     protected async init(): Promise<void> {
         await this._store.initialized;
 
-        this.scheduleEarliestExpiry(Date.now());
+        // Un-awaited, as Injector initialization is dependent on this method completing
+        Injector.initialized.then(() => {
+            // As soon as, but not before, the service is initialized, handle any notifications that expired while the service wasn't running
+            this.scheduleEarliestExpiry(Date.now());
+        });
     }
 
     private async onAction(action: RootAction): Promise<void> {
