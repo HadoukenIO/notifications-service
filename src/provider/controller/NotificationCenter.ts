@@ -24,6 +24,7 @@ const windowOptions: WindowOption = {
     frame: false,
     alwaysOnTop: true,
     icon: 'ui/favicon.ico',
+    backgroundColor: '#373737',
     showTaskbarIcon: false,
     opacity: 0
 };

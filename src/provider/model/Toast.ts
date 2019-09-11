@@ -26,7 +26,7 @@ const windowOptions: WindowOption = {
     alwaysOnTop: true,
     showTaskbarIcon: false,
     opacity: 0,
-    backgroundColor: '#1F1E24',
+    backgroundColor: '#424242',
     cornerRounding: {
         width: 7,
         height: 7
