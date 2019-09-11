@@ -51,7 +51,11 @@ function makeNoteOfType(index: number) {
     } else if (index % 3 === 2) {
         return create({id: `1q2w3e4r${index}`, date: new Date(), ...longNote});
     } else {
-        return create({id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote});
+        if (index === 6) {
+            return create({id: `1q2w3e4r${index}`, date: new Date(), expires: new Date(Date.now() + 30 * 1000), ...buttonNote});
+        } else {
+            return create({id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote});
+        }
     }
 }
 
