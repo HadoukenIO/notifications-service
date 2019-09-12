@@ -38,13 +38,18 @@ export function NotificationCard(props: Props) {
     };
 
     const handleButtonClick = (buttonIndex: number) => {
+        // TODO: Have RemoveNotifications dispatched from inside ClickButton [SERVICE-623]
         storeDispatch(new ClickButton(notification, buttonIndex));
+        storeDispatch(new RemoveNotifications([notification]));
     };
 
     const handleNotificationClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
+
+        // TODO: Have RemoveNotifications dispatched from inside ClickNotification [SERVICE-623]
         storeDispatch(new ClickNotification(notification));
+        storeDispatch(new RemoveNotifications([notification]));
     };
 
     return (

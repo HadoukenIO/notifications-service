@@ -11,8 +11,8 @@ fin.desktop.main(async () => {
             'uuid': `notifications-demoapp-${i}`,
             'url': `${baseUrl}/app.html`,
             'mainWindowOptions': {
-                'defaultHeight': 420,
-                'defaultWidth': 250,
+                'defaultHeight': 510,
+                'defaultWidth': 350,
                 'saveWindowState': true,
                 'autoShow': true
             }

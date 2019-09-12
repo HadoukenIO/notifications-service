@@ -19,6 +19,8 @@ import {Environment} from '../model/Environment';
 import {FinEnvironment} from '../model/FinEnvironment';
 import {TrayIcon} from '../model/TrayIcon';
 import {FinTrayIcon} from '../model/FinTrayIcon';
+import {ExpiryController} from '../controller/ExpiryController';
+import {ClientEventController} from '../controller/ClientEventController';
 
 import {Inject} from './Injectables';
 
@@ -27,10 +29,12 @@ import {Inject} from './Injectables';
  */
 type Types = {
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
+    [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController;
     [Inject.CLIENT_REGISTRY]: ClientRegistry;
     [Inject.DATABASE]: Database;
     [Inject.ENVIRONMENT]: Environment;
     [Inject.EVENT_PUMP]: EventPump;
+    [Inject.EXPIRY_CONTROLLER]: ExpiryController;
     [Inject.LAYOUTER]: Layouter;
     [Inject.MONITOR_MODEL]: MonitorModel;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
@@ -48,10 +52,12 @@ type Types = {
  */
 const Bindings = {
     [Inject.API_HANDLER]: APIHandler,
+    [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController,
     [Inject.CLIENT_REGISTRY]: ClientRegistry,
     [Inject.DATABASE]: Database,
     [Inject.ENVIRONMENT]: FinEnvironment,
     [Inject.EVENT_PUMP]: EventPump,
+    [Inject.EXPIRY_CONTROLLER]: ExpiryController,
     [Inject.LAYOUTER]: Layouter,
     [Inject.MONITOR_MODEL]: FinMonitorModel,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
