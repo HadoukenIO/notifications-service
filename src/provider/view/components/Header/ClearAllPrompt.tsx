@@ -36,11 +36,9 @@ export function ClearAllPrompt(props: Props) {
             divRef.current!.focus();
     }, [clearAllPromptVisible, centerVisible]);
 
-    /*
-    Blur and click event both fire when trying to close the prompt by clicking "Clear All".
-    To prevent this we have to track if the mouse is down and ignore the blur.
-    Events are ordered: MouseDown, Blur, MouseUp, Click
-    */
+    // Blur and click event both fire when trying to close the prompt by clicking "Clear All".
+    // To prevent this we have to track if the mouse is down and ignore the blur.
+    // Events are ordered: MouseDown, Blur, MouseUp, Click
     return (
         <span className="clear detail"
             onMouseDown={() => setMouseDown(true)}
