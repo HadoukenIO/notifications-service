@@ -2,7 +2,6 @@ import {_Window} from 'openfin/_v2/api/window/window';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {Signal} from 'openfin-service-signal';
 import {Transition, TransitionOptions, Bounds} from 'openfin/_v2/shapes';
-import * as ReactDOM from 'react-dom';
 import {injectable} from 'inversify';
 
 import {WebWindowFactory, WebWindow} from './WebWindow';
@@ -65,7 +64,7 @@ export class FinWebWindow implements WebWindow {
     public async setAsForeground(): Promise<void> {
         await this._window.setAsForeground();
         // Focus occurs with `setAsForeground` on Windows but not macOS, so do this for consistency and to make sure we can get a blur event later
-        await window.focus();
+        await this._window.focus();
     }
 
     public async animate(transition: Transition, options: TransitionOptions): Promise<void> {
