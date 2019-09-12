@@ -5,18 +5,18 @@ const moment = require('moment');
 moment.updateLocale('en', {
     relativeTime: {
         future: 'in %s',
-        past: '%s ago',
-        s: 'seconds',
-        ss: '%ss',
-        m: 'a minute',
-        mm: '%dm',
-        h: 'an hour',
+        past: '%s',
+        s: 'just now',
+        ss: '%ss ago',
+        m: '1m ago',
+        mm: '%dm ago',
+        h: '1h ago',
         hh: '%dh',
-        d: 'a day',
+        d: 'a day ago',
         dd: '%dd',
-        M: 'a month',
+        M: 'a month ago',
         MM: '%dM',
-        y: 'a year',
+        y: 'a year ago',
         yy: '%dY'
     }
 });

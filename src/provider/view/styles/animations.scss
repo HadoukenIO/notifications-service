@@ -50,10 +50,6 @@
         transform: translate3d(0, 0, 0);
     }
 
-    20% {
-        transform: translateX(-20px);
-    }
-
     100% {
         opacity: 0;
         transform: translate3d(200%, 0, 0);
