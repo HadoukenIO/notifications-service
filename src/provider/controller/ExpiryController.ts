@@ -90,6 +90,7 @@ export class ExpiryController {
             this._nextExpiry = null;
         }
 
+        // TODO: Have RemoveNotifications dispatched from inside ExpireNotification [SERVICE-623]
         this._store.dispatch(new ExpireNotification(storedNotificaiton));
         this._store.dispatch(new RemoveNotifications([storedNotificaiton]));
         this.scheduleEarliestExpiry(now);
