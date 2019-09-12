@@ -99,7 +99,7 @@ export class ClickNotification extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
-        store.dispatch(this);
+        super.dispatch(store);
         await (new RemoveNotifications([this.notification])).dispatch(store);
     }
 }
@@ -115,7 +115,7 @@ export class ClickButton extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
-        store.dispatch(this);
+        super.dispatch(store);
         await (new RemoveNotifications([this.notification])).dispatch(store);
     }
 }
@@ -132,7 +132,7 @@ export class ToggleCenterVisibility extends Action<RootState> {
 
     public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
         if (toggleFilter.recordToggle(this.source)) {
-            await store.dispatch(this);
+            await super.dispatch(store);
         }
     }
 
@@ -151,7 +151,7 @@ export class BlurCenter extends Action<RootState> {
         // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
         // properly [SERVICE-614]
         if (toggleFilter.recordBlur()) {
-            await store.dispatch(this);
+            await super.dispatch(store);
         }
     }
 
@@ -181,7 +181,7 @@ export class ExpireNotification extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
-        store.dispatch(this);
+        super.dispatch(store);
         new RemoveNotifications([this.notification]).dispatch(store);
     }
 }
