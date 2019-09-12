@@ -14,12 +14,25 @@ const ofBrowser = new OFPuppeteerBrowser<NotifsTestContext>();
 
 export async function create(executionTarget: Identity, options: NotificationOptions) {
     const result = await ofBrowser.executeOnWindow(executionTarget, async function(optionsRemote: NotificationOptions) {
+        // Manually un-stringify Dates, as puppeteer will not do so on the runner-to-remote journey
+        const date =
+            (optionsRemote.date !== undefined) ?
+                new Date(optionsRemote.date) :
+                optionsRemote.date;
+        const expires =
+            (optionsRemote.expires !== undefined && optionsRemote.expires !== null) ?
+                new Date(optionsRemote.expires) :
+                optionsRemote.date;
+
+        optionsRemote = {...optionsRemote, date, expires};
+
         const note = await this.notifications.create(optionsRemote);
-        // We need to manually stringify the date object as puppeteer fails to do so
-        return {...note, date: note.date.toJSON()};
+
+        // We need to manually stringify Date objects as puppeteer fails to do so on the remote-to-runner journey
+        return {...note, date: note.date.toJSON(), expires: note.expires !== null ? note.expires.toJSON() : null};
     }, options);
-    // And then manually un-stringify it
-    return {...result, date: new Date(result.date)};
+    // And then manually un-stringify them
+    return {...result, date: new Date(result.date), expires: result.expires !== null ? new Date(result.expires) : null};
 }
 
 export async function createAndAwait(executionTarget: Identity, options: NotificationOptions) {
@@ -40,11 +53,11 @@ export async function clear(executionTarget: Identity, id: string) {
 export async function getAll(executionTarget: Identity) {
     const result = await ofBrowser.executeOnWindow(executionTarget, async function() {
         const notes = await this.notifications.getAll();
-        // We need to manually stringify the date object as puppeteer fails to do so
-        return notes.map(note => ({...note, date: note.date.toJSON()}));
+        // We need to manually stringify Date objects as puppeteer fails to do so on the remote-to-runner journey
+        return notes.map(note => ({...note, date: note.date.toJSON(), expires: note.expires !== null ? note.expires.toJSON() : null}));
     });
-    // And then manually un-stringify it
-    return result.map(note => ({...note, date: new Date(note.date)}));
+    // And then manually un-stringify them
+    return result.map(note => ({...note, date: new Date(note.date), expires: note.expires !== null ? new Date(note.expires) : null}));
 }
 
 export async function clearAll(executionTarget: Identity) {
@@ -75,9 +88,19 @@ export async function removeEventListener
     }, eventType, remoteFn);
 }
 
-export async function getReceivedEvents(executionTarget: Identity, type: Event['type']): Promise<Events[]> {
+export async function getReceivedEvents(executionTarget: Identity, type: Events['type']): Promise<Events[]> {
     const events = await ofBrowser.executeOnWindow(executionTarget, function() {
-        return this.receivedEvents;
+        // We need to manually stringify Date objects as puppeteer fails to do so on the remote-to-runner journey
+        return this.receivedEvents.map(event => ({...event, notification: {
+            ...event.notification,
+            date: event.notification.date.toJSON(),
+            expires: event.notification.expires !== null ? event.notification.expires.toJSON() : null
+        }}));
     });
-    return events.filter(event => event.type === type);
+    // And then manually un-stringify them
+    return events.filter(event => event.type === type).map(event => ({...event, notification: {
+        ...event.notification,
+        date: new Date(event.notification.date),
+        expires: event.notification.expires !== null ? new Date(event.notification.expires) : null
+    }}));
 }

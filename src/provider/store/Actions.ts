@@ -5,6 +5,12 @@ import {ToggleFilter} from '../utils/ToggleFilter';
 import {RootState} from './State';
 import {StoreAPI, AsyncAction, Action} from './Store';
 
+export const enum ToggleCenterVisibilitySource {
+    API,
+    TRAY,
+    BUTTON
+}
+
 export type RootAction =
     CreateNotification |
     RemoveNotifications |
@@ -14,12 +20,6 @@ export type RootAction =
     BlurCenter |
     ToggleLockCenter |
     RegisterApplication;
-
-export const enum ToggleCenterVisibilitySource {
-    API,
-    TRAY,
-    BUTTON
-}
 
 export class CreateNotification extends AsyncAction<RootState> {
     public readonly notification: StoredNotification;
@@ -173,6 +173,15 @@ export class RegisterApplication extends Action<RootState> {
             ...state,
             applications: map
         };
+    }
+}
+
+export class ExpireNotification extends Action<RootState> {
+    public readonly notification: StoredNotification;
+
+    constructor(notification: StoredNotification) {
+        super();
+        this.notification = notification;
     }
 }
 

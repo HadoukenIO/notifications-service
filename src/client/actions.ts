@@ -167,6 +167,11 @@ export enum ActionTrigger {
     CLOSE = 'close',
 
     /**
+     * The notification expired
+     */
+    EXPIRE = 'expire',
+
+    /**
      * The action was triggered programmatically by an application.
      *
      * *Not currently supported - will be implemented in a future release*
