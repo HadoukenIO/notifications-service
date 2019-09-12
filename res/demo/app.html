@@ -7,24 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Notification Client</title>
     <script src="app-bundle.js"></script>
-    <script>
-        window.receivedEvents = [];
-        const queryParams = new URLSearchParams(location.search);
-        if (queryParams.get('registerListeners') === 'true') {
-            const eventTypes = [
-                'notification-action',
-                'notification-created',
-                'notification-closed'
-                
-            ];
-
-            for (const eventType of eventTypes) {
-                notifications.addEventListener(eventType, (event) => {
-                    window.receivedEvents.push(event);
-                });
-            }
-        }
-    </script>
     <link href="app.css" rel="stylesheet">
 
 </head>
@@ -97,7 +79,12 @@
         </button>
     </div>
 
-    
+    <div class="row">
+        <button id="toggleNotificationCenter">
+            Toggle Center
+        </button>
+    </div>
+
     <div id="clientResponse"></div>
 
 </body>
