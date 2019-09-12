@@ -6,8 +6,6 @@ import {ServiceStore} from '../store/ServiceStore';
 import {Database, CollectionMap} from '../model/database/Database';
 import {DatabaseError} from '../model/Errors';
 
-import {AsyncInit} from './AsyncInit';
-
 @injectable()
 export class Persistor {
     private readonly _store: ServiceStore;
@@ -30,8 +28,7 @@ export class Persistor {
             } catch (error) {
                 throw new DatabaseError(`Unable to upsert notification ${notification.id}`, error);
             }
-        }
-        if (action instanceof RemoveNotifications) {
+        } else if (action instanceof RemoveNotifications) {
             const {notifications} = action;
             const ids = notifications.map(note => note.id);
             try {
@@ -39,8 +36,7 @@ export class Persistor {
             } catch (error) {
                 throw new DatabaseError(`Unable to delete notification ${ids}`, error);
             }
-        }
-        if (action instanceof RegisterApplication) {
+        } else if (action instanceof RegisterApplication) {
             const {application} = action;
             try {
                 const collection = this._database.get(CollectionMap.APPLICATIONS);
