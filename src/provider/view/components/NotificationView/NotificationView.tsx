@@ -32,6 +32,7 @@ export function NotificationView(props: Props) {
 
     return (
         <TransitionGroup className="view" component="div">
+            <Placeholder visible={notifications.length === 0} />
             {
                 [...groups.values()].map((group: Group) => (
                     <CSSTransition
@@ -49,16 +50,13 @@ export function NotificationView(props: Props) {
                     </CSSTransition>
                 ))
             }
-            {
-                !groups.size && <Placeholder />
-            }
         </TransitionGroup>
     );
 }
 
-export function Placeholder() {
+export function Placeholder({visible}: {visible: boolean}) {
     return (
-        <div className="placeholder">
+        <div className="placeholder" style={{display: visible ? 'block' : 'none'}}>
             <h3>All caught up!</h3>
         </div>
     );

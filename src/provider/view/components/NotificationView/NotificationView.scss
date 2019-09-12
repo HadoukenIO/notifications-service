@@ -13,6 +13,7 @@
     overflow-y: scroll;
 
     .placeholder {
+        position: fixed;
         color: #666;
         margin: 20px auto;
         width: 100%;
