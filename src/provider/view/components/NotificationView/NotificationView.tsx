@@ -49,6 +49,17 @@ export function NotificationView(props: Props) {
                     </CSSTransition>
                 ))
             }
+            {
+                !groups.size && <Placeholder />
+            }
         </TransitionGroup>
+    );
+}
+
+export function Placeholder() {
+    return (
+        <div className="placeholder">
+            <h3>All caught up!</h3>
+        </div>
     );
 }

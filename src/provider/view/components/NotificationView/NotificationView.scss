@@ -12,6 +12,17 @@
     overflow-x: hidden;
     overflow-y: scroll;
 
+    .placeholder {
+        color: #666;
+        margin: 20px auto;
+        width: 100%;
+        text-align: center;
+
+        h3 {
+            font-size: 24px;
+        }
+    }
+
     &::-webkit-scrollbar-thumb {
         border-radius: 10px;
         background: var(--accent-color);
