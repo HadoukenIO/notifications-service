@@ -36,8 +36,8 @@ type Types = {
     [Inject.LAYOUTER]: Layouter;
     [Inject.MONITOR_MODEL]: MonitorModel;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
-    [Inject.STORE]: ServiceStore;
     [Inject.PERSISTOR]: Persistor;
+    [Inject.STORE]: ServiceStore;
     [Inject.TOAST_MANAGER]: ToastManager;
     [Inject.TRAY_ICON]: TrayIcon;
     [Inject.WEB_WINDOW_FACTORY]: WebWindowFactory;

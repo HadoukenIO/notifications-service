@@ -5,6 +5,16 @@ import {ToggleFilter} from '../utils/ToggleFilter';
 import {RootState} from './State';
 import {StoreAPI, AsyncAction, Action} from './Store';
 
+export type RootAction =
+    CreateNotification |
+    RemoveNotifications |
+    ClickNotification |
+    ClickButton |
+    ToggleCenterVisibility |
+    BlurCenter |
+    ToggleLockCenter |
+    RegisterApplication;
+
 export const enum ToggleCenterVisibilitySource {
     API,
     TRAY,
@@ -167,13 +177,3 @@ export class RegisterApplication extends Action<RootState> {
 }
 
 const toggleFilter = new ToggleFilter();
-
-export type RootAction =
-    CreateNotification |
-    RemoveNotifications |
-    ClickNotification |
-    ClickButton |
-    ToggleCenterVisibility |
-    BlurCenter |
-    ToggleLockCenter |
-    RegisterApplication;

@@ -1,4 +1,3 @@
-import {unmanaged} from 'inversify';
 import {Signal, Aggregators} from 'openfin-service-signal';
 
 import {AsyncInit} from '../controller/AsyncInit';

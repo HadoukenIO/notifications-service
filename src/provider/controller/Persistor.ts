@@ -9,7 +9,7 @@ import {DatabaseError} from '../model/Errors';
 import {AsyncInit} from './AsyncInit';
 
 @injectable()
-export class Persistor extends AsyncInit {
+export class Persistor {
     private readonly _store: ServiceStore;
     private readonly _database: Database;
 
@@ -17,16 +17,9 @@ export class Persistor extends AsyncInit {
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.DATABASE) database: Database
     ) {
-        super();
-
         this._store = store;
         this._database = database;
         this._store.onAction.add(this.onAction, this);
-    }
-
-    protected async init() {
-        await this._store.initialized;
-        await this._database.initialized;
     }
 
     private async onAction(action: RootAction): Promise<void> {

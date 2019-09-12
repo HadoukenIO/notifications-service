@@ -19,7 +19,7 @@ export class ServiceStore extends Store<RootState, RootAction> {
         centerLocked: false
     };
 
-    private _database!: Database;
+    private readonly _database!: Database;
 
     constructor(@inject(Inject.DATABASE) database: Database) {
         super(ServiceStore.INITIAL_STATE);

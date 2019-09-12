@@ -21,6 +21,7 @@ import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
 import {ServiceStore} from './store/ServiceStore';
+import {Persistor} from './controller/Persistor';
 
 @injectable()
 export class Main {
@@ -30,6 +31,7 @@ export class Main {
     private readonly _database: Database;
     private readonly _eventPump: EventPump;
     private readonly _notificationCenter: NotificationCenter;
+    private readonly _persistor: Persistor;
     private readonly _store: ServiceStore;
     private readonly _toastManager: ToastManager;
 
@@ -39,6 +41,7 @@ export class Main {
         @inject(Inject.DATABASE) database: Database,
         @inject(Inject.EVENT_PUMP) eventPump: EventPump,
         @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
+        @inject(Inject.PERSISTOR) persistor: Persistor,
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TOAST_MANAGER) toastManager: ToastManager
     ) {
@@ -47,6 +50,7 @@ export class Main {
         this._database = database;
         this._eventPump = eventPump;
         this._notificationCenter = notificationCenter;
+        this._persistor = persistor;
         this._store = store;
         this._toastManager = toastManager;
     }
@@ -55,10 +59,11 @@ export class Main {
         Object.assign(window, {
             main: this,
             config: this._config,
-            store: this._store,
             center: this._notificationCenter,
+            database: this._database,
+            persitor: this._persistor,
             toast: this._toastManager,
-            database: this._database
+            store: this._store
         });
 
         // Wait for creation of any injected components that require async initialization
