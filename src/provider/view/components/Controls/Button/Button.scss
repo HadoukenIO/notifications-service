@@ -14,17 +14,11 @@
     flex-grow: 1;
     width: 100%;
     min-width: 40px;
-    // This is to fix a bug with bg-color with a transition
-    // causing the text-shadow color
-    // to change to the bg-color when transitioning
-    text-shadow: rgba(0, 0, 0, 0);
-    transition: text-shadow 0.1s ease-in-out;
 
     &:hover {
         transition: background-color 0.2s ease-in-out;
-        background-color: var(--accent-color);
-        text-shadow: #000 1px 1px 4px;
-        box-shadow: inset var(--accent-color) 0px 0px 5px;
+        background-color: var(--card-border-color);
+        box-shadow: none;
         transition: box-shadow 0.1s ease-out;
 
         &:active {
