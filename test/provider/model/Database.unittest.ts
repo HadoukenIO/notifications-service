@@ -212,8 +212,10 @@ function generateNotification(notificationOptions?: Partial<NotificationInternal
             category: '',
             customData: {},
             date: 1,
+            expires: null,
             icon: '',
             onSelect: null,
+            onExpire: null,
             onClose: null,
             title: '',
             ...notificationOptions

@@ -13,6 +13,8 @@ export const enum ToggleCenterVisibilitySource {
     BUTTON
 }
 
+export type RootAction = BlurCenter | ClickButton | ClickNotification | CreateNotification | RemoveNotifications | ToggleCenterVisibility | ToggleLockCenter;
+
 export class CreateNotification extends AsyncAction<RootState> {
     public readonly notification: StoredNotification;
 
@@ -155,6 +157,13 @@ export class ToggleLockCenter extends Action<RootState> {
     }
 }
 
-const toggleFilter = new ToggleFilter();
+export class ExpireNotification extends Action<RootState> {
+    public readonly notification: StoredNotification;
 
-export type RootAction = CreateNotification | RemoveNotifications | ClickNotification | ClickButton | ToggleCenterVisibility | BlurCenter | ToggleLockCenter;
+    constructor(notification: StoredNotification) {
+        super();
+        this.notification = notification;
+    }
+}
+
+const toggleFilter = new ToggleFilter();

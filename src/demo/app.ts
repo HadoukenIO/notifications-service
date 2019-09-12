@@ -3,6 +3,7 @@ import {addSpawnListeners, createApp, createWindow} from 'openfin-service-toolin
 import * as ofnotes from '../client/index';
 import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll, toggleNotificationCenter} from '../client/index';
 import {Events} from '../client/internal';
+import {ActionTrigger} from '../client/actions';
 
 addSpawnListeners();
 
@@ -51,7 +52,11 @@ function makeNoteOfType(index: number) {
     } else if (index % 3 === 2) {
         return create({id: `1q2w3e4r${index}`, date: new Date(), ...longNote});
     } else {
-        return create({id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote});
+        if (index === 6) {
+            return create({id: `1q2w3e4r${index}`, date: new Date(), expires: new Date(Date.now() + 30 * 1000), onExpire: {foo: 'bar'}, ...buttonNote});
+        } else {
+            return create({id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote});
+        }
     }
 }
 
@@ -112,12 +117,12 @@ fin.desktop.main(async () => {
         addEventListener('notification-action', (event: NotificationActionEvent) => {
             const {notification, trigger, control} = event;
 
-            if (trigger === 'select') {
-                logMessage(`SELECT action received from notification ${event.notification.id}`);
+            if (trigger !== ActionTrigger.CONTROL) {
+                logMessage(`${trigger.toUpperCase()} action received from notification ${event.notification.id}`);
             } else if (control && control.type === 'button') {
                 const buttonIndex = notification.buttons.indexOf(control);
 
-                logMessage(`CONTROL action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
+                logMessage(`${trigger.toUpperCase()} action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
             }
         });
     } else if (queryParams.get('inttest') === 'listeners-on-startup') {
