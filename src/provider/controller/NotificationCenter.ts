@@ -3,7 +3,7 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 import {Inject} from '../common/Injectables';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
-import {ToggleVisibility, RootAction} from '../store/Actions';
+import {RootAction, ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
@@ -68,10 +68,15 @@ export class NotificationCenter extends AsyncInit {
         await this.hideWindowOffscreen();
         this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
         this._trayIcon.onLeftClick.add(() => {
-            this._store.dispatch(new ToggleVisibility());
+            this._store.dispatch(new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY));
         });
         await this.sizeToFit();
         await this.addListeners();
+
+        if (this._store.state.centerVisible) {
+            this.showWindow();
+        }
+
         renderApp(this._webWindow, this._store);
     }
 
@@ -80,31 +85,28 @@ export class NotificationCenter extends AsyncInit {
      */
     public get visible(): boolean {
         const state = this._store.state;
-        return state.windowVisible;
+        return state.centerVisible;
     }
 
     /**
      * Add listeners to the window.
      */
     private async addListeners(): Promise<void> {
-        const hideOnBlur = false;
+        this._webWindow.onBlurred.add(() => {
+            if (this.visible && !this._store.state.centerLocked) {
+                new BlurCenter().dispatch(this._store);
+            }
+        });
 
-        if (hideOnBlur) {
-            this._webWindow.onBlurred.add(async () => {
-                if (this.visible) {
-                    new ToggleVisibility(false).dispatch(this._store);
-                }
-            });
-        }
-
-        this._monitorModel.onMonitorInfoChanged.add(() => {
-            this.sizeToFit();
+        this._monitorModel.onMonitorInfoChanged.add(async () => {
+            await this.sizeToFit();
+            await this.toggleWindow(this._store.state.centerVisible);
         });
     }
 
     private async onAction(action: RootAction): Promise<void> {
-        if (action instanceof ToggleVisibility) {
-            this.toggleWindow(this._store.state.windowVisible);
+        if (action instanceof ToggleCenterVisibility || action instanceof BlurCenter) {
+            this.toggleWindow(this._store.state.centerVisible);
         }
     }
 
@@ -114,6 +116,7 @@ export class NotificationCenter extends AsyncInit {
     public async showWindow(): Promise<void> {
         await this._webWindow.show();
         await this.animateIn();
+
         await this._webWindow.setAsForeground();
     }
 
@@ -129,7 +132,7 @@ export class NotificationCenter extends AsyncInit {
     /**
      * Sets the window dimensions in shape of a side bar
      */
-    public async sizeToFit(): Promise<void> {
+    private async sizeToFit(): Promise<void> {
         const idealWidth = NotificationCenter.WIDTH;
         await this.hideWindow(true);
         const monitorInfo = this._monitorModel.monitorInfo;
