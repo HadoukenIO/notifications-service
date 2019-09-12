@@ -4,32 +4,30 @@
     width: 340px;
     align-self: center;
     background: var(--card-background-color);
-    border-radius: 7px;
     overflow: hidden;
-    transition: box-shadow 0.1s ease-in-out;
-    box-shadow: 0px 0px 0px 1px var(--card-border-color);
+    transition: box-shadow 0.2s ease-in-out;
     color: white;
 
-    &:hover {
-        transition: box-shadow 0.2s ease-in-out;
-        box-shadow: 0px 0px 0px 2px var(--accent-color);
+    &:not(.toast) {
+        border-radius: 7px;
+        box-shadow: 0px 0px 0px 1px var(--card-border-color);
+
+        &:hover {
+
+            box-shadow: 0px 0px 0px 2px var(--accent-color);
+        }
+    }
+
+    &.toast {
+        .text {
+            max-height: $toast-max-height !important;
+        }
     }
 
     &.loading {
         pointer-events: none;
     }
 
-    &.toast {
-        box-shadow: none;
-
-        .text {
-            max-height: $toast-max-height !important;
-        }
-
-        &:hover {
-            box-shadow: none;
-        }
-    }
 
     .loading-screen {
         position: absolute;
