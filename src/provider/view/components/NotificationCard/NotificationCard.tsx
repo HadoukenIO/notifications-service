@@ -20,14 +20,12 @@ export function NotificationCard(props: NotificationCardProps) {
 
     const handleButtonClick = (buttonIndex: number) => {
         new ClickButton(notification, buttonIndex).dispatch(storeApi);
-        new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
     const handleNotificationClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
         new ClickNotification(notification).dispatch(storeApi);
-        new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
     return (

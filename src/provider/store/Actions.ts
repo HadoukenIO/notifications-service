@@ -93,9 +93,14 @@ export class RemoveNotifications extends Action<RootState> {
 export class ClickNotification extends Action<RootState> {
     public readonly notification: StoredNotification;
 
-    constructor(notifications: StoredNotification) {
+    constructor(notification: StoredNotification) {
         super();
-        this.notification = notifications;
+        this.notification = notification;
+    }
+
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+        store.dispatch(this);
+        await (new RemoveNotifications([this.notification])).dispatch(store);
     }
 }
 
@@ -107,6 +112,11 @@ export class ClickButton extends Action<RootState> {
         super();
         this.notification = notification;
         this.buttonIndex = buttonIndex;
+    }
+
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+        store.dispatch(this);
+        await (new RemoveNotifications([this.notification])).dispatch(store);
     }
 }
 
@@ -168,6 +178,11 @@ export class ExpireNotification extends Action<RootState> {
     constructor(notification: StoredNotification) {
         super();
         this.notification = notification;
+    }
+
+    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+        store.dispatch(this);
+        new RemoveNotifications([this.notification]).dispatch(store);
     }
 }
 
