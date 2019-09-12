@@ -99,8 +99,9 @@ export class NotificationCenter extends AsyncInit {
             }
         });
 
-        this._monitorModel.onMonitorInfoChanged.add(() => {
-            this.sizeToFit();
+        this._monitorModel.onMonitorInfoChanged.add(async () => {
+            await this.sizeToFit();
+            await this.toggleWindow(this._store.state.centerVisible);
         });
     }
 

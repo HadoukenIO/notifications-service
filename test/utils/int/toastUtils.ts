@@ -37,3 +37,14 @@ export async function getToastCards(sourceUuid: string, notificationId: string):
         return toastPage.$$('.notification-card');
     }
 }
+
+export async function getToastButtons(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
+    const toastIdentity = getToastIdentity(sourceUuid, notificationId);
+    const toastPage = await ofBrowser.getPage(toastIdentity);
+
+    if (!toastPage) {
+        return undefined;
+    } else {
+        return toastPage.$$('.button');
+    }
+}

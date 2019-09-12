@@ -9,7 +9,7 @@ import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/in
 import {delay, Duration} from '../utils/int/delay';
 import {getToastWindow} from '../utils/int/toastUtils';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
 import {setupOpenCenterBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
@@ -21,7 +21,7 @@ describe('When creating a notification with the center showing', () => {
     setupOpenCenterBookends();
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
     });
 

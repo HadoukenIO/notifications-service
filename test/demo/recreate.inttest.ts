@@ -9,7 +9,7 @@ import {delay, Duration} from '../utils/int/delay';
 import {fin} from '../utils/int/fin';
 import {getToastIdentity} from '../utils/int/toastUtils';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {setupCenterBookends, CenterState} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
@@ -37,7 +37,7 @@ describe('When creating a notification with an ID that already exists but differ
         setupCenterBookends(centerVisibility);
 
         beforeEach(async () => {
-            testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+            testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
             testWindow = await testApp.getWindow();
 
             // Quick sanity check that there is not already a notification with that ID

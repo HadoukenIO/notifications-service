@@ -25,7 +25,7 @@ export class EventPump {
     constructor(@inject(Inject.CLIENT_REGISTRY) clientRegistry: ClientRegistry, @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>) {
         this._apiHandler = apiHandler;
         this._clientRegistry = clientRegistry;
-        this._clientRegistry.onClientHandshake.add(this.dispatchDeferredEvents, this);
+        this._clientRegistry.onAppActionReady.add(this.dispatchDeferredEvents, this);
     }
 
     /**
@@ -37,8 +37,10 @@ export class EventPump {
      * @param event Notification event to be dispatched
      */
     public push<T extends Events>(targetUuid: string, event: Targeted<Transport<T>>): void {
-        if (event.type !== 'notification-action' || this._clientRegistry.isAppActive(targetUuid)) {
-            this._clientRegistry.getAllAppWindows(targetUuid).forEach((window) => {
+        if (event.type !== 'notification-action' || this._clientRegistry.isAppActionReady(targetUuid)) {
+            const connectedAppWindows = this._apiHandler.getClientConnections().filter((client: Identity) => client.uuid === targetUuid);
+
+            connectedAppWindows.forEach((window) => {
                 this._apiHandler.dispatchEvent(window, event);
             });
         } else {
