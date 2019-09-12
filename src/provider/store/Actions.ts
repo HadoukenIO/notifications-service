@@ -58,7 +58,7 @@ export class CreateNotification extends Action<RootState> {
         // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
         const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
         if (existingNotifications.length) {
-            await store.dispatch(new RemoveNotifications(existingNotifications));
+            await new RemoveNotifications(existingNotifications).dispatch(store);
         }
         super.dispatch(store);
     }

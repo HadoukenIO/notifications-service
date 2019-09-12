@@ -21,7 +21,6 @@ import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
 import {ServiceStore} from './store/ServiceStore';
-import {Action} from './store/Store';
 
 @injectable()
 export class Main {
@@ -122,7 +121,7 @@ export class Main {
                     };
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
-                this._store.dispatch(new RemoveNotifications([action.notification]));
+                new RemoveNotifications([action.notification]).dispatch(this._store);
             } else if (action instanceof ClickNotification) {
                 const {notification, source} = action.notification;
 
@@ -136,7 +135,7 @@ export class Main {
                     };
                     this._eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
-                this._store.dispatch(new RemoveNotifications([action.notification]));
+                new RemoveNotifications([action.notification]).dispatch(this._store);
             }
         });
 
@@ -162,7 +161,7 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        this._store.dispatch(new ToggleCenterVisibility(ToggleCenterVisibilitySource.API));
+        new ToggleCenterVisibility(ToggleCenterVisibilitySource.API).dispatch(this._store);
     }
 
     /**
@@ -175,7 +174,7 @@ export class Main {
         const id = this.encodeID(payload.id, sender);
         const notification = this._store.state.notifications.find(n => n.id === id);
         if (notification) {
-            this._store.dispatch(new RemoveNotifications([notification]));
+            new RemoveNotifications([notification]).dispatch(this._store);
             return true;
         }
         return false;
@@ -194,7 +193,7 @@ export class Main {
 
     private async clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
         const notifications = this.getAppNotifications(sender.uuid);
-        await this._store.dispatch(new RemoveNotifications(notifications));
+        await new RemoveNotifications(notifications).dispatch(this._store);
 
         return notifications.length;
     }
