@@ -30,9 +30,7 @@ const windowOptions: WindowOption = {
     cornerRounding: {
         width: 7,
         height: 7
-    },
-    // @ts-ignore
-    backgroundThrottling: true
+    }
 };
 
 /** Margin to other toasts and the window edge. */

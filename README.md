@@ -14,7 +14,7 @@ This project consist of 3 parts:
 
 ### Dependencies
 - OpenFin version for applications using Notifications >= 9.61.38.41
-- OpenFin version used in the Notifications Service = 13.76.43.31
+- OpenFin version used in the Notifications Service = 13.76.44.17
 - RVM >= 4.7
 
 ### Features
