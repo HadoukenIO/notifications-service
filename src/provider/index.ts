@@ -83,17 +83,17 @@ export class Main {
 
     public async register(): Promise<void> {
         Object.assign(window, {
+            main: this,
+            config: this._config,
             apiHandler: this._apiHandler,
             center: this._notificationCenter,
             clientEventController: this._clientEventController,
             clientRegistry: this._clientRegistry,
-            config: this._config,
             database: this._database,
             environment: this._environment,
             eventPump: this._eventPump,
             expiryController: this._expiryController,
             layouter: this._layouter,
-            main: this,
             monitorModel: this._monitorModel,
             notificationCenter: this._notificationCenter,
             persitor: this._persistor,
