@@ -4,7 +4,8 @@ import {StoredApplication} from '../model/Environment';
 export type RootState = Readonly<{
     notifications: StoredNotification[];
     applications: ReadonlyMap<string, StoredApplication>;
-    windowVisible: boolean;
+    centerVisible: boolean;
+    centerLocked: boolean;
 }>;
 
 export type Immutable<T> = {

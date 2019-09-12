@@ -15,7 +15,8 @@ export class ServiceStore extends Store<RootState, RootAction> {
     private static INITIAL_STATE: RootState = {
         notifications: [],
         applications: new Map<string, StoredApplication>(),
-        windowVisible: false
+        centerVisible: false,
+        centerLocked: false
     };
 
     private _database!: Database;

@@ -16,13 +16,13 @@ import {Environment, StoredApplication} from './Environment';
  */
 @injectable()
 export class ClientRegistry {
-    public readonly onClientHandshake: Signal<[Identity]> = new Signal();
+    public readonly onAppActionReady: Signal<[Identity]> = new Signal();
 
     private readonly _apiHandler: APIHandler<APITopic, Events>;
     private readonly _store: ServiceStore;
     private readonly _environment: Environment;
 
-    private _activeClients: Identity[] = [];
+    private _actionReadyWindows: Identity[] = [];
 
     constructor(
         @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
@@ -56,28 +56,27 @@ export class ClientRegistry {
     }
 
     /**
-     * Decides whether an app is running at the moment.
+     * Decides whether an app is ready to receive `notification-action` events
      *
      * @param appUuid Uuid of the app.
      */
-    public isAppActive(appUuid: string): boolean {
-        return this._activeClients.some(client => client.uuid === appUuid);
+    public isAppActionReady(appUuid: string): boolean {
+        return this._actionReadyWindows.some(client => client.uuid === appUuid);
     }
 
-    public getAllAppWindows(uuid: string): Identity[] {
-        return this._activeClients.filter((client) => {
-            return client.uuid === uuid;
-        });
-    }
-
-    public async onAddEventListener(eventType: string, sender: Identity): Promise<void> {
+    public async onAddEventListener(eventType: Events['type'], sender: Identity): Promise<void> {
         if (eventType === 'notification-action') {
-            this._activeClients.push(sender);
-            this.onClientHandshake.emit(sender);
+            const actionReady = this.isAppActionReady(sender.uuid);
+
+            this._actionReadyWindows.push(sender);
+
+            if (!actionReady) {
+                this.onAppActionReady.emit(sender);
+            }
         }
     }
 
-    public async onRemoveEventListener(eventType: string, sender: Identity): Promise<void> {
+    public async onRemoveEventListener(eventType: Events['type'], sender: Identity): Promise<void> {
         if (eventType === 'notification-action') {
             this.removeActiveClient(sender);
         }
@@ -89,6 +88,6 @@ export class ClientRegistry {
     }
 
     private removeActiveClient(client: Identity): void {
-        this._activeClients = this._activeClients.filter(activeClient => activeClient.uuid !== client.uuid || activeClient.name !== client.name);
+        this._actionReadyWindows = this._actionReadyWindows.filter(activeClient => activeClient.uuid !== client.uuid || activeClient.name !== client.name);
     }
 }

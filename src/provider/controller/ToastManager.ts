@@ -3,7 +3,7 @@ import {injectable, inject} from 'inversify';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastEvent} from '../model/Toast';
-import {RootAction, CreateNotification, RemoveNotifications, ToggleVisibility} from '../store/Actions';
+import {RootAction, CreateNotification, RemoveNotifications, ToggleCenterVisibility} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {MonitorModel} from '../model/MonitorModel';
 import {WebWindowFactory} from '../model/WebWindow';
@@ -63,7 +63,7 @@ export class ToastManager extends AsyncInit {
     public async create(notification: StoredNotification): Promise<void> {
         const state = this._store.state;
 
-        if (state.windowVisible) {
+        if (state.centerVisible) {
             return;
         }
 
@@ -123,7 +123,7 @@ export class ToastManager extends AsyncInit {
             this.removeToasts(...action.notifications);
         }
 
-        if (action instanceof ToggleVisibility) {
+        if (action instanceof ToggleCenterVisibility) {
             this.closeAll();
         }
     }
