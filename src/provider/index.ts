@@ -5,9 +5,7 @@ import {Identity} from 'openfin/_v2/main';
 import moment from 'moment';
 
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
-import {NotificationClosedEvent, NotificationActionEvent, NotificationCreatedEvent} from '../client';
-import {Transport, Targeted} from '../client/EventRouter';
-import {ActionTrigger, ActionDeclaration} from '../client/actions';
+import {ActionDeclaration} from '../client/actions';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -16,54 +14,87 @@ import {ToastManager} from './controller/ToastManager';
 import {ExpiryController} from './controller/ExpiryController';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
-import {RootAction, CreateNotification, RemoveNotifications, ClickNotification, ClickButton, ToggleCenterVisibility, ToggleCenterVisibilitySource, ExpireNotification} from './store/Actions';
+import {CreateNotification, RemoveNotifications, ToggleCenterVisibility, ToggleCenterVisibilitySource} from './store/Actions';
 import {mutable} from './store/State';
 import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
 import {ServiceStore} from './store/ServiceStore';
+import {ClientEventController} from './controller/ClientEventController';
+import {TrayIcon} from './model/TrayIcon';
+import {WebWindowFactory} from './model/WebWindow';
+import {Environment} from './model/Environment';
+import {Layouter} from './controller/Layouter';
+import {MonitorModel} from './model/MonitorModel';
 
 @injectable()
 export class Main {
     private _config = null;
     private readonly _apiHandler: APIHandler<APITopic, Events>;
-    private readonly _clientHandler: ClientRegistry;
+    private readonly _clientEventController: ClientEventController;
+    private readonly _clientRegistry: ClientRegistry;
     private readonly _database: Database;
+    private readonly _environment: Environment;
     private readonly _eventPump: EventPump;
     private readonly _expiryController: ExpiryController;
+    private readonly _layouter: Layouter;
+    private readonly _monitorModel: MonitorModel;
     private readonly _notificationCenter: NotificationCenter;
     private readonly _store: ServiceStore;
     private readonly _toastManager: ToastManager;
+    private readonly _trayIcon: TrayIcon;
+    private readonly _webWindowFactory: WebWindowFactory;
 
     constructor(
         @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
-        @inject(Inject.CLIENT_REGISTRY) clientHandler: ClientRegistry,
+        @inject(Inject.CLIENT_EVENT_CONTROLLER) clientEventController: ClientEventController,
+        @inject(Inject.CLIENT_REGISTRY) clientRegistry: ClientRegistry,
         @inject(Inject.DATABASE) database: Database,
+        @inject(Inject.ENVIRONMENT) environment: Environment,
         @inject(Inject.EVENT_PUMP) eventPump: EventPump,
         @inject(Inject.EXPIRY_CONTROLLER) expiryController: ExpiryController,
+        @inject(Inject.LAYOUTER) layouter: Layouter,
+        @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
         @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
         @inject(Inject.STORE) store: ServiceStore,
-        @inject(Inject.TOAST_MANAGER) toastManager: ToastManager
+        @inject(Inject.TOAST_MANAGER) toastManager: ToastManager,
+        @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
+        @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
     ) {
         this._apiHandler = apiHandler;
-        this._clientHandler = clientHandler;
+        this._clientEventController = clientEventController;
+        this._clientRegistry = clientRegistry;
         this._database = database;
+        this._environment = environment;
         this._eventPump = eventPump;
         this._expiryController = expiryController;
+        this._layouter = layouter;
+        this._monitorModel = monitorModel;
         this._notificationCenter = notificationCenter;
         this._store = store;
         this._toastManager = toastManager;
+        this._trayIcon = trayIcon;
+        this._webWindowFactory = webWindowFactory;
     }
 
     public async register(): Promise<void> {
         Object.assign(window, {
             main: this,
             config: this._config,
-            store: this._store,
-            center: this._notificationCenter,
-            toast: this._toastManager,
+            apiHandler: this._apiHandler,
+            notificationCenter: this._notificationCenter,
+            clientEventController: this._clientEventController,
+            clientRegistry: this._clientRegistry,
             database: this._database,
-            expiryController: this._expiryController
+            environment: this._environment,
+            eventPump: this._eventPump,
+            expiryController: this._expiryController,
+            layouter: this._layouter,
+            monitorModel: this._monitorModel,
+            store: this._store,
+            toast: this._toastManager,
+            trayIcon: this._trayIcon,
+            webWindowFactory: this._webWindowFactory
         });
 
         // Wait for creation of any injected components that require async initialization
@@ -76,83 +107,8 @@ export class Main {
             [APITopic.GET_APP_NOTIFICATIONS]: this.fetchAppNotifications.bind(this),
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
             [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
-            [APITopic.ADD_EVENT_LISTENER]: this._clientHandler.onAddEventListener.bind(this._clientHandler),
-            [APITopic.REMOVE_EVENT_LISTENER]: this._clientHandler.onRemoveEventListener.bind(this._clientHandler)
-        });
-
-        this._store.onAction.add(async (action: RootAction): Promise<void> => {
-            if (action instanceof CreateNotification) {
-                const {notification, source} = action.notification;
-                const event: Targeted<Transport<NotificationCreatedEvent>> = {
-                    target: 'default',
-                    type: 'notification-created',
-                    notification: mutable(notification)
-                };
-                this._eventPump.push<NotificationCreatedEvent>(source.uuid, event);
-            } else if (action instanceof RemoveNotifications) {
-                const {notifications} = action;
-                notifications.forEach((storedNotification: StoredNotification) => {
-                    const {notification, source} = storedNotification;
-                    if (notification.onClose !== null) {
-                        const actionEvent: Targeted<Transport<NotificationActionEvent>> = {
-                            target: 'default',
-                            type: 'notification-action',
-                            trigger: ActionTrigger.CLOSE,
-                            notification: mutable(notification),
-                            result: notification.onClose
-                        };
-                        this._eventPump.push<NotificationActionEvent>(source.uuid, actionEvent);
-                    }
-                    const closedEvent: Targeted<Transport<NotificationClosedEvent>> = {
-                        target: 'default',
-                        type: 'notification-closed',
-                        notification: mutable(notification)
-                    };
-                    this._eventPump.push<NotificationClosedEvent>(source.uuid, closedEvent);
-                });
-            } else if (action instanceof ClickButton) {
-                const {notification, source} = action.notification;
-                const button = notification.buttons[action.buttonIndex];
-
-                if (button.onClick !== null) {
-                    const event: Targeted<Transport<NotificationActionEvent>> = {
-                        target: 'default',
-                        type: 'notification-action',
-                        trigger: ActionTrigger.CONTROL,
-                        notification: mutable(notification),
-                        controlSource: 'buttons',
-                        controlIndex: action.buttonIndex,
-                        result: button.onClick
-                    };
-                    this._eventPump.push<NotificationActionEvent>(source.uuid, event);
-                }
-            } else if (action instanceof ClickNotification) {
-                const {notification, source} = action.notification;
-
-                if (notification.onSelect !== null) {
-                    const event: Targeted<Transport<NotificationActionEvent>> = {
-                        target: 'default',
-                        type: 'notification-action',
-                        trigger: ActionTrigger.SELECT,
-                        notification: mutable(notification),
-                        result: notification.onSelect
-                    };
-                    this._eventPump.push<NotificationActionEvent>(source.uuid, event);
-                }
-            } else if (action instanceof ExpireNotification) {
-                const {notification, source} = action.notification;
-
-                if (notification.onExpire !== null) {
-                    const event: Targeted<Transport<NotificationActionEvent>> = {
-                        target: 'default',
-                        type: 'notification-action',
-                        trigger: ActionTrigger.EXPIRE,
-                        notification: mutable(notification),
-                        result: notification.onExpire
-                    };
-                    this._eventPump.push<NotificationActionEvent>(source.uuid, event);
-                }
-            }
+            [APITopic.ADD_EVENT_LISTENER]: this._clientRegistry.onAddEventListener.bind(this._clientRegistry),
+            [APITopic.REMOVE_EVENT_LISTENER]: this._clientRegistry.onRemoveEventListener.bind(this._clientRegistry)
         });
 
         console.log('Service Initialised');

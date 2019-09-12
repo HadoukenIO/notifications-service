@@ -25,23 +25,16 @@ interface ScheduledExpiry {
  * a notification has expired.
  */
 @injectable()
-export class ExpiryController extends AsyncInit {
+export class ExpiryController {
     private readonly _store: Store<RootState, RootAction>;
 
     private _nextExpiry: ScheduledExpiry | null = null;
 
     public constructor(@inject(Inject.STORE) store: Store<RootState, RootAction>) {
-        super();
-
         this._store = store;
 
         this._store.onAction.add(this.onAction, this);
-    }
 
-    protected async init(): Promise<void> {
-        await this._store.initialized;
-
-        // Un-awaited, as Injector initialization is dependent on this method completing
         Injector.initialized.then(() => {
             // As soon as, but not before, the service is initialized, handle any notifications that expired while the service wasn't running
             this.scheduleEarliestExpiry(Date.now());

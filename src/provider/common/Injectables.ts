@@ -6,6 +6,7 @@
  */
 enum Injectable {
     API_HANDLER,
+    CLIENT_EVENT_CONTROLLER,
     CLIENT_REGISTRY,
     DATABASE,
     ENVIRONMENT,
