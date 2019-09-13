@@ -32,7 +32,7 @@ export function NotificationView(props: Props) {
 
     return (
         <TransitionGroup className="view" component="div">
-            <Placeholder visible={notifications.length === 0} />
+            <NoNotificationsMessage visible={notifications.length === 0} />
             {
                 [...groups.values()].map((group: Group) => (
                     <CSSTransition
@@ -54,10 +54,10 @@ export function NotificationView(props: Props) {
     );
 }
 
-export function Placeholder({visible}: {visible: boolean}) {
+export function NoNotificationsMessage({visible}: {visible: boolean}) {
     return (
-        <div className="placeholder" style={{display: visible ? 'block' : 'none'}}>
-            <h3>All caught up!</h3>
+        <div className="no-notes-message" style={{display: visible ? 'block' : 'none'}}>
+            <h3>No new notifications</h3>
         </div>
     );
 }
