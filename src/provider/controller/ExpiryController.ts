@@ -7,8 +7,6 @@ import {RemoveNotifications, RootAction, CreateNotification, ExpireNotification}
 import {RootState} from '../store/State';
 import {Injector} from '../common/Injector';
 
-import {AsyncInit} from './AsyncInit';
-
 type ExpiringNotification = {
     notification: {
         expires: number;

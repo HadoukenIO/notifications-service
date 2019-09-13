@@ -19,7 +19,8 @@ export type RootAction =
     ToggleCenterVisibility |
     BlurCenter |
     ToggleLockCenter |
-    RegisterApplication;
+    RegisterApplication |
+    ExpireNotification;
 
 export class CreateNotification extends AsyncAction<RootState> {
     public readonly notification: StoredNotification;
@@ -35,7 +36,7 @@ export class CreateNotification extends AsyncAction<RootState> {
         const notifications: StoredNotification[] = state.notifications.slice();
 
         // All notification ID's must be unique. The custom dispatch logic of the `CreateNotification` event should
-        // enusure this, but to avoid significant side-effects, also adding a sanity check here.
+        // ensure this, but to avoid significant side-effects, also adding a sanity check here.
         const index: number = state.notifications.findIndex(n => n.id === notification.id);
         if (index >= 0) {
             // Replace existing notification with this ID
