@@ -2,26 +2,26 @@ import * as React from 'react';
 
 import './CircleButton.scss';
 
-enum IconType {
-    accept = 'accept',
-    cancel = 'cancel',
-    close = 'close',
-    hide = 'hide',
-    pin = 'pin',
-    dismiss = 'dismiss'
+export enum IconType {
+    ACCEPT = 'accept',
+    CANCEL = 'cancel',
+    CLOSE = 'close',
+    HIDE = 'hide',
+    PIN = 'pin',
+    DISMISS = 'dismiss'
 }
 
-enum Size {
-    small = 'small',
-    normal = 'normal',
-    large = 'large'
+export enum Size {
+    SMALL = 'small',
+    NORMAL = 'normal',
+    LARGE = 'large'
 }
 
 interface Props {
     onClick?: () => void;
-    type: IconType[keyof IconType];
+    type: IconType;
     alt?: string;
-    size?: Size[keyof Size];
+    size?: Size;
     id?: string;
 }
 

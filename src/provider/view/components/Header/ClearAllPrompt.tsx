@@ -1,7 +1,7 @@
 import React from 'react';
 import {CSSTransition} from 'react-transition-group';
 
-import {CircleButton} from '../CircleButton/CircleButton';
+import {CircleButton, IconType} from '../CircleButton/CircleButton';
 import './ClearAllPrompt.scss';
 
 interface Props {
@@ -53,8 +53,8 @@ export function ClearAllPrompt(props: Props) {
                 unmountOnExit
             >
                 <div tabIndex={0} className="prompt" ref={divRef} onBlur={handleBlur}>
-                    <CircleButton type="cancel" onClick={() => togglePrompt(false, onCancel)} alt="Cancel" />
-                    <CircleButton type="accept" onClick={() => togglePrompt(false, onAccept)} alt="Accept" />
+                    <CircleButton type={IconType.CANCEL} onClick={() => togglePrompt(false, onCancel)} alt="Cancel" />
+                    <CircleButton type={IconType.ACCEPT} onClick={() => togglePrompt(false, onAccept)} alt="Accept" />
                 </div>
             </CSSTransition>
         </span>

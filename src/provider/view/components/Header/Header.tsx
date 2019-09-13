@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import {GroupingType} from '../../utils/Grouping';
 import {Actionable} from '../../../store/Actions';
-import {CircleButton} from '../CircleButton/CircleButton';
+import {CircleButton, IconType, Size} from '../CircleButton/CircleButton';
 import {DevelopmentOnly} from '../Wrappers/DevelopmentOnly';
 import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleLockCenter} from '../../../store/Actions';
 
@@ -33,7 +33,7 @@ export function Header(props: Props): React.ReactElement {
                         <Lock centerLocked={centerLocked} storeDispatch={storeDispatch} />
                     </DevelopmentOnly>
                 </div>
-                <CircleButton id="hide-center" type="hide" size="large" onClick={handleHideWindow} alt="Hide center" />
+                <CircleButton id="hide-center" type={IconType.HIDE} size={Size.LARGE} onClick={handleHideWindow} alt="Hide center" />
             </div>
             <div className="strip">
                 <ul className="options">

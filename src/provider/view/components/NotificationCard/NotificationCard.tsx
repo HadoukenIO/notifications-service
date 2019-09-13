@@ -3,7 +3,7 @@ import * as React from 'react';
 import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {Button} from '../Controls/Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
-import {CircleButton} from '../CircleButton/CircleButton';
+import {CircleButton, IconType} from '../CircleButton/CircleButton';
 import {Actionable} from '../../../store/Actions';
 import {RemoveNotifications, ClickButton, ClickNotification} from '../../../store/Actions';
 
@@ -65,9 +65,9 @@ export function NotificationCard(props: Props) {
                     <NotificationTime date={data.date} />
                     <div className="actions">
                         {isToast &&
-                            <CircleButton type="dismiss" onClick={handleNotificationDismiss} alt="Dismiss toast" />
+                            <CircleButton type={IconType.DISMISS} onClick={handleNotificationDismiss} alt="Dismiss toast" />
                         }
-                        <CircleButton type="close" onClick={handleNotificationClose} alt="Clear notification" />
+                        <CircleButton type={IconType.CLOSE} onClick={handleNotificationClose} alt="Clear notification" />
                     </div>
                 </div>
             </div>

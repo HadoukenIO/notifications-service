@@ -5,7 +5,7 @@ import {NotificationCard} from '../NotificationCard/NotificationCard';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {Actionable} from '../../../store/Actions';
 import {RemoveNotifications} from '../../../store/Actions';
-import {CircleButton} from '../CircleButton/CircleButton';
+import {CircleButton, Size, IconType} from '../CircleButton/CircleButton';
 
 import './NotificationGroup.scss';
 
@@ -29,7 +29,7 @@ export function NotificationGroup(props: Props) {
                     <span className="name single-line">{name}</span>
                     <span className="count">{notifications.length}</span>
                 </span>
-                <CircleButton type="close" size="small" onClick={handleClearAll} alt="Clear notifications" />
+                <CircleButton type={IconType.CLOSE} size={Size.SMALL} onClick={handleClearAll} alt="Clear notifications" />
             </div>
             <TransitionGroup className="notifications" component="ul">
                 {
