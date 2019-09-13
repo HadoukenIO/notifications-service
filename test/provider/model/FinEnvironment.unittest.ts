@@ -3,7 +3,7 @@ import 'reflect-metadata';
 
 import {FinEnvironment} from '../../../src/provider/model/FinEnvironment';
 import {StoredApplication} from '../../../src/provider/model/Environment';
-import {createMockFin} from '../../mocks';
+import {createMockFin} from '../../utils/unit/mocks';
 
 describe('When the same app is attempted to be launched multiple times instantaneously through the Environment', () => {
     const storedApp: StoredApplication = {

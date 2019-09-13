@@ -4,7 +4,7 @@ import 'reflect-metadata';
 import {EventPump} from '../../../src/provider/model/EventPump';
 import {NotificationClosedEvent, NotificationActionEvent} from '../../../src/client';
 import {Targeted, Transport} from '../../../src/client/EventRouter';
-import {createMockApiHandler, createMockClientRegistry} from '../../mocks';
+import {createMockApiHandler, createMockClientRegistry} from '../../utils/unit/mocks';
 
 beforeEach(() => {
     jest.resetAllMocks();

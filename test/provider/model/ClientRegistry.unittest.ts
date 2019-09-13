@@ -6,7 +6,7 @@ import {Identity} from 'openfin/_v2/main';
 import {Database, CollectionMap} from '../../../src/provider/model/database/Database';
 import {ClientRegistry} from '../../../src/provider/model/ClientRegistry';
 import {StoredApplication} from '../../../src/provider/model/Environment';
-import {createMockEnvironment, createMockApiHandler, createMockDatabase} from '../../mocks';
+import {createMockEnvironment, createMockApiHandler, createMockDatabase} from '../../utils/unit/mocks';
 
 jest.unmock('../../../src/provider/model/ClientRegistry');
 
