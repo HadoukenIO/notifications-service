@@ -44,7 +44,13 @@ export function createMockDatabase(): jest.Mocked<Database> {
 }
 
 export function createMockServiceStore(): jest.Mocked<ServiceStore> {
-    return new ServiceStore(null!) as jest.Mocked<ServiceStore>;
+    const serviceStore = new ServiceStore(null!) as jest.Mocked<ServiceStore>;
+
+    Object.defineProperty(serviceStore, 'state', {
+        'get': jest.fn()
+    });
+
+    return serviceStore;
 }
 
 export function createMockFin(): jest.Mocked<Fin> {

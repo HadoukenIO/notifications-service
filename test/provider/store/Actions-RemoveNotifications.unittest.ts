@@ -29,7 +29,7 @@ describe('When removing notifications', () => {
             notifications: [note1, note2, note3]
         };
 
-        (mockStore as PartiallyWritable<typeof mockStore, 'state'>).state = state;
+        (Object.getOwnPropertyDescriptor(mockStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
     });
 
     test('When removing a single notification from the store, the notification is removed from the store', () => {

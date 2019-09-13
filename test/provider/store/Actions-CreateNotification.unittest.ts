@@ -11,11 +11,15 @@ import {normalizeRootState} from '../../utils/common/normalization';
 describe('When creating a notification', () => {
     const mockStore = createMockServiceStore();
 
-    let action: CreateNotification;
+    let state: RootState;
     let note: StoredNotification;
+
+    let action: CreateNotification;
 
     beforeEach(() => {
         jest.resetAllMocks();
+
+        (Object.getOwnPropertyDescriptor(mockStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
 
         note = createFakeStoredNotification();
 
@@ -23,15 +27,11 @@ describe('When creating a notification', () => {
     });
 
     describe('When the store does not contain a duplicate notificiation', () => {
-        let state: RootState;
-
         beforeEach(() => {
             state = {
                 ...createFakeRootState(),
                 notifications: [createFakeStoredNotification()]
             };
-
-            (mockStore as PartiallyWritable<typeof mockStore, 'state'>).state = state;
         });
 
         test('When the action is dispatched, no other action is dispatched to the store', () => {
@@ -46,7 +46,6 @@ describe('When creating a notification', () => {
     });
 
     describe('When the store contains a notificiation with the same ID', () => {
-        let state: RootState;
         let oldNote: StoredNotification;
 
         beforeEach(() => {
@@ -56,8 +55,6 @@ describe('When creating a notification', () => {
                 ...createFakeRootState(),
                 notifications: [oldNote]
             };
-
-            (mockStore as PartiallyWritable<typeof mockStore, 'state'>).state = state;
         });
 
         test('When the action is dispatched, the duplicate notification is removed from the store', () => {
