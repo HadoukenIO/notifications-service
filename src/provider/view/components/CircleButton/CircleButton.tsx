@@ -8,7 +8,7 @@ export enum IconType {
     CLOSE = 'close',
     HIDE = 'hide',
     PIN = 'pin',
-    DISMISS = 'dismiss'
+    MINIMIZE = 'minimize'
 }
 
 export enum Size {

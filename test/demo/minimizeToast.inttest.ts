@@ -6,7 +6,7 @@ import {NotificationOptions, Notification} from '../../src/client';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {getCenterCardsByNotification} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
-import {getToastWindow, getToastCards, getToastDismissButton} from '../utils/int/toastUtils';
+import {getToastWindow, getToastCards, getToastMinimizeButton} from '../utils/int/toastUtils';
 import {assertNotificationStored} from '../utils/int/storageRemote';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {setupClosedCenterBookends} from '../utils/int/common';
@@ -18,7 +18,7 @@ const options: NotificationOptions = {
     category: 'Test Notification Category'
 };
 
-describe('When dismissing a toast', () => {
+describe('When minimizing a toast', () => {
     let testApp: Application;
     let testWindow: Window;
     let note: Notification;
@@ -40,38 +40,38 @@ describe('When dismissing a toast', () => {
         await testApp.quit();
     });
 
-    async function dismissToast() {
-        const dismissButton = (await getToastDismissButton(testApp.identity.uuid, note.id))![0]!;
+    async function minimizeToast() {
+        const minimizeButton = (await getToastMinimizeButton(testApp.identity.uuid, note.id))![0]!;
         await toastCard.hover();
-        await dismissButton.click();
+        await minimizeButton.click();
         await delay(Duration.TOAST_CLOSE);
     }
 
-    test('A toast will have a dismiss button', async () => {
-        expect(getToastDismissButton(testApp.identity.uuid, note.id)).resolves.toBeDefined();
+    test('A toast will have a minimize button', async () => {
+        expect(getToastMinimizeButton(testApp.identity.uuid, note.id)).resolves.toBeDefined();
     });
 
-    test('Clicking the dismiss button removes the toast', async () => {
-        await dismissToast();
+    test('Clicking the minimize button removes the toast', async () => {
+        await minimizeToast();
         const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
         expect(toastWindow).toBeUndefined();
     });
 
     test('The card still exists in the center', async () => {
-        await dismissToast();
+        await minimizeToast();
         const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
         expect(noteCards).toHaveLength(1);
     });
 
-    test('The card in the center does not have a dismiss button', async () => {
-        await dismissToast();
+    test('The card in the center does not have a minimize button', async () => {
+        await minimizeToast();
         const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
-        const dismissButton = await noteCards[0].$$('.dismiss');
-        expect(dismissButton).toHaveLength(0);
+        const minimizeButton = await noteCards[0].$$('.minimize');
+        expect(minimizeButton).toHaveLength(0);
     });
 
     test('The notification still persists in storage', async () => {
-        await dismissToast();
+        await minimizeToast();
         await assertNotificationStored(testWindow.identity, note);
     });
 });

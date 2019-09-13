@@ -35,8 +35,8 @@ export async function getToastButtons(sourceUuid: string, notificationId: string
     return toastQuerySelector('.button', sourceUuid, notificationId);
 }
 
-export async function getToastDismissButton(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
-    return toastQuerySelector('.dismiss', sourceUuid, notificationId);
+export async function getToastMinimizeButton(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
+    return toastQuerySelector('.minimize', sourceUuid, notificationId);
 }
 
 export async function toastQuerySelector(selector: string, sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
