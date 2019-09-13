@@ -4,9 +4,12 @@ import moment from 'moment';
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
 import {GroupingType as GroupingType, Actionable} from '../../containers/NotificationCenterApp';
 import {StoredNotification} from '../../../model/StoredNotification';
+import {TitledNotification} from '../NotificationCard/NotificationCard';
+import {ApplicationMap} from '../../../store/State';
 
 interface NotificationViewProps extends Actionable {
     notifications: StoredNotification[];
+    applications: ApplicationMap,
     groupBy?: GroupingType;
 }
 
@@ -33,7 +36,7 @@ interface Group {
      * This array should always contain at least one notification. If there are no
      * notifications that fit within this category then the group should be deleted.
      */
-    notifications: StoredNotification[];
+    notifications: TitledNotification[];
 }
 
 /**
@@ -45,10 +48,10 @@ interface Group {
  * @param props Props
  */
 export function NotificationView(props: NotificationViewProps) {
-    const {notifications, groupBy = GroupingType.APPLICATION, ...rest} = props;
+    const {notifications, applications, groupBy = GroupingType.APPLICATION, ...rest} = props;
     // TODO: Use useEffect hook
     // Sort the notification by groups
-    const groups: Map<string, Group> = groupNotifications(notifications, groupBy);
+    const groups: Map<string, Group> = groupNotifications(notifications, applications, groupBy);
 
     return (
         <div className="panel">
@@ -92,9 +95,10 @@ function getGroupTitle(notification: StoredNotification, groupingType: GroupingT
 /**
  * Group notifications together based on the given grouping method e.g. application/date.
  * @param notifications List of notifications to sort into groups.
+ * @param applications A map of application registry to resolve the notification title
  * @param groupMethod Grouping type to use for sorting.
  */
-function groupNotifications(notifications: StoredNotification[], groupMethod: GroupingType): Map<string, Group> {
+function groupNotifications(notifications: StoredNotification[], applications: ApplicationMap, groupMethod: GroupingType): Map<string, Group> {
     // TODO: This sorting should be removed and changed to use insert-sort inside the reduce below
     // Pre-sort notifications by date (groups will then also be sorted by date)
     notifications.sort((a: StoredNotification, b: StoredNotification) =>
@@ -109,7 +113,7 @@ function groupNotifications(notifications: StoredNotification[], groupMethod: Gr
                 ...group,
                 notifications: [
                     ...group.notifications,
-                    currentNotification
+                    {...currentNotification, title: (applications.get(currentNotification.source.uuid) || {title: currentNotification.source.name || ''}).title}
                 ]
             });
         } else {
@@ -126,7 +130,10 @@ function groupNotifications(notifications: StoredNotification[], groupMethod: Gr
             groups.set(groupTitle, {
                 key: key,
                 title: groupTitle,
-                notifications: [currentNotification]
+                notifications: [{
+                    ...currentNotification,
+                    title: (applications.get(currentNotification.source.uuid) || {title: currentNotification.source.name || ''}).title
+                }]
             });
         }
         return groups;

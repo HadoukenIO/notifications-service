@@ -8,8 +8,10 @@ import {RemoveNotifications, ClickButton, ClickNotification} from '../../../stor
 import {Actionable} from '../../containers/NotificationCenterApp';
 
 interface NotificationCardProps extends Actionable {
-    notification: StoredNotification;
+    notification: TitledNotification;
 }
+
+export type TitledNotification = StoredNotification & {title: string};
 
 export function NotificationCard(props: NotificationCardProps) {
     const {notification, storeDispatch} = props;
@@ -42,7 +44,7 @@ export function NotificationCard(props: NotificationCardProps) {
                 <div className="source">
                     {data.icon && <img src={data.icon} />}
                     <span className="app-name">
-                        {notification.source.name}
+                        {notification.title}
                     </span>
                 </div>
                 <div className="title">

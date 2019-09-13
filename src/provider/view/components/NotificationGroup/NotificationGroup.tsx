@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import {NotificationCard} from '../NotificationCard/NotificationCard';
-import {StoredNotification} from '../../../model/StoredNotification';
+import {NotificationCard, TitledNotification} from '../NotificationCard/NotificationCard';
 import {CloseButton} from '../CloseButton/CloseButton';
 import {Actionable} from '../../containers/NotificationCenterApp';
 import {RemoveNotifications} from '../../../store/Actions';
@@ -10,7 +9,7 @@ export interface NotificationGroupProps extends Actionable {
     // Group name
     name: string;
     // Notifications in this group
-    notifications: StoredNotification[];
+    notifications: TitledNotification[];
 }
 
 export function NotificationGroup(props: NotificationGroupProps) {
@@ -31,7 +30,7 @@ export function NotificationGroup(props: NotificationGroupProps) {
                     notifications.map((notification, i) => {
                         return (
                             <li key={i + notification.id}>
-                                <NotificationCard notification={notification} storeDispatch={storeDispatch} />
+                                <NotificationCard notification={notification} storeDispatch={storeDispatch}/>
                             </li>
                         );
                     })

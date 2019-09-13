@@ -18,19 +18,28 @@ export class FinEnvironment implements Environment {
     }
 
     public async getApplication(uuid: string): Promise<StoredApplication> {
-        const info = await fin.Application.wrapSync({uuid}).getInfo();
+        const app = fin.Application.wrapSync({uuid});
+        const info = await app.getInfo();
         const isProgrammatic: boolean = !!info.parentUuid;
 
-        return isProgrammatic ? {
-            type: 'programmatic',
-            id: uuid,
-            initialOptions: info.initialOptions as ApplicationOption, // TODO: Use updated type so cast is unecessary [SERVICE-601]
-            parentUuid: info.parentUuid!
-        } : {
-            type: 'manifest',
-            id: uuid,
-            manifestUrl: info.manifestUrl
-        };
+        if (isProgrammatic) {
+            const initialOptions: ApplicationOption = info.initialOptions as ApplicationOption;
+            return {
+                type: 'programmatic',
+                id: uuid,
+                title: initialOptions.name || app.identity.name || '',
+                initialOptions: info.initialOptions as ApplicationOption, // TODO: Use updated type so cast is unecessary [SERVICE-601]
+                parentUuid: info.parentUuid!
+            };
+        } else {
+            const manifest: {startup_app?: {name: string}, shortcut?: {name?: string}} = info.manifest;
+            return {
+                type: 'manifest',
+                id: uuid,
+                title: (manifest.shortcut && manifest.shortcut.name) || (manifest.startup_app && manifest.startup_app.name) || app.identity.name || '',
+                manifestUrl: info.manifestUrl
+            };
+        }
     }
 
     public async startApplication(application: StoredApplication): Promise<void> {

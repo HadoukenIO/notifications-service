@@ -24,7 +24,7 @@ type Props = ReturnType<typeof mapStateToProps> & Actionable;
 
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, storeDispatch, centerLocked} = props;
+    const {notifications, applications, storeDispatch, centerLocked} = props;
 
     return (
         <div className='notification-center'>
@@ -36,6 +36,7 @@ export function NotificationCenterApp(props: Props) {
             />
             <NotificationView
                 notifications={notifications}
+                applications={applications}
                 groupBy={groupBy}
                 storeDispatch={storeDispatch}
             />
@@ -46,6 +47,7 @@ export function NotificationCenterApp(props: Props) {
 
 const mapStateToProps = (state: RootState, ownProps: Actionable) => ({
     notifications: state.notifications,
+    applications: state.applications,
     centerLocked: state.centerLocked,
     ...ownProps
 });
