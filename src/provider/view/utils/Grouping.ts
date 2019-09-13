@@ -78,7 +78,7 @@ export function groupNotifications(notifications: StoredNotification[], groupMet
             group.notifications.push(currentNotification);
         } else {
             // Create a new group and add the notification to the group
-            let key: string = currentNotification.source.name || currentNotification.source.uuid;
+            let key: string = currentNotification.source.name + currentNotification.source.uuid || currentNotification.source.uuid;
             if (groupMethod === GroupingType.DATE) {
                 const date = new Date(currentNotification.notification.date);
                 key = [
