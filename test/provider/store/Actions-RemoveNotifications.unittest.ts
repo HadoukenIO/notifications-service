@@ -3,7 +3,6 @@ import 'reflect-metadata';
 import {RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {createMockServiceStore} from '../../utils/unit/mocks';
-import {PartiallyWritable} from '../../types';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeStoredNotification, createFakeRootState} from '../../utils/common/fakes';
 import {normalizeRootState} from '../../utils/common/normalization';
