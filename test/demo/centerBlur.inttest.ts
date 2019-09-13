@@ -5,7 +5,7 @@ import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 import {isCenterShowing, getCenterCloseButton} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
-import {getDomElementById} from '../utils/int/dom';
+import {getElementById} from '../utils/int/dom';
 
 describe('When the Notification Center is open', () => {
     let testApp: Application;
@@ -42,7 +42,7 @@ describe('When the Notification Center is open', () => {
     });
 
     test('If the Notification Center loses focus due to a click on a \'Toggle Visibility\' button, the Center is closed and remains closed', async () => {
-        const toggleButton = await getDomElementById(testWindow.identity, 'toggleNotificationCenter');
+        const toggleButton = await getElementById('toggleNotificationCenter', testWindow.identity);
 
         await testWindow.focus();
         await toggleButton.click();

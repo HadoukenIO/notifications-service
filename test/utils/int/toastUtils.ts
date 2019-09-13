@@ -28,23 +28,24 @@ export async function getToastWindow(sourceUuid: string, notificationId: string)
 
 const ofBrowser = new OFPuppeteerBrowser();
 export async function getToastCards(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
-    const toastIdentity = getToastIdentity(sourceUuid, notificationId);
-    const toastPage = await ofBrowser.getPage(toastIdentity);
-
-    if (!toastPage) {
-        return undefined;
-    } else {
-        return toastPage.$$('.notification-card');
-    }
+    return toastQuerySelector('.notification-card', sourceUuid, notificationId);
 }
 
 export async function getToastButtons(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
+    return toastQuerySelector('.button', sourceUuid, notificationId);
+}
+
+export async function getToastDismissButton(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
+    return toastQuerySelector('.dismiss', sourceUuid, notificationId);
+}
+
+export async function toastQuerySelector(selector: string, sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
     const toastIdentity = getToastIdentity(sourceUuid, notificationId);
     const toastPage = await ofBrowser.getPage(toastIdentity);
 
     if (!toastPage) {
         return undefined;
     } else {
-        return toastPage.$$('.button');
+        return toastPage.$$(selector);
     }
 }
