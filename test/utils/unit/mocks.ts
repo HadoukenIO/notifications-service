@@ -8,7 +8,7 @@ import {APITopic, Events} from '../../../src/client/internal';
 import {ClientRegistry} from '../../../src/provider/model/ClientRegistry';
 import {Database} from '../../../src/provider/model/database/Database';
 import {PartiallyWritable} from '../../types';
-import { ServiceStore } from '../../../src/provider/store/ServiceStore';
+import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 
 jest.mock('../../../src/provider/model/APIHandler');
 jest.mock('../../../src/provider/model/ClientRegistry');

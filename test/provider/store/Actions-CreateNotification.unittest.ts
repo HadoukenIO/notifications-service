@@ -6,7 +6,7 @@ import {createMockServiceStore} from '../../utils/unit/mocks';
 import {PartiallyWritable} from '../../types';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeStoredNotification, createFakeRootState} from '../../utils/common/fakes';
-import { normalizeRootState } from '../../utils/common/normalization';
+import {normalizeRootState} from '../../utils/common/normalization';
 
 describe('When creating a notification', () => {
     const mockStore = createMockServiceStore();

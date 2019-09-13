@@ -1,4 +1,4 @@
-import { RootState } from "../../../src/provider/store/State";
+import {RootState} from '../../../src/provider/store/State';
 
 /**
  * Functions for normalizing data, to prevent test failures on irrelevant features, eg., ordering of notifications in RootState
