@@ -4,9 +4,10 @@ import {Signal} from 'openfin-service-signal';
 
 import {APITopic, Events} from '../../client/internal';
 import {Inject} from '../common/Injectables';
+import {ServiceStore} from '../store/ServiceStore';
+import {RegisterApplication} from '../store/Actions';
 
 import {APIHandler} from './APIHandler';
-import {CollectionMap, Database} from './database/Database';
 import {Environment, StoredApplication} from './Environment';
 
 /**
@@ -18,21 +19,21 @@ export class ClientRegistry {
     public readonly onAppActionReady: Signal<[Identity]> = new Signal();
 
     private readonly _apiHandler: APIHandler<APITopic, Events>;
-    private readonly _database: Database;
+    private readonly _store: ServiceStore;
     private readonly _environment: Environment;
 
     private _actionReadyWindows: Identity[] = [];
 
     constructor(
         @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
-        @inject(Inject.DATABASE) database: Database,
+        @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.ENVIRONMENT) environment: Environment
     ) {
         this._apiHandler = apiHandler;
         this._apiHandler.onConnection.add(this.onClientConnection, this);
         this._apiHandler.onDisconnection.add(this.removeActiveClient, this);
 
-        this._database = database;
+        this._store = store;
         this._environment = environment;
     }
 
@@ -45,8 +46,7 @@ export class ClientRegistry {
         const isRunning = await this._environment.isApplicationRunning(appUuid);
 
         if (!isRunning) {
-            const collection = this._database.get(CollectionMap.APPLICATIONS);
-            const storedApplication = await collection.get(appUuid);
+            const storedApplication = this._store.state.applications.get(appUuid);
             if (storedApplication) {
                 await this._environment.startApplication(storedApplication);
             } else {
@@ -84,9 +84,7 @@ export class ClientRegistry {
 
     private async onClientConnection(app: Identity): Promise<void> {
         const application: StoredApplication = await this._environment.getApplication(app.uuid);
-
-        const collection = this._database.get(CollectionMap.APPLICATIONS);
-        await collection.upsert(application);
+        this._store.dispatch(new RegisterApplication(application));
     }
 
     private removeActiveClient(client: Identity): void {

@@ -4,6 +4,7 @@ import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Database, CollectionMap} from '../model/database/Database';
 import {Collection} from '../model/database/Collection';
+import {StoredApplication} from '../model/Environment';
 
 import {RootAction} from './Actions';
 import {RootState} from './State';
@@ -13,6 +14,7 @@ import {Store} from './Store';
 export class ServiceStore extends Store<RootState, RootAction> {
     private static INITIAL_STATE: RootState = {
         notifications: [],
+        applications: new Map<string, StoredApplication>(),
         centerVisible: false,
         centerLocked: false
     };
@@ -33,6 +35,9 @@ export class ServiceStore extends Store<RootState, RootAction> {
         const notificationCollection: Collection<StoredNotification> = this._database.get(CollectionMap.NOTIFICATIONS);
         const notifications: StoredNotification[] = await notificationCollection.getAll();
 
-        return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications});
+        const clientsCollection: Collection<StoredApplication> = this._database.get(CollectionMap.APPLICATIONS);
+        const clients: StoredApplication[] = await clientsCollection.getAll();
+
+        return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications, clients});
     }
 }
