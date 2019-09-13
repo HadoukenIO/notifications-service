@@ -42,10 +42,10 @@ export class CreateNotification extends AsyncAction<RootState> {
             // Replace existing notification with this ID
             console.warn(`Attempted to add a notitification with duplicate id '${notification.id}'. Will replace existing notification.`);
             notifications[index] = notification;
+        } else {
+            // Add new notification (ordering within array doesn't matter)
+            notifications.push(notification);
         }
-
-        // Add new notification (ordering within array doesn't matter)
-        notifications.push(notification);
 
         return {
             ...state,
