@@ -23,7 +23,8 @@ export type RootAction =
     ToggleCenterVisibility |
     BlurCenter |
     ToggleLockCenter |
-    RegisterApplication;
+    RegisterApplication |
+    MinimizeToast;
 
 export class CreateNotification extends AsyncAction<RootState> {
     public readonly notification: StoredNotification;
@@ -181,6 +182,15 @@ export class RegisterApplication extends Action<RootState> {
 }
 
 export class ExpireNotification extends Action<RootState> {
+    public readonly notification: StoredNotification;
+
+    constructor(notification: StoredNotification) {
+        super();
+        this.notification = notification;
+    }
+}
+
+export class MinimizeToast extends Action<RootState> {
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {

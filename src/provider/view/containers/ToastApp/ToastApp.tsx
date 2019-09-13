@@ -18,17 +18,16 @@ import './ToastApp.scss';
 interface ToastAppProps extends Actionable {
     notification: StoredNotification;
     setWindowSize: (dimensions: WindowDimensions) => void;
-    onDismiss: () => Promise<void>;
 }
 
 type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 
 export function ToastApp(props: Props) {
-    const {notification, setWindowSize, storeDispatch, onDismiss} = props;
+    const {notification, setWindowSize, storeDispatch} = props;
 
     return (
         <ResizeWrapper onSize={setWindowSize}>
-            <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} onDismiss={onDismiss} />
+            <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} />
         </ResizeWrapper>
     );
 }
@@ -44,15 +43,14 @@ export interface RenderOptions {
     webWindow: WebWindow;
     store: ServiceStore;
     setWindowSize: (dim: WindowDimensions) => void;
-    onDismiss: () => Promise<void>;
 }
 
 export function renderApp(options: RenderOptions) {
-    const {notification, webWindow, store, setWindowSize, onDismiss} = options;
+    const {notification, webWindow, store, setWindowSize} = options;
 
     ReactDOM.render(
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} onDismiss={onDismiss} />
+            <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

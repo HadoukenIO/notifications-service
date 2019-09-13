@@ -4,7 +4,7 @@ import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {Button} from '../Controls/Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {CircleButton, IconType} from '../CircleButton/CircleButton';
-import {Actionable} from '../../../store/Actions';
+import {Actionable, MinimizeToast} from '../../../store/Actions';
 import {RemoveNotifications, ClickButton, ClickNotification} from '../../../store/Actions';
 
 import {Body} from './Body';
@@ -15,7 +15,6 @@ import './NotificationCard.scss';
 interface Props extends Actionable {
     notification: StoredNotification;
     isToast?: boolean;
-    onDismiss?: () => void;
 }
 
 NotificationCard.defaultProps = {
@@ -23,7 +22,7 @@ NotificationCard.defaultProps = {
 };
 
 export function NotificationCard(props: Props) {
-    const {notification, storeDispatch, isToast, onDismiss} = props;
+    const {notification, storeDispatch, isToast} = props;
     const data = notification.notification;
     const [loading, setLoading] = React.useState(false);
 
@@ -32,8 +31,8 @@ export function NotificationCard(props: Props) {
     };
 
     const handleNotificationDismiss = () => {
-        if (isToast && onDismiss) {
-            onDismiss();
+        if (isToast) {
+            storeDispatch(new MinimizeToast(notification));
         }
     };
 
