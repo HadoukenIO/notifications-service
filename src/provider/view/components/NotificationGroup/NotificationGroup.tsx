@@ -37,10 +37,7 @@ export function NotificationGroup(props: Props) {
                         return (
                             <CSSTransition
                                 key={notification.id}
-                                timeout={{
-                                    enter: 300,
-                                    exit: 300
-                                }}
+                                timeout={200}
                                 classNames="item"
                             >
                                 <li key={notification.id + notification.notification.date}>

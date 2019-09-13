@@ -37,7 +37,7 @@ export function NotificationView(props: Props) {
                 [...groups.values()].map((group: Group) => (
                     <CSSTransition
                         key={group.key}
-                        timeout={300}
+                        timeout={200}
                         classNames="group-item"
                         exit={groupBy === group.type}
                     >

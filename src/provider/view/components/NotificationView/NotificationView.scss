@@ -2,6 +2,7 @@
 @import '../../styles/animations.scss';
 
 .view {
+    $animationSpeed: 200ms;
     height: 100%;
     user-select: none;
     background: var(--center-background-color);
@@ -44,7 +45,7 @@
     }
 
     .group-item-exit-active {
-        animation: fadeIn 300ms ease-in forwards reverse;
+        animation: fadeIn $animationSpeed ease-in forwards reverse;
     }
 
     .group-item-enter-done {
@@ -52,6 +53,6 @@
     }
 
     .group-item-enter-active {
-        animation: fadeIn 300ms ease-in forwards;
+        animation: fadeIn $animationSpeed ease-in forwards;
     }
 }
