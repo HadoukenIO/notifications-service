@@ -1,7 +1,5 @@
 import {StoredNotification} from '../model/StoredNotification';
-import {Injector} from '../common/Injector';
-import {Inject} from '../common/Injectables';
-import {CollectionMap} from '../model/database/Database';
+import {StoredApplication} from '../model/Environment';
 import {ToggleFilter} from '../utils/ToggleFilter';
 
 import {RootState} from './State';
@@ -17,7 +15,15 @@ export const enum ToggleCenterVisibilitySource {
     BUTTON
 }
 
-export type RootAction = BlurCenter | ClickButton | ClickNotification | CreateNotification | RemoveNotifications | ToggleCenterVisibility | ToggleLockCenter;
+export type RootAction =
+    CreateNotification |
+    RemoveNotifications |
+    ClickNotification |
+    ClickButton |
+    ToggleCenterVisibility |
+    BlurCenter |
+    ToggleLockCenter |
+    RegisterApplication;
 
 export class CreateNotification extends AsyncAction<RootState> {
     public readonly notification: StoredNotification;
@@ -29,9 +35,6 @@ export class CreateNotification extends AsyncAction<RootState> {
 
     public reduce(state: RootState): RootState {
         const {notification} = this;
-
-        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
-        database.get(CollectionMap.NOTIFICATIONS).upsert(notification);
 
         const notifications: StoredNotification[] = state.notifications.slice();
 
@@ -75,12 +78,9 @@ export class RemoveNotifications extends Action<RootState> {
 
     public reduce(state: RootState): RootState {
         const {notifications} = this;
-        const database = Injector.get<'DATABASE'>(Inject.DATABASE);
         const idsToRemove = notifications.map(n => {
             return n.id;
         });
-
-        database.get(CollectionMap.NOTIFICATIONS).delete(idsToRemove);
 
         return {
             ...state,
@@ -157,6 +157,25 @@ export class ToggleLockCenter extends Action<RootState> {
         return {
             ...state,
             centerLocked: !state.centerLocked
+        };
+    }
+}
+
+export class RegisterApplication extends Action<RootState> {
+    public readonly application: StoredApplication;
+
+    constructor(info: StoredApplication) {
+        super();
+        this.application = info;
+    }
+
+    public reduce(state: RootState): RootState {
+        const info = this.application;
+        const map = new Map(state.applications);
+        map.set(info.id, info);
+        return {
+            ...state,
+            applications: map
         };
     }
 }
