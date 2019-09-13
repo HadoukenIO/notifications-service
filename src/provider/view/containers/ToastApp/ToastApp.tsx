@@ -5,7 +5,7 @@ import {Store} from 'redux';
 
 import {StoredNotification} from '../../../model/StoredNotification';
 import {NotificationCard} from '../../components/NotificationCard/NotificationCard';
-import {TearOut} from '../../components/Wrappers/TearOut';
+import {ResizeWrapper} from '../../components/Wrappers/TearOut';
 import {WindowDimensions} from '../../../controller/Layouter';
 import {RootState} from '../../../store/State';
 import {Actionable} from '../../../store/Actions';
@@ -27,9 +27,9 @@ export function ToastApp(props: Props) {
     const {notification, setWindowSize, storeDispatch, onDismiss} = props;
 
     return (
-        <TearOut onSize={setWindowSize}>
+        <ResizeWrapper onSize={setWindowSize}>
             <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} onDismiss={onDismiss} />
-        </TearOut>
+        </ResizeWrapper>
     );
 }
 

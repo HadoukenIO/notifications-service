@@ -14,7 +14,7 @@ const style: React.CSSProperties = {
     overflow: 'hidden! important'
 };
 
-export function TearOut(props: React.PropsWithChildren<Props>) {
+export function ResizeWrapper(props: React.PropsWithChildren<Props>) {
     const {children, onSize} = props;
     const containerRef = React.useRef<HTMLDivElement>(null);
 
