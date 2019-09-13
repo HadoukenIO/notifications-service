@@ -31,3 +31,11 @@ export function createFakeRootState(): RootState {
         centerLocked: false
     };
 }
+
+export function createFakeStoredApplication(): StoredApplication {
+    return {
+        type: 'manifest',
+        id: 'test-app',
+        manifestUrl: 'test-manifest'
+    };
+}
