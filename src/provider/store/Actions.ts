@@ -5,10 +5,10 @@ import {CollectionMap} from '../model/database/Database';
 import {ToggleFilter} from '../utils/ToggleFilter';
 
 import {RootState} from './State';
-import {StoreAPI, Action} from './Store';
+import {Action, StoreAPI} from './Store';
 
 export interface Actionable {
-    storeApi: StoreAPI<RootState, RootAction>;
+    storeApi: StoreAPI<RootState>;
 }
 
 export const enum ToggleCenterVisibilitySource {
@@ -16,8 +16,6 @@ export const enum ToggleCenterVisibilitySource {
     TRAY,
     BUTTON
 }
-
-export type RootAction = BlurCenter | ClickButton | ClickNotification | CreateNotification | RemoveNotifications | ToggleCenterVisibility | ToggleLockCenter;
 
 export class CreateNotification extends Action<RootState> {
     public readonly notification: StoredNotification;
@@ -53,7 +51,7 @@ export class CreateNotification extends Action<RootState> {
         };
     }
 
-    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+    public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         const notification = this.notification;
 
         // First remove any existing notifications with this ID, to ensure ID uniqueness
@@ -98,7 +96,7 @@ export class ClickNotification extends Action<RootState> {
         this.notification = notification;
     }
 
-    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+    public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         super.dispatch(store);
         await (new RemoveNotifications([this.notification])).dispatch(store);
     }
@@ -114,7 +112,7 @@ export class ClickButton extends Action<RootState> {
         this.buttonIndex = buttonIndex;
     }
 
-    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+    public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         super.dispatch(store);
         await (new RemoveNotifications([this.notification])).dispatch(store);
     }
@@ -130,7 +128,7 @@ export class ToggleCenterVisibility extends Action<RootState> {
         this.visible = visible;
     }
 
-    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+    public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         if (toggleFilter.recordToggle(this.source)) {
             await super.dispatch(store);
         }
@@ -147,7 +145,7 @@ export class ToggleCenterVisibility extends Action<RootState> {
 }
 
 export class BlurCenter extends Action<RootState> {
-    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+    public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
         // properly [SERVICE-614]
         if (toggleFilter.recordBlur()) {
@@ -180,7 +178,7 @@ export class ExpireNotification extends Action<RootState> {
         this.notification = notification;
     }
 
-    public async dispatch(store: StoreAPI<RootState, RootAction>): Promise<void> {
+    public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         super.dispatch(store);
         new RemoveNotifications([this.notification]).dispatch(store);
     }

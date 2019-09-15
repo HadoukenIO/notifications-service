@@ -4,8 +4,8 @@ import {Inject} from '../common/Injectables';
 import {Transport, Targeted} from '../../client/EventRouter';
 import {NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from '../../client';
 import {RootState, mutable} from '../store/State';
-import {RootAction, CreateNotification, RemoveNotifications, ClickButton, ClickNotification, ExpireNotification} from '../store/Actions';
-import {Store} from '../store/Store';
+import {CreateNotification, RemoveNotifications, ClickButton, ClickNotification, ExpireNotification} from '../store/Actions';
+import {Store, Action} from '../store/Store';
 import {ActionTrigger} from '../../client/actions';
 import {StoredNotification} from '../model/StoredNotification';
 import {EventPump} from '../model/EventPump';
@@ -17,9 +17,9 @@ import {EventPump} from '../model/EventPump';
 export class ClientEventController {
     constructor(
         @inject(Inject.EVENT_PUMP) eventPump: EventPump,
-        @inject(Inject.STORE) store: Store<RootState, RootAction>
+        @inject(Inject.STORE) store: Store<RootState>
     ) {
-        store.onAction.add(async (action: RootAction): Promise<void> => {
+        store.onAction.add(async (action: Action<RootState>): Promise<void> => {
             if (action instanceof CreateNotification) {
                 const {notification, source} = action.notification;
                 const event: Targeted<Transport<NotificationCreatedEvent>> = {

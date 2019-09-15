@@ -5,12 +5,11 @@ import {StoredNotification} from '../model/StoredNotification';
 import {Database, CollectionMap} from '../model/database/Database';
 import {Collection} from '../model/database/Collection';
 
-import {RootAction} from './Actions';
 import {RootState} from './State';
 import {Store} from './Store';
 
 @injectable()
-export class ServiceStore extends Store<RootState, RootAction> {
+export class ServiceStore extends Store<RootState> {
     private static INITIAL_STATE: RootState = {
         notifications: [],
         centerVisible: false,

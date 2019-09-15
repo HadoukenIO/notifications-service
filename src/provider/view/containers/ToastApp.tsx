@@ -62,7 +62,7 @@ export function renderApp(
         // Replace redux store with service store implementation.
         // This will resolve the interface incompatibility issues.
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeApi={store.api} notification={notification} setWindowSize={setWindowSize} />
+            <Container storeApi={store} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

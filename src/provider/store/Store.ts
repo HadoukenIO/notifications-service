@@ -2,14 +2,6 @@ import {Signal, Aggregators} from 'openfin-service-signal';
 
 import {AsyncInit} from '../controller/AsyncInit';
 
-/**
- * Subset of properties of `Store` that are safe for use from actions and components.
- */
-export interface StoreAPI<S, A> {
-    state: S;
-    dispatch(action: A): Promise<void>;
-}
-
 export abstract class Action<S> {
     public readonly type?: string;
 
@@ -17,7 +9,7 @@ export abstract class Action<S> {
         this.type = type;
     }
 
-    public async dispatch(store: StoreAPI<S, Action<S>>): Promise<void> {
+    public async dispatch(store: StoreAPI<S>): Promise<void> {
         await store.dispatch(this);
     }
 
@@ -26,24 +18,32 @@ export abstract class Action<S> {
     }
 }
 
+export class Init<S> extends Action<S> {
+    private readonly initialState: S;
+
+    constructor(initialState: S) {
+        super('@@INIT');
+        this.initialState = initialState;
+    }
+
+    public reduce(state: S): S {
+        return this.initialState;
+    }
+}
+
 type Listener<S> = (getState: () => S) => void;
 
-export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI<S, A> {
-    public readonly onAction: Signal<[A], Promise<void>, Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
+export type StoreAPI<S> = Pick<Store<S>, 'dispatch' | 'state'>;
+
+export class Store<S> extends AsyncInit {
+    public readonly onAction: Signal<[Action<S>], Promise<void>, Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
 
     private _currentState: S;
     private readonly _listeners: Listener<S>[] = [];
 
     constructor(initialState: S) {
         super();
-        this._currentState = initialState;
-    }
-
-    public get api(): StoreAPI<S, A> {
-        return {
-            state: this.getState(),
-            dispatch: this.dispatch.bind(this)
-        };
+        new Init(initialState).dispatch(this);
     }
 
     public get state(): S {
@@ -71,13 +71,13 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         this._currentState = state;
     }
 
-    private reduceAndSignal(action: A): Promise<void> {
+    private reduceAndSignal(action: Action<S>): Promise<void> {
         // emit signal last
         this.reduce(action);
         return this.onAction.emit(action);
     }
 
-    private reduce(action: A): void {
+    private reduce(action: Action<S>): void {
         this._currentState = action.reduce(this.state);
         this._listeners.forEach(listener => listener(() => this._currentState));
     }

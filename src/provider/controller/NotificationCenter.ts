@@ -3,11 +3,13 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 import {Inject} from '../common/Injectables';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
-import {RootAction, ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
 import {TrayIcon} from '../model/TrayIcon';
+import {Action} from '../store/Store';
+import {RootState} from '../store/State';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -104,7 +106,7 @@ export class NotificationCenter extends AsyncInit {
         });
     }
 
-    private async onAction(action: RootAction): Promise<void> {
+    private async onAction(action: Action<RootState>): Promise<void> {
         if (action instanceof ToggleCenterVisibility || action instanceof BlurCenter) {
             this.toggleWindow(this._store.state.centerVisible);
         }
