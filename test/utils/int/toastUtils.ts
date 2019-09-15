@@ -48,3 +48,16 @@ export async function getToastButtons(sourceUuid: string, notificationId: string
         return toastPage.$$('.button');
     }
 }
+
+export async function getToastName(sourceUuid: string, notificationId: string): Promise<string | undefined> {
+    const toastIdentity = getToastIdentity(sourceUuid, notificationId);
+    const toastPage = await ofBrowser.getPage(toastIdentity);
+
+    if (!toastPage) {
+        return undefined;
+    } else {
+        return toastPage.$eval('.app-name', (element) => {
+            return element.innerHTML;
+        });
+    }
+}
