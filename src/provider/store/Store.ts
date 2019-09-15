@@ -50,7 +50,7 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         return this._currentState;
     }
 
-    public async dispatch(action: A): Promise<void> {
+    public dispatch(action: Action<S>): Promise<void> {
         return this.reduceAndSignal(action);
     }
 
