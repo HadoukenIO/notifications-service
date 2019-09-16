@@ -3,13 +3,12 @@ import 'reflect-metadata';
 import {CreateNotification, RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {createMockServiceStore} from '../../utils/unit/mocks';
-import {PartiallyWritable} from '../../types';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeStoredNotification, createFakeRootState} from '../../utils/common/fakes';
 import {normalizeRootState} from '../../utils/common/normalization';
 
 describe('When creating a notification', () => {
-    const mockStore = createMockServiceStore();
+    const mockServiceStore = createMockServiceStore();
 
     let state: RootState;
     let note: StoredNotification;
@@ -19,7 +18,7 @@ describe('When creating a notification', () => {
     beforeEach(() => {
         jest.resetAllMocks();
 
-        (Object.getOwnPropertyDescriptor(mockStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+        (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
 
         note = createFakeStoredNotification();
 
@@ -35,9 +34,9 @@ describe('When creating a notification', () => {
         });
 
         test('When the action is dispatched, no other action is dispatched to the store', () => {
-            action.dispatch(mockStore);
+            action.dispatch(mockServiceStore);
 
-            expect(mockStore.dispatch).toBeCalledTimes(0);
+            expect(mockServiceStore.dispatch).toBeCalledTimes(0);
         });
 
         test('When the action is reduced, the notification is added to the state', () => {
@@ -58,10 +57,10 @@ describe('When creating a notification', () => {
         });
 
         test('When the action is dispatched, the duplicate notification is removed from the store', () => {
-            action.dispatch(mockStore);
+            action.dispatch(mockServiceStore);
 
-            expect(mockStore.dispatch).toBeCalledTimes(1);
-            expect(mockStore.dispatch).toBeCalledWith(new RemoveNotifications([oldNote]));
+            expect(mockServiceStore.dispatch).toBeCalledTimes(1);
+            expect(mockServiceStore.dispatch).toBeCalledWith(new RemoveNotifications([oldNote]));
         });
 
         test('When the action is reduced, the old notification is replaced in the store', () => {

@@ -8,7 +8,7 @@ import {createFakeStoredNotification, createFakeRootState} from '../../utils/com
 import {normalizeRootState} from '../../utils/common/normalization';
 
 describe('When removing notifications', () => {
-    const mockStore = createMockServiceStore();
+    const mockServiceStore = createMockServiceStore();
 
     let note1: StoredNotification;
     let note2: StoredNotification;
@@ -28,7 +28,7 @@ describe('When removing notifications', () => {
             notifications: [note1, note2, note3]
         };
 
-        (Object.getOwnPropertyDescriptor(mockStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+        (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
     });
 
     test('When removing a single notification from the store, the notification is removed from the store', () => {
