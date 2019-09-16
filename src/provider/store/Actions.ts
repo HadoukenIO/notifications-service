@@ -16,6 +16,7 @@ export const enum ToggleCenterVisibilitySource {
 }
 
 export class CreateNotification extends Action<RootState> {
+    public readonly type = '@@NOTIFICATION/CREATE_NOTIFICATION';
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
@@ -60,6 +61,7 @@ export class CreateNotification extends Action<RootState> {
 }
 
 export class RemoveNotifications extends Action<RootState> {
+    public readonly type = '@@NOTIFICATION/REMOVE_NOTIFICATIONS';
     public readonly notifications: StoredNotification[];
 
     constructor(notifications: StoredNotification[]) {
@@ -81,6 +83,7 @@ export class RemoveNotifications extends Action<RootState> {
 }
 
 export class ClickNotification extends Action<RootState> {
+    public readonly type = '@@NOTIFICATION/CLICK_NOTIFICATION';
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
@@ -95,6 +98,7 @@ export class ClickNotification extends Action<RootState> {
 }
 
 export class ClickButton extends Action<RootState> {
+    public readonly type = '@@NOTIFICATION/CREATE_NOTIFICATION';
     public readonly notification: StoredNotification;
     public readonly buttonIndex: number;
 
@@ -111,6 +115,7 @@ export class ClickButton extends Action<RootState> {
 }
 
 export class ToggleCenterVisibility extends Action<RootState> {
+    public readonly type = '@@CENTER/TOGGLE_CENTER_VISIBILITY';
     public readonly source: ToggleCenterVisibilitySource;
     public readonly visible?: boolean;
 
@@ -137,6 +142,8 @@ export class ToggleCenterVisibility extends Action<RootState> {
 }
 
 export class BlurCenter extends Action<RootState> {
+    public readonly type = '@@CENTER/BLUR_CENTER';
+
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
         // properly [SERVICE-614]
@@ -154,6 +161,7 @@ export class BlurCenter extends Action<RootState> {
 }
 
 export class ToggleLockCenter extends Action<RootState> {
+    public readonly type = '@@CENTER/TOGGLE_LOCK_CENTER';
     public reduce(state: RootState): RootState {
         return {
             ...state,
@@ -163,6 +171,7 @@ export class ToggleLockCenter extends Action<RootState> {
 }
 
 export class RegisterApplication extends Action<RootState> {
+    public readonly type = '@@APPLICATIONS/REGISTER_APPLICATION';
     public readonly application: StoredApplication;
 
     constructor(info: StoredApplication) {
@@ -182,6 +191,7 @@ export class RegisterApplication extends Action<RootState> {
 }
 
 export class ExpireNotification extends Action<RootState> {
+    public readonly type = '@@NOTIFICATION/EXPIRE_NOTIFICATION';
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {

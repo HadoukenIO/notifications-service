@@ -3,11 +3,7 @@ import {Signal, Aggregators} from 'openfin-service-signal';
 import {AsyncInit} from '../controller/AsyncInit';
 
 export abstract class Action<S> {
-    public readonly type?: string;
-
-    constructor(type?: string) {
-        this.type = type;
-    }
+    public readonly type: string = this.constructor.name;
 
     public async dispatch(store: StoreAPI<S>): Promise<void> {
         await store.dispatch(this);
@@ -19,10 +15,11 @@ export abstract class Action<S> {
 }
 
 export class Init<S> extends Action<S> {
+    public readonly type = '@@INIT';
     private readonly initialState: S;
 
     constructor(initialState: S) {
-        super('@@INIT');
+        super();
         this.initialState = initialState;
     }
 
