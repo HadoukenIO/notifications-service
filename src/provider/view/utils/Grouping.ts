@@ -1,6 +1,6 @@
-import moment = require('moment');
-
 import {StoredNotification} from '../../model/StoredNotification';
+
+import {getDateTitle} from './Time';
 
 export enum GroupingType {
     APPLICATION = 'Application',
@@ -48,14 +48,7 @@ export function getGroupTitle(notification: StoredNotification, groupingType: Gr
         return notification.source.uuid;
     } else if (groupingType === GroupingType.DATE) {
         const {date} = notification.notification;
-        return moment(date).calendar(undefined, {
-            sameDay: '[Today]',
-            nextDay: '[Tomorrow]',
-            nextWeek: 'dddd',
-            lastDay: '[Yesterday]',
-            lastWeek: '[Last] dddd',
-            sameElse: 'L'
-        });
+        return getDateTitle(date);
     }
     throw new Error(`invalid groupMethod : ${groupingType}`);
 }
@@ -71,21 +64,12 @@ export function groupNotifications(notifications: StoredNotification[], groupMet
         b.notification.date.valueOf() - a.notification.date.valueOf());
     // Reduce the notifications array into a Map of notifications grouped by their title
     const groupMap = notifications.reduce((groups: Map<string, Group>, currentNotification: StoredNotification) => {
-        let key = (groupMethod === GroupingType.DATE) ? getGroupTitle(currentNotification, groupMethod) : currentNotification.source.uuid;
+        const key = (groupMethod === GroupingType.DATE) ? getGroupTitle(currentNotification, groupMethod) : currentNotification.source.uuid;
         // If group title already exists just add it to the group
         if (groups.has(key)) {
             const group = groups.get(key)!;
             group.notifications.push(currentNotification);
         } else {
-            // Create a new group and add the notification to the group
-            if (groupMethod === GroupingType.DATE) {
-                const date = new Date(currentNotification.notification.date);
-                key = [
-                    date.getFullYear(),
-                    date.getMonth(),
-                    date.getDate()
-                ].join('-');
-            }
             groups.set(key, {
                 key: key,
                 type: groupMethod,
