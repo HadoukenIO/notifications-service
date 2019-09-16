@@ -3,7 +3,7 @@ import {Signal, Aggregators} from 'openfin-service-signal';
 import {AsyncInit} from '../controller/AsyncInit';
 
 export abstract class Action<S> {
-    public readonly type: string = this.constructor.name;
+    public abstract readonly type: string;
 
     public async dispatch(store: StoreAPI<S>): Promise<void> {
         await store.dispatch(this);
