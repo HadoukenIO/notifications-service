@@ -20,6 +20,7 @@ import {EventPump} from './model/EventPump';
 import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
 import {ServiceStore} from './store/ServiceStore';
+import {Persistor} from './controller/Persistor';
 import {ClientEventController} from './controller/ClientEventController';
 import {TrayIcon} from './model/TrayIcon';
 import {WebWindowFactory} from './model/WebWindow';
@@ -40,6 +41,7 @@ export class Main {
     private readonly _layouter: Layouter;
     private readonly _monitorModel: MonitorModel;
     private readonly _notificationCenter: NotificationCenter;
+    private readonly _persistor: Persistor;
     private readonly _store: ServiceStore;
     private readonly _toastManager: ToastManager;
     private readonly _trayIcon: TrayIcon;
@@ -56,6 +58,7 @@ export class Main {
         @inject(Inject.LAYOUTER) layouter: Layouter,
         @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
         @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
+        @inject(Inject.PERSISTOR) persistor: Persistor,
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TOAST_MANAGER) toastManager: ToastManager,
         @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
@@ -71,6 +74,7 @@ export class Main {
         this._layouter = layouter;
         this._monitorModel = monitorModel;
         this._notificationCenter = notificationCenter;
+        this._persistor = persistor;
         this._store = store;
         this._toastManager = toastManager;
         this._trayIcon = trayIcon;
@@ -82,7 +86,7 @@ export class Main {
             main: this,
             config: this._config,
             apiHandler: this._apiHandler,
-            notificationCenter: this._notificationCenter,
+            center: this._notificationCenter,
             clientEventController: this._clientEventController,
             clientRegistry: this._clientRegistry,
             database: this._database,
@@ -91,6 +95,8 @@ export class Main {
             expiryController: this._expiryController,
             layouter: this._layouter,
             monitorModel: this._monitorModel,
+            notificationCenter: this._notificationCenter,
+            persitor: this._persistor,
             store: this._store,
             toast: this._toastManager,
             trayIcon: this._trayIcon,
@@ -98,7 +104,7 @@ export class Main {
         });
 
         // Wait for creation of any injected components that require async initialization
-        await Injector.initialized;
+        await Injector.init();
 
         // Current API
         this._apiHandler.registerListeners<API>({
