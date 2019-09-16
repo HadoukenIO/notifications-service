@@ -45,7 +45,7 @@ export interface Group {
  */
 export function getGroupTitle(notification: StoredNotification, groupingType: GroupingType): string {
     if (groupingType === GroupingType.APPLICATION) {
-        return notification.source.name || notification.source.uuid;
+        return notification.source.uuid;
     } else if (groupingType === GroupingType.DATE) {
         const {date} = notification.notification;
         return moment(date).calendar(undefined, {
@@ -71,14 +71,13 @@ export function groupNotifications(notifications: StoredNotification[], groupMet
         b.notification.date.valueOf() - a.notification.date.valueOf());
     // Reduce the notifications array into a Map of notifications grouped by their title
     const groupMap = notifications.reduce((groups: Map<string, Group>, currentNotification: StoredNotification) => {
-        const groupTitle = getGroupTitle(currentNotification, groupMethod);
+        let key = (groupMethod === GroupingType.DATE) ? getGroupTitle(currentNotification, groupMethod) : currentNotification.source.uuid;
         // If group title already exists just add it to the group
-        if (groups.has(groupTitle)) {
-            const group = groups.get(groupTitle)!;
+        if (groups.has(key)) {
+            const group = groups.get(key)!;
             group.notifications.push(currentNotification);
         } else {
             // Create a new group and add the notification to the group
-            let key: string = currentNotification.source.name + currentNotification.source.uuid || currentNotification.source.uuid;
             if (groupMethod === GroupingType.DATE) {
                 const date = new Date(currentNotification.notification.date);
                 key = [
@@ -87,10 +86,10 @@ export function groupNotifications(notifications: StoredNotification[], groupMet
                     date.getDate()
                 ].join('-');
             }
-            groups.set(groupTitle, {
+            groups.set(key, {
                 key: key,
                 type: groupMethod,
-                title: groupTitle,
+                title: getGroupTitle(currentNotification, groupMethod),
                 notifications: [currentNotification]
             });
         }
