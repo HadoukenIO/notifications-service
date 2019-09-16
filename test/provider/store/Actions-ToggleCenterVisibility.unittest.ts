@@ -12,67 +12,65 @@ type VisibilityTestParam = [string, boolean];
 const mockServiceStore = createMockServiceStore();
 let state: RootState;
 
-describe('When toggling the Notification Center', () => {
-    beforeEach(async () => {
-        jest.resetAllMocks();
-        useFakeTime();
+beforeEach(async () => {
+    jest.resetAllMocks();
+    useFakeTime();
 
-        mockServiceStore.dispatch.mockImplementation(async (action: RootAction) => {
-            state = action.reduce(state);
-        });
-
-        (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+    mockServiceStore.dispatch.mockImplementation(async (action: RootAction) => {
+        state = action.reduce(state);
     });
 
-    afterEach(async () => {
-        jest.runAllTimers();
-    });
+    (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+});
 
+afterEach(async () => {
+    jest.runAllTimers();
+});
+
+describe.each([
+    ['an API call', ToggleCenterVisibilitySource.API],
+    ['the tray icon', ToggleCenterVisibilitySource.TRAY],
+    ['an internal button press', ToggleCenterVisibilitySource.BUTTON]
+] as SourceTestParam[])('When the Notification Center is toggled by %s', (titleParam: string, source: ToggleCenterVisibilitySource) => {
     describe.each([
-        ['an API call', ToggleCenterVisibilitySource.API],
-        ['the tray icon', ToggleCenterVisibilitySource.TRAY],
-        ['an internal button press', ToggleCenterVisibilitySource.BUTTON]
-    ] as SourceTestParam[])('When the Notification Center is toggled by %s', (titleParam: string, source: ToggleCenterVisibilitySource) => {
-        describe.each([
-            ['open', true],
-            ['closed', false]
-        ] as VisibilityTestParam[])('When the Notification Center is %s', (titleParam: string, centerVisible: boolean) => {
-            beforeEach(() => {
-                state = {...createFakeRootState(), centerVisible};
-            });
-
-            test(`A toggle will ${centerVisible ? 'close' : 'open'} the Notification Center`, async () => {
-                await new ToggleCenterVisibility(source).dispatch(mockServiceStore);
-
-                expect(state.centerVisible).toBe(!centerVisible);
-            });
-
-            test(`Two toggles will leave the Notification Center ${centerVisible ? 'open' : 'close'}`, async () => {
-                await new ToggleCenterVisibility(source).dispatch(mockServiceStore);
-                await advanceTime(5);
-                await new ToggleCenterVisibility(source).dispatch(mockServiceStore);
-
-                expect(state.centerVisible).toBe(centerVisible);
-            });
-
-            test('A toggle with visiblity set to false will close the Notification Center if not already closed', async () => {
-                await new ToggleCenterVisibility(source, false).dispatch(mockServiceStore);
-
-                expect(state.centerVisible).toBe(false);
-            });
-
-            test('A toggle with visiblity set to true will open the Notification Center if not already opened', async () => {
-                await new ToggleCenterVisibility(source, true).dispatch(mockServiceStore);
-
-                expect(state.centerVisible).toBe(true);
-            });
-
-            if (source === ToggleCenterVisibilitySource.BUTTON) {
-                testUnfilteredToggle(source, centerVisible);
-            } else {
-                testFilteredToggle(source, centerVisible);
-            }
+        ['open', true],
+        ['closed', false]
+    ] as VisibilityTestParam[])('When the Notification Center is %s', (titleParam: string, centerVisible: boolean) => {
+        beforeEach(() => {
+            state = {...createFakeRootState(), centerVisible};
         });
+
+        test(`A toggle will ${centerVisible ? 'close' : 'open'} the Notification Center`, async () => {
+            await new ToggleCenterVisibility(source).dispatch(mockServiceStore);
+
+            expect(state.centerVisible).toBe(!centerVisible);
+        });
+
+        test(`Two toggles will leave the Notification Center ${centerVisible ? 'open' : 'close'}`, async () => {
+            await new ToggleCenterVisibility(source).dispatch(mockServiceStore);
+            await advanceTime(5);
+            await new ToggleCenterVisibility(source).dispatch(mockServiceStore);
+
+            expect(state.centerVisible).toBe(centerVisible);
+        });
+
+        test('A toggle with visiblity set to false will close the Notification Center if not already closed', async () => {
+            await new ToggleCenterVisibility(source, false).dispatch(mockServiceStore);
+
+            expect(state.centerVisible).toBe(false);
+        });
+
+        test('A toggle with visiblity set to true will open the Notification Center if not already opened', async () => {
+            await new ToggleCenterVisibility(source, true).dispatch(mockServiceStore);
+
+            expect(state.centerVisible).toBe(true);
+        });
+
+        if (source === ToggleCenterVisibilitySource.BUTTON) {
+            testUnfilteredToggle(source, centerVisible);
+        } else {
+            testFilteredToggle(source, centerVisible);
+        }
     });
 });
 

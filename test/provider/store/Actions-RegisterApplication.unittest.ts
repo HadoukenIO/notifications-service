@@ -5,27 +5,25 @@ import {createMockServiceStore} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeRootState, createFakeStoredApplication} from '../../utils/common/fakes';
 
-describe('When regsitering an application', () => {
-    const mockServiceStore = createMockServiceStore();
-    let state: RootState;
+const mockServiceStore = createMockServiceStore();
+let state: RootState;
 
-    beforeEach(() => {
-        jest.resetAllMocks();
+beforeEach(() => {
+    jest.resetAllMocks();
 
-        state = createFakeRootState();
+    state = createFakeRootState();
 
-        mockServiceStore.dispatch.mockImplementation(async (action: RootAction) => {
-            state = action.reduce(state);
-        });
-
-        (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+    mockServiceStore.dispatch.mockImplementation(async (action: RootAction) => {
+        state = action.reduce(state);
     });
 
-    test('When registering an application, the application is added to the store', () => {
-        const storedApplication = createFakeStoredApplication();
+    (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+});
 
-        const action = new RegisterApplication(storedApplication);
+test('When registering an application, the application is added to the store', () => {
+    const storedApplication = createFakeStoredApplication();
 
-        expect(action.reduce(state).applications.get(storedApplication.id)).toEqual(storedApplication);
-    });
+    const action = new RegisterApplication(storedApplication);
+
+    expect(action.reduce(state).applications.get(storedApplication.id)).toEqual(storedApplication);
 });

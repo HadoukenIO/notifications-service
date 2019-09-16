@@ -3,21 +3,21 @@ import {injectable, inject} from 'inversify';
 import {Inject} from '../common/Injectables';
 import {Transport, Targeted} from '../../client/EventRouter';
 import {NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from '../../client';
-import {RootState, mutable} from '../store/State';
+import {mutable} from '../store/State';
 import {RootAction, CreateNotification, RemoveNotifications, ClickButton, ClickNotification, ExpireNotification} from '../store/Actions';
-import {Store} from '../store/Store';
 import {ActionTrigger} from '../../client/actions';
 import {StoredNotification} from '../model/StoredNotification';
 import {EventPump} from '../model/EventPump';
+import { ServiceStore } from '../store/ServiceStore';
 
 /**
- * Responsible for translating store events to events to be dispatched to the client.
+ * Translates store events to events to be dispatched to the client.
  */
 @injectable()
 export class ClientEventController {
     constructor(
         @inject(Inject.EVENT_PUMP) eventPump: EventPump,
-        @inject(Inject.STORE) store: Store<RootState, RootAction>
+        @inject(Inject.STORE) store: ServiceStore
     ) {
         store.onAction.add(async (action: RootAction): Promise<void> => {
             if (action instanceof CreateNotification) {
