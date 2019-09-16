@@ -4,7 +4,7 @@ import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {RemoveNotifications, RootAction, CreateNotification, ExpireNotification} from '../store/Actions';
 import {Injector} from '../common/Injector';
-import { ServiceStore } from '../store/ServiceStore';
+import {ServiceStore} from '../store/ServiceStore';
 
 type ExpiringNotification = {
     notification: {

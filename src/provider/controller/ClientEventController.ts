@@ -8,7 +8,7 @@ import {RootAction, CreateNotification, RemoveNotifications, ClickButton, ClickN
 import {ActionTrigger} from '../../client/actions';
 import {StoredNotification} from '../model/StoredNotification';
 import {EventPump} from '../model/EventPump';
-import { ServiceStore } from '../store/ServiceStore';
+import {ServiceStore} from '../store/ServiceStore';
 
 /**
  * Translates store events to events to be dispatched to the client.
