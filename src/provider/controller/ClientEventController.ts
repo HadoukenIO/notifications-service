@@ -10,6 +10,7 @@ import {ActionTrigger} from '../../client/actions';
 import {StoredNotification} from '../model/StoredNotification';
 import {EventPump} from '../model/EventPump';
 import {ServiceStore} from '../store/ServiceStore';
+import {LaunchApplicationError} from '../model/Errors';
 
 /**
  * Responsible for translating store events to events to be dispatched to the client.
@@ -28,10 +29,10 @@ export class ClientEventController {
                     type: 'notification-created',
                     notification: mutable(notification)
                 };
-                eventPump.push<NotificationCreatedEvent>(source.uuid, event);
+                await eventPump.push<NotificationCreatedEvent>(source.uuid, event);
             } else if (action instanceof RemoveNotifications) {
                 const {notifications} = action;
-                notifications.forEach((storedNotification: StoredNotification) => {
+                await Promise.all(notifications.map(async (storedNotification: StoredNotification) => {
                     const {notification, source} = storedNotification;
                     if (notification.onClose !== null) {
                         const actionEvent: Targeted<Transport<NotificationActionEvent>> = {
@@ -41,19 +42,18 @@ export class ClientEventController {
                             notification: mutable(notification),
                             result: notification.onClose
                         };
-                        eventPump.push<NotificationActionEvent>(source.uuid, actionEvent);
+                        await eventPump.push<NotificationActionEvent>(source.uuid, actionEvent);
                     }
                     const closedEvent: Targeted<Transport<NotificationClosedEvent>> = {
                         target: 'default',
                         type: 'notification-closed',
                         notification: mutable(notification)
                     };
-                    eventPump.push<NotificationClosedEvent>(source.uuid, closedEvent);
-                });
+                    await eventPump.push<NotificationClosedEvent>(source.uuid, closedEvent);
+                }));
             } else if (action instanceof ClickButton) {
                 const {notification, source} = action.notification;
                 const button = notification.buttons[action.buttonIndex];
-
                 if (button.onClick !== null) {
                     const event: Targeted<Transport<NotificationActionEvent>> = {
                         target: 'default',
@@ -64,7 +64,7 @@ export class ClientEventController {
                         controlIndex: action.buttonIndex,
                         result: button.onClick
                     };
-                    eventPump.push<NotificationActionEvent>(source.uuid, event);
+                    await eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
             } else if (action instanceof ClickNotification) {
                 const {notification, source} = action.notification;
@@ -77,7 +77,7 @@ export class ClientEventController {
                         notification: mutable(notification),
                         result: notification.onSelect
                     };
-                    eventPump.push<NotificationActionEvent>(source.uuid, event);
+                    await eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
             } else if (action instanceof ExpireNotification) {
                 const {notification, source} = action.notification;
@@ -90,7 +90,7 @@ export class ClientEventController {
                         notification: mutable(notification),
                         result: notification.onExpire
                     };
-                    eventPump.push<NotificationActionEvent>(source.uuid, event);
+                    await eventPump.push<NotificationActionEvent>(source.uuid, event);
                 }
             }
         });

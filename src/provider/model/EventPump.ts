@@ -36,7 +36,7 @@ export class EventPump {
      * @param targetUuid Uuid of target client.
      * @param event Notification event to be dispatched
      */
-    public push<T extends Events>(targetUuid: string, event: Targeted<Transport<T>>): void {
+    public async push<T extends Events>(targetUuid: string, event: Targeted<Transport<T>>): Promise<void> {
         if (event.type !== 'notification-action' || this._clientRegistry.isAppActionReady(targetUuid)) {
             const connectedAppWindows = this._apiHandler.getClientConnections().filter((client: Identity) => client.uuid === targetUuid);
 
@@ -45,7 +45,7 @@ export class EventPump {
             });
         } else {
             this._deferredEvents.push({targetUuid, event: event as DeferrableEvent});
-            this._clientRegistry.tryLaunchApplication(targetUuid);
+            await this._clientRegistry.tryLaunchApplication(targetUuid);
         }
     }
 

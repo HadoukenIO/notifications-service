@@ -5,6 +5,7 @@ import {Button} from '../Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {CloseButton} from '../CloseButton/CloseButton';
 import {RemoveNotifications, ClickButton, ClickNotification, Actionable} from '../../../store/Actions';
+import {BatchError, LaunchApplicationError} from '../../../model/Errors';
 
 interface NotificationCardProps extends Actionable {
     notification: StoredNotification;
@@ -14,18 +15,46 @@ export function NotificationCard(props: NotificationCardProps) {
     const {notification, storeApi} = props;
     const data = notification.notification;
 
-    const handleNotificationClose = () => {
-        new RemoveNotifications([notification]).dispatch(storeApi);
+    const handleNotificationClose = async () => {
+        await (new RemoveNotifications([notification])).dispatch(storeApi);
     };
 
-    const handleButtonClick = (buttonIndex: number) => {
-        new ClickButton(notification, buttonIndex).dispatch(storeApi);
+    const handleButtonClick = async (buttonIndex: number) => {
+        try {
+            await (new ClickButton(notification, buttonIndex)).dispatch(storeApi);
+            // Display loading UI
+        } catch (e) {
+            BatchError.handleError(e, (batchError: BatchError) => {
+                const launchErrors = batchError.getErrors(LaunchApplicationError);
+                if (launchErrors.length > 0) {
+                    console.warn('Unable to launch application.');
+                    batchError.log();
+                    // Show error in UI
+                } else {
+                    batchError.log();
+                }
+            });
+        }
     };
 
-    const handleNotificationClick = (event: React.MouseEvent) => {
+    const handleNotificationClick = async (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
-        new ClickNotification(notification).dispatch(storeApi);
+        try {
+            await (new ClickNotification(notification)).dispatch(storeApi);
+            // Display loading UI
+        } catch (e) {
+            BatchError.handleError(e, (batchError: BatchError) => {
+                const launchErrors = batchError.getErrors(LaunchApplicationError);
+                if (launchErrors.length > 0) {
+                    console.warn('Unable to launch application.');
+                    batchError.log();
+                    // Show error in UI
+                } else {
+                    batchError.log();
+                }
+            });
+        }
     };
 
     return (

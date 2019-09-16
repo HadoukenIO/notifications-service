@@ -54,9 +54,9 @@ export class CreateNotification extends Action<RootState> {
         // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
         const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
         if (existingNotifications.length) {
-            await new RemoveNotifications(existingNotifications).dispatch(store);
+            await (new RemoveNotifications(existingNotifications)).dispatch(store);
         }
-        super.dispatch(store);
+        await super.dispatch(store);
     }
 }
 
@@ -92,8 +92,8 @@ export class ClickNotification extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
-        super.dispatch(store);
-        new RemoveNotifications([this.notification]).dispatch(store);
+        await super.dispatch(store);
+        await (new RemoveNotifications([this.notification])).dispatch(store);
     }
 }
 
@@ -109,8 +109,8 @@ export class ClickButton extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
-        super.dispatch(store);
-        new RemoveNotifications([this.notification]).dispatch(store);
+        await super.dispatch(store);
+        await (new RemoveNotifications([this.notification])).dispatch(store);
     }
 }
 
@@ -200,8 +200,8 @@ export class ExpireNotification extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
-        super.dispatch(store);
-        new RemoveNotifications([this.notification]).dispatch(store);
+        await super.dispatch(store);
+        await (new RemoveNotifications([this.notification])).dispatch(store);
     }
 }
 

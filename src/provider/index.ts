@@ -128,7 +128,7 @@ export class Main {
     private async createNotification(payload: CreatePayload, sender: ProviderIdentity): Promise<NotificationInternal> {
         // Explicitly create the identity object to avoid storing other unneeded info from ProviderIdentity
         const notification = this.hydrateNotification(payload, {uuid: sender.uuid, name: sender.name});
-        new CreateNotification(notification).dispatch(this._store);
+        await (new CreateNotification(notification)).dispatch(this._store);
 
         return mutable(notification.notification);
     }
@@ -139,7 +139,7 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        new ToggleCenterVisibility(ToggleCenterVisibilitySource.API).dispatch(this._store);
+        await (new ToggleCenterVisibility(ToggleCenterVisibilitySource.API)).dispatch(this._store);
     }
 
     /**
@@ -152,7 +152,7 @@ export class Main {
         const id = this.encodeID(payload.id, sender);
         const notification = this._store.state.notifications.find(n => n.id === id);
         if (notification) {
-            new RemoveNotifications([notification]).dispatch(this._store);
+            await (new RemoveNotifications([notification])).dispatch(this._store);
             return true;
         }
         return false;
@@ -171,7 +171,7 @@ export class Main {
 
     private async clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
         const notifications = this.getAppNotifications(sender.uuid);
-        await new RemoveNotifications(notifications).dispatch(this._store);
+        await (new RemoveNotifications(notifications)).dispatch(this._store);
 
         return notifications.length;
     }
