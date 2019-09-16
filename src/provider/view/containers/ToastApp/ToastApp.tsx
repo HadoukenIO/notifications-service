@@ -5,7 +5,7 @@ import {Store} from 'redux';
 
 import {StoredNotification} from '../../../model/StoredNotification';
 import {NotificationCard} from '../../components/NotificationCard/NotificationCard';
-import {ResizeWrapper} from '../../components/Wrappers/TearOut';
+import {ResizeWrapper} from '../../components/Wrappers/ResizeWrapper';
 import {WindowDimensions} from '../../../controller/Layouter';
 import {RootState} from '../../../store/State';
 import {Actionable} from '../../../store/Actions';
