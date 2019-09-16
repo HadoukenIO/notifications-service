@@ -1,13 +1,12 @@
 import {injectable, inject} from 'inversify';
 
-import {Store, Action} from '../store/Store';
+import {Action} from '../store/Store';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {RemoveNotifications, CreateNotification, ExpireNotification} from '../store/Actions';
 import {RootState} from '../store/State';
 import {Injector} from '../common/Injector';
-
-import {AsyncInit} from './AsyncInit';
+import {ServiceStore} from '../store/ServiceStore';
 
 type ExpiringNotification = {
     notification: {
@@ -26,11 +25,11 @@ interface ScheduledExpiry {
  */
 @injectable()
 export class ExpiryController {
-    private readonly _store: Store<RootState>;
+    private readonly _store: ServiceStore;
 
     private _nextExpiry: ScheduledExpiry | null = null;
 
-    public constructor(@inject(Inject.STORE) store: Store<RootState>) {
+    public constructor(@inject(Inject.STORE) store: ServiceStore) {
         this._store = store;
 
         this._store.onAction.add(this.onAction, this);

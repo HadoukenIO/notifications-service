@@ -5,10 +5,11 @@ import {Transport, Targeted} from '../../client/EventRouter';
 import {NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from '../../client';
 import {RootState, mutable} from '../store/State';
 import {CreateNotification, RemoveNotifications, ClickButton, ClickNotification, ExpireNotification} from '../store/Actions';
-import {Store, Action} from '../store/Store';
+import {Action} from '../store/Store';
 import {ActionTrigger} from '../../client/actions';
 import {StoredNotification} from '../model/StoredNotification';
 import {EventPump} from '../model/EventPump';
+import {ServiceStore} from '../store/ServiceStore';
 
 /**
  * Responsible for translating store events to events to be dispatched to the client.
@@ -17,7 +18,7 @@ import {EventPump} from '../model/EventPump';
 export class ClientEventController {
     constructor(
         @inject(Inject.EVENT_PUMP) eventPump: EventPump,
-        @inject(Inject.STORE) store: Store<RootState>
+        @inject(Inject.STORE) store: ServiceStore
     ) {
         store.onAction.add(async (action: Action<RootState>): Promise<void> => {
             if (action instanceof CreateNotification) {
