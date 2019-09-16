@@ -38,11 +38,12 @@ export type StoreAPI<S> = Pick<Store<S>, 'dispatch' | 'state'>;
 export class Store<S> extends AsyncInit {
     public readonly onAction: Signal<[Action<S>], Promise<void>, Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
 
-    private _currentState: S;
+    private _currentState!: S;
     private readonly _listeners: Listener<S>[] = [];
 
     constructor(initialState: S) {
         super();
+        // This is used by dev tools
         new Init(initialState).dispatch(this);
     }
 
