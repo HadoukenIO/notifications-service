@@ -53,19 +53,33 @@ export function createMockServiceStore(): jest.Mocked<ServiceStore> {
     return serviceStore;
 }
 
+/**
+ * Note that this is a special case. It provides implementations that will unavoidably be lost with any calls to
+ * `jest.resetAllMocks`, and so should be recreated for each test. It also assigns itself to the global `fin` object
+ */
 export function createMockFin(): jest.Mocked<Fin> {
-    return {
+    const fin = {
         Application: {
-            wrapSync: jest.fn().mockReturnValue({
+            wrapSync: jest.fn(async () => ({
                 isRunning: jest.fn()
-            }),
-            createFromManifest: jest.fn().mockReturnValue({
+            })),
+            createFromManifest: jest.fn(async () => ({
                 addListener: jest.fn(),
                 run: jest.fn()
-            })
+            })),
+            create: jest.fn(async () => ({
+                addListener: jest.fn(),
+                run: jest.fn()
+            }))
         },
         InterApplicationBus: {
             create: jest.fn()
         }
     } as unknown as jest.Mocked<Fin>;
+
+    Object.assign(global, {
+        fin
+    });
+
+    return fin;
 }

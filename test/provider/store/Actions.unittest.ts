@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import {ClickNotification, ClickButton, ExpireNotification, RemoveNotifications} from '../../../src/provider/store/Actions';
 import {Action} from '../../../src/provider/store/Store';
 import {RootState} from '../../../src/provider/store/State';
