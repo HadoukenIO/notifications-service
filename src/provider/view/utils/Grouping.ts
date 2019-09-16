@@ -54,7 +54,7 @@ export function getGroupTitle(notification: StoredNotification, groupingType: Gr
             nextWeek: 'dddd',
             lastDay: '[Yesterday]',
             lastWeek: '[Last] dddd',
-            sameElse: 'DD/MM/YYYY'
+            sameElse: 'L'
         });
     }
     throw new Error(`invalid groupMethod : ${groupingType}`);
