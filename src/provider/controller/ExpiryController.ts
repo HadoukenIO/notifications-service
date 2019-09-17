@@ -37,6 +37,7 @@ export class ExpiryController {
 
         Injector.initialized.then(() => {
             // As soon as, but not before, the service is initialized, handle any notifications that expired while the service wasn't running
+            // TODO: Ensure this runs before `index.ts` registers client methods [SERVICE-729]
             this.scheduleEarliestExpiry(Date.now());
         });
     }

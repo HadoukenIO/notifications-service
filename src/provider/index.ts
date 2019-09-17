@@ -100,7 +100,8 @@ export class Main {
             store: this._store,
             toast: this._toastManager,
             trayIcon: this._trayIcon,
-            webWindowFactory: this._webWindowFactory
+            webWindowFactory: this._webWindowFactory,
+            injector: Injector
         });
 
         // Wait for creation of any injected components that require async initialization
