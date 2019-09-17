@@ -37,8 +37,8 @@ import {RootAction} from '../../../src/provider/store/Actions';
  */
 
 /**
-  * Incomplete type representing a mock `fin` object. This should be expanded as tests require
-  */
+ * Incomplete type representing a mock `fin` object. This should be expanded as tests require
+ */
 export type MockFin = {
     Application: {
         wrapSync: jest.Mock<Promise<Application>, [Identity]>;
