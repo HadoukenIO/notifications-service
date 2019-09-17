@@ -9,7 +9,9 @@ import {testManagerIdentity, testAppUrlListenersOnStartup} from '../utils/int/co
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {delay, Duration} from '../utils/int/delay';
-import {waitForAppToBeRunning} from '../utils/int/common';
+import {waitForAppToBeRunning, generateStoredNotification} from '../utils/int/common';
+import {clearDatabase, populateDatabase} from '../utils/int/storageRemote';
+import {CollectionMap} from '../../src/provider/model/database/Database';
 
 let testApp: Application;
 let testWindow: _Window;
@@ -26,6 +28,7 @@ const options: NotificationOptions = {
 
 beforeEach(async () => {
     jest.resetAllMocks();
+    clearDatabase();
 
     testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlListenersOnStartup});
     testWindow = await testApp.getWindow();
@@ -279,8 +282,12 @@ describe('When a notification with an expiry is created by an app that then quit
     });
 });
 
-// TODO: [SERVICE-619]
-test.todo('When the provider is started and there are notifications with expiries in the past, they are expired on startup');
+test('When the provider is started and there are notifications with expiries in the past, they are expired on startup', async () => {
+    await populateDatabase(CollectionMap.NOTIFICATIONS, generateStoredNotification({expires: past(seconds(15)).valueOf()}));
+    await providerRemote.restartProvider();
+
+    await expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
+});
 
 function expectTimeSoonAfter(actualTime: number, expectedTime: number): void {
     expect(actualTime - expectedTime).toBeGreaterThan(0);
