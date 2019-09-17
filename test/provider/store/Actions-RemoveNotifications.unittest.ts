@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import {RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
-import {createMockServiceStore} from '../../utils/unit/mocks';
+import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeStoredNotification, createFakeRootState} from '../../utils/unit/fakes';
 import {normalizeRootState} from '../../utils/unit/normalization';
@@ -27,7 +27,7 @@ beforeEach(() => {
         notifications: [note1, note2, note3]
     };
 
-    (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+    getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 });
 
 test('When removing a single notification from the store, the notification is removed from the store', () => {

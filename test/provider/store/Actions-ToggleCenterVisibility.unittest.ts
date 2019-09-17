@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import {useFakeTime, advanceTime} from '../../utils/unit/time';
 import {ToggleCenterVisibilitySource, ToggleCenterVisibility, BlurCenter, RootAction} from '../../../src/provider/store/Actions';
-import {createMockServiceStore} from '../../utils/unit/mocks';
+import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {createFakeRootState} from '../../utils/unit/fakes';
 import {RootState} from '../../../src/provider/store/State';
 
@@ -20,7 +20,7 @@ beforeEach(async () => {
         state = action.reduce(state);
     });
 
-    (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+    getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 });
 
 afterEach(async () => {

@@ -4,7 +4,7 @@ import {ClickNotification, ClickButton, ExpireNotification, RemoveNotifications}
 import {Action} from '../../../src/provider/store/Store';
 import {RootState} from '../../../src/provider/store/State';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
-import {createMockServiceStore} from '../../utils/unit/mocks';
+import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {createFakeStoredNotification} from '../../utils/unit/fakes';
 
 type TestParam = [string, (note: StoredNotification) => Action<RootState>];
@@ -16,7 +16,7 @@ let state: RootState;
 beforeEach(() => {
     jest.resetAllMocks();
 
-    (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+    getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 });
 
 /*

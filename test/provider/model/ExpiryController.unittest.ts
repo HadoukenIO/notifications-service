@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import {ExpiryController} from '../../../src/provider/controller/ExpiryController';
-import {createMockServiceStore, useMocksInInjector} from '../../utils/unit/mocks';
+import {createMockServiceStore, useMocksInInjector, getterMock} from '../../utils/unit/mocks';
 import {createFakeRootState, createFakeStoredNotification, createFakeNotificationInternal} from '../../utils/unit/fakes';
 import {RootState} from '../../../src/provider/store/State';
 import {RootAction, ExpireNotification, RemoveNotifications} from '../../../src/provider/store/Actions';
@@ -29,7 +29,7 @@ beforeEach(async () => {
         }
     });
 
-    (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+    getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 
     new ExpiryController(mockServiceStore);
 });

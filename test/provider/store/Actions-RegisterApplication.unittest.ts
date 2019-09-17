@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import {RootAction, RegisterApplication} from '../../../src/provider/store/Actions';
-import {createMockServiceStore} from '../../utils/unit/mocks';
+import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeRootState, createFakeStoredApplication} from '../../utils/unit/fakes';
 
@@ -17,7 +17,7 @@ beforeEach(() => {
         state = action.reduce(state);
     });
 
-    (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+    getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 });
 
 test('When registering an application, the application is added to the store', () => {

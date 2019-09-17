@@ -66,7 +66,7 @@ describe('When launching a manifest application', () => {
     test('Once the app is initialized, we can attempt to launch the app again', async () => {
         const mockApp = new EventEmitter() as unknown as Application;
         Object.assign(mockApp, {
-            run: jest.fn()
+            run: jest.fn<Promise<void>, []>()
         });
 
         mockCreateFromManifest.mockResolvedValue(mockApp);
@@ -81,10 +81,7 @@ describe('When launching a manifest application', () => {
     test('If app launch fails, we can attempt to launch the app again', async () => {
         mockCreateFromManifest.mockImplementationOnce(async () => {
             throw new Error();
-        }).mockResolvedValue({
-            run: jest.fn(),
-            addListener: jest.fn()
-        } as unknown as Application);
+        }).mockResolvedValue(createMockApplication());
 
         await environment.startApplication(manifestApp);
         await environment.startApplication(manifestApp);
@@ -136,7 +133,7 @@ describe('When launching a programmatic application', () => {
     test('Once the app is initialized, we can attempt to launch the app again', async () => {
         const mockApp = new EventEmitter() as unknown as Application;
         Object.assign(mockApp, {
-            run: jest.fn()
+            run: jest.fn<Promise<void>, []>()
         });
 
         mockCreate.mockResolvedValue(mockApp);

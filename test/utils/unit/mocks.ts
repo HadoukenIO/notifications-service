@@ -2,11 +2,14 @@ import 'jest';
 import 'jsdom';
 
 import {Signal} from 'openfin-service-signal';
-import {Identity, Fin} from 'openfin/_v2/main';
+import {Identity} from 'openfin/_v2/main';
 import {MonitorInfo} from 'openfin/_v2/api/system/monitor';
-import ApplicationModule, {TrayInfo, Application} from 'openfin/_v2/api/application/application';
+import {TrayInfo, Application} from 'openfin/_v2/api/application/application';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
+import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
+import {ApplicationEvents} from 'openfin/_v2/api/events/application';
+import {SubOptions} from 'openfin/_v2/api/base';
 
 import {Environment, StoredApplication} from '../../../src/provider/model/Environment';
 import {APIHandler} from '../../../src/provider/model/APIHandler';
@@ -16,7 +19,7 @@ import {Database} from '../../../src/provider/model/database/Database';
 import {PartiallyWritable} from '../../types';
 import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {Injector} from '../../../src/provider/common/Injector';
-import {Inject} from '../../../src/provider/common/Injectables';
+import {Inject, InjectableMap} from '../../../src/provider/common/Injectables';
 import {ClientEventController} from '../../../src/provider/controller/ClientEventController';
 import {EventPump} from '../../../src/provider/model/EventPump';
 import {ExpiryController} from '../../../src/provider/controller/ExpiryController';
@@ -29,17 +32,15 @@ import {TrayIcon} from '../../../src/provider/model/TrayIcon';
 import {WebWindowFactory, WebWindow} from '../../../src/provider/model/WebWindow';
 import {RootAction} from '../../../src/provider/store/Actions';
 import {DeferredPromise} from '../../../src/provider/common/DeferredPromise';
+import {RootState} from '../../../src/provider/store/State';
 
 import {createFakeMonitorInfo} from './fakes';
 
 /**
- * Methods for creating mocks for use in unit tests. Within the mocked objects, methods, getters and setters are jest
- * mock functions without any implementation, and readonly member variables are set to sensible defaults, which
- * includes instantiating any signals the object holds.
+ * Methods for creating mocks for use in unit tests. As a rough rule, mocks are created so they will be reset to their
+ * original state by `jest.resetMocks`.
  *
- * Roughly, mocks are created in the same state that they will be reset to by `jest.resetMocks`.
- *
- * This module also provides functions for mounting a mock `fin` object, and populating the injector with mocks.
+ * This module also provides utility functions for working with these mocks.
  */
 
 export type MockFin = {
@@ -71,7 +72,7 @@ export function createMockApiHandler(): jest.Mocked<APIHandler<APITopic, Events>
     (apiHandler as PartiallyWritable<APIHandler<APITopic, Events>, 'onDisconnection'>).onDisconnection = new Signal<[Identity]>();
 
     Object.defineProperty(apiHandler, 'channel', {
-        'get': jest.fn()
+        'get': jest.fn<ChannelProvider, []>()
     });
 
     return apiHandler;
@@ -154,7 +155,7 @@ export function createMockServiceStore(): jest.Mocked<ServiceStore> {
     (serviceStore as PartiallyWritable<ServiceStore, 'onAction'>).onAction = new Signal<[RootAction], Promise<void>, Promise<void>>();
 
     Object.defineProperty(serviceStore, 'state', {
-        'get': jest.fn()
+        'get': jest.fn<RootState, []>()
     });
 
     return serviceStore;
@@ -181,7 +182,7 @@ export function createMockWebWindowFactory(): jest.Mocked<WebWindowFactory> {
 }
 
 /**
- * Note that this also assigns the created mock to the global `fin` object. Also note that this is impconplete, and
+ * Note that this also assigns the created mock to the global `fin` object. Also note that this is incomplete, and
  * should be expanded as tests require
  */
 export function createMockFin(): MockFin {
@@ -199,28 +200,59 @@ export function createMockFin(): MockFin {
 }
 
 export function createMockApplication(): jest.Mocked<Application> {
+    type AddListenerParams = [string, (...args: any[]) => void, SubOptions];
+
     return {
-        addListener: jest.fn(),
-        run: jest.fn()
+        addListener: jest.fn<Promise<Application>, AddListenerParams>(),
+        run: jest.fn<Promise<void>, []>()
     } as unknown as jest.Mocked<Application>;
 }
 
+/**
+ * Resets `Injector`, and configures it to return mocks for all injectables
+ */
 export function useMocksInInjector(): void {
     Injector.reset();
 
-    Injector.rebind(Inject.API_HANDLER).toConstantValue(createMockApiHandler());
-    Injector.rebind(Inject.CLIENT_EVENT_CONTROLLER).toConstantValue(createMockClientEventController());
-    Injector.rebind(Inject.CLIENT_REGISTRY).toConstantValue(createMockClientRegistry());
-    Injector.rebind(Inject.DATABASE).toConstantValue(createMockDatabase());
-    Injector.rebind(Inject.ENVIRONMENT).toConstantValue(createMockEnvironment());
-    Injector.rebind(Inject.EVENT_PUMP).toConstantValue(createMockEventPump());
-    Injector.rebind(Inject.EXPIRY_CONTROLLER).toConstantValue(createMockExpiryController());
-    Injector.rebind(Inject.LAYOUTER).toConstantValue(createMockLayouter());
-    Injector.rebind(Inject.MONITOR_MODEL).toConstantValue(createMockMonitorModel());
-    Injector.rebind(Inject.NOTIFICATION_CENTER).toConstantValue(createMockNotificationCenter());
-    Injector.rebind(Inject.PERSISTOR).toConstantValue(createMockPeristor());
-    Injector.rebind(Inject.STORE).toConstantValue(createMockServiceStore());
-    Injector.rebind(Inject.TOAST_MANAGER).toConstantValue(createMockToastManager());
-    Injector.rebind(Inject.TRAY_ICON).toConstantValue(createMockTrayIcon());
-    Injector.rebind(Inject.WEB_WINDOW_FACTORY).toConstantValue(createMockWebWindowFactory());
+    const bindings: InjectableMap = {
+        [Inject.API_HANDLER]: createMockApiHandler(),
+        [Inject.CLIENT_EVENT_CONTROLLER]: createMockClientEventController(),
+        [Inject.CLIENT_REGISTRY]: createMockClientRegistry(),
+        [Inject.DATABASE]: createMockDatabase(),
+        [Inject.ENVIRONMENT]: createMockEnvironment(),
+        [Inject.EVENT_PUMP]: createMockEventPump(),
+        [Inject.EXPIRY_CONTROLLER]: createMockExpiryController(),
+        [Inject.LAYOUTER]: createMockLayouter(),
+        [Inject.MONITOR_MODEL]: createMockMonitorModel(),
+        [Inject.NOTIFICATION_CENTER]: createMockNotificationCenter(),
+        [Inject.PERSISTOR]: createMockPeristor(),
+        [Inject.STORE]: createMockServiceStore(),
+        [Inject.TOAST_MANAGER]: createMockToastManager(),
+        [Inject.TRAY_ICON]: createMockTrayIcon(),
+        [Inject.WEB_WINDOW_FACTORY]: createMockWebWindowFactory()
+    };
+
+    Object.keys(bindings).forEach(k => {
+        const key = k as keyof typeof Inject;
+        Injector.rebind(key).toConstantValue(bindings[key]);
+    });
+}
+
+/**
+ * Returns the mock getter function of an object
+ *
+ * @param mock The mock object to get a getter mock of
+ * @param key The key of the mock getter to get
+ */
+export function getterMock<Mock extends object, Key extends keyof Mock, Value extends Mock[Key]>(mock: Mock, key: Key): jest.Mock<Value, []> {
+    return Object.getOwnPropertyDescriptor(mock, key)!.get as jest.Mock<Value, []>;
+}
+
+/**
+ * Returns the mock setter function of an object
+ * @param mock The mock object to get a setter mock of
+ * @param key The key of the mock setter to get
+ */
+export function setterMock<Mock extends object, Key extends keyof Mock, Value extends Mock[Key]>(mock: Mock, key: Key): jest.Mock<void, [Value]> {
+    return Object.getOwnPropertyDescriptor(mock, key)!.set as jest.Mock<void, [Value]>;
 }

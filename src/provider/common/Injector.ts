@@ -24,9 +24,8 @@ import {TrayIcon} from '../model/TrayIcon';
 import {FinTrayIcon} from '../model/FinTrayIcon';
 import {ExpiryController} from '../controller/ExpiryController';
 import {ClientEventController} from '../controller/ClientEventController';
-import {AsyncAction} from '../store/Store';
 
-import {Inject} from './Injectables';
+import {Inject, InjectableMap} from './Injectables';
 import {DeferredPromise} from './DeferredPromise';
 
 /**
@@ -56,7 +55,7 @@ type Types = {
  * Using a type here will configure injectify to instantiate a class and inject it as a singleton.
  * Using a value here will inject that instance.
  */
-const Bindings = {
+const Bindings: InjectableMap = {
     [Inject.API_HANDLER]: APIHandler,
     [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController,
     [Inject.CLIENT_REGISTRY]: ClientRegistry,

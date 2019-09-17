@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import {CreateNotification, RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
-import {createMockServiceStore} from '../../utils/unit/mocks';
+import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeStoredNotification, createFakeRootState} from '../../utils/unit/fakes';
 import {normalizeRootState} from '../../utils/unit/normalization';
@@ -17,7 +17,7 @@ let action: CreateNotification;
 beforeEach(() => {
     jest.resetAllMocks();
 
-    (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
+    getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 
     note = createFakeStoredNotification();
 
