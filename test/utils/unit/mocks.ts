@@ -233,7 +233,7 @@ export function useMocksInInjector(): void {
     };
 
     Object.keys(bindings).forEach(k => {
-        const key = k as keyof typeof Inject;
+        const key = k as keyof InjectableMap;
         Injector.rebind(key).toConstantValue(bindings[key]);
     });
 }
