@@ -7,8 +7,6 @@ import {MonitorInfo} from 'openfin/_v2/api/system/monitor';
 import {TrayInfo, Application} from 'openfin/_v2/api/application/application';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
-import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
-import {ApplicationEvents} from 'openfin/_v2/api/events/application';
 import {SubOptions} from 'openfin/_v2/api/base';
 
 import {Environment, StoredApplication} from '../../../src/provider/model/Environment';
@@ -16,7 +14,6 @@ import {APIHandler} from '../../../src/provider/model/APIHandler';
 import {APITopic, Events} from '../../../src/client/internal';
 import {ClientRegistry} from '../../../src/provider/model/ClientRegistry';
 import {Database} from '../../../src/provider/model/database/Database';
-import {PartiallyWritable} from '../../types';
 import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {Injector} from '../../../src/provider/common/Injector';
 import {Inject, InjectableMap} from '../../../src/provider/common/Injectables';
@@ -31,18 +28,17 @@ import {NotificationCenter} from '../../../src/provider/controller/NotificationC
 import {TrayIcon} from '../../../src/provider/model/TrayIcon';
 import {WebWindowFactory, WebWindow} from '../../../src/provider/model/WebWindow';
 import {RootAction} from '../../../src/provider/store/Actions';
-import {DeferredPromise} from '../../../src/provider/common/DeferredPromise';
-import {RootState} from '../../../src/provider/store/State';
-
-import {createFakeMonitorInfo} from './fakes';
 
 /**
  * Methods for creating mocks for use in unit tests. As a rough rule, mocks are created so they will be reset to their
- * original state by `jest.resetMocks`.
+ * original state by `jest.resetMocks`, with any Signals held by the mock being an exception.
  *
  * This module also provides utility functions for working with these mocks.
  */
 
+/**
+  * Incomplete type representing a mock `fin` object. This should be expanded as tests require
+  */
 export type MockFin = {
     Application: {
         wrapSync: jest.Mock<Promise<Application>, [Identity]>;
@@ -68,12 +64,9 @@ export function createMockApiHandler(): jest.Mocked<APIHandler<APITopic, Events>
 
     const apiHandler = new APIHandler() as jest.Mocked<APIHandler<APITopic, Events>>;
 
-    (apiHandler as PartiallyWritable<APIHandler<APITopic, Events>, 'onConnection'>).onConnection = new Signal<[Identity]>();
-    (apiHandler as PartiallyWritable<APIHandler<APITopic, Events>, 'onDisconnection'>).onDisconnection = new Signal<[Identity]>();
-
-    Object.defineProperty(apiHandler, 'channel', {
-        'get': jest.fn<ChannelProvider, []>()
-    });
+    assignSignal(apiHandler, 'onConnection');
+    assignSignal(apiHandler, 'onDisconnection');
+    assignMockGetter(apiHandler, 'channel');
 
     return apiHandler;
 }
@@ -87,7 +80,7 @@ export function createMockClientRegistry(): jest.Mocked<ClientRegistry> {
     const {ClientRegistry} = jest.requireMock(clientRegistryPath);
 
     const clientRegistry = new ClientRegistry() as jest.Mocked<ClientRegistry>;
-    (clientRegistry as PartiallyWritable<typeof clientRegistry, 'onAppActionReady'>).onAppActionReady = new Signal<[Identity]>();
+    assignSignal(clientRegistry, 'onAppActionReady');
 
     return clientRegistry;
 }
@@ -119,21 +112,20 @@ export function createMockLayouter(): jest.Mocked<Layouter> {
     const {Layouter} = jest.requireMock(layouterPath);
 
     const layouter = new Layouter() as jest.Mocked<Layouter>;
-    (layouter as PartiallyWritable<Layouter, 'onLayoutRequired'>).onLayoutRequired = new Signal<[]>();
+    assignSignal(layouter, 'onLayoutRequired');
 
     return layouter;
 }
 
 export function createMockMonitorModel(): jest.Mocked<MonitorModel> {
-    const initialized = new DeferredPromise<MonitorModel>();
-
     const monitorModel: jest.Mocked<MonitorModel> = {
         onMonitorInfoChanged: new Signal<[MonitorInfo]>(),
-        initialized: initialized.promise,
-        monitorInfo: createFakeMonitorInfo()
+        initialized: null!,
+        monitorInfo: null!
     };
 
-    initialized.resolve(monitorModel);
+    assignMockGetter(monitorModel, 'initialized');
+    assignMockGetter(monitorModel, 'monitorInfo');
 
     return monitorModel;
 }
@@ -152,11 +144,9 @@ export function createMockServiceStore(): jest.Mocked<ServiceStore> {
     const {ServiceStore} = jest.requireMock(serviceStorePath);
 
     const serviceStore = new ServiceStore() as jest.Mocked<ServiceStore>;
-    (serviceStore as PartiallyWritable<ServiceStore, 'onAction'>).onAction = new Signal<[RootAction], Promise<void>, Promise<void>>();
+    assignSignal<ServiceStore, 'onAction', [RootAction], Promise<void>, Promise<void>>(serviceStore, 'onAction');
 
-    Object.defineProperty(serviceStore, 'state', {
-        'get': jest.fn<RootState, []>()
-    });
+    assignMockGetter(serviceStore, 'state');
 
     return serviceStore;
 }
@@ -250,9 +240,27 @@ export function getterMock<Mock extends object, Key extends keyof Mock, Value ex
 
 /**
  * Returns the mock setter function of an object
+ *
  * @param mock The mock object to get a setter mock of
  * @param key The key of the mock setter to get
  */
 export function setterMock<Mock extends object, Key extends keyof Mock, Value extends Mock[Key]>(mock: Mock, key: Key): jest.Mock<void, [Value]> {
     return Object.getOwnPropertyDescriptor(mock, key)!.set as jest.Mock<void, [Value]>;
+}
+
+function assignMockGetter<Mock extends object, Key extends keyof Mock, Value extends Mock[Key]>(mock: Mock, key: Key): void {
+    Object.defineProperty(mock, key, {
+        'get': jest.fn<Value, []>()
+    });
+}
+
+function assignSignal<
+    Mock extends object & {[K in Key]: Signal<SignalA, SignalR, SignalR2>},
+    Key extends keyof Mock,
+    SignalA extends any[],
+    SignalR = void,
+    SignalR2 = void>(mock: Mock, key: Key): void {
+    Object.assign(mock, {
+        [key]: new Signal<SignalA, SignalR, SignalR2>()
+    });
 }

@@ -6,7 +6,7 @@ import {createFakeRootState, createFakeStoredNotification, createFakeNotificatio
 import {RootState} from '../../../src/provider/store/State';
 import {RootAction, ExpireNotification, RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
-import {useFakeTime, advanceTime} from '../../utils/unit/time';
+import {mockTime, advanceTime} from '../../utils/unit/time';
 import {Injector} from '../../../src/provider/common/Injector';
 
 let state: RootState;
@@ -16,7 +16,7 @@ const mockServiceStore = createMockServiceStore();
 beforeEach(async () => {
     jest.resetAllMocks();
 
-    useFakeTime();
+    mockTime();
 
     // Advance time so we don't need to deal with negative time to work in the past
     await advanceTime(1000);
