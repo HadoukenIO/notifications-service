@@ -8,16 +8,19 @@ import {Application} from 'openfin/_v2/main';
 
 import {FinEnvironment} from '../../../src/provider/model/FinEnvironment';
 import {StoredApplication} from '../../../src/provider/model/Environment';
-import {createMockFin} from '../../utils/unit/mocks';
-import {createFakeManifestStoredApplication as createFakeManifestStoredApplication, createFakeProgrammaticApplication, createFakeStoredApplication} from '../../utils/common/fakes';
+import {createMockFin, createMockApplication} from '../../utils/unit/mocks';
+import {createFakeManifestStoredApplication as createFakeManifestStoredApplication, createFakeProgrammaticApplication} from '../../utils/unit/fakes';
+
+const mockFin = createMockFin();
 
 let environment: FinEnvironment;
 
 beforeEach(async () => {
     jest.resetAllMocks();
-    createMockFin();
 
     environment = new FinEnvironment();
+
+    mockFin.Application.wrapSync;
 });
 
 describe('When launching a manifest application', () => {
@@ -28,14 +31,16 @@ describe('When launching a manifest application', () => {
     beforeEach(() => {
         manifestApp = createFakeManifestStoredApplication();
 
-        mockCreateFromManifest = fin.Application.createFromManifest as jest.Mock<Promise<Application>, [string]>;
+        mockCreateFromManifest = mockFin.Application.createFromManifest;
+
+        mockCreateFromManifest.mockResolvedValue(createMockApplication());
     });
 
     test('The app is launched through the OpenFin runtime', async () => {
         await environment.startApplication(manifestApp);
 
-        expect(fin.Application.createFromManifest).toBeCalledTimes(1);
-        expect(fin.Application.createFromManifest).toBeCalledWith(manifestApp.manifestUrl);
+        expect(mockCreateFromManifest).toBeCalledTimes(1);
+        expect(mockCreateFromManifest).toBeCalledWith(manifestApp.manifestUrl);
     });
 
     test('Subsequent attempts to launch the same application are ignored', async () => {
@@ -45,7 +50,7 @@ describe('When launching a manifest application', () => {
             await environment.startApplication(manifestApp);
         }
 
-        expect(fin.Application.createFromManifest).toBeCalledTimes(1);
+        expect(mockCreateFromManifest).toBeCalledTimes(1);
     });
 
     test('Subsequent attempts to launch a different application are not ignored', async () => {
@@ -54,8 +59,8 @@ describe('When launching a manifest application', () => {
         await environment.startApplication(manifestApp);
         await environment.startApplication(otherApplication);
 
-        expect(fin.Application.createFromManifest).toBeCalledTimes(2);
-        expect((fin.Application.createFromManifest as jest.Mock<Promise<Application>, [string]>).mock.calls[1]).toEqual([otherApplication.manifestUrl]);
+        expect(mockCreateFromManifest).toBeCalledTimes(2);
+        expect(mockCreateFromManifest.mock.calls[1]).toEqual([otherApplication.manifestUrl]);
     });
 
     test('Once the app is initialized, we can attempt to launch the app again', async () => {
@@ -70,7 +75,7 @@ describe('When launching a manifest application', () => {
         mockApp.emit('initialized', {uuid: manifestApp.id, type: 'initialized', topic: 'application'});
         await environment.startApplication(manifestApp);
 
-        expect(fin.Application.createFromManifest).toBeCalledTimes(2);
+        expect(mockCreateFromManifest).toBeCalledTimes(2);
     });
 
     test('If app launch fails, we can attempt to launch the app again', async () => {
@@ -84,7 +89,7 @@ describe('When launching a manifest application', () => {
         await environment.startApplication(manifestApp);
         await environment.startApplication(manifestApp);
 
-        expect(fin.Application.createFromManifest).toBeCalledTimes(2);
+        expect(mockCreateFromManifest).toBeCalledTimes(2);
     });
 });
 
@@ -96,14 +101,16 @@ describe('When launching a programmatic application', () => {
     beforeEach(() => {
         programmaticApp = createFakeProgrammaticApplication();
 
-        mockCreate = fin.Application.create as jest.Mock<Promise<Application>, [ApplicationOption]>;
+        mockCreate = mockFin.Application.create;
+
+        mockCreate.mockResolvedValue(createMockApplication());
     });
 
     test('The app is launched through the OpenFin runtime', async () => {
         await environment.startApplication(programmaticApp);
 
-        expect(fin.Application.create).toBeCalledTimes(1);
-        expect(fin.Application.create).toBeCalledWith(programmaticApp.initialOptions);
+        expect(mockCreate).toBeCalledTimes(1);
+        expect(mockCreate).toBeCalledWith(programmaticApp.initialOptions);
     });
 
     test('Subsequent attempts to launch the same application are ignored', async () => {
@@ -113,7 +120,7 @@ describe('When launching a programmatic application', () => {
             await environment.startApplication(programmaticApp);
         }
 
-        expect(fin.Application.create).toBeCalledTimes(1);
+        expect(mockCreate).toBeCalledTimes(1);
     });
 
     test('Subsequent attempts to launch a different application are not ignored', async () => {
@@ -122,7 +129,7 @@ describe('When launching a programmatic application', () => {
         await environment.startApplication(programmaticApp);
         await environment.startApplication(otherApplication);
 
-        expect(fin.Application.create).toBeCalledTimes(2);
+        expect(mockCreate).toBeCalledTimes(2);
         expect(mockCreate.mock.calls[1]).toEqual([otherApplication.initialOptions]);
     });
 
@@ -138,20 +145,17 @@ describe('When launching a programmatic application', () => {
         mockApp.emit('initialized', {uuid: programmaticApp.id, type: 'initialized', topic: 'application'});
         await environment.startApplication(programmaticApp);
 
-        expect(fin.Application.create).toBeCalledTimes(2);
+        expect(mockCreate).toBeCalledTimes(2);
     });
 
     test('If app launch fails, we can attempt to launch the app again', async () => {
         mockCreate.mockImplementationOnce(async () => {
             throw new Error();
-        }).mockResolvedValue({
-            run: jest.fn(),
-            addListener: jest.fn()
-        } as unknown as Application);
+        }).mockResolvedValue(createMockApplication());
 
         await environment.startApplication(programmaticApp);
         await environment.startApplication(programmaticApp);
 
-        expect(fin.Application.create).toBeCalledTimes(2);
+        expect(mockCreate).toBeCalledTimes(2);
     });
 });

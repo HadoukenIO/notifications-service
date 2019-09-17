@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import {useFakeTime, advanceTime} from '../../utils/unit/time';
 import {ToggleCenterVisibilitySource, ToggleCenterVisibility, BlurCenter, RootAction} from '../../../src/provider/store/Actions';
 import {createMockServiceStore} from '../../utils/unit/mocks';
-import {createFakeRootState} from '../../utils/common/fakes';
+import {createFakeRootState} from '../../utils/unit/fakes';
 import {RootState} from '../../../src/provider/store/State';
 
 type SourceTestParam = [string, ToggleCenterVisibilitySource];

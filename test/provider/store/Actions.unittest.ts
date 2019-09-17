@@ -5,7 +5,7 @@ import {Action} from '../../../src/provider/store/Store';
 import {RootState} from '../../../src/provider/store/State';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {createMockServiceStore} from '../../utils/unit/mocks';
-import {createFakeStoredNotification} from '../../utils/common/fakes';
+import {createFakeStoredNotification} from '../../utils/unit/fakes';
 
 type TestParam = [string, (note: StoredNotification) => Action<RootState>];
 
@@ -19,7 +19,8 @@ beforeEach(() => {
     (Object.getOwnPropertyDescriptor(mockServiceStore, 'state')!.get as jest.Mock<RootState, []>).mockImplementation(() => state);
 });
 
-test.todo.each([
+/*
+test.each([
     ['a notification is clicked', (note: StoredNotification) => new ClickNotification(note)],
     ['a button on a notification is clicked', (note: StoredNotification) => new ClickButton(note, 0)],
     ['a notification expires', (note: StoredNotification) => new ExpireNotification(note)]
@@ -27,8 +28,9 @@ test.todo.each([
     const note = createFakeStoredNotification();
     const action = actionFactory(note);
 
-    // action.dispatch(mockServiceStore);
+    action.dispatch(mockServiceStore);
 
     expect(mockServiceStore.dispatch).toBeCalledTimes(2);
     expect(mockServiceStore.dispatch.mock.calls[1]).toEqual(new RemoveNotifications([note]));
 });
+*/

@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import {RootAction, RegisterApplication} from '../../../src/provider/store/Actions';
 import {createMockServiceStore} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
-import {createFakeRootState, createFakeStoredApplication} from '../../utils/common/fakes';
+import {createFakeRootState, createFakeStoredApplication} from '../../utils/unit/fakes';
 
 const mockServiceStore = createMockServiceStore();
 let state: RootState;

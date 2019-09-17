@@ -6,8 +6,6 @@ import {StoredNotification} from '../../../src/provider/model/StoredNotification
 import {NotificationInternal} from '../../../src/client/internal';
 import {Collection} from '../../../src/provider/model/database/Collection';
 
-jest.unmock('../../../src/provider/model/database/Database');
-
 let database: Database;
 let collection: Collection<StoredNotification>;
 let generatedNotificationCount: number = 0;

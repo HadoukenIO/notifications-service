@@ -34,10 +34,10 @@
     "url": "https://github.com/openfin/Notification-Service/issues"
   },
   "homepage": "https://github.com/openfin/Notification-Service#readme",
-  "dependencies": {},
   "devDependencies": {
     "@types/mkdirp": "^0.5.2",
     "@types/moment": "^2.13.0",
+    "@types/jsdom": "^11.0.4",
     "@types/node": "^9.4.6",
     "@types/node-fetch": "^2.3.4",
     "@types/openfin": "^43.0.1",
@@ -50,6 +50,7 @@
     "fake-indexeddb": "^2.1.1",
     "hadouken-js-adapter": "^0.39.1",
     "inversify": "^5.0.1",
+    "jsdom": "^15.1.1",
     "mkdirp": "^0.5.1",
     "moment": "^2.22.1",
     "node-fetch": "^2.6.0",

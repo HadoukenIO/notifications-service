@@ -8,8 +8,6 @@ import {ClientRegistry} from '../../../src/provider/model/ClientRegistry';
 import {StoredApplication} from '../../../src/provider/model/Environment';
 import {createMockEnvironment, createMockApiHandler, createMockDatabase} from '../../utils/unit/mocks';
 
-jest.unmock('../../../src/provider/model/ClientRegistry');
-
 beforeEach(async () => {
     jest.resetAllMocks();
 });
@@ -28,8 +26,7 @@ describe('When attemping to launch an app through the client registry', () => {
     let database: Database;
 
     beforeEach(async () => {
-        const {Database: ActualDatabase} = jest.requireActual('../../../src/provider/model/database/Database');
-        database = await (new ActualDatabase() as Database).delayedInit();
+        database = await new Database().delayedInit();
 
         const collection = database.get(CollectionMap.APPLICATIONS);
         await collection.upsert(storedApp);

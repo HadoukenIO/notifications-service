@@ -4,8 +4,8 @@ import {RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {createMockServiceStore} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
-import {createFakeStoredNotification, createFakeRootState} from '../../utils/common/fakes';
-import {normalizeRootState} from '../../utils/common/normalization';
+import {createFakeStoredNotification, createFakeRootState} from '../../utils/unit/fakes';
+import {normalizeRootState} from '../../utils/unit/normalization';
 
 const mockServiceStore = createMockServiceStore();
 

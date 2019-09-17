@@ -7,11 +7,11 @@ export interface WebWindowFactory {
 }
 
 export interface WebWindow {
-    onMouseEnter: Signal<[]>;
-    onMouseLeave: Signal<[]>;
-    onBlurred: Signal<[]>;
+    readonly onMouseEnter: Signal<[]>;
+    readonly onMouseLeave: Signal<[]>;
+    readonly onBlurred: Signal<[]>;
 
-    document: Document;
+    readonly document: Document;
 
     show(): Promise<void>;
     showAt(left: number, top: number): Promise<void>;
@@ -21,4 +21,3 @@ export interface WebWindow {
     setBounds(bounds: Bounds): Promise<void>;
     close(): Promise<void>;
 }
-
