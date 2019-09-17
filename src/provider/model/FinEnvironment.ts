@@ -1,6 +1,8 @@
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
 import {injectable} from 'inversify';
 
+import {mutable} from '../store/State';
+
 import {Environment, StoredApplication} from './Environment';
 
 @injectable()
@@ -43,7 +45,7 @@ export class FinEnvironment implements Environment {
             if (application.type === 'manifest') {
                 finApplication = await fin.Application.createFromManifest(application.manifestUrl);
             } else {
-                finApplication = await fin.Application.create(application.initialOptions);
+                finApplication = await fin.Application.create(mutable(application.initialOptions));
             }
             await finApplication.addListener('initialized', (event) => {
                 this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== event.uuid);

@@ -18,8 +18,8 @@ console.log(`creating ${numApps} apps at: ${baseUrl}`);
             name: `OpenFin Notifications Demo App ${index}`,
             url: `${baseUrl}/app.html`,
             mainWindowOptions: {
-                defaultHeight: 535,
-                defaultWidth: 305,
+                defaultHeight: 565,
+                defaultWidth: 350,
                 saveWindowState: true,
                 autoShow: true
             }

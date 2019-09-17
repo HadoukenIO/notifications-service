@@ -7,6 +7,7 @@ import {renderApp} from '../view/containers/ToastApp';
 import {Store} from '../store/Store';
 import {LayoutItem} from '../controller/Layouter';
 import {LayouterConfig} from '../controller/LayouterConfig';
+import {ServiceStore} from '../store/ServiceStore';
 
 import {StoredNotification} from './StoredNotification';
 import {WebWindow, WebWindowFactory} from './WebWindow';
@@ -168,7 +169,7 @@ export class Toast implements LayoutItem {
         return this._currentTransition && this._currentTransition.promise;
     }
 
-    public constructor(store: Store, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification) {
+    public constructor(store: ServiceStore, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification) {
         this._id = notification.id;
         this._origin = {x: 0, y: 0};
         this._size = {x: 0, y: 0};
@@ -290,7 +291,12 @@ export class Toast implements LayoutItem {
         }
     }
 
-    private async init(store: Store, monitorModel: MonitorModel, webWindowFactory: WebWindowFactory, notification: StoredNotification): Promise<WebWindow> {
+    private async init(
+        store: ServiceStore,
+        monitorModel: MonitorModel,
+        webWindowFactory: WebWindowFactory,
+        notification: StoredNotification
+    ): Promise<WebWindow> {
         // Create and prepare a window for the toast
         const name = `${windowOptions.name}:${this._id}`;
         const webWindow: WebWindow = await webWindowFactory.createWebWindow({...windowOptions, name});

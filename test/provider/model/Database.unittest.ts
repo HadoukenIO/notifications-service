@@ -1,10 +1,12 @@
 import 'jest';
 import 'fake-indexeddb/auto';
 
-import {Database, CollectionMap} from '../../src/provider/model/database/Database';
-import {StoredNotification} from '../../src/provider/model/StoredNotification';
-import {NotificationInternal} from '../../src/client/internal';
-import {Collection} from '../../src/provider/model/database/Collection';
+import {Database, CollectionMap} from '../../../src/provider/model/database/Database';
+import {StoredNotification} from '../../../src/provider/model/StoredNotification';
+import {NotificationInternal} from '../../../src/client/internal';
+import {Collection} from '../../../src/provider/model/database/Collection';
+
+jest.unmock('../../../src/provider/model/database/Database');
 
 let database: Database;
 let collection: Collection<StoredNotification>;
@@ -17,12 +19,12 @@ beforeAll(async () => {
 
 describe('Database Methods', () => {
     describe('Get', () => {
-        it('Returns a collection when given a valid name', async () => {
+        test('Returns a collection when given a valid name', async () => {
             const localCollection: Collection<StoredNotification> = database.get(CollectionMap.NOTIFICATIONS);
             expect(localCollection).toBeDefined();
         });
 
-        it('Throws an error when given an invalid name', async () => {
+        test('Throws an error when given an invalid name', async () => {
             expect(() => {
                 database.get('INVALID COLLECTION' as any);
             }).toThrowError();
@@ -48,19 +50,19 @@ describe('Collection Methods', () => {
             await collection.upsert(note);
         });
 
-        it('Returns a single record when passed a valid ID', async () => {
+        test('Returns a single record when passed a valid ID', async () => {
             const record = await collection.get(note.id);
             expect(record).toEqual(note);
         });
 
-        it('Returns undefined when passed an invalid ID', async () => {
+        test('Returns undefined when passed an invalid ID', async () => {
             const record = await collection.get('INVALID ID');
             expect(record).toBeUndefined();
         });
     });
 
     describe('GetAll', () => {
-        it('Returns all records from collection', async () => {
+        test('Returns all records from collection', async () => {
             const notes = [generateNotification(), generateNotification(), generateNotification()];
             await collection.upsert(notes);
 
@@ -68,7 +70,7 @@ describe('Collection Methods', () => {
             expect(results).toEqual(notes);
         });
 
-        it('Returns an empty array when no records are in the collection', async () => {
+        test('Returns an empty array when no records are in the collection', async () => {
             const results = await collection.getAll();
             expect(results).toEqual([]);
         });
@@ -82,21 +84,21 @@ describe('Collection Methods', () => {
             await collection.upsert(notes);
         });
 
-        it('Returns an array of all records for valid IDs passed in', async () => {
+        test('Returns an array of all records for valid IDs passed in', async () => {
             const notesToGet = [notes[0], notes[1]];
             const results = await collection.getMany(notesToGet.map(note => note.id));
 
             expect(results).toEqual(notesToGet);
         });
 
-        it('Returns an empty array for array of invalid IDs passed in', async () => {
+        test('Returns an empty array for array of invalid IDs passed in', async () => {
             const notesToGet = ['INVALID', 'INVALID2'];
 
             const results = await collection.getMany(notesToGet);
             expect(results).toEqual([]);
         });
 
-        it('Returns an array of only valid notifications when valid and invalid IDs passed in', async () => {
+        test('Returns an array of only valid notifications when valid and invalid IDs passed in', async () => {
             const notesToGet = [notes[0], notes[1]];
             const results = await collection.getMany([...notesToGet.map(note => note.id), 'INVALID ID']);
 
@@ -105,14 +107,14 @@ describe('Collection Methods', () => {
     });
 
     describe('Upsert', () => {
-        it('Adds a new record', async () => {
+        test('Adds a new record', async () => {
             const note = generateNotification();
 
             await collection.upsert(note);
             expect(await collection.getAll()).toEqual([note]);
         });
 
-        it('Adds many records from array', async () => {
+        test('Adds many records from array', async () => {
             const notes = [generateNotification(), generateNotification(), generateNotification()];
             await collection.upsert(notes);
 
@@ -120,7 +122,7 @@ describe('Collection Methods', () => {
             expect(results).toEqual(notes);
         });
 
-        it('Updates an existing record', async () => {
+        test('Updates an existing record', async () => {
             const [note1, note2] = [generateNotification({id: 'updateable'}), generateNotification({id: 'updateable', title: 'title'})];
 
             await collection.upsert(note1);
@@ -130,7 +132,7 @@ describe('Collection Methods', () => {
             expect(results).toEqual([note2]);
         });
 
-        it('Updates many existing records from array', async () => {
+        test('Updates many existing records from array', async () => {
             const expectedTitle = 'updated title';
             const notes = [generateNotification({id: 'updateable'}), generateNotification({id: 'updateable2'}), generateNotification()];
             await collection.upsert(notes);
@@ -143,7 +145,7 @@ describe('Collection Methods', () => {
             expect(filteredNotes.length).toEqual(updatedNotes.length);
         });
 
-        it('Updates existing records and adds new records from array', async () => {
+        test('Updates existing records and adds new records from array', async () => {
             const expectedTitle = 'updated title';
             await collection.upsert(generateNotification({id: 'updateable'}));
 
@@ -163,7 +165,7 @@ describe('Collection Methods', () => {
             notes = [generateNotification(), generateNotification(), generateNotification()];
         });
 
-        it('Deletes a single record', async () => {
+        test('Deletes a single record', async () => {
             const noteToDelete = generateNotification();
             await collection.upsert([...notes, noteToDelete]);
             await collection.delete(noteToDelete.id);
@@ -171,14 +173,14 @@ describe('Collection Methods', () => {
             expect(await collection.getAll()).toEqual(notes);
         });
 
-        it('Deletes many records from array', async () => {
+        test('Deletes many records from array', async () => {
             await collection.upsert(notes);
             await collection.delete(notes.map(note => note.id));
 
             expect(await collection.getAll()).toEqual([]);
         });
 
-        it('Passing in an invalid ID does nothing', async () => {
+        test('Passing in an invalid ID does nothing', async () => {
             await collection.upsert(notes);
             const preDeleteCollection = await collection.getAll();
             await collection.delete(['INVALID']);
@@ -187,7 +189,7 @@ describe('Collection Methods', () => {
             expect(results).toEqual(preDeleteCollection);
         });
 
-        it('Deletes valid IDs from an array of valid and invalid IDs', async () => {
+        test('Deletes valid IDs from an array of valid and invalid IDs', async () => {
             const notesToDelete = [generateNotification(), generateNotification()];
             await collection.upsert([...notes, ...notesToDelete]);
             await collection.delete(['INVALID', ...notesToDelete.map(note => note.id), 'INVALID']);
@@ -210,8 +212,10 @@ function generateNotification(notificationOptions?: Partial<NotificationInternal
             category: '',
             customData: {},
             date: 1,
+            expires: null,
             icon: '',
             onSelect: null,
+            onExpire: null,
             onClose: null,
             title: '',
             ...notificationOptions

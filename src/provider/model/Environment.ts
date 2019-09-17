@@ -1,6 +1,8 @@
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
 
-export type StoredApplication = ProgrammaticApplication | ManifestApplication;
+import {Immutable} from '../store/State';
+
+export type StoredApplication = Immutable<ProgrammaticApplication> | Immutable<ManifestApplication>;
 
 type ProgrammaticApplication = {
     type: 'programmatic';

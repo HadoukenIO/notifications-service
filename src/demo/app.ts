@@ -1,12 +1,16 @@
 import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
 
 import * as ofnotes from '../client/index';
-import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll} from '../client/index';
+import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll, toggleNotificationCenter} from '../client/index';
+import {Events} from '../client/internal';
+import {ActionTrigger} from '../client/actions';
 
 addSpawnListeners();
 
-// Mount createWindow and createApp on the window to be used by puppeteer
-Object.assign(window, {createWindow, createApp, notifications: ofnotes});
+const receivedEvents: Events[] = [];
+
+// Mount functions and objects used by puppeteer
+Object.assign(window, {createWindow, createApp, notifications: ofnotes, receivedEvents});
 
 const normalNote: NotificationOptions = {
     title: 'Notification Title',
@@ -53,6 +57,8 @@ function makeNoteOfType(index: number) {
         options = {id: `1q2w3e4r${index}`, date: new Date(), ...normalNote};
     } else if (index % 3 === 2) {
         options = {id: `1q2w3e4r${index}`, date: new Date(), ...longNote};
+    } else if (index === 6) {
+        options = {id: `1q2w3e4r${index}`, date: new Date(), expires: new Date(Date.now() + 30 * 1000), onExpire: {foo: 'bar'}, ...buttonNote};
     } else {
         options = {id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote};
     }
@@ -73,6 +79,8 @@ function makeNoteOfType(index: number) {
 
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
+
+    document.title = fin.Window.me.uuid;
 
     function logMessage(msg: string) {
         const logEntry = document.createElement('div');
@@ -136,28 +144,38 @@ fin.desktop.main(async () => {
             logMessage(`${notifications.length} notifications received from the Notification Center`);
         });
     });
+    document.getElementById('toggleNotificationCenter')!.addEventListener('click', () => {
+        toggleNotificationCenter();
+    });
 
-    const {name} = fin.Window.getCurrentSync().identity;
-    const prefix = 'notifications-demoapp-';
-    if (name && name.startsWith(prefix)) {
-        document.title += ` ${name.substr(prefix.length)}`;
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get('inttest') === null) {
+        addEventListener('notification-created', (event: NotificationCreatedEvent) => {
+            logMessage(`CREATE action received from notification ${event.notification.id}`);
+        });
+        addEventListener('notification-closed', (event: NotificationClosedEvent) => {
+            logMessage(`CLOSE action received from notification ${event.notification.id}`);
+        });
+        addEventListener('notification-action', (event: NotificationActionEvent) => {
+            const {notification, trigger, control} = event;
+
+            if (trigger !== ActionTrigger.CONTROL) {
+                logMessage(`${trigger.toUpperCase()} action received from notification ${event.notification.id}`);
+            } else if (control && control.type === 'button') {
+                const buttonIndex = notification.buttons.indexOf(control);
+
+                logMessage(`${trigger.toUpperCase()} action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
+            }
+        });
+    } else if (queryParams.get('inttest') === 'listeners-on-startup') {
+        ofnotes.addEventListener('notification-action', (event) => {
+            receivedEvents.push(event);
+        });
+        ofnotes.addEventListener('notification-created', (event) => {
+            receivedEvents.push(event);
+        });
+        ofnotes.addEventListener('notification-closed', (event) => {
+            receivedEvents.push(event);
+        });
     }
-
-    addEventListener('notification-created', (event: NotificationCreatedEvent) => {
-        logMessage(`CREATE action received from notification ${event.notification.id}`);
-    });
-    addEventListener('notification-closed', (event: NotificationClosedEvent) => {
-        logMessage(`CLOSE action received from notification ${event.notification.id}`);
-    });
-    addEventListener('notification-action', (event: NotificationActionEvent) => {
-        const {notification, trigger, control} = event;
-
-        if (trigger === 'select') {
-            logMessage(`SELECT action received from notification ${event.notification.id}`);
-        } else if (control && control.type === 'button') {
-            const buttonIndex = notification.buttons.indexOf(control);
-
-            logMessage(`CONTROL action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
-        }
-    });
 });

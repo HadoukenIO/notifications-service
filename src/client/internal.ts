@@ -44,8 +44,8 @@ export type API = {
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
     [APITopic.GET_APP_NOTIFICATIONS]: [undefined, NotificationInternal[]];
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
-    [APITopic.ADD_EVENT_LISTENER]: [string, void];
-    [APITopic.REMOVE_EVENT_LISTENER]: [string, void];
+    [APITopic.ADD_EVENT_LISTENER]: [Events['type'], void];
+    [APITopic.REMOVE_EVENT_LISTENER]: [Events['type'], void];
 };
 
 export type Events = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;
@@ -57,12 +57,14 @@ export type TransportMemberMappings<T> =
     T extends Notification ? NotificationInternal :
     T;
 
-export interface CreatePayload extends Omit<NotificationOptions, 'date'> {
+export interface CreatePayload extends Omit<NotificationOptions, 'date' | 'expires'> {
     date?: number;
+    expires?: number | null;
 }
 
-export interface NotificationInternal extends Omit<Notification, 'date'> {
+export interface NotificationInternal extends Omit<Notification, 'date' | 'expires'> {
     date: number;
+    expires: number | null;
 }
 
 export interface ClearPayload {

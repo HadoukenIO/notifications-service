@@ -3,17 +3,16 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
-
-import {createAppInServiceRealm} from './utils/spawnRemote';
-import {isCenterShowing, getCenterCardsByNotification} from './utils/centerUtils';
-import * as notifsRemote from './utils/notificationsRemote';
-import {assertNotificationStored, getStoredNotificationsByApp} from './utils/storageRemote';
-import {delay, Duration} from './utils/delay';
-import {getToastWindow} from './utils/toastUtils';
-import {assertDOMMatches, CardType} from './utils/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from './utils/constants';
-import {assertHydratedCorrectly} from './utils/hydrateNotification';
-import {setupOpenCenterBookends} from './common';
+import {getCenterCardsByNotification} from '../utils/int/centerUtils';
+import * as notifsRemote from '../utils/int/notificationsRemote';
+import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/int/storageRemote';
+import {delay, Duration} from '../utils/int/delay';
+import {getToastWindow} from '../utils/int/toastUtils';
+import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
+import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
+import {setupOpenCenterBookends} from '../utils/int/common';
+import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;
@@ -22,7 +21,7 @@ describe('When creating a notification with the center showing', () => {
     setupOpenCenterBookends();
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
     });
 

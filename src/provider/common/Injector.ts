@@ -5,10 +5,10 @@ import {APITopic, Events} from '../../client/internal';
 import {AsyncInit} from '../controller/AsyncInit';
 import {NotificationCenter} from '../controller/NotificationCenter';
 import {ToastManager} from '../controller/ToastManager';
+import {Persistor} from '../controller/Persistor';
 import {Layouter} from '../controller/Layouter';
 import {APIHandler} from '../model/APIHandler';
-import {ActionHandlerMap, ActionHandlers} from '../store/Actions';
-import {Store} from '../store/Store';
+import {ServiceStore} from '../store/ServiceStore';
 import {EventPump} from '../model/EventPump';
 import {ClientRegistry} from '../model/ClientRegistry';
 import {Database} from '../model/database/Database';
@@ -20,23 +20,28 @@ import {Environment} from '../model/Environment';
 import {FinEnvironment} from '../model/FinEnvironment';
 import {TrayIcon} from '../model/TrayIcon';
 import {FinTrayIcon} from '../model/FinTrayIcon';
+import {ExpiryController} from '../controller/ExpiryController';
+import {ClientEventController} from '../controller/ClientEventController';
 
 import {Inject} from './Injectables';
+import {DeferredPromise} from './DeferredPromise';
 
 /**
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
 type Types = {
-    [Inject.ACTION_HANDLER_MAP]: ActionHandlerMap;
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
+    [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController;
     [Inject.CLIENT_REGISTRY]: ClientRegistry;
     [Inject.DATABASE]: Database;
     [Inject.ENVIRONMENT]: Environment;
     [Inject.EVENT_PUMP]: EventPump;
+    [Inject.EXPIRY_CONTROLLER]: ExpiryController;
     [Inject.LAYOUTER]: Layouter;
     [Inject.MONITOR_MODEL]: MonitorModel;
     [Inject.NOTIFICATION_CENTER]: NotificationCenter;
-    [Inject.STORE]: Store;
+    [Inject.PERSISTOR]: Persistor;
+    [Inject.STORE]: ServiceStore;
     [Inject.TOAST_MANAGER]: ToastManager;
     [Inject.TRAY_ICON]: TrayIcon;
     [Inject.WEB_WINDOW_FACTORY]: WebWindowFactory;
@@ -49,16 +54,18 @@ type Types = {
  * Using a value here will inject that instance.
  */
 const Bindings = {
-    [Inject.ACTION_HANDLER_MAP]: ActionHandlers,
     [Inject.API_HANDLER]: APIHandler,
+    [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController,
     [Inject.CLIENT_REGISTRY]: ClientRegistry,
     [Inject.DATABASE]: Database,
     [Inject.ENVIRONMENT]: FinEnvironment,
     [Inject.EVENT_PUMP]: EventPump,
+    [Inject.EXPIRY_CONTROLLER]: ExpiryController,
     [Inject.LAYOUTER]: Layouter,
     [Inject.MONITOR_MODEL]: FinMonitorModel,
     [Inject.NOTIFICATION_CENTER]: NotificationCenter,
-    [Inject.STORE]: Store,
+    [Inject.PERSISTOR]: Persistor,
+    [Inject.STORE]: ServiceStore,
     [Inject.TOAST_MANAGER]: ToastManager,
     [Inject.TRAY_ICON]: FinTrayIcon,
     [Inject.WEB_WINDOW_FACTORY]: FinWebWindowFactory
@@ -70,41 +77,39 @@ type Keys = (keyof typeof Inject & keyof typeof Bindings & keyof Types);
  * Wrapper around inversify that allows more concise injection
  */
 export class Injector {
-    private static _initialized: Promise<void>;
+    private static _initialized: DeferredPromise = new DeferredPromise();
+    private static _ready: boolean = false;
+    private static _container: Container = Injector.createContainer();
 
-    private static _container: Container = (() => {
-        const container = new Container();
+    public static async init(): Promise<void> {
+        const container: Container = Injector._container;
         const promises: Promise<unknown>[] = [];
 
-        Object.keys(Bindings).forEach(k => {
-            const key: Keys = k as any;
-
-            if (typeof Bindings[key] === 'function') {
-                container.bind(Inject[key]).to(Bindings[key] as any).inSingletonScope();
-            } else {
-                container.bind(Inject[key]).toConstantValue(Bindings[key]);
-            }
-        });
         Object.keys(Bindings).forEach(k => {
             const key: Keys = k as any;
             const proto = (Bindings[key] as Function).prototype;
 
             if (proto && proto.hasOwnProperty('init')) {
                 const instance = (container.get(Inject[key]) as AsyncInit);
-                promises.push(instance.delayedInit());
+                if (instance.delayedInit) {
+                    promises.push(instance.delayedInit());
+                }
             }
         });
 
-        Injector._initialized = Promise.all(promises).then(() => {});
-        return container;
-    })();
+        await Promise.all(promises);
+        Injector._ready = true;
+        Injector._initialized.resolve();
+
+        return Injector._initialized.promise;
+    }
 
     public static get initialized(): Promise<void> {
-        return this._initialized;
+        return Injector._initialized.promise;
     }
 
     public static rebind<K extends Keys>(type: typeof Inject[K]): inversify.BindingToSyntax<Types[K]> {
-        return Injector._container.rebind<Types[K]>(Bindings[type] as inversify.Newable<Types[K]>);
+        return Injector._container.rebind<Types[K]>(type);
     }
 
     /**
@@ -115,6 +120,9 @@ export class Injector {
      * @param type Identifier of the type/value to extract from the injector
      */
     public static get<K extends Keys>(type: typeof Inject[K]): Types[K] {
+        if (!Injector._ready) {
+            throw new Error('Injector not initialised');
+        }
         return Injector._container.get<Types[K]>(type);
     }
 
@@ -129,5 +137,21 @@ export class Injector {
         const value = Injector._container.resolve<T>(type);
 
         return value;
+    }
+
+    private static createContainer(): Container {
+        const container = new Container();
+
+        Object.keys(Bindings).forEach(k => {
+            const key: Keys = k as any;
+
+            if (typeof Bindings[key] === 'function') {
+                container.bind(Inject[key]).to(Bindings[key] as any).inSingletonScope();
+            } else {
+                container.bind(Inject[key]).toConstantValue(Bindings[key]);
+            }
+        });
+
+        return container;
     }
 }

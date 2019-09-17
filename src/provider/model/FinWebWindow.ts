@@ -77,7 +77,9 @@ export class FinWebWindow implements WebWindow {
 
     public async setAsForeground(): Promise<void> {
         if (this._isActive) {
-            return this._window.setAsForeground();
+            await this._window.setAsForeground();
+            // Focus occurs with `setAsForeground` on Windows but not macOS, so do this for consistency and to make sure we can get a blur event later
+            await window.focus();
         }
     }
 

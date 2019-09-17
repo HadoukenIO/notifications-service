@@ -3,8 +3,8 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 import {Inject} from '../common/Injectables';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
-import {ToggleVisibility} from '../store/Actions';
-import {Store} from '../store/Store';
+import {RootAction, ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
+import {ServiceStore} from '../store/ServiceStore';
 import {renderApp} from '../view/containers/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
 import {TrayIcon} from '../model/TrayIcon';
@@ -33,7 +33,7 @@ export class NotificationCenter extends AsyncInit {
     private static readonly WIDTH: number = 388;
 
     private readonly _monitorModel: MonitorModel;
-    private readonly _store: Store;
+    private readonly _store: ServiceStore;
     private readonly _trayIcon: TrayIcon;
     private readonly _webWindowFactory: WebWindowFactory;
 
@@ -41,7 +41,7 @@ export class NotificationCenter extends AsyncInit {
 
     public constructor(
         @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
-        @inject(Inject.STORE) store: Store,
+        @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
         @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
     ) {
@@ -49,6 +49,7 @@ export class NotificationCenter extends AsyncInit {
 
         this._monitorModel = monitorModel;
         this._store = store;
+        this._store.onAction.add(this.onAction, this);
         this._trayIcon = trayIcon;
         this._webWindowFactory = webWindowFactory;
     }
@@ -67,24 +68,16 @@ export class NotificationCenter extends AsyncInit {
         await this.hideWindowOffscreen();
         this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
         this._trayIcon.onLeftClick.add(() => {
-            this._store.dispatch(new ToggleVisibility());
+            this._store.dispatch(new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY));
         });
         await this.sizeToFit();
         await this.addListeners();
-        renderApp(this._webWindow, this._store);
-        this.subscribe();
-    }
 
-    /**
-     * Subscribe to the store.
-     * Perform all watching for state change in here.
-     */
-    private subscribe(): void {
-        // Window visibility
-        this._store.watchForChange(
-            state => state.windowVisible,
-            (_, value) => this.toggleWindow(value)
-        );
+        if (this._store.state.centerVisible) {
+            this.showWindow();
+        }
+
+        renderApp(this._webWindow, this._store);
     }
 
     /**
@@ -92,26 +85,29 @@ export class NotificationCenter extends AsyncInit {
      */
     public get visible(): boolean {
         const state = this._store.state;
-        return state.windowVisible;
+        return state.centerVisible;
     }
 
     /**
      * Add listeners to the window.
      */
     private async addListeners(): Promise<void> {
-        const hideOnBlur = false;
-
-        if (hideOnBlur) {
-            this._webWindow.onBlurred.add(async () => {
-                if (this.visible) {
-                    this._store.dispatch(new ToggleVisibility(false));
-                }
-            });
-        }
-
-        this._monitorModel.onMonitorInfoChanged.add(() => {
-            this.sizeToFit();
+        this._webWindow.onBlurred.add(() => {
+            if (this.visible && !this._store.state.centerLocked) {
+                this._store.dispatch(new BlurCenter());
+            }
         });
+
+        this._monitorModel.onMonitorInfoChanged.add(async () => {
+            await this.sizeToFit();
+            await this.toggleWindow(this._store.state.centerVisible);
+        });
+    }
+
+    private async onAction(action: RootAction): Promise<void> {
+        if (action instanceof ToggleCenterVisibility || action instanceof BlurCenter) {
+            this.toggleWindow(this._store.state.centerVisible);
+        }
     }
 
     /**
@@ -120,6 +116,7 @@ export class NotificationCenter extends AsyncInit {
     public async showWindow(): Promise<void> {
         await this._webWindow.show();
         await this.animateIn();
+
         await this._webWindow.setAsForeground();
     }
 
@@ -135,7 +132,7 @@ export class NotificationCenter extends AsyncInit {
     /**
      * Sets the window dimensions in shape of a side bar
      */
-    public async sizeToFit(): Promise<void> {
+    private async sizeToFit(): Promise<void> {
         const idealWidth = NotificationCenter.WIDTH;
         await this.hideWindow(true);
         const monitorInfo = this._monitorModel.monitorInfo;
