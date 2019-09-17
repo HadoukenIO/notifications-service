@@ -77,9 +77,7 @@ describe('When launching a manifest application', () => {
     });
 
     test('If app launch fails, we can attempt to launch the app again', async () => {
-        mockCreateFromManifest.mockImplementationOnce(async () => {
-            throw new Error();
-        }).mockResolvedValue(createMockApplication());
+        mockCreateFromManifest.mockRejectedValueOnce(new Error()).mockResolvedValue(createMockApplication());
 
         await environment.startApplication(manifestApp);
         await environment.startApplication(manifestApp);
