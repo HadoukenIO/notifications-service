@@ -41,6 +41,7 @@ export class FinWebWindow implements WebWindow {
     private readonly _window: _Window;
 
     private _isActive: boolean;
+    private _closePromise!: Promise<void>;
 
     constructor(window: _Window, document: Document) {
         this._window = window;
@@ -95,7 +96,9 @@ export class FinWebWindow implements WebWindow {
     public async close(): Promise<void> {
         if (this._isActive) {
             this._isActive = false;
-            return this._window.close();
+            this._closePromise = this._window.close();
         }
+
+        return this._closePromise;
     }
 }

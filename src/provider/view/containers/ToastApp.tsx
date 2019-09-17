@@ -4,16 +4,16 @@ import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../model/StoredNotification';
 import {NotificationCard} from '../components/NotificationCard/NotificationCard';
-import {WindowDimensions} from '../../controller/Layouter';
 import {RootState} from '../../store/State';
 import {Store} from '../../store/Store';
 import {WebWindow} from '../../model/WebWindow';
+import {Point} from '../../model/Toast';
 
 import {Actionable} from './NotificationCenterApp';
 
 interface ToastAppProps extends Actionable {
     notification: StoredNotification;
-    setWindowSize: (dimensions: WindowDimensions) => void;
+    setWindowSize: (dimensions: Point) => void;
 }
 
 type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
@@ -27,7 +27,7 @@ export function ToastApp(props: Props) {
         if (containerRef && containerRef.current) {
             const {width, height} = containerRef.current.getBoundingClientRect();
             if (width && height) {
-                setWindowSize({width, height});
+                setWindowSize({x: width, y: height});
             }
         }
     };
@@ -52,7 +52,7 @@ const mapStateToProps = (state: RootState, ownProps: ToastAppProps) => ({
 
 const Container = connect(mapStateToProps)(ToastApp);
 
-export function renderApp(notification: StoredNotification, webWindow: WebWindow, store: Store, setWindowSize: (dim: WindowDimensions) => void) {
+export function renderApp(notification: StoredNotification, webWindow: WebWindow, store: Store, setWindowSize: (dim: Point) => void) {
     ReactDOM.render(
         <Provider store={store['_store']}>
             <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} />

@@ -2,7 +2,7 @@ import {injectable, inject} from 'inversify';
 
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
-import {Toast, ToastEvent} from '../model/Toast';
+import {Toast, ToastState} from '../model/Toast';
 import {Action, RootAction} from '../store/Actions';
 import {Store} from '../store/Store';
 import {MonitorModel} from '../model/MonitorModel';
@@ -31,7 +31,6 @@ export class ToastManager extends AsyncInit {
 
         this._store = store;
         this._store.onAction.add(this.onAction, this);
-        this.addListeners();
         this._layouter = layouter;
         this._layouter.onLayoutRequired.add(this.onLayoutRequired, this);
         this._monitorModel = monitorModel;
@@ -79,60 +78,55 @@ export class ToastManager extends AsyncInit {
         const existing = this._stack.getToast(id);
         if (existing) {
             // Need to wait for the existing toast to close, so that we can re-use that window identity for a new toast
-            await this.closeToast(existing);
-            this._stack.remove(existing);
+            await existing.setState(existing.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
+            if (this._stack.items.includes(existing) || this._stack.queue.includes(existing)) {
+                console.warn('Toast should have been removed from queue by now');
+            }
+            await existing.close();
         }
 
         // Create toast and immediately add to queue
         const toast: Toast = new Toast(this._store, this._monitorModel, this._webWindowFactory, notification);
         this._stack.addToQueue(toast);
 
-        // Move from queue to stack once window is ready
-        toast.ready.then(async () => {
-            if (this._stack.getToast(toast.id) === toast) {
-                await this._layouter.setInitialTransform(toast);
-
-                // Move toast to stack if it'll fit on screen. Otherwise, leave in queue.
-                if ((await this._layouter.getFittingItems(this._stack, [toast])).length > 0) {
-                    if (this._stack.moveToStack(toast)) {
-                        await toast.show();
-                        this._layouter.layout(this._stack);
-                    } else {
-                        // Notification was deleted whilst toast was being measured and positioned
-                        console.info(`Toast created but no longer required (measure) ${toast.id} ${notification.notification.title}`);
-                        toast.close();
-                    }
-                }
-            } else {
-                // Notification was deleted whilst window/toast was initialising
-                console.info(`Toast created but no longer required (init) ${toast.id} ${notification.notification.title}`);
-                toast.close();
-            }
-        });
+        // Handle state changes
+        toast.onStateChange.add(this.handleToastStateChange, this);
     }
 
-    /**
-     * Remove toasts. Will play a close animation on the toast, then remove it from the stack.
-     *
-     * @param notifications The toasts that match the given notifications.
-     */
-    public async removeToasts(...notifications: StoredNotification[]): Promise<void> {
-        const removePromise = Promise.all(notifications.map(async notification => {
-            const toast = this._stack.getToast(notification.id);
+    private async handleToastStateChange(toast: Toast, state: ToastState): Promise<void> {
+        // Handle state-specific toast updates
+        if (state === ToastState.QUEUED) {
+            if (this._stack.getToast(toast.id) === toast) {
+                toast.setState(ToastState.QUEUED);
 
-            if (toast) {
-                await this._layouter.removeItem(toast);
-
-                // Check toast still exists before closing. May have been force-closed during animation.
-                if (this._stack.getToast(toast.id)) {
-                    await this.closeToast(toast);
-                }
+                // Move toast to stack if it'll fit on screen. Otherwise, leave in queue.
+                this.checkQueue();
+            } else {
+                // Notification was deleted whilst window/toast was initialising
+                console.info(`Toast created but no longer required (init) ${toast.id}`);
+                toast.close();
             }
-        }));
+        } else if (state === ToastState.ACTIVE) {
+            await toast.show();
+        } else if (state === ToastState.TRANSITION_OUT) {
+            // Queue-up a CLOSED transition once animation completes
+            toast.currentTransition!.then(() => {
+                toast.setState(ToastState.CLOSED);
+            });
+        } else if (state === ToastState.CLOSED) {
+            // Keep toast in stack until window has fully closed
+            // This ensures we won't attempt to create a new window with the same identity
+            await toast.close();
+            this._stack.remove(toast);
 
-        this._layouter.layout(this._stack);
+            // There is extra space now, check the queue.
+            this.checkQueue();
+        }
 
-        await removePromise;
+        // Refresh toast positions
+        if (state >= ToastState.ACTIVE) {
+            this._layouter.layout(this._stack);
+        }
     }
 
     /**
@@ -149,7 +143,13 @@ export class ToastManager extends AsyncInit {
         }
 
         if (action.type === Action.REMOVE) {
-            this.removeToasts(...action.notifications);
+            action.notifications.forEach((notification: StoredNotification) => {
+                const toast: Toast | null = this._stack.getToast(notification.id);
+
+                if (toast) {
+                    toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
+                }
+            });
         }
 
         if (action.type === Action.TOGGLE_VISIBILITY) {
@@ -165,12 +165,14 @@ export class ToastManager extends AsyncInit {
      */
     private async closeToast(toast: Toast): Promise<void> {
         if (this._stack.existsWithinStack(toast.id) && this._stack.remove(toast)) {
-            this._layouter.layout(this._stack);
+            if (toast.state < ToastState.CLOSED) {
+                toast.setState(ToastState.CLOSED);
+            } else {
+                console.warn('Stack contained a toast that was in CLOSED state', toast.id);
 
-            await toast.close();
-
-            // There is extra space now, check the queue.
-            this.checkQueue();
+                // Sanity check, to ensure toast window is removed
+                toast.close();
+            }
         } else {
             console.warn('Trying to delete a toast that is not in the stack', toast && toast.id);
 
@@ -183,12 +185,19 @@ export class ToastManager extends AsyncInit {
      * Adds a toast from awaiting toasts queue to the layout stack if it would fit.
      */
     private async checkQueue(): Promise<void> {
-        const items = await this._layouter.getFittingItems(this._stack, this._stack.queue.slice());
-        for (const toast of items as Toast[]) {
-            this._stack.moveToStack(toast);
-            await toast.show();
-            this._layouter.layout(this._stack);
-        }
+        const items = this._layouter.getFittingItems(this._stack, this._stack.queue) as Toast[];
+
+        await Promise.all(items.map(async (toast: Toast) => {
+            if (this._stack.moveToStack(toast)) {
+                // Snap toast into starting position, and start transition-in animation
+                await this._layouter.setInitialTransform(toast);
+                toast.setState(ToastState.ACTIVE);
+            } else {
+                // Notification was deleted whilst toast was being measured and positioned
+                console.info(`Toast created but no longer required (measure) ${toast.id}`);
+                toast.close();
+            }
+        }));
     }
 
     /**
@@ -205,27 +214,5 @@ export class ToastManager extends AsyncInit {
                 }
             }
         );
-    }
-
-    /**
-     * Add listeners for toast events.
-    */
-    private addListeners() {
-        Toast.onToastEvent.add((event: ToastEvent, id: string) => {
-            if (event === ToastEvent.CLOSED) {
-                const toast = this._stack.getToast(id);
-                if (toast) {
-                    this.closeToast(toast);
-                }
-            } else if (event === ToastEvent.UNPAUSE) {
-                for (const toast of this._stack.items) {
-                    toast.unfreeze();
-                }
-            } else {
-                for (const toast of this._stack.items) {
-                    toast.freeze();
-                }
-            }
-        }, this);
     }
 }
