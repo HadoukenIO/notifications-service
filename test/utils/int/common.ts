@@ -1,5 +1,8 @@
 import {Identity} from 'hadouken-js-adapter';
 
+import {NotificationInternal} from '../../../src/client/internal';
+import {StoredNotification} from '../../../src/provider/model/StoredNotification';
+
 import {fin} from './fin';
 import {delay} from './delay';
 import {Duration} from './delay';
@@ -74,4 +77,33 @@ export function setupClosedCenterBookends(): void {
             await delay(Duration.CENTER_TOGGLED);
         }
     });
+}
+
+/**
+ * Generates an object with the shape that matches a notification in the database.
+ */
+export function generateStoredNotification(notificationOptions?: Partial<NotificationInternal>): StoredNotification {
+    const id = notificationOptions && notificationOptions.id || `generatedNotification-${Math.random()*Math.random()}`;
+
+    const storedNotification: StoredNotification = {
+        id,
+        notification: {
+            id,
+            body: '',
+            buttons: [],
+            category: '',
+            customData: {},
+            date: 1,
+            expires: null,
+            icon: '',
+            onSelect: null,
+            onExpire: null,
+            onClose: null,
+            title: '',
+            ...notificationOptions
+        },
+        source: {uuid: '', name: ''}
+    };
+
+    return storedNotification;
 }

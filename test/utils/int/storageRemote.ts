@@ -3,7 +3,7 @@ import {Identity} from 'hadouken-js-adapter';
 import {SERVICE_IDENTITY} from '../../../src/client/internal';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {Notification} from '../../../src/client';
-import {Database, CollectionMap} from '../../../src/provider/model/database/Database';
+import {Database, CollectionMap, Collections} from '../../../src/provider/model/database/Database';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
@@ -54,4 +54,27 @@ async function getStoredNotification(id: string): Promise<StoredNotification | u
 
         return note;
     }, id);
+}
+
+/**
+ * Populates the specified database collection with the provided records.
+ * Note: This will bypass any internal provider logic (sanitization etc) so trust the data you are inserting.
+ * @param collection The collection name
+ * @param data The data to insert
+ */
+export async function populateDatabase<T extends CollectionMap>(collection: T, data: Collections[T]|Collections[T][]) {
+    await ofBrowser.executeOnWindow<any, void>(SERVICE_IDENTITY, async function(collectionName, dataToInsert) {
+        const col = this.database.get(collectionName);
+        await col.upsert(dataToInsert);
+    }, collection, data);
+}
+
+/**
+ * Clears all of the database collections of their records. This will not drop the table.
+ * This is a direct database method so any internal provider logic is bypassed.
+ */
+export async function clearDatabase(): Promise<void> {
+    await ofBrowser.executeOnWindow<any, void>(SERVICE_IDENTITY, async function() {
+        await Promise.all(this.database['_database'].tables.map(table => table.clear()));
+    });
 }
