@@ -120,6 +120,7 @@ fin.desktop.main(async () => {
         for (let i = 0; i < 2 && notifications.length > 0; i++) {
             const index = Math.floor(Math.random() * notifications.length);
             await clear(notifications[index].id);
+            notifications.splice(index, 1);
         }
     });
     document.getElementById('clear5')!.addEventListener('click', async () => {
@@ -127,6 +128,7 @@ fin.desktop.main(async () => {
         for (let i = 0; i < 5 && notifications.length > 0; i++) {
             const index = Math.floor(Math.random() * notifications.length);
             await clear(notifications[index].id);
+            notifications.splice(index, 1);
         }
     });
     document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
