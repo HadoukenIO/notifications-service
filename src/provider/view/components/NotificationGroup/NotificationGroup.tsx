@@ -30,7 +30,7 @@ export function NotificationGroup(props: NotificationGroupProps) {
                     notifications.map((notification, i) => {
                         return (
                             <li key={i + notification.id}>
-                                <NotificationCard notification={notification} storeDispatch={storeDispatch}/>
+                                <NotificationCard notification={notification} storeDispatch={storeDispatch} />
                             </li>
                         );
                     })

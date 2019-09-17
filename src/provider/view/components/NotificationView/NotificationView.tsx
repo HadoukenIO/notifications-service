@@ -100,11 +100,14 @@ function getGroupTitle(notification: StoredNotification, groupingType: GroupingT
  */
 function groupNotifications(notifications: StoredNotification[], applications: ApplicationMap, groupMethod: GroupingType): Map<string, Group> {
     // TODO: This sorting should be removed and changed to use insert-sort inside the reduce below
-    // Pre-sort notifications by date (groups will then also be sorted by date)
-    notifications.sort((a: StoredNotification, b: StoredNotification) =>
-        b.notification.date.valueOf() - a.notification.date.valueOf());
-    // Reduce the notifications array into a Map of notifications grouped by their title
-    const groupMap = notifications.reduce((groups: Map<string, Group>, currentNotification: StoredNotification) => {
+    const groupMap = notifications.map((notification) => {
+        // Map stored notifications to titled notifications
+        return {...notification, title: (applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title};
+    }).sort((a: StoredNotification, b: StoredNotification) => {
+        // Sort notifications by date (groups will then also be sorted by date)
+        return b.notification.date.valueOf() - a.notification.date.valueOf();
+    }).reduce((groups: Map<string, Group>, currentNotification: TitledNotification) => {
+        // Reduce the titled notifications array into a Map of notifications grouped by their title
         const groupTitle = getGroupTitle(currentNotification, groupMethod);
         // If group title already exists just add it to the group
         if (groups.has(groupTitle)) {
@@ -113,7 +116,7 @@ function groupNotifications(notifications: StoredNotification[], applications: A
                 ...group,
                 notifications: [
                     ...group.notifications,
-                    {...currentNotification, title: (applications.get(currentNotification.source.uuid) || {title: currentNotification.source.name || ''}).title}
+                    currentNotification
                 ]
             });
         } else {
@@ -130,10 +133,7 @@ function groupNotifications(notifications: StoredNotification[], applications: A
             groups.set(groupTitle, {
                 key: key,
                 title: groupTitle,
-                notifications: [{
-                    ...currentNotification,
-                    title: (applications.get(currentNotification.source.uuid) || {title: currentNotification.source.name || ''}).title
-                }]
+                notifications: [currentNotification]
             });
         }
         return groups;

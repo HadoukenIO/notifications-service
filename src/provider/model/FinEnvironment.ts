@@ -27,7 +27,7 @@ export class FinEnvironment implements Environment {
             return {
                 type: 'programmatic',
                 id: uuid,
-                title: initialOptions.name || app.identity.name || '',
+                title: initialOptions.name || app.identity.name || app.identity.uuid,
                 initialOptions: info.initialOptions as ApplicationOption, // TODO: Use updated type so cast is unecessary [SERVICE-601]
                 parentUuid: info.parentUuid!
             };
@@ -36,7 +36,10 @@ export class FinEnvironment implements Environment {
             return {
                 type: 'manifest',
                 id: uuid,
-                title: (manifest.shortcut && manifest.shortcut.name) || (manifest.startup_app && manifest.startup_app.name) || app.identity.name || '',
+                title: (manifest.shortcut && manifest.shortcut.name) ||
+                       (manifest.startup_app && manifest.startup_app.name) ||
+                       app.identity.name ||
+                       app.identity.uuid,
                 manifestUrl: info.manifestUrl
             };
         }
