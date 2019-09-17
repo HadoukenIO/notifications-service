@@ -19,8 +19,6 @@ beforeEach(async () => {
     jest.resetAllMocks();
 
     environment = new FinEnvironment();
-
-    mockFin.Application.wrapSync;
 });
 
 describe('When launching a manifest application', () => {
