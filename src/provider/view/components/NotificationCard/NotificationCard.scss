@@ -128,7 +128,7 @@
                     $size: 18px;
                     width: $size;
                     height: $size;
-                    margin-right: 5px;
+                    margin-right: 8px;
                     background-color: var(--secondary-text-color);
 
                     .image {
@@ -136,7 +136,7 @@
                     }
 
                     &.minimize:hover {
-                        background-color: var(--secondary-text-color-highlight);
+                        background-color: #DEA837;
                     }
 
                     &.close:hover {

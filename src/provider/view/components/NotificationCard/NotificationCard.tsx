@@ -6,6 +6,7 @@ import {StoredNotification} from '../../../model/StoredNotification';
 import {CircleButton, IconType} from '../CircleButton/CircleButton';
 import {Actionable, MinimizeToast} from '../../../store/Actions';
 import {RemoveNotifications, ClickButton, ClickNotification} from '../../../store/Actions';
+import {useOnClickOnly} from '../../hooks/clicks';
 
 import {Body} from './Body';
 import {Loading} from './Loading';
@@ -25,6 +26,8 @@ export function NotificationCard(props: Props) {
     const {notification, storeDispatch, isToast} = props;
     const data = notification.notification;
     const [loading, setLoading] = React.useState(false);
+    const cardRef = React.createRef<HTMLDivElement>();
+    const [validClick, finishedClick] = useOnClickOnly(cardRef);
 
     const handleNotificationClose = () => {
         storeDispatch(new RemoveNotifications([notification]));
@@ -36,19 +39,23 @@ export function NotificationCard(props: Props) {
         }
     };
 
-    const handleButtonClick = (buttonIndex: number) => {
+    const handleButtonClick = async (buttonIndex: number) => {
         // TODO: Have RemoveNotifications dispatched from inside ClickButton [SERVICE-623]
-        storeDispatch(new ClickButton(notification, buttonIndex));
-        storeDispatch(new RemoveNotifications([notification]));
+        await storeDispatch(new ClickButton(notification, buttonIndex));
+        await storeDispatch(new RemoveNotifications([notification]));
     };
 
-    const handleNotificationClick = (event: React.MouseEvent) => {
+    const handleNotificationClick = async (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
-
+        // Check if the click did not originate from a button
+        if (!validClick) {
+            return;
+        }
+        finishedClick();
         // TODO: Have RemoveNotifications dispatched from inside ClickNotification [SERVICE-623]
-        storeDispatch(new ClickNotification(notification));
-        storeDispatch(new RemoveNotifications([notification]));
+        await storeDispatch(new ClickNotification(notification));
+        await storeDispatch(new RemoveNotifications([notification]));
     };
 
     return (
@@ -56,6 +63,7 @@ export function NotificationCard(props: Props) {
             className={`notification-card no-select ${isToast ? 'toast' : ''} ${loading ? 'loading' : ''}`}
             onClick={handleNotificationClick}
             data-id={notification.id}
+            ref={cardRef}
         >
             <div className="header">
                 <div className="app-icon" style={{backgroundImage: `url(${data.icon})`}}></div>
@@ -81,7 +89,8 @@ export function NotificationCard(props: Props) {
                     {data.buttons.map((btn, i) => {
                         return (
                             <Button
-                                key={i} text={btn.title}
+                                key={i}
+                                text={btn.title}
                                 onClick={() => {
                                     handleButtonClick(i);
                                 }}

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import './Button.scss';
+import {usePreventMouseDownPropagating} from '../../../hooks/clicks';
 
 interface Props {
     text?: string;
@@ -10,6 +11,8 @@ interface Props {
 
 export function Button(props: Props) {
     const {text, icon, onClick} = props;
+    const ref = React.createRef<HTMLDivElement>();
+
     const handleClick = (event: React.MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
@@ -17,8 +20,10 @@ export function Button(props: Props) {
             onClick();
     };
 
+    usePreventMouseDownPropagating(ref);
+
     return (
-        <div className="button single-line" onClick={handleClick}>
+        <div className="button single-line" onClickCapture={handleClick} ref={ref}>
             <div className="value">
                 {icon && <img src={icon} alt="" />}
                 <span className="single-line">{text}</span>
@@ -26,3 +31,4 @@ export function Button(props: Props) {
         </div>
     );
 }
+

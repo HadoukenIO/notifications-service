@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import './CircleButton.scss';
+import {usePreventMouseDownPropagating} from '../../hooks/clicks';
 
 export enum IconType {
     ACCEPT = 'accept',
@@ -17,7 +18,7 @@ export enum Size {
     LARGE = 'large'
 }
 
-interface Props {
+export interface Props {
     onClick?: () => void;
     type: IconType;
     alt?: string;
@@ -31,6 +32,7 @@ CircleButton.defaultProps = {
 
 export function CircleButton(props: Props) {
     const {onClick, type, size, alt, id} = props;
+    const ref = React.createRef<HTMLDivElement>();
 
     const handleClick = (event: React.MouseEvent) => {
         event.stopPropagation();
@@ -40,8 +42,10 @@ export function CircleButton(props: Props) {
         }
     };
 
+    usePreventMouseDownPropagating(ref);
+
     return (
-        <div id={id} className={`icon ${type} ${size}`} onClick={handleClick} title={alt}>
+        <div ref={ref} id={id} className={`icon ${type} ${size}`} onClick={handleClick} title={alt}>
             <div className="image">
             </div>
         </div>

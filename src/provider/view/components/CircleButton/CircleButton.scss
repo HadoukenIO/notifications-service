@@ -27,6 +27,8 @@ $minus: url('../../../../../res/provider/ui/image/shapes/Minus.svg');
     cursor: pointer;
     text-align: center;
     transition: background-color 0.1s ease-in-out;
+    transform: scale(1);
+    transition: transform 0.2s ease-out 0s;
 
     .image {
         width: 100%;
@@ -39,6 +41,14 @@ $minus: url('../../../../../res/provider/ui/image/shapes/Minus.svg');
         -webkit-mask-position: center center;
         -webkit-mask-size: 70%;
         -webkit-mask-repeat: no-repeat;
+    }
+
+    &:active {
+        transform: scale(0.9);
+    }
+
+    &:active:not(:hover) {
+        transform: scale(1);
     }
 
     &:hover {
@@ -112,9 +122,5 @@ $minus: url('../../../../../res/provider/ui/image/shapes/Minus.svg');
         &:hover {
             background-color: var(--accent-color-highlight);
         }
-    }
-
-    &:active {
-        animation: clickShrink 100ms ease-in-out;
     }
 }
