@@ -2,8 +2,7 @@ export async function delay(duration: Duration) {
     return new Promise(res => setTimeout(res, duration));
 }
 
-// values of TOAST_DOM_LOADED and TOAST_CLOSE durations are increased due to integration test issues,
-// to be investigated within the scope of ticket SERVICE-730
+// TODO: Investigate TOAST_DOM_LOADED and TOAST_CLOSE needing to be increased for tests to pass on CI [SERVICE-730]
 export enum Duration {
     TOAST_DOM_LOADED = 1000,
     TOAST_CREATE = 200,
