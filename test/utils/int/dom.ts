@@ -5,11 +5,11 @@ import {OFPuppeteerBrowser} from './ofPuppeteer';
 
 const ofBrowser = new OFPuppeteerBrowser();
 
-export async function getElementById(id: string, target: Identity): Promise<ElementHandle> {
-    return (await querySelector(`#${id}`, target))![0]!;
+export async function getElementById(target: Identity, id: string): Promise<ElementHandle> {
+    return (await querySelector(target, `#${id}`))[0]!;
 }
 
-export async function querySelector(selector: string, target: Identity): Promise<ElementHandle[]> {
+export async function querySelector(target: Identity, selector: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(target);
     return centerPage!.$$(selector);
 }

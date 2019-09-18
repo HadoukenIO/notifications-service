@@ -42,7 +42,7 @@ describe('When the Notification Center is open', () => {
     });
 
     test('If the Notification Center loses focus due to a click on a \'Toggle Visibility\' button, the Center is closed and remains closed', async () => {
-        const toggleButton = await getElementById('toggleNotificationCenter', testWindow.identity);
+        const toggleButton = await getElementById(testWindow.identity, 'toggleNotificationCenter');
 
         await testWindow.focus();
         await toggleButton.click();

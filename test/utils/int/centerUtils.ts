@@ -14,15 +14,15 @@ export async function getAllCenterCards(): Promise<ElementHandle[]> {
 }
 
 export async function getCenterCardsByApp(sourceUuid: string): Promise<ElementHandle[]> {
-    return querySelector(`${CARDS_SELECTOR}[data-id*="${sourceUuid}"]`, CENTER_IDENTITY);
+    return querySelector(CENTER_IDENTITY, `${CARDS_SELECTOR}[data-id*="${sourceUuid}"]`);
 }
 
 export async function getCenterCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
-    return querySelector(`${CARDS_SELECTOR}[data-id="${sourceUuid}:${notificationId}"]`, CENTER_IDENTITY);
+    return querySelector(CENTER_IDENTITY, `${CARDS_SELECTOR}[data-id="${sourceUuid}:${notificationId}"]`);
 }
 
 export async function getCenterCloseButton(): Promise<ElementHandle> {
-    return getElementById('hide-center', CENTER_IDENTITY);
+    return getElementById(CENTER_IDENTITY, 'hide-center');
 }
 
 export async function isCenterShowing(): Promise<boolean> {
