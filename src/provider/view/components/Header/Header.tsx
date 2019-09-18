@@ -28,7 +28,7 @@ export function Header(props: Props): React.ReactElement {
         <div className="header">
             <div className="title">
                 <div>
-                    {/* Layoutspace and in the future place filter/settings here */}
+                    {/* Layout space, in the future place filter/settings here */}
                     <DevelopmentOnly>
                         <Lock centerLocked={centerLocked} storeDispatch={storeDispatch} />
                     </DevelopmentOnly>
