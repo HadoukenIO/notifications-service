@@ -93,7 +93,7 @@ export class ClickNotification extends Action<RootState> {
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         super.dispatch(store);
-        await (new RemoveNotifications([this.notification])).dispatch(store);
+        new RemoveNotifications([this.notification]).dispatch(store);
     }
 }
 
