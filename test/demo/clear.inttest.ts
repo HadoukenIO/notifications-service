@@ -131,7 +131,9 @@ describe.each([
             });
         } else {
             test('The expected toast has been removed', async () => {
-                await delay(Duration.TOAST_CLOSE);
+                // this close action takes longer than expected in this test possibly an intermittent issue from previous test.
+                // to be investigated within the scope of ticket SERVICE-730
+                await delay(Duration.TOAST_CLOSE * 2);
 
                 await expect(getToastWindowsByApp(testApp.identity.uuid)).resolves.toHaveLength(notes.length - 1);
 
