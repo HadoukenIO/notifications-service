@@ -40,13 +40,6 @@ describe('When minimizing a toast', () => {
         await testApp.quit();
     });
 
-    async function minimizeToast() {
-        const minimizeButton = (await getToastMinimizeButton(testApp.identity.uuid, note.id))![0]!;
-        await toastCard.hover();
-        await minimizeButton.click();
-        await delay(Duration.TOAST_CLOSE);
-    }
-
     test('A toast will have a minimize button', async () => {
         expect(getToastMinimizeButton(testApp.identity.uuid, note.id)).resolves.toBeDefined();
     });
@@ -74,4 +67,11 @@ describe('When minimizing a toast', () => {
         await minimizeToast();
         await assertNotificationStored(testWindow.identity, note);
     });
+
+    async function minimizeToast() {
+        const minimizeButton = (await getToastMinimizeButton(testApp.identity.uuid, note.id))![0]!;
+        await toastCard.hover();
+        await minimizeButton.click();
+        await delay(Duration.TOAST_CLOSE);
+    }
 });
