@@ -8,6 +8,7 @@ Loading.defaultProps = {
     hidden: false
 };
 
+// TODO: [SERVICE-605] Use this component as the base for loading UI/Error messages
 export function Loading(props: Props) {
     return (
         <div className="loading-screen">

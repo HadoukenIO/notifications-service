@@ -24,7 +24,8 @@ NotificationCard.defaultProps = {
 export function NotificationCard(props: Props) {
     const {notification, storeApi, isToast} = props;
     const data = notification.notification;
-    const [loading, setLoading] = React.useState(false);
+    // TODO: [SERVICE-605] use this state to toggle loading/error component.
+    const [loading] = React.useState(false);
     const cardRef = React.createRef<HTMLDivElement>();
     const [validClick, finishedClick] = useOnClickOnly(cardRef);
 
