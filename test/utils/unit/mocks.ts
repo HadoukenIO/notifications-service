@@ -13,7 +13,7 @@ import {Environment, StoredApplication} from '../../../src/provider/model/Enviro
 import {APIHandler} from '../../../src/provider/model/APIHandler';
 import {APITopic, Events} from '../../../src/client/internal';
 import {ClientRegistry} from '../../../src/provider/model/ClientRegistry';
-import {Database} from '../../../src/provider/model/database/Database';
+import {Database, Collections} from '../../../src/provider/model/database/Database';
 import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {Injector} from '../../../src/provider/common/Injector';
 import {Inject, InjectableMap} from '../../../src/provider/common/Injectables';
@@ -27,6 +27,7 @@ import {MonitorModel} from '../../../src/provider/model/MonitorModel';
 import {NotificationCenter} from '../../../src/provider/controller/NotificationCenter';
 import {TrayIcon} from '../../../src/provider/model/TrayIcon';
 import {WebWindowFactory, WebWindow} from '../../../src/provider/model/WebWindow';
+import {Collection} from '../../../src/provider/model/database/Collection';
 
 /**
  * Methods for creating mocks for use in unit tests. Mocks are created so they will be reset to their original state by
@@ -57,6 +58,8 @@ const notificationCenterPath = '../../../src/provider/controller/NotificationCen
 const persistorPath = '../../../src/provider/controller/Persistor';
 const serviceStorePath = '../../../src/provider/store/ServiceStore';
 const toastManagerPath = '../../../src/provider/controller/ToastManager';
+
+const collectionPath = '../../../src/provider/model/database/Collection';
 
 export function createMockApiHandler(): jest.Mocked<APIHandler<APITopic, Events>> {
     const {APIHandler} = jest.requireMock(apiHandlerPath);
@@ -170,6 +173,11 @@ export function createMockWebWindowFactory(): jest.Mocked<WebWindowFactory> {
     return {
         createWebWindow: jest.fn<Promise<WebWindow>, [WindowOption]>()
     };
+}
+
+export function createMockCollection<T extends Collections[keyof Collections]>(): jest.Mocked<Collection<T>> {
+    const {Collection} = jest.requireMock(collectionPath);
+    return new Collection();
 }
 
 /**
