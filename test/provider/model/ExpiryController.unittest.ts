@@ -1,13 +1,16 @@
 import 'reflect-metadata';
 
+import {Signal} from 'openfin-service-signal';
+
 import {ExpiryController} from '../../../src/provider/controller/ExpiryController';
 import {createMockServiceStore, useMocksInInjector, getterMock} from '../../utils/unit/mocks';
 import {createFakeRootState, createFakeStoredNotification, createFakeNotificationInternal} from '../../utils/unit/fakes';
 import {RootState} from '../../../src/provider/store/State';
-import {RootAction, ExpireNotification, RemoveNotifications} from '../../../src/provider/store/Actions';
+import {ExpireNotification, RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {mockTime, advanceTime} from '../../utils/unit/time';
 import {Injector} from '../../../src/provider/common/Injector';
+import {Action} from '../../../src/provider/store/Store';
 
 let state: RootState;
 
@@ -23,13 +26,14 @@ beforeEach(async () => {
 
     useMocksInInjector();
 
-    mockServiceStore.dispatch.mockImplementation(async (action: RootAction) => {
+    mockServiceStore.dispatch.mockImplementation(async (action: Action<RootState>) => {
         if (action instanceof RemoveNotifications) {
             state = {...state, notifications: state.notifications.filter(note => !action.notifications.includes(note))};
         }
     });
 
     getterMock(mockServiceStore, 'state').mockImplementation(() => state);
+    getterMock(mockServiceStore, 'onAction').mockReturnValue(new Signal<[Action<RootState>], Promise<void>, Promise<void>>());
 
     new ExpiryController(mockServiceStore);
 });

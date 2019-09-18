@@ -2,6 +2,7 @@ import 'jest';
 import 'fake-indexeddb/auto';
 
 import {Identity} from 'openfin/_v2/main';
+import {Signal} from 'openfin-service-signal';
 
 import {ClientRegistry} from '../../../src/provider/model/ClientRegistry';
 import {StoredApplication} from '../../../src/provider/model/Environment';
@@ -9,17 +10,18 @@ import {createMockEnvironment, createMockApiHandler, createMockServiceStore, get
 import {RegisterApplication} from '../../../src/provider/store/Actions';
 import {createFakeStoredApplication} from '../../utils/unit/fakes';
 
-jest.unmock('../../../src/provider/model/ClientRegistry');
+const mockApiHandler = createMockApiHandler();
+const mockEnvironment = createMockEnvironment();
+const mockServiceStore = createMockServiceStore();
 
 beforeEach(async () => {
     jest.resetAllMocks();
+
+    getterMock(mockApiHandler, 'onConnection').mockReturnValue(new Signal<[Identity]>());
+    getterMock(mockApiHandler, 'onDisconnection').mockReturnValue(new Signal<[Identity]>());
 });
 
 describe('When attemping to launch an app through the client registry', () => {
-    const mockApiHandler = createMockApiHandler();
-    const mockEnvironment = createMockEnvironment();
-    const mockServiceStore = createMockServiceStore();
-
     let storedApp: StoredApplication;
 
     let clientRegistry: ClientRegistry;
@@ -65,10 +67,6 @@ describe('When querying windows', () => {
 
     const mockApp1Window1 = {uuid: mockUuid1, name: 'mock-window-1'};
     const mockApp1Window2 = {uuid: mockUuid1, name: 'mock-window-2'};
-
-    const mockApiHandler = createMockApiHandler();
-    const mockEnvironment = createMockEnvironment();
-    const mockServiceStore = createMockServiceStore();
 
     let clientRegistry: ClientRegistry;
 
@@ -150,10 +148,6 @@ describe('When querying windows', () => {
 });
 
 describe('When an app connects', () => {
-    const mockApiHandler = createMockApiHandler();
-    const mockEnvironment = createMockEnvironment();
-    const mockServiceStore = createMockServiceStore();
-
     let mockStoredApplication: StoredApplication;
     let mockWindow: Identity;
 

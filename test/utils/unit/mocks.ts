@@ -27,17 +27,16 @@ import {MonitorModel} from '../../../src/provider/model/MonitorModel';
 import {NotificationCenter} from '../../../src/provider/controller/NotificationCenter';
 import {TrayIcon} from '../../../src/provider/model/TrayIcon';
 import {WebWindowFactory, WebWindow} from '../../../src/provider/model/WebWindow';
-import {RootAction} from '../../../src/provider/store/Actions';
 
 /**
- * Methods for creating mocks for use in unit tests. As a rough rule, mocks are created so they will be reset to their
- * original state by `jest.resetMocks`, with any Signals held by the mock being an exception.
+ * Methods for creating mocks for use in unit tests. Mocks are created so they will be reset to their original state by
+ * `jest.resetMocks`, with any Signals held by the mock being an exception.
  *
  * This module also provides utility functions for working with these mocks.
  */
 
 /**
- * Incomplete type representing a mock `fin` object. This should be expanded as tests require
+ * Incomplete type representing a mock `fin` object. This should be expanded as tests require.
  */
 export type MockFin = {
     Application: {
@@ -64,8 +63,8 @@ export function createMockApiHandler(): jest.Mocked<APIHandler<APITopic, Events>
 
     const apiHandler = new APIHandler() as jest.Mocked<APIHandler<APITopic, Events>>;
 
-    assignSignal(apiHandler, 'onConnection');
-    assignSignal(apiHandler, 'onDisconnection');
+    assignMockGetter(apiHandler, 'onConnection');
+    assignMockGetter(apiHandler, 'onDisconnection');
     assignMockGetter(apiHandler, 'channel');
 
     return apiHandler;
@@ -80,7 +79,8 @@ export function createMockClientRegistry(): jest.Mocked<ClientRegistry> {
     const {ClientRegistry} = jest.requireMock(clientRegistryPath);
 
     const clientRegistry = new ClientRegistry() as jest.Mocked<ClientRegistry>;
-    assignSignal(clientRegistry, 'onAppActionReady');
+
+    assignMockGetter(clientRegistry, 'onAppActionReady');
 
     return clientRegistry;
 }
@@ -112,7 +112,8 @@ export function createMockLayouter(): jest.Mocked<Layouter> {
     const {Layouter} = jest.requireMock(layouterPath);
 
     const layouter = new Layouter() as jest.Mocked<Layouter>;
-    assignSignal(layouter, 'onLayoutRequired');
+
+    assignMockGetter(layouter, 'onLayoutRequired');
 
     return layouter;
 }
@@ -144,9 +145,9 @@ export function createMockServiceStore(): jest.Mocked<ServiceStore> {
     const {ServiceStore} = jest.requireMock(serviceStorePath);
 
     const serviceStore = new ServiceStore() as jest.Mocked<ServiceStore>;
-    assignSignal<ServiceStore, 'onAction', [RootAction], Promise<void>, Promise<void>>(serviceStore, 'onAction');
 
     assignMockGetter(serviceStore, 'state');
+    assignMockGetter(serviceStore, 'onAction');
 
     return serviceStore;
 }
@@ -199,7 +200,7 @@ export function createMockApplication(): jest.Mocked<Application> {
 }
 
 /**
- * Resets `Injector`, and configures it to return mocks for all injectables
+ * Resets `Injector`, and configures it to return mocks for all injectables.
  */
 export function useMocksInInjector(): void {
     Injector.reset();
@@ -229,7 +230,7 @@ export function useMocksInInjector(): void {
 }
 
 /**
- * Returns the mock getter function of an object
+ * Returns the mock getter function of an object.
  *
  * @param mock The mock object to get a getter mock of
  * @param key The key of the mock getter to get
@@ -239,7 +240,7 @@ export function getterMock<Mock extends object, Key extends keyof Mock, Value ex
 }
 
 /**
- * Returns the mock setter function of an object
+ * Returns the mock setter function of an object.
  *
  * @param mock The mock object to get a setter mock of
  * @param key The key of the mock setter to get
@@ -251,16 +252,5 @@ export function setterMock<Mock extends object, Key extends keyof Mock, Value ex
 function assignMockGetter<Mock extends object, Key extends keyof Mock, Value extends Mock[Key]>(mock: Mock, key: Key): void {
     Object.defineProperty(mock, key, {
         'get': jest.fn<Value, []>()
-    });
-}
-
-function assignSignal<
-    Mock extends object & {[K in Key]: Signal<SignalA, SignalR, SignalR2>},
-    Key extends keyof Mock,
-    SignalA extends any[],
-    SignalR = void,
-    SignalR2 = void>(mock: Mock, key: Key): void {
-    Object.assign(mock, {
-        [key]: new Signal<SignalA, SignalR, SignalR2>()
     });
 }
