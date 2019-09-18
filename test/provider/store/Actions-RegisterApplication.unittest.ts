@@ -1,9 +1,10 @@
 import 'reflect-metadata';
 
-import {RootAction, RegisterApplication} from '../../../src/provider/store/Actions';
+import {RegisterApplication} from '../../../src/provider/store/Actions';
 import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeRootState, createFakeStoredApplication} from '../../utils/unit/fakes';
+import { Action } from '../../../src/provider/store/Store';
 
 const mockServiceStore = createMockServiceStore();
 let state: RootState;
@@ -13,17 +14,18 @@ beforeEach(() => {
 
     state = createFakeRootState();
 
-    mockServiceStore.dispatch.mockImplementation(async (action: RootAction) => {
+    mockServiceStore.dispatch.mockImplementation(async (action: Action<RootState>) => {
         state = action.reduce(state);
     });
 
     getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 });
 
-test('When registering an application, the application is added to the store', () => {
+test('When registering an application, the application is added to the store', async () => {
     const storedApplication = createFakeStoredApplication();
 
     const action = new RegisterApplication(storedApplication);
+    await action.dispatch(mockServiceStore);
 
-    expect(action.reduce(state).applications.get(storedApplication.id)).toEqual(storedApplication);
+    expect(state.applications.get(storedApplication.id)).toEqual(storedApplication);
 });

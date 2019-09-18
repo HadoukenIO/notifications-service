@@ -1,8 +1,10 @@
 import {injectable, inject} from 'inversify';
 
+import {Action} from '../store/Store';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
-import {RemoveNotifications, RootAction, CreateNotification, ExpireNotification} from '../store/Actions';
+import {RemoveNotifications, CreateNotification, ExpireNotification} from '../store/Actions';
+import {RootState} from '../store/State';
 import {Injector} from '../common/Injector';
 import {ServiceStore} from '../store/ServiceStore';
 
@@ -38,7 +40,7 @@ export class ExpiryController {
         });
     }
 
-    private async onAction(action: RootAction): Promise<void> {
+    private async onAction(action: Action<RootState>): Promise<void> {
         if (action instanceof CreateNotification) {
             this.addNotification(action.notification);
         } else if (action instanceof RemoveNotifications) {
@@ -87,9 +89,7 @@ export class ExpiryController {
             this._nextExpiry = null;
         }
 
-        // TODO: Have RemoveNotifications dispatched from inside ExpireNotification [SERVICE-623]
-        this._store.dispatch(new ExpireNotification(storedNotificaiton));
-        this._store.dispatch(new RemoveNotifications([storedNotificaiton]));
+        new ExpireNotification(storedNotificaiton).dispatch(this._store);
         this.scheduleEarliestExpiry(now);
     }
 

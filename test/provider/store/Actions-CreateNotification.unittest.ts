@@ -32,10 +32,11 @@ describe('When creating a new notification', () => {
         };
     });
 
-    test('When the action is dispatched, no other action is dispatched to the store', () => {
-        action.dispatch(mockServiceStore);
+    test('When the action is dispatched, no other action is dispatched to the store', async () => {
+        await action.dispatch(mockServiceStore);
 
-        expect(mockServiceStore.dispatch).toBeCalledTimes(0);
+        expect(mockServiceStore.dispatch).toBeCalledTimes(1);
+        expect(mockServiceStore.dispatch).toBeCalledWith(action);
     });
 
     test('When the action is reduced, the notification is added to the state', () => {
@@ -55,11 +56,11 @@ describe('When creating a notification with the same ID as an existing notificat
         };
     });
 
-    test('When the action is dispatched, the duplicate notification is removed from the store', () => {
-        action.dispatch(mockServiceStore);
+    test('When the action is dispatched, the duplicate notification is removed from the store', async () => {
+        await action.dispatch(mockServiceStore);
 
-        expect(mockServiceStore.dispatch).toBeCalledTimes(1);
-        expect(mockServiceStore.dispatch).toBeCalledWith(new RemoveNotifications([oldNote]));
+        expect(mockServiceStore.dispatch).toBeCalledTimes(2);
+        expect(mockServiceStore.dispatch.mock.calls).toEqual([[new RemoveNotifications([oldNote])], [action]]);
     });
 
     test('When the action is reduced, the old notification is replaced in the store', () => {

@@ -1,10 +1,11 @@
 import 'reflect-metadata';
 
 import {mockTime, advanceTime} from '../../utils/unit/time';
-import {ToggleCenterVisibilitySource, ToggleCenterVisibility, BlurCenter, RootAction} from '../../../src/provider/store/Actions';
+import {ToggleCenterVisibilitySource, ToggleCenterVisibility, BlurCenter} from '../../../src/provider/store/Actions';
 import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {createFakeRootState} from '../../utils/unit/fakes';
 import {RootState} from '../../../src/provider/store/State';
+import { Action } from '../../../src/provider/store/Store';
 
 type SourceTestParam = [string, ToggleCenterVisibilitySource];
 type VisibilityTestParam = [string, boolean];
@@ -16,7 +17,7 @@ beforeEach(async () => {
     jest.resetAllMocks();
     mockTime();
 
-    mockServiceStore.dispatch.mockImplementation(async (action: RootAction) => {
+    mockServiceStore.dispatch.mockImplementation(async (action: Action<RootState>) => {
         state = action.reduce(state);
     });
 
