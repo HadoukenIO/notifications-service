@@ -4,8 +4,7 @@ import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {Button} from '../Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {CloseButton} from '../CloseButton/CloseButton';
-import {RemoveNotifications, ClickButton, ClickNotification} from '../../../store/Actions';
-import {Actionable} from '../../containers/NotificationCenterApp';
+import {RemoveNotifications, ClickButton, ClickNotification, Actionable} from '../../../store/Actions';
 
 interface NotificationCardProps extends Actionable {
     notification: TitledNotification;
@@ -14,26 +13,21 @@ interface NotificationCardProps extends Actionable {
 export type TitledNotification = StoredNotification & {title: string};
 
 export function NotificationCard(props: NotificationCardProps) {
-    const {notification, storeDispatch} = props;
+    const {notification, storeApi} = props;
     const data = notification.notification;
 
     const handleNotificationClose = () => {
-        storeDispatch(new RemoveNotifications([notification]));
+        new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
     const handleButtonClick = (buttonIndex: number) => {
-        // TODO: Have RemoveNotifications dispatched from inside ClickButton [SERVICE-623]
-        storeDispatch(new ClickButton(notification, buttonIndex));
-        storeDispatch(new RemoveNotifications([notification]));
+        new ClickButton(notification, buttonIndex).dispatch(storeApi);
     };
 
     const handleNotificationClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
-
-        // TODO: Have RemoveNotifications dispatched from inside ClickNotification [SERVICE-623]
-        storeDispatch(new ClickNotification(notification));
-        storeDispatch(new RemoveNotifications([notification]));
+        new ClickNotification(notification).dispatch(storeApi);
     };
 
     return (

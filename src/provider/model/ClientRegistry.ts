@@ -84,7 +84,7 @@ export class ClientRegistry {
 
     private async onClientConnection(app: Identity): Promise<void> {
         const application: StoredApplication = await this._environment.getApplication(app.uuid);
-        this._store.dispatch(new RegisterApplication(application));
+        new RegisterApplication(application).dispatch(this._store);
     }
 
     private removeActiveClient(client: Identity): void {
