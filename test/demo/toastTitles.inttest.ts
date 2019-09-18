@@ -62,7 +62,7 @@ describe.each([
         testWindow = await testApp.getWindow();
         const {note} = await notifsRemote.createAndAwait(testWindow.identity, notificationOptions);
         noteId = note.id;
-        await delay(Duration.TOAST_DOM_LOADED);
+        await delay(Duration.TOAST_DOM_LOADED * 2);
     });
 
     afterEach(async () => {

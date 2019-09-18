@@ -131,7 +131,7 @@ describe.each([
             });
         } else {
             test('The expected toast has been removed', async () => {
-                // this close action takes longer than expected in this test possibly an intermittent issue from previous test.
+                // this close action takes longer than expected in this test possibly due to an intermittent issue from previous test.
                 // to be investigated within the scope of ticket SERVICE-730
                 await delay(Duration.TOAST_CLOSE * 2);
 
