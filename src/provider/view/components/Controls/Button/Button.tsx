@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {usePreventMouseDownPropagating} from '../../../hooks/clicks';
+import {usePreventMouseDownPropagating} from '../../../hooks/Clicks';
 import './Button.scss';
 
 interface Props {

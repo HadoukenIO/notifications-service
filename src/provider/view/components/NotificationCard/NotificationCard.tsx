@@ -6,7 +6,7 @@ import {StoredNotification} from '../../../model/StoredNotification';
 import {CircleButton, IconType} from '../CircleButton/CircleButton';
 import {Actionable, MinimizeToast} from '../../../store/Actions';
 import {RemoveNotifications, ClickButton, ClickNotification} from '../../../store/Actions';
-import {useOnClickOnly} from '../../hooks/clicks';
+import {useOnClickOnly} from '../../hooks/Clicks';
 
 import {Body} from './Body';
 import {Loading} from './Loading';

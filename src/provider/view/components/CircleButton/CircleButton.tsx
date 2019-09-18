@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {usePreventMouseDownPropagating} from '../../hooks/clicks';
+import {usePreventMouseDownPropagating} from '../../hooks/Clicks';
 import './CircleButton.scss';
 
 export enum IconType {
