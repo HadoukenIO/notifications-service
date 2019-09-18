@@ -1,11 +1,11 @@
 import {StoredNotification} from '../model/StoredNotification';
 import {StoredApplication} from '../model/Environment';
 
-export type ApplicationMap = ReadonlyMap<string, StoredApplication>;
+export type StoredApplicationMap = ReadonlyMap<string, StoredApplication>;
 
 export type RootState = Readonly<{
     notifications: StoredNotification[];
-    applications: ApplicationMap;
+    applications: StoredApplicationMap;
     centerVisible: boolean;
     centerLocked: boolean;
 }>;

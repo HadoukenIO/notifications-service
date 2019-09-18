@@ -5,11 +5,11 @@ import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
 import {GroupingType as GroupingType, Actionable} from '../../containers/NotificationCenterApp';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {TitledNotification} from '../NotificationCard/NotificationCard';
-import {ApplicationMap} from '../../../store/State';
+import {StoredApplicationMap} from '../../../store/State';
 
 interface NotificationViewProps extends Actionable {
     notifications: StoredNotification[];
-    applications: ApplicationMap,
+    applications: StoredApplicationMap,
     groupBy?: GroupingType;
 }
 
@@ -51,7 +51,7 @@ export function NotificationView(props: NotificationViewProps) {
     const {notifications, applications, groupBy = GroupingType.APPLICATION, ...rest} = props;
     // TODO: Use useEffect hook
     // Sort the notification by groups
-    const groups: Map<string, Group> = groupNotifications(notifications, applications, groupBy);
+    const groups: Group[] = groupNotifications(notifications, applications, groupBy);
 
     return (
         <div className="panel">
@@ -75,9 +75,9 @@ export function NotificationView(props: NotificationViewProps) {
  * @param notification Notificiation
  * @param groupingType Grouping method
  */
-function getGroupTitle(notification: StoredNotification, groupingType: GroupingType): string {
+function getGroupTitle(notification: TitledNotification, groupingType: GroupingType): string {
     if (groupingType === GroupingType.APPLICATION) {
-        return notification.source.name || notification.source.uuid;
+        return notification.title;
     } else if (groupingType === GroupingType.DATE) {
         const {date} = notification.notification;
         return moment(date).calendar(undefined, {
@@ -98,7 +98,7 @@ function getGroupTitle(notification: StoredNotification, groupingType: GroupingT
  * @param applications A map of application registry to resolve the notification title
  * @param groupMethod Grouping type to use for sorting.
  */
-function groupNotifications(notifications: StoredNotification[], applications: ApplicationMap, groupMethod: GroupingType): Map<string, Group> {
+function groupNotifications(notifications: StoredNotification[], applications: StoredApplicationMap, groupMethod: GroupingType): Group[] {
     // TODO: This sorting should be removed and changed to use insert-sort inside the reduce below
     const groupMap = notifications.map((notification) => {
         // Map stored notifications to titled notifications
@@ -109,10 +109,21 @@ function groupNotifications(notifications: StoredNotification[], applications: A
     }).reduce((groups: Map<string, Group>, currentNotification: TitledNotification) => {
         // Reduce the titled notifications array into a Map of notifications grouped by their title
         const groupTitle = getGroupTitle(currentNotification, groupMethod);
+        let key: string;
+        if (groupMethod === GroupingType.DATE) {
+            const date = new Date(currentNotification.notification.date);
+            key = [
+                date.getUTCFullYear(),
+                date.getMonth(),
+                date.getDate()
+            ].join('-');
+        } else {
+            key = currentNotification.source.uuid;
+        }
         // If group title already exists just add it to the group
-        if (groups.has(groupTitle)) {
-            const group = groups.get(groupTitle)!;
-            groups.set(groupTitle, {
+        if (groups.has(key)) {
+            const group = groups.get(key)!;
+            groups.set(key, {
                 ...group,
                 notifications: [
                     ...group.notifications,
@@ -121,16 +132,7 @@ function groupNotifications(notifications: StoredNotification[], applications: A
             });
         } else {
             // Create a new group and add the notification to the group
-            let key: string = currentNotification.source.name || currentNotification.source.uuid;
-            if (groupMethod === GroupingType.DATE) {
-                const date = new Date(currentNotification.notification.date);
-                key = [
-                    date.getUTCFullYear(),
-                    date.getMonth(),
-                    date.getDate()
-                ].join('-');
-            }
-            groups.set(groupTitle, {
+            groups.set(key, {
                 key: key,
                 title: groupTitle,
                 notifications: [currentNotification]
@@ -139,6 +141,6 @@ function groupNotifications(notifications: StoredNotification[], applications: A
         return groups;
     }, new Map<string, Group>());
 
-    return groupMap;
+    return Array.from(groupMap.values());
 }
 

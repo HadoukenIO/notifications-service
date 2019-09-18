@@ -19,46 +19,46 @@ const notificationOptions: NotificationOptions = {
     buttons: []
 };
 
-const shortcut = 'Test App Shortcut Name';
-const applicationName = 'Test App Name';
+const testShortcutName = 'Test App Shortcut Name';
+const testApplicationName = 'Test App Name';
 
 type TestParam = [
     string,
+    string,
     string | undefined,
     string | undefined,
-    string | undefined,
-    string
+    string | undefined
 ];
 
 describe.each([
     ['When an application which has a shortcut name and an application name creates a notifiction',
-        shortcut,
-        applicationName,
-        shortcut,
-        'shortcut name'],
+        'shortcut name',
+        testShortcutName,
+        testApplicationName,
+        testShortcutName],
     ['When an application which does not have a shortcut name but has an application name creates a notifiction',
+        'application name',
         undefined,
-        applicationName,
-        applicationName,
-        'application name'],
+        testApplicationName,
+        testApplicationName],
     ['When an application which does not have a shortcut name or an application name creates a notifiction',
+        'application identity',
         undefined,
         undefined,
-        undefined,
-        'application identity']
+        undefined]
 ] as TestParam[])('%s', (
     titleParam: string,
+    expectedTitleDescription: string,
     shortcutName: string | undefined,
-    name: string | undefined,
-    expectedTitleValue: string | undefined,
-    expectedTitleDescription: string
+    applicationName: string | undefined,
+    expectedTitleValue: string | undefined
 ) => {
     let testApp: Application;
     let testWindow: Window;
     let noteId: string;
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlListenersOnStartup, name, shortcutName});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlListenersOnStartup, name: applicationName, shortcutName});
         testWindow = await testApp.getWindow();
         const {note} = await notifsRemote.createAndAwait(testWindow.identity, notificationOptions);
         noteId = note.id;
@@ -72,7 +72,7 @@ describe.each([
         }
     });
 
-    test(`The notification card should have ${expectedTitleDescription} as its card title.`, async () => {
+    test(`The notification card should have ${expectedTitleDescription} as its card title`, async () => {
         const toastTitle = await getToastName(testApp.identity.uuid, noteId);
         const expected = expectedTitleValue || testApp.identity.uuid;
         expect(toastTitle).toEqual(expected);
