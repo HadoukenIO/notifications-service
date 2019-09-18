@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import './CircleButton.scss';
 import {usePreventMouseDownPropagating} from '../../hooks/clicks';
+import './CircleButton.scss';
 
 export enum IconType {
     ACCEPT = 'accept',

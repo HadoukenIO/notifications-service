@@ -1,7 +1,7 @@
 import React from 'react';
 
-import './Button.scss';
 import {usePreventMouseDownPropagating} from '../../../hooks/clicks';
+import './Button.scss';
 
 interface Props {
     text?: string;
