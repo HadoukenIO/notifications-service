@@ -206,6 +206,7 @@ export class ExpireNotification extends Action<RootState> {
 }
 
 export class MinimizeToast extends Action<RootState> {
+    public readonly type = '@@NOTIFICATION/MINIMIZE_NOTIFICATION';
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
