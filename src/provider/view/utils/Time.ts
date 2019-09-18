@@ -4,7 +4,7 @@ const moment = require('moment');
 
 let localeData = moment.localeData();
 
-const language = navigator.language;
+const language = navigator ? navigator.language : 'en';
 localeData = moment.localeData(language);
 
 moment.defineLocale(localeData, {
