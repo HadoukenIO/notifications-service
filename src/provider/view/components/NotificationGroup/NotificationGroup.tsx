@@ -3,8 +3,7 @@ import * as React from 'react';
 import {NotificationCard} from '../NotificationCard/NotificationCard';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {CloseButton} from '../CloseButton/CloseButton';
-import {Actionable} from '../../containers/NotificationCenterApp';
-import {RemoveNotifications} from '../../../store/Actions';
+import {RemoveNotifications, Actionable} from '../../../store/Actions';
 
 export interface NotificationGroupProps extends Actionable {
     // Group name
@@ -14,9 +13,9 @@ export interface NotificationGroupProps extends Actionable {
 }
 
 export function NotificationGroup(props: NotificationGroupProps) {
-    const {notifications, storeDispatch} = props;
+    const {notifications, storeApi} = props;
     const handleClearAll = () => {
-        storeDispatch(new RemoveNotifications(notifications));
+        new RemoveNotifications(notifications).dispatch(storeApi);
     };
     return (
         <div className="group">
@@ -31,7 +30,7 @@ export function NotificationGroup(props: NotificationGroupProps) {
                     notifications.map((notification, i) => {
                         return (
                             <li key={i + notification.id}>
-                                <NotificationCard notification={notification} storeDispatch={storeDispatch} />
+                                <NotificationCard notification={notification} storeApi={storeApi} />
                             </li>
                         );
                     })
