@@ -9,7 +9,9 @@ Loading.defaultProps = {
 };
 
 export function Loading(props: Props) {
-    return (<div className="loading-screen">
-        <div className="throbber dot-stretching"></div>
-    </div>);
+    return (
+        <div className="loading-screen">
+            <div className="throbber dot-stretching"></div>
+        </div>
+    );
 }

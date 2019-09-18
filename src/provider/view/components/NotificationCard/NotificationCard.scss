@@ -7,6 +7,7 @@
     overflow: hidden;
     transition: box-shadow 0.2s ease-in-out;
     color: white;
+    position: relative;
 
     &:not(.toast) {
         border-radius: 7px;
