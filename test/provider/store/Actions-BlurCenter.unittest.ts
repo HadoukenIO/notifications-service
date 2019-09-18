@@ -5,7 +5,7 @@ import {ToggleCenterVisibilitySource, ToggleCenterVisibility, BlurCenter} from '
 import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {createFakeRootState} from '../../utils/unit/fakes';
 import {RootState} from '../../../src/provider/store/State';
-import { Action } from '../../../src/provider/store/Store';
+import {Action} from '../../../src/provider/store/Store';
 
 type VisibilityTestParam = [string, boolean];
 

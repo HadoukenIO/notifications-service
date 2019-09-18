@@ -4,7 +4,7 @@ import {RegisterApplication} from '../../../src/provider/store/Actions';
 import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeRootState, createFakeStoredApplication} from '../../utils/unit/fakes';
-import { Action } from '../../../src/provider/store/Store';
+import {Action} from '../../../src/provider/store/Store';
 
 const mockServiceStore = createMockServiceStore();
 let state: RootState;

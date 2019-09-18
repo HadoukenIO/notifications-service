@@ -6,7 +6,7 @@ import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeStoredNotification, createFakeRootState} from '../../utils/unit/fakes';
 import {normalizeRootState} from '../../utils/unit/normalization';
-import { Action } from '../../../src/provider/store/Store';
+import {Action} from '../../../src/provider/store/Store';
 
 const mockServiceStore = createMockServiceStore();
 
