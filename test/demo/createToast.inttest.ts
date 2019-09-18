@@ -58,7 +58,7 @@ describe('When calling createNotification with the Notification Center not showi
     test('The toast is displaying the correct data', async () => {
         // The toast creation is not awaited as part of notes.create, so we add a small
         // delay to allow the toast time to spawn.
-        await delay(Duration.TOAST_DOM_LOADED);
+        await delay(Duration.TOAST_DOM_LOADED * 2);
 
         const toastCards = await getToastCards(testApp.identity.uuid, note.id);
 

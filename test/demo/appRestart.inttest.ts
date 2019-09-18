@@ -48,7 +48,7 @@ describe('When an app that uses notification-service is created', () => {
 
         beforeEach(async () => {
             const {note} = await notifsRemote.createAndAwait(testWindow.identity, relaunchNotificationOptions);
-            await delay(Duration.TOAST_DOM_LOADED);
+            await delay(Duration.TOAST_DOM_LOADED * 2);
             toastCards = await getToastCards(testApp.identity.uuid, note.id);
             await testApp.quit();
         });
@@ -67,7 +67,7 @@ describe('When an app that uses notification-service is created', () => {
 
         beforeEach(async () => {
             const {note} = await notifsRemote.createAndAwait(testWindow.identity, nonRelaunchNotificationOptions);
-            await delay(Duration.TOAST_DOM_LOADED);
+            await delay(Duration.TOAST_DOM_LOADED * 2);
             toastCards = await getToastCards(testApp.identity.uuid, note.id);
             await testApp.quit();
         });
