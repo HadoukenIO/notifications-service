@@ -42,7 +42,7 @@ export function ToastApp(props: Props) {
 
     return (
         <div id='toast-container' ref={containerRef}>
-            <NotificationCard notification={notification} storeDispatch={storeDispatch}/>
+            <NotificationCard notification={notification} storeDispatch={storeDispatch} />
         </div>
     );
 }

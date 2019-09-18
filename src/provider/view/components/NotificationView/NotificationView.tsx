@@ -56,7 +56,7 @@ export function NotificationView(props: NotificationViewProps) {
     return (
         <div className="panel">
             {
-                [...groups.values()].map((group: Group) => (
+                groups.map((group: Group) => (
                     <NotificationGroup
                         key={group.key}
                         name={group.title}
