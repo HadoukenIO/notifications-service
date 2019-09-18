@@ -49,7 +49,7 @@ describe('When an app that uses notification-service is created', () => {
         beforeEach(async () => {
             const {note} = await notifsRemote.createAndAwait(testWindow.identity, notificationOptions);
             noteId = note.id;
-            await delay(Duration.TOAST_DOM_LOADED * 2);
+            await delay(Duration.TOAST_DOM_LOADED);
         });
 
         describe('When the notification body is clicked', () => {
