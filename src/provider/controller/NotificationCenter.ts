@@ -3,11 +3,13 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 
 import {Inject} from '../common/Injectables';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
-import {RootAction, ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {renderApp} from '../view/containers/NotificationCenterApp/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
 import {TrayIcon} from '../model/TrayIcon';
+import {Action} from '../store/Store';
+import {RootState} from '../store/State';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -69,7 +71,7 @@ export class NotificationCenter extends AsyncInit {
         await this.hideWindowOffscreen();
         this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
         this._trayIcon.onLeftClick.add(() => {
-            this._store.dispatch(new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY));
+            new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
         });
         await this.sizeToFit();
         await this.addListeners();
@@ -95,7 +97,7 @@ export class NotificationCenter extends AsyncInit {
     private async addListeners(): Promise<void> {
         this._webWindow.onBlurred.add(() => {
             if (this.visible && !this._store.state.centerLocked) {
-                this._store.dispatch(new BlurCenter());
+                new BlurCenter().dispatch(this._store);
             }
         });
 
@@ -105,7 +107,7 @@ export class NotificationCenter extends AsyncInit {
         });
     }
 
-    private async onAction(action: RootAction): Promise<void> {
+    private async onAction(action: Action<RootState>): Promise<void> {
         if (action instanceof ToggleCenterVisibility || action instanceof BlurCenter) {
             this.toggleWindow(this._store.state.centerVisible);
         }

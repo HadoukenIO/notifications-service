@@ -4,8 +4,7 @@ import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {Button} from '../Controls/Button/Button';
 import {StoredNotification} from '../../../model/StoredNotification';
 import {CircleButton, IconType} from '../CircleButton/CircleButton';
-import {Actionable, MinimizeToast} from '../../../store/Actions';
-import {RemoveNotifications, ClickButton, ClickNotification} from '../../../store/Actions';
+import {RemoveNotifications, ClickButton, ClickNotification, Actionable, MinimizeToast} from '../../../store/Actions';
 import {useOnClickOnly} from '../../hooks/Clicks';
 
 import {Body} from './Body';
@@ -23,26 +22,24 @@ NotificationCard.defaultProps = {
 };
 
 export function NotificationCard(props: Props) {
-    const {notification, storeDispatch, isToast} = props;
+    const {notification, storeApi, isToast} = props;
     const data = notification.notification;
     const [loading, setLoading] = React.useState(false);
     const cardRef = React.createRef<HTMLDivElement>();
     const [validClick, finishedClick] = useOnClickOnly(cardRef);
 
     const handleNotificationClose = () => {
-        storeDispatch(new RemoveNotifications([notification]));
+        new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
     const handleNotificationDismiss = () => {
         if (isToast) {
-            storeDispatch(new MinimizeToast(notification));
+            new MinimizeToast(notification).dispatch(storeApi);
         }
     };
 
     const handleButtonClick = async (buttonIndex: number) => {
-        // TODO: Have RemoveNotifications dispatched from inside ClickButton [SERVICE-623]
-        await storeDispatch(new ClickButton(notification, buttonIndex));
-        await storeDispatch(new RemoveNotifications([notification]));
+        new ClickButton(notification, buttonIndex).dispatch(storeApi);
     };
 
     const handleNotificationClick = async (event: React.MouseEvent) => {
@@ -52,10 +49,8 @@ export function NotificationCard(props: Props) {
         if (!validClick) {
             return;
         }
+        new ClickNotification(notification).dispatch(storeApi);
         finishedClick();
-        // TODO: Have RemoveNotifications dispatched from inside ClickNotification [SERVICE-623]
-        await storeDispatch(new ClickNotification(notification));
-        await storeDispatch(new RemoveNotifications([notification]));
     };
 
     return (

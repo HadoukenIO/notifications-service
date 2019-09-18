@@ -2,19 +2,11 @@ import {Signal, Aggregators} from 'openfin-service-signal';
 
 import {AsyncInit} from '../controller/AsyncInit';
 
-/**
- * Subset of properties of `Store` that are safe for use from actions and components.
- */
-export interface StoreAPI<S, A> {
-    state: S;
-    dispatch(action: A): Promise<void>;
-}
-
 export abstract class Action<S> {
-    public readonly type?: string;
+    public abstract readonly type: string;
 
-    constructor(type?: string) {
-        this.type = type;
+    public async dispatch(store: StoreAPI<S>): Promise<void> {
+        await store.dispatch(this);
     }
 
     public reduce(state: S): S {
@@ -22,32 +14,41 @@ export abstract class Action<S> {
     }
 }
 
-export abstract class AsyncAction<S> extends Action<S> {
-    public abstract async dispatch(api: StoreAPI<S, Action<S>>): Promise<void>;
+export class Init<S> extends Action<S> {
+    public readonly type = '@@INIT';
+    private readonly initialState: S;
+
+    constructor(initialState: S) {
+        super();
+        this.initialState = initialState;
+    }
+
+    public reduce(state: S): S {
+        return this.initialState;
+    }
 }
 
 type Listener<S> = (getState: () => S) => void;
 
-export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI<S, A> {
-    public readonly onAction: Signal<[A], Promise<void>, Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
+export type StoreAPI<S> = Pick<Store<S>, 'dispatch' | 'state'>;
 
-    private _currentState: S;
+export class Store<S> extends AsyncInit {
+    public readonly onAction: Signal<[Action<S>], Promise<void>, Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
+
+    private _currentState!: S;
     private readonly _listeners: Listener<S>[] = [];
 
     constructor(initialState: S) {
         super();
-        this._currentState = initialState;
+        // This is used by dev tools
+        new Init(initialState).dispatch(this);
     }
 
     public get state(): S {
         return this._currentState;
     }
 
-    public async dispatch(action: A): Promise<void> {
-        if (action instanceof AsyncAction) {
-            // Action has custom dispatch logic
-            await action.dispatch(this);
-        }
+    public dispatch(action: Action<S>): Promise<void> {
         return this.reduceAndSignal(action);
     }
 
@@ -68,13 +69,13 @@ export class Store<S, A extends Action<S>> extends AsyncInit implements StoreAPI
         this._currentState = state;
     }
 
-    private reduceAndSignal(action: A): Promise<void> {
+    private reduceAndSignal(action: Action<S>): Promise<void> {
         // emit signal last
         this.reduce(action);
         return this.onAction.emit(action);
     }
 
-    private reduce(action: A): void {
+    private reduce(action: Action<S>): void {
         this._currentState = action.reduce(this.state);
         this._listeners.forEach(listener => listener(() => this._currentState));
     }

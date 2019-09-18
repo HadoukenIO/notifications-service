@@ -1,10 +1,9 @@
 import * as React from 'react';
 
 import {GroupingType} from '../../utils/Grouping';
-import {Actionable} from '../../../store/Actions';
 import {CircleButton, IconType, Size} from '../CircleButton/CircleButton';
 import {DevelopmentOnly} from '../Wrappers/DevelopmentOnly';
-import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleLockCenter} from '../../../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleLockCenter, Actionable} from '../../../store/Actions';
 
 import {ClearAllPrompt} from './ClearAllPrompt';
 
@@ -19,9 +18,9 @@ interface Props extends Actionable {
 }
 
 export function Header(props: Props): React.ReactElement {
-    const {groupBy, centerVisible, handleGroupBy, centerLocked, onClearAll, storeDispatch} = props;
+    const {groupBy, centerVisible, handleGroupBy, centerLocked, onClearAll, storeApi} = props;
     const handleHideWindow = () => {
-        storeDispatch(new ToggleCenterVisibility(ToggleCenterVisibilitySource.BUTTON, false));
+        new ToggleCenterVisibility(ToggleCenterVisibilitySource.BUTTON, false).dispatch(storeApi);
     };
 
     return (
@@ -30,7 +29,7 @@ export function Header(props: Props): React.ReactElement {
                 <div>
                     {/* Layout space, in the future place filter/settings here */}
                     <DevelopmentOnly>
-                        <Lock centerLocked={centerLocked} storeDispatch={storeDispatch} />
+                        <Lock centerLocked={centerLocked} storeApi={storeApi} />
                     </DevelopmentOnly>
                 </div>
                 <CircleButton id="hide-center" type={IconType.HIDE} size={Size.LARGE} onClick={handleHideWindow} alt="Hide center" />
@@ -57,7 +56,7 @@ export function Header(props: Props): React.ReactElement {
                 </ul>
                 <ClearAllPrompt centerVisible={centerVisible} onAccept={onClearAll} />
             </div>
-        </div>
+        </div >
     );
 }
 
@@ -66,10 +65,10 @@ interface LockProps extends Actionable {
 }
 
 function Lock(props: LockProps): React.ReactElement {
-    const {storeDispatch, centerLocked} = props;
+    const {storeApi, centerLocked} = props;
 
     const handleLockWindow = () => {
-        storeDispatch(new ToggleLockCenter());
+        new ToggleLockCenter().dispatch(storeApi);
     };
 
     return <a id="lock-link" onClick={handleLockWindow}>{centerLocked ? '🔒' : '🔓'}</a>;

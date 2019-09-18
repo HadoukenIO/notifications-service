@@ -23,11 +23,11 @@ interface ToastAppProps extends Actionable {
 type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 
 export function ToastApp(props: Props) {
-    const {notification, setWindowSize, storeDispatch} = props;
+    const {notification, setWindowSize, storeApi} = props;
 
     return (
         <ResizeWrapper onSize={setWindowSize}>
-            <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} />
+            <NotificationCard notification={notification} storeApi={storeApi} isToast={true} />
         </ResizeWrapper>
     );
 }
@@ -50,7 +50,7 @@ export function renderApp(options: RenderOptions) {
 
     ReactDOM.render(
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} />
+            <Container storeApi={store} notification={notification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

@@ -3,8 +3,10 @@ import {injectable, inject} from 'inversify';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastEvent} from '../model/Toast';
-import {RootAction, CreateNotification, RemoveNotifications, ToggleCenterVisibility, MinimizeToast} from '../store/Actions';
+import {CreateNotification, RemoveNotifications, ToggleCenterVisibility, MinimizeToast} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
+import {Action} from '../store/Store';
+import {RootState} from '../store/State';
 import {MonitorModel} from '../model/MonitorModel';
 import {WebWindowFactory} from '../model/WebWindow';
 
@@ -114,7 +116,7 @@ export class ToastManager extends AsyncInit {
         this._layouter.layout(this._stack);
     }
 
-    private async onAction(action: RootAction): Promise<void> {
+    private async onAction(action: Action<RootState>): Promise<void> {
         if (action instanceof CreateNotification) {
             this.create(action.notification);
         } else if (action instanceof RemoveNotifications) {
