@@ -62,7 +62,7 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
  *
  * @param card DOM element that holds the visual representation of a notification
  */
-async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMetadata> {
+export async function getCardMetadata(card: ElementHandle): Promise<NotificationCardMetadata> {
     const title = await getPropertyBySelector(card, '.content .title', 'innerText');
     const body = await getPropertyBySelector(card, '.content .text', 'innerHTML') || '';
     const sourceApp = await getPropertyBySelector(card, '.header .app-name', 'innerText');
