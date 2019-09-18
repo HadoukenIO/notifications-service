@@ -28,7 +28,6 @@
         pointer-events: none;
     }
 
-
     .loading-screen {
         position: absolute;
         display: flex;
@@ -165,6 +164,5 @@
         justify-content: space-around;
         flex-direction: row;
         border-top: var(--card-border-color) solid 1px;
-
     }
 }
