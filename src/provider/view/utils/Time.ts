@@ -9,7 +9,8 @@ localeData = moment.localeData(language);
 
 moment.defineLocale(localeData, {
     relativeTime: {
-        future: 'in %s',
+        future: (value: string) => value === 'now' ? 'soon' : 'in ' + value,
+        past: (value: string) => value === 'now' ? value : value + ' ago',
         s: 'now',
         m: '1m',
         mm: '%dm',
