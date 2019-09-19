@@ -6,6 +6,7 @@ import {StoredNotification} from '../../../model/StoredNotification';
 import {CircleButton, IconType} from '../CircleButton/CircleButton';
 import {RemoveNotifications, ClickButton, ClickNotification, Actionable, MinimizeToast} from '../../../store/Actions';
 import {useOnClickOnly} from '../../hooks/Clicks';
+import {ClassNames} from '../../utils/ClassNames';
 
 import {Body} from './Body';
 import {Loading} from './Loading';
@@ -17,29 +18,29 @@ interface Props extends Actionable {
     isToast?: boolean;
 }
 
-NotificationCard.defaultProps = {
-    isToast: false
-};
-
 export function NotificationCard(props: Props) {
-    const {notification, storeApi, isToast} = props;
+    const {notification, storeApi, isToast = false} = props;
     const data = notification.notification;
     // TODO: [SERVICE-605] use this state to toggle loading/error component.
     const [loading] = React.useState(false);
+    const [uninteractable, setUninteractable] = React.useState(false);
     const cardRef = React.createRef<HTMLDivElement>();
     const [validClick, finishedClick] = useOnClickOnly(cardRef);
 
     const handleNotificationClose = () => {
+        setUninteractable(true);
         new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
     const handleNotificationDismiss = () => {
         if (isToast) {
+            setUninteractable(true);
             new MinimizeToast(notification).dispatch(storeApi);
         }
     };
 
     const handleButtonClick = async (buttonIndex: number) => {
+        setUninteractable(true);
         new ClickButton(notification, buttonIndex).dispatch(storeApi);
     };
 
@@ -47,16 +48,21 @@ export function NotificationCard(props: Props) {
         event.stopPropagation();
         event.preventDefault();
         // Check if the click did not originate from a button
+        // This is to prevent a user clicking a button and holding their mouse down
+        // dragging onto the body and letting go
         if (!validClick) {
             return;
         }
+        setUninteractable(true);
         new ClickNotification(notification).dispatch(storeApi);
         finishedClick();
     };
 
+    const classNames = new ClassNames('notification-card', 'no-select', ['uninteractable', (loading || uninteractable)], ['toast', isToast]);
+
     return (
         <div
-            className={`notification-card no-select ${isToast ? 'toast' : ''} ${loading ? 'loading' : ''}`}
+            className={classNames.toString()}
             onClick={handleNotificationClick}
             data-id={notification.id}
             ref={cardRef}
@@ -68,7 +74,7 @@ export function NotificationCard(props: Props) {
                     <NotificationTime date={data.date} />
                     <div className="actions">
                         {isToast &&
-                            <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationDismiss} alt="Dismiss toast" />
+                            <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationDismiss} alt="Minimize Toast" />
                         }
                         <CircleButton type={IconType.CLOSE} onClick={handleNotificationClose} alt="Clear notification" />
                     </div>
