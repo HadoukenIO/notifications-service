@@ -25,13 +25,16 @@ export function unmockTime(): void {
 export async function advanceTime(duration: number): Promise<void> {
     if (usingMockTime) {
         for (let i = 0; i < duration; i++) {
-            for (let j = 0; j < MAX_PROMISE_CHAIN_LENGTH; j++) {
-                await Promise.resolve();
-            }
+            await pumpPromiseChain();
             moketime++;
             jest.advanceTimersByTime(1);
         }
     } else {
         await new Promise(res => setTimeout(res, duration));
+    }
+}
+export async function pumpPromiseChain(): Promise<void> {
+    for (let j = 0; j < MAX_PROMISE_CHAIN_LENGTH; j++) {
+        await Promise.resolve();
     }
 }

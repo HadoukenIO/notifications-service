@@ -28,6 +28,8 @@ import {NotificationCenter} from '../../../src/provider/controller/NotificationC
 import {TrayIcon} from '../../../src/provider/model/TrayIcon';
 import {WebWindowFactory, WebWindow} from '../../../src/provider/model/WebWindow';
 import {Collection} from '../../../src/provider/model/database/Collection';
+import {Action} from '../../../src/provider/store/Store';
+import {RootState} from '../../../src/provider/store/State';
 
 /**
  * Methods for creating mocks for use in unit tests. Mocks are created so they will be reset to their original state by
@@ -60,6 +62,7 @@ const serviceStorePath = '../../../src/provider/store/ServiceStore';
 const toastManagerPath = '../../../src/provider/controller/ToastManager';
 
 const collectionPath = '../../../src/provider/model/database/Collection';
+const actionPath = '../../../src/provider/store/Store';
 
 export function createMockApiHandler(): jest.Mocked<APIHandler<APITopic, Events>> {
     const {APIHandler} = jest.requireMock(apiHandlerPath);
@@ -90,7 +93,11 @@ export function createMockClientRegistry(): jest.Mocked<ClientRegistry> {
 
 export function createMockDatabase(): jest.Mocked<Database> {
     const {Database} = jest.requireMock(databasePath);
-    return new Database();
+
+    const database = new Database() as jest.Mocked<Database>;
+    assignMockGetter(database, 'initialized');
+
+    return database;
 }
 
 export function createMockEnvironment(): jest.Mocked<Environment> {
@@ -116,6 +123,7 @@ export function createMockLayouter(): jest.Mocked<Layouter> {
 
     const layouter = new Layouter() as jest.Mocked<Layouter>;
 
+    assignMockGetter(layouter, 'initialized');
     assignMockGetter(layouter, 'onLayoutRequired');
 
     return layouter;
@@ -136,7 +144,11 @@ export function createMockMonitorModel(): jest.Mocked<MonitorModel> {
 
 export function createMockNotificationCenter(): jest.Mocked<NotificationCenter> {
     const {NotificationCenter} = jest.requireMock(notificationCenterPath);
-    return new NotificationCenter();
+
+    const notificationCenter = new NotificationCenter() as jest.Mocked<NotificationCenter>;
+    assignMockGetter(notificationCenter, 'initialized');
+
+    return notificationCenter;
 }
 
 export function createMockPeristor(): jest.Mocked<Persistor> {
@@ -149,6 +161,7 @@ export function createMockServiceStore(): jest.Mocked<ServiceStore> {
 
     const serviceStore = new ServiceStore() as jest.Mocked<ServiceStore>;
 
+    assignMockGetter(serviceStore, 'initialized');
     assignMockGetter(serviceStore, 'state');
     assignMockGetter(serviceStore, 'onAction');
 
@@ -157,7 +170,11 @@ export function createMockServiceStore(): jest.Mocked<ServiceStore> {
 
 export function createMockToastManager(): jest.Mocked<ToastManager> {
     const {ToastManager} = jest.requireMock(toastManagerPath);
-    return new ToastManager();
+
+    const toastManager = new ToastManager() as jest.Mocked<ToastManager>;
+    assignMockGetter(toastManager, 'initialized');
+
+    return toastManager;
 }
 
 export function createMockTrayIcon(): jest.Mocked<TrayIcon> {
@@ -178,6 +195,12 @@ export function createMockWebWindowFactory(): jest.Mocked<WebWindowFactory> {
 export function createMockCollection<T extends Collections[keyof Collections]>(): jest.Mocked<Collection<T>> {
     const {Collection} = jest.requireMock(collectionPath);
     return new Collection();
+}
+
+export function createMockAction(): jest.Mocked<Action<RootState>> {
+    const {Action} = jest.requireMock(actionPath);
+
+    return new Action;
 }
 
 /**

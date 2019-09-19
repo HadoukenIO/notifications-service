@@ -11,12 +11,13 @@ import {StoredNotification} from '../../../src/provider/model/StoredNotification
 import {CollectionMap} from '../../../src/provider/model/database/Database';
 import {createFakeStoredNotification, createFakeStoredApplication} from '../../utils/unit/fakes';
 import {DatabaseError} from '../../../src/provider/model/Errors';
+import {StoredApplication} from '../../../src/provider/model/Environment';
 
 const mockServiceStore = createMockServiceStore();
 const mockDatabase = createMockDatabase();
 
 const mockNotificationsCollection = createMockCollection<StoredNotification>();
-const mockApplicationsCollection = createMockCollection<StoredNotification>();
+const mockApplicationsCollection = createMockCollection<StoredApplication>();
 
 let onAction: Signal<[Action<RootState>], Promise<void>, Promise<void>>;
 
