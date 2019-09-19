@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {mockTime, advanceTime} from '../../utils/unit/time';
+import {useMockTime, advanceTime} from '../../utils/unit/time';
 import {ToggleCenterVisibilitySource, ToggleCenterVisibility, BlurCenter} from '../../../src/provider/store/Actions';
 import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {createFakeRootState} from '../../utils/unit/fakes';
@@ -14,7 +14,7 @@ let state: RootState;
 
 beforeEach(async () => {
     jest.resetAllMocks();
-    mockTime();
+    useMockTime();
 
     mockServiceStore.dispatch.mockImplementation(async (action: Action<RootState>) => {
         state = action.reduce(state);

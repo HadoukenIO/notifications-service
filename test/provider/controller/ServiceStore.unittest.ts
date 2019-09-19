@@ -10,7 +10,7 @@ import {createFakeStoredNotification, createFakeStoredApplication, createFakeRoo
 import {normalizeRootState} from '../../utils/unit/normalization';
 import {RootState} from '../../../src/provider/store/State';
 import {Action} from '../../../src/provider/store/Store';
-import {pumpPromiseChain} from '../../utils/unit/time';
+import {resolvePromiseChain} from '../../utils/unit/time';
 
 const mockDatabase = createMockDatabase();
 
@@ -147,19 +147,19 @@ describe('When the store is initialized', () => {
             let resolved = false;
 
             const promise = serviceStore.dispatch(mockAction).then(() => resolved = true);
-            await pumpPromiseChain();
+            await resolvePromiseChain();
             expect(resolved).toBeFalsy();
 
             deferredPromise1.resolve();
-            await pumpPromiseChain();
+            await resolvePromiseChain();
             expect(resolved).toBeFalsy();
 
             deferredPromise3.resolve();
-            await pumpPromiseChain();
+            await resolvePromiseChain();
             expect(resolved).toBeFalsy();
 
             deferredPromise2.resolve();
-            await pumpPromiseChain();
+            await resolvePromiseChain();
             expect(resolved).toBeTruthy();
 
             await promise;
