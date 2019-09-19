@@ -1,5 +1,3 @@
-import {type} from 'os';
-
 import {Container} from 'inversify';
 import {interfaces as inversify} from 'inversify/dts/interfaces/interfaces';
 
