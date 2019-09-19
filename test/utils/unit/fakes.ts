@@ -78,6 +78,7 @@ export function createFakeManifestStoredApplication(): StoredApplication & {type
     return {
         type: 'manifest',
         id: `test-app-${randomString()}`,
+        title: `Test App ${randomString()}`,
         manifestUrl: `test-manifest-${randomString()}`
     };
 }
@@ -89,6 +90,7 @@ export function createFakeProgrammaticApplication(): StoredApplication & {type: 
     return {
         type: 'programmatic',
         id: `test-app-${uuid}`,
+        title: `Test App ${randomString()}`,
         initialOptions: {uuid: `test-app-${uuid}`},
         parentUuid: `test-parent-app-${randomString()}`
     };

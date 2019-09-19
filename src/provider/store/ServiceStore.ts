@@ -35,7 +35,7 @@ export class ServiceStore extends Store<RootState> {
         const notifications: StoredNotification[] = await notificationCollection.getAll();
 
         const applicationsCollection: Collection<StoredApplication> = this._database.get(CollectionMap.APPLICATIONS);
-        const applications: Map<string, StoredApplication> = new Map((await applicationsCollection.getAll()).map(app => [app.id, app]));
+        const applications = new Map<string, StoredApplication>((await applicationsCollection.getAll()).map(application => [application.id, application]));
 
         return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications, applications});
     }

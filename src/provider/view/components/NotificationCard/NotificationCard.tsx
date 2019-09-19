@@ -7,8 +7,10 @@ import {CloseButton} from '../CloseButton/CloseButton';
 import {RemoveNotifications, ClickButton, ClickNotification, Actionable} from '../../../store/Actions';
 
 interface NotificationCardProps extends Actionable {
-    notification: StoredNotification;
+    notification: TitledNotification;
 }
+
+export type TitledNotification = StoredNotification & {title: string};
 
 export function NotificationCard(props: NotificationCardProps) {
     const {notification, storeApi} = props;
@@ -36,7 +38,7 @@ export function NotificationCard(props: NotificationCardProps) {
                 <div className="source">
                     {data.icon && <img src={data.icon} />}
                     <span className="app-name">
-                        {notification.source.name}
+                        {notification.title}
                     </span>
                 </div>
                 <div className="title">

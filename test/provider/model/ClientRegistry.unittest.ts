@@ -9,6 +9,7 @@ import {StoredApplication} from '../../../src/provider/model/Environment';
 import {createMockEnvironment, createMockApiHandler, createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RegisterApplication} from '../../../src/provider/store/Actions';
 import {createFakeStoredApplication} from '../../utils/unit/fakes';
+import {pumpPromiseChain} from '../../utils/unit/time';
 
 const mockApiHandler = createMockApiHandler();
 const mockEnvironment = createMockEnvironment();
@@ -166,7 +167,7 @@ describe('When an app connects', () => {
         mockApiHandler.onConnection.emit(mockWindow);
 
         // Give the promises internal to ClientRegistry a chance to resolve
-        await Promise.resolve();
+        await pumpPromiseChain();
 
         expect(mockServiceStore.dispatch).toBeCalledTimes(1);
         expect(mockServiceStore.dispatch).toBeCalledWith(new RegisterApplication(mockStoredApplication));
