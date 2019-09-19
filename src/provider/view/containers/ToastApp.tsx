@@ -4,7 +4,7 @@ import {Store} from 'redux';
 import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../model/StoredNotification';
-import {NotificationCard} from '../components/NotificationCard/NotificationCard';
+import {NotificationCard, TitledNotification} from '../components/NotificationCard/NotificationCard';
 import {Actionable} from '../../store/Actions';
 import {RootState} from '../../store/State';
 import {ServiceStore} from '../../store/ServiceStore';
@@ -12,7 +12,7 @@ import {Point} from '../../model/Toast';
 import {WebWindow} from '../../model/WebWindow';
 
 interface ToastAppProps extends Actionable {
-    notification: StoredNotification;
+    notification: TitledNotification;
     setWindowSize: (dimensions: Point) => void;
 }
 
@@ -58,11 +58,15 @@ export function renderApp(
     store: ServiceStore,
     setWindowSize: (dim: Point) => void
 ) {
+    const titledNotification: TitledNotification = {
+        ...notification,
+        title: (store.state.applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title
+    };
     ReactDOM.render(
         // Replace redux store with service store implementation.
         // This will resolve the interface incompatibility issues.
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeApi={store} notification={notification} setWindowSize={setWindowSize} />
+            <Container storeApi={store} notification={titledNotification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

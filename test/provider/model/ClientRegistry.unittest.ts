@@ -18,6 +18,7 @@ beforeEach(async () => {
 describe('When attemping to launch an app through the client registry', () => {
     const storedApp: StoredApplication = {
         type: 'manifest',
+        title: 'cr test app',
         id: 'cr-test-app',
         manifestUrl: 'some-manifest-url'
     };
@@ -163,6 +164,7 @@ describe('When an app connects', () => {
     const mockWindow = {name: 'mock-window', uuid: 'mock-app'};
     const mockStoredApplication: StoredApplication = {
         type: 'manifest',
+        title: 'mock application',
         id: mockWindow.uuid,
         manifestUrl: 'manifest-url'
     };
