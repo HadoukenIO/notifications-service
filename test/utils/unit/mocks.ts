@@ -1,9 +1,7 @@
 import 'jest';
 import 'jsdom';
 
-import {Signal} from 'openfin-service-signal';
 import {Identity} from 'openfin/_v2/main';
-import {MonitorInfo} from 'openfin/_v2/api/system/monitor';
 import {TrayInfo, Application} from 'openfin/_v2/api/application/application';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
@@ -33,7 +31,7 @@ import {RootState} from '../../../src/provider/store/State';
 
 /**
  * Methods for creating mocks for use in unit tests. Mocks are created so they will be reset to their original state by
- * `jest.resetMocks`.
+ * `jest.resetAllMocks`.
  *
  * This module also provides utility functions for working with these mocks.
  */
@@ -131,11 +129,12 @@ export function createMockLayouter(): jest.Mocked<Layouter> {
 
 export function createMockMonitorModel(): jest.Mocked<MonitorModel> {
     const monitorModel: jest.Mocked<MonitorModel> = {
-        onMonitorInfoChanged: new Signal<[MonitorInfo]>(),
+        onMonitorInfoChanged: null!,
         initialized: null!,
         monitorInfo: null!
     };
 
+    assignMockGetter(monitorModel, 'onMonitorInfoChanged');
     assignMockGetter(monitorModel, 'initialized');
     assignMockGetter(monitorModel, 'monitorInfo');
 
@@ -178,12 +177,17 @@ export function createMockToastManager(): jest.Mocked<ToastManager> {
 }
 
 export function createMockTrayIcon(): jest.Mocked<TrayIcon> {
-    return {
-        onLeftClick: new Signal<[]>(),
-        onRightClick: new Signal<[]>(),
+    const trayIcon: jest.Mocked<TrayIcon> = {
+        onLeftClick: null!,
+        onRightClick: null!,
         setIcon: jest.fn<Promise<void>, [string]>(),
         getInfo: jest.fn<Promise<TrayInfo>, []>()
     };
+
+    assignMockGetter(trayIcon, 'onLeftClick');
+    assignMockGetter(trayIcon, 'onRightClick');
+
+    return trayIcon;
 }
 
 export function createMockWebWindowFactory(): jest.Mocked<WebWindowFactory> {

@@ -11,8 +11,8 @@ import {NotificationInternal} from '../../../src/client/internal';
 import {WebWindow} from '../../../src/provider/model/WebWindow';
 
 /**
- * Utility functions for creating fake data for use in unit tests. These make copious use of random strings, to guard against accidental
- * false positives when comparing data
+ * Utility functions for creating fake data for use in unit tests. These make use of random strings to guard against
+ * accidental false positives when comparing data.
  */
 
 export function createFakeStoredNotification(): StoredNotification {
@@ -49,10 +49,7 @@ export function createFakeRootState(): RootState {
     };
 }
 
-/**
- * This arguable blongs under 'mocks', but given this holds a lot of state in document, this should be used more like a
- * fake - i.e., without depending on `jest.resetMocks` to reset it
- */
+// Considered a 'fake' rather than a 'mock' due to state in `document` that cannot be reset by `jest.resetAllMocks`
 export function createFakeWebWindow(): jest.Mocked<WebWindow> {
     return {
         onMouseEnter: new Signal<[]>(),
