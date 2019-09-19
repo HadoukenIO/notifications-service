@@ -88,8 +88,7 @@ export class ClickNotification extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
-        super.dispatch(store);
-        new RemoveNotifications([this.notification]).dispatch(store);
+        await Promise.all([super.dispatch(store), new RemoveNotifications([this.notification]).dispatch(store)]);
     }
 }
 
@@ -105,8 +104,7 @@ export class ClickButton extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
-        super.dispatch(store);
-        new RemoveNotifications([this.notification]).dispatch(store);
+        await Promise.all([super.dispatch(store), new RemoveNotifications([this.notification]).dispatch(store)]);
     }
 }
 
