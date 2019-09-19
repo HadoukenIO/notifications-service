@@ -12,7 +12,7 @@ import {EventPump} from '../model/EventPump';
 import {ServiceStore} from '../store/ServiceStore';
 
 /**
- * Translates store events to events to be dispatched to the client.
+ * Translates store actions to events to be dispatched to the client.
  */
 @injectable()
 export class ClientEventController {
