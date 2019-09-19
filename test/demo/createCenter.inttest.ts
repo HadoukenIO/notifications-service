@@ -77,7 +77,7 @@ describe('When creating a notification with the center showing', () => {
             expect(toastWindow).toBe(undefined);
         });
 
-        test('Markdown inside of `body` gets rendered to HTML', async () => {
+        test.skip('Markdown inside of `body` gets rendered to HTML', async () => {
             const body = `
             # Title
             
@@ -88,11 +88,10 @@ describe('When creating a notification with the center showing', () => {
             const note = await notifsRemote.create(testWindow.identity, {...options, body});
             const card = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
             const cardValues = await getCardMetadata(card[0]);
-            console.log(cardValues.body);
 
             expect(cardValues.body).toBeDefined();
-            expect(cardValues.body!.search(/<h1>Title<\/h1>/));
-            expect(cardValues.body!.search(/<ul>(\s*<li>([\w\s])*<\/li>\s*)+<\/ul>/));
+            expect(cardValues.body!.search(/<h1>Title<\/h1>/)).toBe(true);
+            expect(cardValues.body!.search(/<ul>(\s*<li>([\w\s])*<\/li>\s*)+<\/ul>/)).toBe(true);
         });
     });
 

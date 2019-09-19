@@ -11,5 +11,13 @@ export async function getElementById(target: Identity, id: string): Promise<Elem
 
 export async function querySelector(target: Identity, selector: string): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(target);
-    return centerPage!.$$(selector);
+    if (centerPage) {
+        try {
+            await centerPage.waitForSelector(selector, {timeout: 500});
+        } catch (error) {
+            return [];
+        }
+        return centerPage.$$(selector);
+    }
+    return [];
 }

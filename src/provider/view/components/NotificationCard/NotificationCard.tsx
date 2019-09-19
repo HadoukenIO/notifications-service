@@ -27,21 +27,21 @@ export function NotificationCard(props: Props) {
     const cardRef = React.createRef<HTMLDivElement>();
     const [validClick, finishedClick] = useOnClickOnly(cardRef);
 
-    const handleNotificationClose = () => {
+    const handleNotificationClose = async () => {
         setUninteractable(true);
-        new RemoveNotifications([notification]).dispatch(storeApi);
+        await new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
-    const handleNotificationDismiss = () => {
+    const handleNotificationDismiss = async () => {
         if (isToast) {
             setUninteractable(true);
-            new MinimizeToast(notification).dispatch(storeApi);
+            await new MinimizeToast(notification).dispatch(storeApi);
         }
     };
 
     const handleButtonClick = async (buttonIndex: number) => {
         setUninteractable(true);
-        new ClickButton(notification, buttonIndex).dispatch(storeApi);
+        await new ClickButton(notification, buttonIndex).dispatch(storeApi);
     };
 
     const handleNotificationClick = async (event: React.MouseEvent) => {
@@ -54,7 +54,7 @@ export function NotificationCard(props: Props) {
             return;
         }
         setUninteractable(true);
-        new ClickNotification(notification).dispatch(storeApi);
+        await new ClickNotification(notification).dispatch(storeApi);
         finishedClick();
     };
 
