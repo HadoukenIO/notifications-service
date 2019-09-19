@@ -1,8 +1,7 @@
 import * as React from 'react';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
-import {NotificationCard} from '../NotificationCard/NotificationCard';
-import {StoredNotification} from '../../../model/StoredNotification';
+import {NotificationCard, TitledNotification} from '../NotificationCard/NotificationCard';
 import {RemoveNotifications, Actionable} from '../../../store/Actions';
 import {CircleButton, Size, IconType} from '../CircleButton/CircleButton';
 
@@ -12,7 +11,7 @@ interface Props extends Actionable {
     // Group name
     name: string;
     // Notifications in this group
-    notifications: StoredNotification[];
+    notifications: TitledNotification[];
 }
 
 export function NotificationGroup(props: Props) {

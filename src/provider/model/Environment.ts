@@ -7,13 +7,15 @@ export type StoredApplication = Immutable<ProgrammaticApplication> | Immutable<M
 type ProgrammaticApplication = {
     type: 'programmatic';
     id: string;
-    initialOptions: ApplicationOption;
+    title: string;
+    initialOptions: ApplicationOption
     parentUuid: string;
 }
 
 type ManifestApplication = {
     type: 'manifest';
     id: string;
+    title: string;
     manifestUrl: string;
 }
 

@@ -13,8 +13,10 @@ import {Loading} from './Loading';
 
 import './NotificationCard.scss';
 
+export type TitledNotification = StoredNotification & {title: string};
+
 interface Props extends Actionable {
-    notification: StoredNotification;
+    notification: TitledNotification;
     isToast?: boolean;
 }
 
@@ -69,7 +71,7 @@ export function NotificationCard(props: Props) {
         >
             <div className="header">
                 <div className="app-icon" style={{backgroundImage: `url(${data.icon})`}}></div>
-                <div className="app-name single-line">{notification.source.name}</div>
+                <div className="app-name single-line">{notification.title}</div>
                 <div className="time-close">
                     <NotificationTime date={data.date} />
                     <div className="actions">

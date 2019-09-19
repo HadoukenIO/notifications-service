@@ -18,7 +18,7 @@ type Props = ReturnType<typeof mapStateToProps> & Actionable;
 
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, visible, storeApi, centerLocked} = props;
+    const {notifications, applications, visible, storeApi, centerLocked} = props;
 
     const handleClearAll = () => {
         new RemoveNotifications(notifications).dispatch(storeApi);
@@ -36,6 +36,7 @@ export function NotificationCenterApp(props: Props) {
             />
             <NotificationView
                 notifications={notifications}
+                applications={applications}
                 groupBy={groupBy}
                 storeApi={storeApi}
             />
@@ -47,6 +48,7 @@ const mapStateToProps = (state: RootState, ownProps: Actionable) => ({
     ...ownProps,
     notifications: state.notifications,
     visible: state.centerVisible,
+    applications: state.applications,
     centerLocked: state.centerLocked
 });
 
