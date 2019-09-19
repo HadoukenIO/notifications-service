@@ -12,14 +12,15 @@ beforeEach(() => {
     jest.resetAllMocks();
 });
 
+const mockApiHandler = createMockApiHandler();
+const mockClientRegistry = createMockClientRegistry();
+
 const mockUuid = 'mock-app';
 const mockWindow1 = {uuid: mockUuid, name: 'mock-window-1'};
 const mockWindow2 = {uuid: mockUuid, name: 'mock-window-2'};
 
-const mockApiHandler = createMockApiHandler();
-const mockClientRegistry = createMockClientRegistry();
-
 let eventPump: EventPump;
+
 beforeEach(() => {
     getterMock(mockClientRegistry, 'onAppActionReady').mockReturnValue(new Signal<[Identity]>());
 
