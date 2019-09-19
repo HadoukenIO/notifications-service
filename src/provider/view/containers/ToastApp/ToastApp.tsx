@@ -11,6 +11,7 @@ import {Point} from '../../../model/Toast';
 import {WebWindow} from '../../../model/WebWindow';
 import {ServiceStore} from '../../../store/ServiceStore';
 import {TitledNotification, Actionable} from '../../types';
+import {WindowProvider, WindowContext} from '../../components/Wrappers/WindowContext';
 
 import '../../styles/base.scss';
 import './ToastApp.scss';
@@ -24,6 +25,11 @@ type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 
 export function ToastApp(props: Props) {
     const {notification, setWindowSize, storeApi} = props;
+    const window = React.useContext(WindowContext);
+
+    React.useEffect(() => {
+        window.document.title = notification.id;
+    });
 
     return (
         <ResizeWrapper onSize={setWindowSize}>
@@ -49,11 +55,11 @@ export function renderApp(
         title: (store.state.applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title
     };
     ReactDOM.render(
-        // Replace redux store with service store implementation.
-        // This will resolve the interface incompatibility issues.
-        <Provider store={store as unknown as Store<RootState>}>
-            <Container storeApi={store} notification={titledNotification} setWindowSize={setWindowSize} />
-        </Provider>,
+        <WindowProvider value={webWindow.nativeWindow}>
+            <Provider store={store as unknown as Store<RootState>}>
+                <Container storeApi={store} notification={titledNotification} setWindowSize={setWindowSize} />
+            </Provider>
+        </WindowProvider>,
         webWindow.document.getElementById('react-app')
     );
 }

@@ -11,6 +11,7 @@ import {RemoveNotifications} from '../../../store/Actions';
 import {GroupingType} from '../../utils/Grouping';
 import {WebWindow} from '../../../model/WebWindow';
 import {Actionable} from '../../types';
+import {WindowProvider, WindowContext} from '../../components/Wrappers/WindowContext';
 
 import '../../styles/_main.scss';
 import './NotificationCenterApp.scss';
@@ -20,10 +21,14 @@ type Props = ReturnType<typeof mapStateToProps> & Actionable;
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
     const {notifications, applications, visible, storeApi, centerLocked} = props;
-
+    const window = React.useContext(WindowContext);
     const handleClearAll = () => {
         new RemoveNotifications(notifications).dispatch(storeApi);
     };
+
+    React.useEffect(() => {
+        window.document.title = 'Center';
+    });
 
     return (
         <div className='notification-center'>
@@ -64,9 +69,11 @@ export function renderApp(webWindow: WebWindow, store: ServiceStore): void {
     ReactDOM.render(
         // Replace redux store with service store implementation.
         // This will resolve the interface incompatibility issues.
-        <Provider store={store as unknown as Store<RootState>}>
-            <Container storeApi={store} />
-        </Provider>,
+        <WindowProvider value={webWindow.nativeWindow}>
+            <Provider store={store as unknown as Store<RootState>}>
+                <Container storeApi={store} />
+            </Provider>
+        </WindowProvider>,
         webWindow.document.getElementById('react-app')
     );
 }
