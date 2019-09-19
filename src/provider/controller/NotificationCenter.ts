@@ -72,6 +72,13 @@ export class NotificationCenter extends AsyncInit {
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
         });
+        try {
+            await fin.GlobalHotkey.register('ctrl+alt+n', async () => {
+                new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
+            });
+        } catch (error) {
+            console.error('Global hotkey could not be created. ', error.message);
+        }
         await this.sizeToFit();
         await this.addListeners();
 
