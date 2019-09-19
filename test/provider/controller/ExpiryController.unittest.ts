@@ -12,9 +12,8 @@ import {useMockTime, advanceTime} from '../../utils/unit/time';
 import {Injector} from '../../../src/provider/common/Injector';
 import {Action} from '../../../src/provider/store/Store';
 
-let state: RootState;
-
 const mockServiceStore = createMockServiceStore();
+let state: RootState;
 
 beforeEach(async () => {
     jest.resetAllMocks();

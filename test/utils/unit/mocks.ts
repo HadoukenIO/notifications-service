@@ -1,6 +1,3 @@
-import 'jest';
-import 'jsdom';
-
 import {Identity} from 'openfin/_v2/main';
 import {TrayInfo, Application} from 'openfin/_v2/api/application/application';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';

@@ -62,7 +62,7 @@ describe('When creating a notification with the same ID as an existing notificat
         action = new CreateNotification(newNote);
     });
 
-    test('When the action is dispatched, the a remove action is also dispatched', async () => {
+    test('When the action is dispatched, a remove action is also dispatched', async () => {
         await action.dispatch(mockServiceStore);
 
         expect(mockServiceStore.dispatch).toBeCalledTimes(2);

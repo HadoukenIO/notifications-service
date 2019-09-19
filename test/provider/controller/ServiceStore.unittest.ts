@@ -89,7 +89,7 @@ describe('When the store is initialized', () => {
         mockAction = createMockAction();
     });
 
-    test('When an action is dispatched, tt is reduced synchronously', async () => {
+    test('When an action is dispatched, it is reduced synchronously', async () => {
         const state = {...createFakeRootState(), notifications: [createFakeStoredNotification()]};
         mockAction.reduce.mockReturnValue(state);
 
