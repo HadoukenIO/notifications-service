@@ -29,7 +29,7 @@ export class CreateNotification extends Action<RootState> {
 
         const notifications: StoredNotification[] = state.notifications.slice();
 
-        // All notification ID's must be unique. The custom dispatch logic of the `CreateNotification` event should
+        // All notification IDs must be unique. The custom dispatch logic of the `CreateNotification` event should
         // ensure this, but to avoid significant side-effects, also adding a sanity check here.
         const index: number = state.notifications.findIndex(n => n.id === notification.id);
         if (index >= 0) {
