@@ -7,9 +7,10 @@ import {Header} from '../../components/Header/Header';
 import {NotificationView} from '../../components/NotificationView/NotificationView';
 import {RootState} from '../../../store/State';
 import {ServiceStore} from '../../../store/ServiceStore';
-import {RemoveNotifications, Actionable} from '../../../store/Actions';
+import {RemoveNotifications} from '../../../store/Actions';
 import {GroupingType} from '../../utils/Grouping';
 import {WebWindow} from '../../../model/WebWindow';
+import {Actionable} from '../../types';
 
 import '../../styles/_main.scss';
 import './NotificationCenterApp.scss';

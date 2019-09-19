@@ -1,9 +1,10 @@
 import * as React from 'react';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
-import {NotificationCard, TitledNotification} from '../NotificationCard/NotificationCard';
-import {RemoveNotifications, Actionable} from '../../../store/Actions';
+import {NotificationCard} from '../NotificationCard/NotificationCard';
+import {RemoveNotifications} from '../../../store/Actions';
 import {CircleButton, Size, IconType} from '../CircleButton/CircleButton';
+import {TitledNotification, Actionable} from '../../types';
 
 import './NotificationGroup.scss';
 

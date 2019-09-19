@@ -4,13 +4,13 @@ import {connect, Provider} from 'react-redux';
 import {Store} from 'redux';
 
 import {StoredNotification} from '../../../model/StoredNotification';
-import {NotificationCard, TitledNotification} from '../../components/NotificationCard/NotificationCard';
+import {NotificationCard} from '../../components/NotificationCard/NotificationCard';
 import {ResizeWrapper} from '../../components/Wrappers/ResizeWrapper';
 import {WindowDimensions} from '../../../controller/Layouter';
 import {RootState} from '../../../store/State';
-import {Actionable} from '../../../store/Actions';
 import {WebWindow} from '../../../model/WebWindow';
 import {ServiceStore} from '../../../store/ServiceStore';
+import {TitledNotification, Actionable} from '../../types';
 
 import '../../styles/base.scss';
 import './ToastApp.scss';

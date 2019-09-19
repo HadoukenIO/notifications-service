@@ -1,6 +1,6 @@
 import {StoredNotification} from '../../model/StoredNotification';
-import {TitledNotification} from '../components/NotificationCard/NotificationCard';
 import {StoredApplicationMap} from '../../store/State';
+import {TitledNotification} from '../types';
 
 import {getDateTitle} from './Time';
 

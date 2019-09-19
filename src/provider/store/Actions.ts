@@ -5,10 +5,6 @@ import {ToggleFilter} from '../utils/ToggleFilter';
 import {RootState} from './State';
 import {Action, StoreAPI} from './Store';
 
-export interface Actionable {
-    storeApi: StoreAPI<RootState>;
-}
-
 export const enum ToggleCenterVisibilitySource {
     API,
     TRAY,

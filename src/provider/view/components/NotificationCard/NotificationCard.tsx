@@ -2,18 +2,16 @@ import * as React from 'react';
 
 import {NotificationTime} from '../NotificationTime/NotificationTime';
 import {Button} from '../Controls/Button/Button';
-import {StoredNotification} from '../../../model/StoredNotification';
 import {CircleButton, IconType} from '../CircleButton/CircleButton';
-import {RemoveNotifications, ClickButton, ClickNotification, Actionable, MinimizeToast} from '../../../store/Actions';
+import {RemoveNotifications, ClickButton, ClickNotification, MinimizeToast} from '../../../store/Actions';
 import {useOnClickOnly} from '../../hooks/Clicks';
 import {ClassNames} from '../../utils/ClassNames';
+import {TitledNotification, Actionable} from '../../types';
 
 import {Body} from './Body';
 import {Loading} from './Loading';
 
 import './NotificationCard.scss';
-
-export type TitledNotification = StoredNotification & {title: string};
 
 interface Props extends Actionable {
     notification: TitledNotification;

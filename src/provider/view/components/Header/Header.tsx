@@ -3,7 +3,8 @@ import * as React from 'react';
 import {GroupingType} from '../../utils/Grouping';
 import {CircleButton, IconType, Size} from '../CircleButton/CircleButton';
 import {DevelopmentOnly} from '../Wrappers/DevelopmentOnly';
-import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleLockCenter, Actionable} from '../../../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleLockCenter} from '../../../store/Actions';
+import {Actionable} from '../../types';
 
 import {ClearAllPrompt} from './ClearAllPrompt';
 
