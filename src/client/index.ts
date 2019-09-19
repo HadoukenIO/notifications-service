@@ -136,8 +136,7 @@ export interface NotificationOptions {
      * application-defined buttons, and the default 'X' close button) will not trigger a
      * {@link ActionTrigger.SELECT|select} action.
      *
-     * See {@link Actions} for more details on notification actions, and receiving interaction events from
-     * notifications.
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
      */
     onSelect?: ActionDeclaration<never, never>|null;
 
@@ -149,8 +148,7 @@ export interface NotificationOptions {
      * `expires` is not specified for the notification, this action will never be raised. Note that if an `onClose`
      * action result is also specified, both actions will be raised if and when the notification expires.
      *
-     * See {@link Actions} for more details on notification actions, and receiving interaction events from
-     * notifications.
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
      */
     onExpire?: ActionDeclaration<never, never>|null;
 
@@ -163,8 +161,7 @@ export interface NotificationOptions {
      * the notification), the notification expiring, or from the notification being programmaticially removed, such as
      * a call to `clear`.
      *
-     * See {@link Actions} for more details on notification actions, and receiving interaction events from
-     * notifications.
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
      */
     onClose?: ActionDeclaration<never, never>|null;
 }
@@ -253,8 +250,8 @@ export interface NotificationActionEvent<T = CustomData> {
     /**
      * Application-defined metadata that this event is passing back to the application.
      *
-     * A `notification-action` event is only fired for an interaction with a notification if the
-     * {@link NotificationOptions|notification options} included an action result for that interaction.
+     * A `notification-action` event is only fired for a given trigger if the
+     * {@link NotificationOptions|notification options} included an action result for that trigger.
      *
      * See the comment on the {@link NotificationActionEvent} type for an example of buttons that do and don't raise
      * actions.
