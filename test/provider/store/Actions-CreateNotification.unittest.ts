@@ -6,30 +6,37 @@ import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
 import {createFakeStoredNotification, createFakeRootState} from '../../utils/unit/fakes';
 import {normalizeRootState} from '../../utils/unit/normalization';
+import {Action} from '../../../src/provider/store/Store';
 
 const mockServiceStore = createMockServiceStore();
 
 let state: RootState;
 let note: StoredNotification;
 
-let action: CreateNotification;
-
 beforeEach(() => {
     jest.resetAllMocks();
+
+    mockServiceStore.dispatch.mockImplementation(async (action: Action<RootState>) => {
+        state = action.reduce(state);
+    });
 
     getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 
     note = createFakeStoredNotification();
 
-    action = new CreateNotification(note);
+    state = {
+        ...createFakeRootState(),
+        notifications: [note]
+    };
 });
 
 describe('When creating a new notification', () => {
+    let newNote: StoredNotification;
+    let action: CreateNotification;
+
     beforeEach(() => {
-        state = {
-            ...createFakeRootState(),
-            notifications: [createFakeStoredNotification()]
-        };
+        newNote = createFakeStoredNotification();
+        action = new CreateNotification(newNote);
     });
 
     test('When the action is dispatched, no other action is dispatched to the store', async () => {
@@ -39,31 +46,32 @@ describe('When creating a new notification', () => {
         expect(mockServiceStore.dispatch).toBeCalledWith(action);
     });
 
-    test('When the action is reduced, the notification is added to the state', () => {
-        expect(normalizeRootState(action.reduce(state))).toEqual(normalizeRootState({...state, notifications: [...state.notifications, note]}));
+    test('When the action is dispatched, the notification is added to the state', async () => {
+        await action.dispatch(mockServiceStore);
+
+        expect(normalizeRootState(state)).toEqual(normalizeRootState({...state, notifications: [note, newNote]}));
     });
 });
 
 describe('When creating a notification with the same ID as an existing notification', () => {
-    let oldNote: StoredNotification;
+    let newNote: StoredNotification;
+    let action: CreateNotification;
 
     beforeEach(() => {
-        oldNote = {...note, notification: {...note.notification, title: `Old ${note.notification.title}`}};
-
-        state = {
-            ...createFakeRootState(),
-            notifications: [oldNote]
-        };
+        newNote = {...note, notification: {...note.notification, title: `New ${note.notification.title}`}};
+        action = new CreateNotification(newNote);
     });
 
-    test('When the action is dispatched, the duplicate notification is removed from the store', async () => {
+    test('When the action is dispatched, the a remove action is also dispatched', async () => {
         await action.dispatch(mockServiceStore);
 
         expect(mockServiceStore.dispatch).toBeCalledTimes(2);
-        expect(mockServiceStore.dispatch.mock.calls).toEqual([[new RemoveNotifications([oldNote])], [action]]);
+        expect(mockServiceStore.dispatch.mock.calls).toEqual([[new RemoveNotifications([note])], [action]]);
     });
 
-    test('When the action is reduced, the old notification is replaced in the store', () => {
-        expect(normalizeRootState(action.reduce(state))).toEqual(normalizeRootState({...state, notifications: [note]}));
+    test('When the action is dispatched, the old notification is replaced in the store', async () => {
+        await action.dispatch(mockServiceStore);
+
+        expect(normalizeRootState(state)).toEqual(normalizeRootState({...state, notifications: [newNote]}));
     });
 });
