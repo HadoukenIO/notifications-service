@@ -1,4 +1,3 @@
-import 'jest';
 import 'reflect-metadata';
 
 import {Signal} from 'openfin-service-signal';

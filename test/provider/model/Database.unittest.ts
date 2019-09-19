@@ -1,4 +1,3 @@
-import 'jest';
 import 'fake-indexeddb/auto';
 
 import {Database, CollectionMap} from '../../../src/provider/model/database/Database';

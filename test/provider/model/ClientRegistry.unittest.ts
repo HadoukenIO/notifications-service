@@ -1,5 +1,4 @@
-import 'jest';
-import 'fake-indexeddb/auto';
+import 'reflect-metadata';
 
 import {Identity} from 'openfin/_v2/main';
 import {Signal} from 'openfin-service-signal';

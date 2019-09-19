@@ -1,4 +1,3 @@
-import 'jest';
 import 'reflect-metadata';
 
 import {EventEmitter} from 'events';
