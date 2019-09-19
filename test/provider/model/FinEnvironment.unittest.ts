@@ -109,7 +109,7 @@ describe('When launching a programmatic application', () => {
     test('Subsequent attempts to launch the same application are ignored', async () => {
         await environment.startApplication(programmaticApp);
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 10; i++) {
             await environment.startApplication(programmaticApp);
         }
 
