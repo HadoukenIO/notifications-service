@@ -33,7 +33,7 @@ import {RootState} from '../../../src/provider/store/State';
 
 /**
  * Methods for creating mocks for use in unit tests. Mocks are created so they will be reset to their original state by
- * `jest.resetMocks`, with any Signals held by the mock being an exception.
+ * `jest.resetMocks`.
  *
  * This module also provides utility functions for working with these mocks.
  */
@@ -204,8 +204,8 @@ export function createMockAction(): jest.Mocked<Action<RootState>> {
 }
 
 /**
- * Note that this also assigns the created mock to the global `fin` object. Also note that this is incomplete, and
- * should be expanded as tests require
+ * Note that this also assigns the created mock to the global `fin` object. Incomplete, and
+ * should be expanded as tests require.
  */
 export function createMockFin(): MockFin {
     const fin = {
@@ -261,7 +261,7 @@ export function useMocksInInjector(): void {
 }
 
 /**
- * Returns the mock getter function of an object.
+ * Returns the mock getter function of an object. Assumes the mock has already been assigned.
  *
  * @param mock The mock object to get a getter mock of
  * @param key The key of the mock getter to get
@@ -271,7 +271,7 @@ export function getterMock<Mock extends object, Key extends keyof Mock, Value ex
 }
 
 /**
- * Returns the mock setter function of an object.
+ * Returns the mock setter function of an object. Assumes the mock has already been assigned.
  *
  * @param mock The mock object to get a setter mock of
  * @param key The key of the mock setter to get
