@@ -35,7 +35,7 @@ export function NotificationGroup(props: Props) {
                     notifications.map((notification) => {
                         return (
                             <CSSTransition
-                                key={notification.id}
+                                key={notification.id + notification.notification.date}
                                 timeout={200}
                                 classNames="item"
                             >
