@@ -1,11 +1,12 @@
 /**
  * Actions are the mechanism through which notifications send messages back to the application that created them. The
- * service defines a number of ways in which actions can be raised (typically user interactions, such as clicking a
- * button), and it is up to each application to decide if it wishes to be informed of these interactions.
+ * service defines a number of ways in which actions can be raised (user interactions such as a button press, a
+ * notification expiring or being closed, etc.), and it is up to each application to decide if it wishes to be informed
+ * of these interactions.
  *
  * For an action to be raised when one of these interactions occurs, the application must specify an
  * {@link NotificationActionResult|action result} for each interaction it is interested in. The application should then
- * listen for when these actions are raised by listening for the {@link NotificationActionEvent|notification-action}
+ * listen for when these actions are raised by listening for the {@link NotificationActionEvent|`notification-action`}
  * event.
  *
  * This event is fired once each time an action is raised, and will contain the
@@ -16,6 +17,11 @@
  * If an {@link NotificationActionResult|action result} is not specified for a particular interaction, or it is set to
  * `null`, the application will not receive a corresponding {@link NotificationActionEvent|`notification-action`} for
  * that interaction.
+ *
+ * Unlike other event types, {@link NotificationActionEvent|`notification-action`} events will be buffered by the
+ * service until the application has added a listener for this event type, at which point it will receive all buffered
+ * {@link NotificationActionEvent|`notification-action`} events. The service will also attempt to restart the
+ * application if it is not running when the event is fired.
  *
  * For an overview of actions, consider the sample notification below:
  * ```ts

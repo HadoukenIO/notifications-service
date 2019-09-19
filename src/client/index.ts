@@ -186,16 +186,21 @@ export type CustomData = {[key: string]: any};
 export type Notification = Readonly<Required<Omit<NotificationOptions, 'buttons'>> & {readonly buttons: ReadonlyArray<Readonly<Required<ButtonOptions>>>}>;
 
 /**
- * Event fired for interactions with notification UI elements. It is important to note that applications will only
- * receive these events if they indicate to the service that they want to receive these events. See {@link Actions} for
- * a full example of how actions are defined, and how an application can listen to and handle them.
+ * Event fired when an action is raised for a notification UI elements. It is important to note that applications will
+ * only receive these events if they indicate to the service that they want to receive these events. See {@link Actions}
+ * for a full example of how actions are defined, and how an application can listen to and handle them.
  *
- * This can be fired due to interaction with notification buttons, or the notification itself. Later versions of the
- * service will add additional control types. All actions, for all control types, will be returned to the application
- * via the same `notification-action` event type.
+ * This can be fired due to interaction with notification buttons or the notification itself, the notification being
+ * closed (either by user interaction or by API call), or by the notification expiring. Later versions of the service
+ * will add additional control types that may raise actions from user interaction. All actions, for all control types,
+ * will be returned to the application via the same `notification-action` event type.
  *
  * The event object will contain the application-defined {@link NotificationActionResult|metadata} that allowed this
  * action to be raised, and details on what triggered this action and which control the user interacted with.
+ *
+ * Unlike other event types, `notification-action` events will be buffered by the service until the application has
+ * added a listener for this event type, at which point it will receive all buffered `notification-action` events. The
+ * service will also attempt to restart the application if it is not running when the event is fired.
  *
  * This type includes a generic type argument, should applications wish to define their own interface for action
  * results. See {@link NotificationActionResult} for details.
