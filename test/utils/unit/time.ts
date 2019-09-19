@@ -1,17 +1,17 @@
 const MAX_PROMISE_CHAIN_LENGTH = 100;
 
 const realDateNow = Date.now;
-let moketime = 0;
+let time = 0;
 let usingMockTime = false;
 
 export function mockTime(): void {
     jest.useFakeTimers();
 
     Date.now = () => {
-        return moketime;
+        return time;
     };
 
-    moketime = 0;
+    time = 0;
     usingMockTime = true;
 }
 
@@ -26,7 +26,7 @@ export async function advanceTime(duration: number): Promise<void> {
     if (usingMockTime) {
         for (let i = 0; i < duration; i++) {
             await pumpPromiseChain();
-            moketime++;
+            time++;
             jest.advanceTimersByTime(1);
         }
     } else {
