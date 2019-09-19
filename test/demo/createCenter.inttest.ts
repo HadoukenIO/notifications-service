@@ -8,8 +8,8 @@ import * as notifsRemote from '../utils/int/notificationsRemote';
 import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/int/storageRemote';
 import {delay, Duration} from '../utils/int/delay';
 import {getToastWindow} from '../utils/int/toastUtils';
-import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
-import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {assertDOMMatches, CardType, getCardMetadata} from '../utils/int/cardUtils';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
 import {setupOpenCenterBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
@@ -21,7 +21,7 @@ describe('When creating a notification with the center showing', () => {
     setupOpenCenterBookends();
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
     });
 
@@ -75,6 +75,24 @@ describe('When creating a notification with the center showing', () => {
 
             const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
             expect(toastWindow).toBe(undefined);
+        });
+
+        test('Markdown inside of `body` gets rendered to HTML', async () => {
+            const body = `
+            # Title
+            
+            - item 1
+            - item 2
+            `;
+
+            const note = await notifsRemote.create(testWindow.identity, {...options, body});
+            const card = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
+            const cardValues = await getCardMetadata(card[0]);
+            console.log(cardValues.body);
+
+            expect(cardValues.body).toBeDefined();
+            expect(cardValues.body!.search(/<h1>Title<\/h1>/));
+            expect(cardValues.body!.search(/<ul>(\s*<li>([\w\s])*<\/li>\s*)+<\/ul>/));
         });
     });
 

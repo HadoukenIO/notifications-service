@@ -1,12 +1,14 @@
 import 'jest';
 import 'reflect-metadata';
 
-import {FinEnvironment} from '../../src/provider/model/FinEnvironment';
-import {StoredApplication} from '../../src/provider/model/Environment';
+import {FinEnvironment} from '../../../src/provider/model/FinEnvironment';
+import {StoredApplication} from '../../../src/provider/model/Environment';
+import {createMockFin} from '../../mocks';
 
 describe('When the same app is attempted to be launched multiple times instantaneously through the Environment', () => {
     const storedApp: StoredApplication = {
         type: 'manifest',
+        title: 'cr test app',
         id: 'cr-test-app',
         manifestUrl: 'some-manifest-url'
     };
@@ -14,25 +16,12 @@ describe('When the same app is attempted to be launched multiple times instantan
 
     beforeEach(async () => {
         Object.assign(global, {
-            fin: {
-                Application: {
-                    wrapSync: jest.fn().mockReturnValue({
-                        isRunning: jest.fn()
-                    }),
-                    createFromManifest: jest.fn().mockReturnValue({
-                        addListener: jest.fn(),
-                        run: jest.fn()
-                    })
-                },
-                InterApplicationBus: {
-                    create: jest.fn()
-                }
-            }
+            fin: createMockFin()
         });
         environment = new FinEnvironment();
     });
 
-    it('The Environment will only attempt to start the app once', async () => {
+    test('The Environment will only attempt to start the app once', async () => {
         for (let i = 0; i < 10; ++i) {
             await environment.startApplication(storedApp);
         }

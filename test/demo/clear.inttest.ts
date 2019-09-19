@@ -3,7 +3,7 @@ import {Application, Window} from 'hadouken-js-adapter';
 import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
 import {getCenterCardsByNotification, getCenterCardsByApp} from '../utils/int/centerUtils';
-import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {delay, Duration} from '../utils/int/delay';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
@@ -86,7 +86,7 @@ describe.each([
     setupCenterBookends(centerVisibility);
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
 
         actionListener = jest.fn<void, [NotificationActionEvent]>();
@@ -189,7 +189,7 @@ describe('When attempting to clear a notification that does not exist', () => {
     let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
 
         closedListener = jest.fn<void, [NotificationClosedEvent]>();

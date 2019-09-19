@@ -2,6 +2,7 @@
 @import '../../styles/animations.scss';
 
 .view {
+    $animationSpeed: 200ms;
     height: 100%;
     user-select: none;
     background: var(--center-background-color);
@@ -11,6 +12,20 @@
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: scroll;
+
+    .no-notes-message {
+        position: fixed;
+        color: #666;
+        top: 50%;
+        margin: 0 auto;
+        width: 100%;
+        text-align: center;
+
+        h3 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+    }
 
     &::-webkit-scrollbar-thumb {
         border-radius: 10px;
@@ -30,7 +45,7 @@
     }
 
     .group-item-exit-active {
-        animation: fadeIn 300ms ease-in forwards reverse;
+        animation: fadeIn $animationSpeed ease-in forwards reverse;
     }
 
     .group-item-enter-done {
@@ -38,6 +53,6 @@
     }
 
     .group-item-enter-active {
-        animation: fadeIn 300ms ease-in forwards;
+        animation: fadeIn $animationSpeed ease-in forwards;
     }
 }

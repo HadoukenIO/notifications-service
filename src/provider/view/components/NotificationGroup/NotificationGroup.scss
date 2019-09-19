@@ -28,7 +28,6 @@
             max-width: 300px;
 
             .name {
-                cursor: pointer;
                 display: inline-block;
                 flex: 1;
                 flex-wrap: nowrap;
@@ -70,6 +69,7 @@
     }
 
     .notifications {
+        $animationSpeed: 200ms;
         list-style: none;
 
         &>li {
@@ -94,11 +94,11 @@
         }
 
         .item-enter-active {
-            animation: grow 300ms ease-in forwards;
+            animation: fadeIn $animationSpeed ease-in forwards;
         }
 
         .item-exit-active {
-            animation: fadeOutLeft 300ms ease-in;
+            animation: fadeOutRight $animationSpeed ease-in;
             perspective: 1000;
             pointer-events: none;
         }

@@ -26,7 +26,7 @@ const windowOptions: WindowOption = {
     alwaysOnTop: true,
     showTaskbarIcon: false,
     opacity: 0,
-    backgroundColor: '#1F1E24',
+    backgroundColor: '#424242',
     cornerRounding: {
         width: 7,
         height: 7
@@ -41,7 +41,6 @@ interface Margin {
 
 interface Options {
     timeout: number;
-    onDismiss: (toast: Toast) => Promise<void>;
 }
 
 export enum ToastEvent {
@@ -109,8 +108,7 @@ export class Toast implements LayoutItem {
                 notification,
                 webWindow,
                 store,
-                setWindowSize: dimensionResolve,
-                onDismiss: () => this._options.onDismiss(this)
+                setWindowSize: dimensionResolve
             };
 
             renderApp(renderOptions);

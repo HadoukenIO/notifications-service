@@ -10,10 +10,11 @@ const style: React.CSSProperties = {
     margin: '0',
     display: 'inline-block',
     userSelect: 'none',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    overflow: 'hidden! important'
 };
 
-export function TearOut(props: React.PropsWithChildren<Props>) {
+export function ResizeWrapper(props: React.PropsWithChildren<Props>) {
     const {children, onSize} = props;
     const containerRef = React.useRef<HTMLDivElement>(null);
 

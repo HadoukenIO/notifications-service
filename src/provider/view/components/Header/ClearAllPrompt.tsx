@@ -1,7 +1,7 @@
 import React from 'react';
 import {CSSTransition} from 'react-transition-group';
 
-import {CircleButton} from '../CircleButton/CircleButton';
+import {CircleButton, IconType} from '../CircleButton/CircleButton';
 import './ClearAllPrompt.scss';
 
 interface Props {
@@ -36,11 +36,9 @@ export function ClearAllPrompt(props: Props) {
             divRef.current!.focus();
     }, [clearAllPromptVisible, centerVisible]);
 
-    /*
-    Blur and click event both fire when trying to close the prompt by clicking "Clear All".
-    To prevent this we have to track if the mouse is down and ignore the blur.
-    Events are ordered: MouseDown, Blur, MouseUp, Click
-    */
+    // Blur and click event both fire when trying to close the prompt by clicking "Clear All".
+    // To prevent this we have to track if the mouse is down and ignore the blur.
+    // Events are ordered: MouseDown, Blur, MouseUp, Click
     return (
         <span className="clear detail"
             onMouseDown={() => setMouseDown(true)}
@@ -55,8 +53,8 @@ export function ClearAllPrompt(props: Props) {
                 unmountOnExit
             >
                 <div tabIndex={0} className="prompt" ref={divRef} onBlur={handleBlur}>
-                    <CircleButton type="cancel" onClick={() => togglePrompt(false, onCancel)} alt="Cancel" />
-                    <CircleButton type="accept" onClick={() => togglePrompt(false, onAccept)} alt="Accept" />
+                    <CircleButton type={IconType.CANCEL} onClick={() => togglePrompt(false, onCancel)} alt="Cancel" />
+                    <CircleButton type={IconType.ACCEPT} onClick={() => togglePrompt(false, onAccept)} alt="Accept" />
                 </div>
             </CSSTransition>
         </span>

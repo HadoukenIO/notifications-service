@@ -7,9 +7,10 @@ import {Header} from '../../components/Header/Header';
 import {NotificationView} from '../../components/NotificationView/NotificationView';
 import {RootState} from '../../../store/State';
 import {ServiceStore} from '../../../store/ServiceStore';
-import {RemoveNotifications, Actionable} from '../../../store/Actions';
+import {RemoveNotifications} from '../../../store/Actions';
 import {GroupingType} from '../../utils/Grouping';
 import {WebWindow} from '../../../model/WebWindow';
+import {Actionable} from '../../types';
 
 import '../../styles/_main.scss';
 import './NotificationCenterApp.scss';
@@ -18,10 +19,10 @@ type Props = ReturnType<typeof mapStateToProps> & Actionable;
 
 export function NotificationCenterApp(props: Props) {
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const {notifications, visible, storeDispatch, centerLocked} = props;
+    const {notifications, applications, visible, storeApi, centerLocked} = props;
 
     const handleClearAll = () => {
-        storeDispatch(new RemoveNotifications(notifications));
+        new RemoveNotifications(notifications).dispatch(storeApi);
     };
 
     return (
@@ -29,15 +30,16 @@ export function NotificationCenterApp(props: Props) {
             <Header
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}
-                storeDispatch={storeDispatch}
                 centerVisible={visible}
                 onClearAll={handleClearAll}
+                storeApi={storeApi}
                 centerLocked={centerLocked}
             />
             <NotificationView
                 notifications={notifications}
+                applications={applications}
                 groupBy={groupBy}
-                storeDispatch={storeDispatch}
+                storeApi={storeApi}
             />
         </div>
     );
@@ -47,8 +49,8 @@ const mapStateToProps = (state: RootState, ownProps: Actionable) => ({
     ...ownProps,
     notifications: state.notifications,
     visible: state.centerVisible,
-    centerLocked: state.centerLocked,
-    ...ownProps
+    applications: state.applications,
+    centerLocked: state.centerLocked
 });
 
 const Container = connect(mapStateToProps)(NotificationCenterApp);
@@ -63,7 +65,7 @@ export function renderApp(webWindow: WebWindow, store: ServiceStore): void {
         // Replace redux store with service store implementation.
         // This will resolve the interface incompatibility issues.
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeDispatch={store.dispatch.bind(store)} />
+            <Container storeApi={store} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

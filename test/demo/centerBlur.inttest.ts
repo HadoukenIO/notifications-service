@@ -1,11 +1,11 @@
 import {Application, Window} from 'hadouken-js-adapter';
 
 import * as notifsRemote from '../utils/int/notificationsRemote';
-import {testManagerIdentity, defaultTestAppUrl} from '../utils/int/constants';
+import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 import {isCenterShowing, getCenterCloseButton} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
-import {getDomElementById} from '../utils/int/dom';
+import {getElementById} from '../utils/int/dom';
 
 describe('When the Notification Center is open', () => {
     let testApp: Application;
@@ -20,7 +20,7 @@ describe('When the Notification Center is open', () => {
     });
 
     beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: defaultTestAppUrl});
+        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
 
         // Ensure center is showing
@@ -42,7 +42,7 @@ describe('When the Notification Center is open', () => {
     });
 
     test('If the Notification Center loses focus due to a click on a \'Toggle Visibility\' button, the Center is closed and remains closed', async () => {
-        const toggleButton = await getDomElementById(testWindow.identity, 'toggleNotificationCenter');
+        const toggleButton = await getElementById(testWindow.identity, 'toggleNotificationCenter');
 
         await testWindow.focus();
         await toggleButton.click();

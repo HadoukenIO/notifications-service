@@ -2,25 +2,40 @@
 // which have esModuleIntrop = false
 const moment = require('moment');
 
-moment.updateLocale('en', {
+let localeData = moment.localeData();
+
+const language = window ? navigator.language : 'en';
+localeData = moment.localeData(language);
+
+moment.defineLocale(localeData, {
     relativeTime: {
-        future: 'in %s',
-        past: '%s ago',
-        s: 'seconds',
-        ss: '%ss',
-        m: 'a minute',
+        future: (value: string) => value === 'now' ? 'soon' : 'in ' + value,
+        past: (value: string) => value === 'now' ? value : value + ' ago',
+        s: 'now',
+        m: '1m',
         mm: '%dm',
-        h: 'an hour',
+        h: '1h',
         hh: '%dh',
         d: 'a day',
-        dd: '%dd',
+        dd: '%d days',
         M: 'a month',
-        MM: '%dM',
+        MM: '%d months',
         y: 'a year',
-        yy: '%dY'
+        yy: '%d years'
     }
 });
 
-export function getDate(date: Date | number) {
+export function getDateTitle(date: Date | number): string {
+    return moment(date).calendar(localeData, {
+        sameDay: '[Today]',
+        nextDay: '[Tomorrow]',
+        nextWeek: 'dddd',
+        lastDay: '[Yesterday]',
+        lastWeek: '[Last] dddd',
+        sameElse: 'LL'
+    });
+}
+
+export function getDate(date: Date | number): string {
     return moment(date).fromNow();
 }

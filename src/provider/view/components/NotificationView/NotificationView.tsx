@@ -3,14 +3,16 @@ import {TransitionGroup, CSSTransition} from 'react-transition-group';
 
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
 import {GroupingType, Group, groupNotifications} from '../../utils/Grouping';
-import {Actionable} from '../../../store/Actions';
+import {StoredApplicationMap} from '../../../store/State';
 import {StoredNotification} from '../../../model/StoredNotification';
+import {TitledNotification, Actionable} from '../../types';
 
 import './NotificationView.scss';
 
 interface Props extends Actionable {
     notifications: StoredNotification[];
     groupBy: GroupingType;
+    applications: StoredApplicationMap,
 }
 
 /**
@@ -22,21 +24,22 @@ interface Props extends Actionable {
  * @param props Props
  */
 export function NotificationView(props: Props) {
-    const {notifications, groupBy, ...rest} = props;
-    const [groups, setGroups] = React.useState<Map<string, Group>>(new Map());
+    const {notifications, applications, groupBy, ...rest} = props;
+    const [groups, setGroups] = React.useState<Group[]>([]);
 
     React.useEffect(() => {
         // Sort the notification by groups
-        setGroups(groupNotifications(notifications, groupBy));
+        setGroups(groupNotifications(notifications, applications, groupBy));
     }, [notifications, groupBy]);
 
     return (
         <TransitionGroup className="view" component="div">
+            <NoNotificationsMessage visible={notifications.length === 0} />
             {
-                [...groups.values()].map((group: Group) => (
+                groups.map((group: Group) => (
                     <CSSTransition
                         key={group.key}
-                        timeout={300}
+                        timeout={200}
                         classNames="group-item"
                         exit={groupBy === group.type}
                     >
@@ -50,5 +53,13 @@ export function NotificationView(props: Props) {
                 ))
             }
         </TransitionGroup>
+    );
+}
+
+export function NoNotificationsMessage({visible}: {visible: boolean}) {
+    return (
+        <div className="no-notes-message" style={{display: visible ? 'block' : 'none'}}>
+            <h3>No new notifications</h3>
+        </div>
     );
 }

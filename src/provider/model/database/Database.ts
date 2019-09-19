@@ -5,6 +5,7 @@ import {StoredSetting} from '../StoredSetting';
 import {StoredNotification} from '../StoredNotification';
 import {StoredApplication} from '../Environment';
 import {AsyncInit} from '../../controller/AsyncInit';
+import {DatabaseError} from '../Errors';
 
 import {Collection} from './Collection';
 
@@ -25,7 +26,7 @@ export class Database extends AsyncInit {
     private readonly _database: Dexie;
     private readonly _collections: Map<CollectionMap, Collection<any>>;
 
-    constructor () {
+    constructor() {
         super();
         this._database = new Dexie('notifications-service');
         this._collections = new Map<CollectionMap, Collection<any>>();
@@ -53,7 +54,7 @@ export class Database extends AsyncInit {
         if (table) {
             return table;
         } else {
-            throw new Error(`Table with id ${collectionName} not found.`);
+            throw new DatabaseError(`Table with id ${collectionName} not found.`);
         }
     }
 

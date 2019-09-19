@@ -5,31 +5,30 @@ import {Store} from 'redux';
 
 import {StoredNotification} from '../../../model/StoredNotification';
 import {NotificationCard} from '../../components/NotificationCard/NotificationCard';
-import {TearOut} from '../../components/Wrappers/TearOut';
+import {ResizeWrapper} from '../../components/Wrappers/ResizeWrapper';
 import {WindowDimensions} from '../../../controller/Layouter';
 import {RootState} from '../../../store/State';
-import {Actionable} from '../../../store/Actions';
 import {WebWindow} from '../../../model/WebWindow';
 import {ServiceStore} from '../../../store/ServiceStore';
+import {TitledNotification, Actionable} from '../../types';
 
 import '../../styles/base.scss';
 import './ToastApp.scss';
 
 interface ToastAppProps extends Actionable {
-    notification: StoredNotification;
+    notification: TitledNotification;
     setWindowSize: (dimensions: WindowDimensions) => void;
-    onDismiss: () => Promise<void>;
 }
 
 type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 
 export function ToastApp(props: Props) {
-    const {notification, setWindowSize, storeDispatch, onDismiss} = props;
+    const {notification, setWindowSize, storeApi} = props;
 
     return (
-        <TearOut onSize={setWindowSize}>
-            <NotificationCard notification={notification} storeDispatch={storeDispatch} isToast={true} onDismiss={onDismiss} />
-        </TearOut>
+        <ResizeWrapper onSize={setWindowSize}>
+            <NotificationCard notification={notification} storeApi={storeApi} isToast={true} />
+        </ResizeWrapper>
     );
 }
 
@@ -44,15 +43,18 @@ export interface RenderOptions {
     webWindow: WebWindow;
     store: ServiceStore;
     setWindowSize: (dim: WindowDimensions) => void;
-    onDismiss: () => Promise<void>;
 }
 
 export function renderApp(options: RenderOptions) {
-    const {notification, webWindow, store, setWindowSize, onDismiss} = options;
+    const {notification, webWindow, store, setWindowSize} = options;
+    const titledNotification: TitledNotification = {
+        ...notification,
+        title: (store.state.applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title
+    };
 
     ReactDOM.render(
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeDispatch={store.dispatch.bind(store)} notification={notification} setWindowSize={setWindowSize} onDismiss={onDismiss} />
+            <Container storeApi={store} notification={titledNotification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );

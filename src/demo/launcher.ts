@@ -7,12 +7,12 @@ console.log(`creating ${numApps} apps at: ${baseUrl}`);
 fin.desktop.main(async () => {
     for (let i = 0; i < numApps; i++) {
         const conf = {
-            'name': `OpenFin Notifications Demo App ${i}`,
+            'name': `Demo App ${i}`,
             'uuid': `notifications-demoapp-${i}`,
             'url': `${baseUrl}/app.html`,
             'mainWindowOptions': {
-                'defaultHeight': 420,
-                'defaultWidth': 250,
+                'defaultHeight': 510,
+                'defaultWidth': 350,
                 'saveWindowState': true,
                 'autoShow': true
             }
