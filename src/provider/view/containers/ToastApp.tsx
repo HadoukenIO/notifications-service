@@ -5,21 +5,21 @@ import {connect, Provider} from 'react-redux';
 
 import {StoredNotification} from '../../model/StoredNotification';
 import {NotificationCard, TitledNotification} from '../components/NotificationCard/NotificationCard';
-import {WindowDimensions} from '../../controller/Layouter';
+import {Actionable} from '../../store/Actions';
 import {RootState} from '../../store/State';
 import {ServiceStore} from '../../store/ServiceStore';
+import {Point} from '../../model/Toast';
 import {WebWindow} from '../../model/WebWindow';
-import {Actionable} from '../../store/Actions';
 
 interface ToastAppProps extends Actionable {
     notification: TitledNotification;
-    setWindowSize: (dimensions: WindowDimensions) => void;
+    setWindowSize: (dimensions: Point) => void;
 }
 
 type Props = ToastAppProps & ReturnType<typeof mapStateToProps>;
 
 export function ToastApp(props: Props) {
-    const {notification, setWindowSize, storeApi: storeApi} = props;
+    const {notification, setWindowSize, storeApi} = props;
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     // Get the size of the container ref
@@ -27,7 +27,7 @@ export function ToastApp(props: Props) {
         if (containerRef && containerRef.current) {
             const {width, height} = containerRef.current.getBoundingClientRect();
             if (width && height) {
-                setWindowSize({width, height});
+                setWindowSize({x: width, y: height});
             }
         }
     };
@@ -56,7 +56,7 @@ export function renderApp(
     notification: StoredNotification,
     webWindow: WebWindow,
     store: ServiceStore,
-    setWindowSize: (dim: WindowDimensions) => void
+    setWindowSize: (dim: Point) => void
 ) {
     const titledNotification: TitledNotification = {
         ...notification,
