@@ -151,20 +151,20 @@ fin.desktop.main(async () => {
     const queryParams = new URLSearchParams(location.search);
     if (queryParams.get('inttest') === null) {
         addEventListener('notification-created', (event: NotificationCreatedEvent) => {
-            logMessage(`CREATE action received from notification ${event.notification.id}`);
+            logMessage(`created event received from notification ${event.notification.id}`);
         });
         addEventListener('notification-closed', (event: NotificationClosedEvent) => {
-            logMessage(`CLOSE action received from notification ${event.notification.id}`);
+            logMessage(`closed event received from notification ${event.notification.id}`);
         });
         addEventListener('notification-action', (event: NotificationActionEvent) => {
             const {notification, trigger, control} = event;
 
             if (trigger !== ActionTrigger.CONTROL) {
-                logMessage(`${trigger.toUpperCase()} action received from notification ${event.notification.id}`);
+                logMessage(`action event received from notification ${event.notification.id} (trigger: ${trigger.toUpperCase()})`);
             } else if (control && control.type === 'button') {
                 const buttonIndex = notification.buttons.indexOf(control);
 
-                logMessage(`${trigger.toUpperCase()} action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
+                logMessage(`action event on button ${control.title} from ${notification.id} (trigger: ${trigger.toUpperCase()}, buttonIndex: ${buttonIndex})`);
             }
         });
     } else if (queryParams.get('inttest') === 'listeners-on-startup') {
