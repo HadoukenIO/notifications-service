@@ -21,8 +21,7 @@ export class FinWebWindowFactory implements WebWindowFactory {
         const nativeWindow = windowV1.getNativeWindow();
         const document = nativeWindow.document;
         const windowV2 = fin.Window.wrapSync({name: windowV1.name, uuid: windowV1.uuid});
-
-        const webWindow = new FinWebWindow(windowV2, document, nativeWindow);
+        const webWindow = new FinWebWindow(windowV2, nativeWindow);
 
         document.addEventListener('mouseenter', () => webWindow.onMouseEnter.emit());
         document.addEventListener('mouseleave', () => webWindow.onMouseLeave.emit());
@@ -44,9 +43,9 @@ export class FinWebWindow implements WebWindow {
     private _isActive: boolean;
     private _closePromise!: Promise<void>;
 
-    constructor(window: _Window, document: Document, nativeWindow: Window) {
+    constructor(window: _Window, nativeWindow: Window) {
         this._window = window;
-        this._document = document;
+        this._document = nativeWindow.document;
         this._navtiveWindow = nativeWindow;
 
         this._isActive = true;
