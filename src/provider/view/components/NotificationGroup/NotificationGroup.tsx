@@ -2,9 +2,9 @@ import * as React from 'react';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
 import {NotificationCard} from '../NotificationCard/NotificationCard';
-import {StoredNotification} from '../../../model/StoredNotification';
-import {RemoveNotifications, Actionable} from '../../../store/Actions';
+import {RemoveNotifications} from '../../../store/Actions';
 import {CircleButton, Size, IconType} from '../CircleButton/CircleButton';
+import {TitledNotification, Actionable} from '../../types';
 
 import './NotificationGroup.scss';
 
@@ -12,7 +12,7 @@ interface Props extends Actionable {
     // Group name
     name: string;
     // Notifications in this group
-    notifications: StoredNotification[];
+    notifications: TitledNotification[];
 }
 
 export function NotificationGroup(props: Props) {
@@ -35,7 +35,7 @@ export function NotificationGroup(props: Props) {
                     notifications.map((notification) => {
                         return (
                             <CSSTransition
-                                key={notification.id}
+                                key={notification.id + notification.notification.date}
                                 timeout={200}
                                 classNames="item"
                             >

@@ -1,4 +1,6 @@
 import {StoredNotification} from '../../model/StoredNotification';
+import {StoredApplicationMap} from '../../store/State';
+import {TitledNotification} from '../types';
 
 import {getDateTitle} from './Time';
 
@@ -34,7 +36,7 @@ export interface Group {
      * This array should always contain at least one notification. If there are no
      * notifications that fit within this category then the group should be deleted.
      */
-    notifications: StoredNotification[];
+    notifications: TitledNotification[];
 }
 
 /**
@@ -43,9 +45,9 @@ export interface Group {
  * @param notification Notificiation
  * @param groupingType Grouping method
  */
-export function getGroupTitle(notification: StoredNotification, groupingType: GroupingType): string {
+export function getGroupTitle(notification: TitledNotification, groupingType: GroupingType): string {
     if (groupingType === GroupingType.APPLICATION) {
-        return notification.source.uuid;
+        return notification.title;
     } else if (groupingType === GroupingType.DATE) {
         const {date} = notification.notification;
         return getDateTitle(date);
@@ -56,14 +58,17 @@ export function getGroupTitle(notification: StoredNotification, groupingType: Gr
 /**
  * Group notifications together based on the given grouping method e.g. application/date.
  * @param notifications List of notifications to sort into groups.
+ * @param applications A map of application registry to resolve the notification title
  * @param groupMethod Grouping type to use for sorting.
  */
-export function groupNotifications(notifications: StoredNotification[], groupMethod: GroupingType): Map<string, Group> {
-    // Sort notifications by date, this also causes the most recent group to be first
-    notifications.sort((a: StoredNotification, b: StoredNotification) =>
-        b.notification.date.valueOf() - a.notification.date.valueOf());
-    // Reduce the notifications array into a Map of notifications grouped by their title
-    const groupMap = notifications.reduce((groups: Map<string, Group>, currentNotification: StoredNotification) => {
+export function groupNotifications(notifications: StoredNotification[], applications: StoredApplicationMap, groupMethod: GroupingType): Group[] {
+    const groupMap = notifications.map((notification) => {
+        // Map stored notifications to titled notifications
+        return {...notification, title: (applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title};
+    }).sort((a: StoredNotification, b: StoredNotification) => {
+        // Sort notifications by date (groups will then also be sorted by date)
+        return b.notification.date.valueOf() - a.notification.date.valueOf();
+    }).reduce((groups: Map<string, Group>, currentNotification: TitledNotification) => {
         const key = (groupMethod === GroupingType.DATE) ? getGroupTitle(currentNotification, groupMethod) : currentNotification.source.uuid;
         // If group title already exists just add it to the group
         if (groups.has(key)) {
@@ -80,5 +85,5 @@ export function groupNotifications(notifications: StoredNotification[], groupMet
         return groups;
     }, new Map<string, Group>());
 
-    return groupMap;
+    return Array.from(groupMap.values());
 }

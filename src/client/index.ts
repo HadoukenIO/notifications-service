@@ -68,6 +68,15 @@ export interface NotificationOptions {
      * Notification body text.
      *
      * This is the main notification content, displayed below the notification title. The notification will expand to fit the length of this text.
+     * Markdown is supported and **only** rendered when displaying a notification.
+     * Supported tags:
+     * - hr
+     * - paragraph
+     * - newline
+     * - list heading
+     * - list
+     * - blockquote
+     * - emphasis
      */
     body: string;
 
@@ -118,7 +127,7 @@ export interface NotificationOptions {
      * soon as possible after. If not specified, the notification will never expire, and will persist until it
      * is closed.
      */
-    expires?: Date|null;
+    expires?: Date | null;
 
     /**
      * A list of buttons to display below the notification text.
@@ -139,7 +148,7 @@ export interface NotificationOptions {
      * See {@link Actions} for more details on notification actions, and receiving interaction events from
      * notifications.
      */
-    onSelect?: ActionDeclaration<never, never>|null;
+    onSelect?: ActionDeclaration<never, never> | null;
 
     /**
      * An {@link NotificationActionResult|action result} to be passed back to the application inside the
@@ -152,7 +161,7 @@ export interface NotificationOptions {
      * See {@link Actions} for more details on notification actions, and receiving interaction events from
      * notifications.
      */
-    onExpire?: ActionDeclaration<never, never>|null;
+    onExpire?: ActionDeclaration<never, never> | null;
 
     /**
      * An {@link NotificationActionResult|action result} to be passed back to the application inside the
@@ -166,7 +175,7 @@ export interface NotificationOptions {
      * See {@link Actions} for more details on notification actions, and receiving interaction events from
      * notifications.
      */
-    onClose?: ActionDeclaration<never, never>|null;
+    onClose?: ActionDeclaration<never, never> | null;
 }
 
 /**

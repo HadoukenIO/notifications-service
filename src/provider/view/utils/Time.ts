@@ -4,14 +4,14 @@ const moment = require('moment');
 
 let localeData = moment.localeData();
 
-const language = navigator ? navigator.language : 'en';
+const language = this.navigator ? navigator.language : 'en';
 localeData = moment.localeData(language);
 
 moment.defineLocale(localeData, {
     relativeTime: {
-        future: 'in %s',
-        past: '%s ago',
-        s: 'a moment',
+        future: (value: string) => value === 'now' ? 'soon' : 'in ' + value,
+        past: (value: string) => value === 'now' ? value : value + ' ago',
+        s: 'now',
         m: '1m',
         mm: '%dm',
         h: '1h',

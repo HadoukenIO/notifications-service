@@ -8,6 +8,7 @@ import {createMockFin} from '../../mocks';
 describe('When the same app is attempted to be launched multiple times instantaneously through the Environment', () => {
     const storedApp: StoredApplication = {
         type: 'manifest',
+        title: 'cr test app',
         id: 'cr-test-app',
         manifestUrl: 'some-manifest-url'
     };

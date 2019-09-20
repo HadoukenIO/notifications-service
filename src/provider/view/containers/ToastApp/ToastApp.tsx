@@ -8,15 +8,15 @@ import {NotificationCard} from '../../components/NotificationCard/NotificationCa
 import {ResizeWrapper} from '../../components/Wrappers/ResizeWrapper';
 import {WindowDimensions} from '../../../controller/Layouter';
 import {RootState} from '../../../store/State';
-import {Actionable} from '../../../store/Actions';
 import {WebWindow} from '../../../model/WebWindow';
 import {ServiceStore} from '../../../store/ServiceStore';
+import {TitledNotification, Actionable} from '../../types';
 
 import '../../styles/base.scss';
 import './ToastApp.scss';
 
 interface ToastAppProps extends Actionable {
-    notification: StoredNotification;
+    notification: TitledNotification;
     setWindowSize: (dimensions: WindowDimensions) => void;
 }
 
@@ -47,10 +47,14 @@ export interface RenderOptions {
 
 export function renderApp(options: RenderOptions) {
     const {notification, webWindow, store, setWindowSize} = options;
+    const titledNotification: TitledNotification = {
+        ...notification,
+        title: (store.state.applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title
+    };
 
     ReactDOM.render(
         <Provider store={store as unknown as Store<RootState>}>
-            <Container storeApi={store} notification={notification} setWindowSize={setWindowSize} />
+            <Container storeApi={store} notification={titledNotification} setWindowSize={setWindowSize} />
         </Provider>,
         webWindow.document.getElementById('react-app')
     );
