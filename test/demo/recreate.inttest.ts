@@ -126,8 +126,7 @@ describe('When creating a notification with an ID that already exists but differ
                     expect(finCloseListener).toHaveBeenCalledWith(expectedEvent);
                 });
 
-                // Test is unstable on CI, attempting to debug shows some ToastManager glitches - disabling until we can investigate [SERVICE-581]
-                test.skip('A new toast window is created', async () => {
+                test('A new toast window is created', async () => {
                     const expectedEvent = {
                         topic: 'system',
                         type: 'window-created',

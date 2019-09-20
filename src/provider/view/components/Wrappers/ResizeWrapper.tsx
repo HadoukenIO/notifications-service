@@ -1,9 +1,7 @@
 import React from 'react';
 
-import {WindowDimensions} from '../../../controller/Layouter';
-
 interface Props {
-    onSize?: (dimensions: WindowDimensions) => void;
+    onSize?: (dimensions: {x: number, y: number}) => void;
 }
 
 const style: React.CSSProperties = {
@@ -24,7 +22,7 @@ export function ResizeWrapper(props: React.PropsWithChildren<Props>) {
             const {width, height} = containerRef.current.getBoundingClientRect();
             if (width && height) {
                 if (onSize)
-                    onSize({width, height});
+                    onSize({x: width, y: height});
             }
         }
     };
