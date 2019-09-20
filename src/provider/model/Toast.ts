@@ -2,9 +2,8 @@ import {Signal, Aggregators} from 'openfin-service-signal';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {Opacity} from 'openfin/_v2/shapes';
 
+import {renderApp} from '../view/containers/ToastApp/ToastApp';
 import {DeferredPromise} from '../common/DeferredPromise';
-import {renderApp} from '../view/containers/ToastApp';
-import {Store} from '../store/Store';
 import {LayoutItem} from '../controller/Layouter';
 import {LayouterConfig} from '../controller/LayouterConfig';
 import {ServiceStore} from '../store/ServiceStore';
@@ -82,7 +81,7 @@ const windowOptions: WindowOption = {
     alwaysOnTop: true,
     showTaskbarIcon: false,
     opacity: 0,
-    backgroundColor: '#1F1E24',
+    backgroundColor: '#424242',
     cornerRounding: {
         width: 7,
         height: 7
@@ -124,7 +123,7 @@ export class Toast implements LayoutItem {
     private _origin: Point;
     private _size: Point;
 
-    private _currentTransition: DeferredPromise|null;
+    private _currentTransition: DeferredPromise | null;
     private _activeTransitions: Promise<void>[];
 
     /**
@@ -165,7 +164,7 @@ export class Toast implements LayoutItem {
      *
      * A return value of null indicates that the window isn't currently animating or being moved.
      */
-    public get currentTransition(): Promise<void>|null {
+    public get currentTransition(): Promise<void> | null {
         return this._currentTransition && this._currentTransition.promise;
     }
 
