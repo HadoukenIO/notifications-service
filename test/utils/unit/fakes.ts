@@ -145,5 +145,5 @@ export function createFakeEmptyMonitorInfo(): MonitorInfo {
 }
 
 function idString(): string {
-    return `[${(fakeCount++).toString(16)}]`;
+    return `[${(fakeCount++).toString(16).toUpperCase()}]`;
 }
