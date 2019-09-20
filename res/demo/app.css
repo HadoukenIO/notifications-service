@@ -4,7 +4,7 @@
 
 :root {
   --main-bg-color: #1F1E24;
-  --border-color: #2A2A30;
+  --border-color: #666666;
   --highlight-color: #0E00A0;
 }
 
@@ -16,7 +16,7 @@ html {
 body {
   position: relative;
   background-color: var(--main-bg-color);
-  padding: 10px 25px 0;
+  padding: 10px;
 	font-family: 'Helvetica';
 	margin: 0;
 	text-shadow: 0 0 1px rgba(0,0,0,0.3);
@@ -36,12 +36,12 @@ ul {
 }
 
 button {
-  width: 130px;
+  width: 100%;
   font-size: 12px;
-  height: 30px;
+  height: 25px;
   box-sizing: border-box;
   border-radius: 5px;
-  border: 3px solid var(--border-color);
+  border: 1px solid var(--border-color);
   padding: 2px;
   margin: 3px;
   box-shadow: 0.5px 0.5px 0px 0 #1b1b2b;
@@ -144,9 +144,10 @@ input {
 
 
 #clientResponse {
-    border: 1px solid #666;
+    border: 1px solid var(--border-color);
     font-size: 10px;
     padding: 5px;
+    margin: 3px;
     min-height: 140px;
     max-height: 140px;
     margin-top: 3px;

@@ -2,26 +2,27 @@ import {ElementHandle} from 'puppeteer';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
-import {getDomElementById} from './dom';
+import {getElementById, querySelector} from './dom';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
-
+const CARDS_SELECTOR = '.group:not([class*="exit"]) li:not([class*="exit"]) .notification-card';
 const ofBrowser = new OFPuppeteerBrowser();
-export async function getAllCenterCards() {
+
+export async function getAllCenterCards(): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$('.notification');
+    return centerPage!.$$(CARDS_SELECTOR);
 }
+
 export async function getCenterCardsByApp(sourceUuid: string): Promise<ElementHandle[]> {
-    const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$(`.notification[data-id*="${sourceUuid}"]`);
+    return querySelector(CENTER_IDENTITY, `${CARDS_SELECTOR}[data-id*="${sourceUuid}"]`);
 }
+
 export async function getCenterCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
-    const centerPage = await ofBrowser.getPage(CENTER_IDENTITY);
-    return centerPage!.$$(`.notification[data-id="${sourceUuid}:${notificationId}"]`);
+    return querySelector(CENTER_IDENTITY, `${CARDS_SELECTOR}[data-id="${sourceUuid}:${notificationId}"]`);
 }
 
 export async function getCenterCloseButton(): Promise<ElementHandle> {
-    return getDomElementById(CENTER_IDENTITY, 'exit-link');
+    return getElementById(CENTER_IDENTITY, 'hide-center');
 }
 
 export async function isCenterShowing(): Promise<boolean> {
