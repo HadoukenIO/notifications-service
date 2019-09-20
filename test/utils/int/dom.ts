@@ -2,6 +2,7 @@ import {Identity} from 'openfin/_v2/main';
 import {ElementHandle} from 'puppeteer';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
+import {Duration} from './delay';
 
 const ofBrowser = new OFPuppeteerBrowser();
 
@@ -13,7 +14,7 @@ export async function querySelector(target: Identity, selector: string): Promise
     const centerPage = await ofBrowser.getPage(target);
     if (centerPage) {
         try {
-            await centerPage.waitForSelector(selector, {timeout: 500});
+            await centerPage.waitForSelector(selector, {timeout: Duration.WAIT_FOR_SELECTOR});
         } catch (error) {
             return [];
         }

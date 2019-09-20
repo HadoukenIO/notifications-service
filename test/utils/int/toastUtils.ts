@@ -6,6 +6,7 @@ import {SERVICE_IDENTITY} from '../../../src/client/internal';
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
 import {querySelector} from './dom';
+import {Duration} from './delay';
 
 export function getToastIdentity(sourceUuid: string, notificationId: string): Identity {
     return {uuid: SERVICE_IDENTITY.uuid, name: `Notification-Toast:${sourceUuid}:${notificationId}`};
@@ -53,7 +54,11 @@ export async function getToastName(sourceUuid: string, notificationId: string): 
     if (!page) {
         return undefined;
     } else {
-        page.waitForSelector('.app-name', {timeout: 500});
+        try {
+            await page.waitForSelector('.app-name', {timeout: Duration.WAIT_FOR_SELECTOR});
+        } catch (error) {
+            return undefined;
+        }
         return page.$eval('.app-name', (element) => {
             return element.innerHTML;
         });
