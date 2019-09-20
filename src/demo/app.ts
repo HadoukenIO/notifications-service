@@ -1,16 +1,15 @@
 import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
 
-import * as ofnotes from '../client/index';
-import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll, toggleNotificationCenter} from '../client/index';
+import * as api from '../client/index';
+import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll, toggleNotificationCenter, ActionTrigger} from '../client/index';
 import {Events} from '../client/internal';
-import {ActionTrigger} from '../client/actions';
 
 addSpawnListeners();
 
 const receivedEvents: Events[] = [];
 
 // Mount functions and objects used by puppeteer
-Object.assign(window, {createWindow, createApp, notifications: ofnotes, receivedEvents});
+Object.assign(window, {createWindow, createApp, notifications: api, receivedEvents});
 
 const normalNote: NotificationOptions = {
     title: 'Notification Title',
@@ -182,13 +181,13 @@ fin.desktop.main(async () => {
             }
         });
     } else if (queryParams.get('inttest') === 'listeners-on-startup') {
-        ofnotes.addEventListener('notification-action', (event) => {
+        addEventListener('notification-action', (event) => {
             receivedEvents.push(event);
         });
-        ofnotes.addEventListener('notification-created', (event) => {
+        addEventListener('notification-created', (event) => {
             receivedEvents.push(event);
         });
-        ofnotes.addEventListener('notification-closed', (event) => {
+        addEventListener('notification-closed', (event) => {
             receivedEvents.push(event);
         });
     }
