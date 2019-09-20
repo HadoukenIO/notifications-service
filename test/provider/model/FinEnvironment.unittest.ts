@@ -38,7 +38,7 @@ describe('When launching a programmatic application', () => {
 function testLaunch<TStoredApplication extends StoredApplication, TCreateParam>(
     mockCreate: jest.Mock<Promise<Application>, [TCreateParam]>,
     createFakeStoredApplication: () => TStoredApplication,
-    extractLaunchParameter: (param: TStoredApplication) => TCreateParam
+    extractCreateParameter: (param: TStoredApplication) => TCreateParam
 ): void {
     let storedApp: TStoredApplication;
 
@@ -52,7 +52,7 @@ function testLaunch<TStoredApplication extends StoredApplication, TCreateParam>(
         await environment.startApplication(storedApp);
 
         expect(mockCreate).toBeCalledTimes(1);
-        expect(mockCreate).toBeCalledWith(extractLaunchParameter(storedApp));
+        expect(mockCreate).toBeCalledWith(extractCreateParameter(storedApp));
     });
 
     test('Subsequent attempts to launch the same application are ignored', async () => {
@@ -105,6 +105,6 @@ function testLaunch<TStoredApplication extends StoredApplication, TCreateParam>(
         await environment.startApplication(otherApplication);
 
         expect(mockCreate).toBeCalledTimes(2);
-        expect(mockCreate.mock.calls[1]).toEqual([extractLaunchParameter(otherApplication)]);
+        expect(mockCreate.mock.calls[1]).toEqual([extractCreateParameter(otherApplication)]);
     });
 }
