@@ -4,7 +4,7 @@ import {RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RootState} from '../../../src/provider/store/State';
-import {createFakeStoredNotification, createFakeRootState} from '../../utils/unit/fakes';
+import {createFakeStoredNotification, createFakeEmptyRootState} from '../../utils/unit/fakes';
 import {normalizeRootState} from '../../utils/unit/normalization';
 import {Action} from '../../../src/provider/store/Store';
 
@@ -24,7 +24,7 @@ beforeEach(() => {
     note3 = createFakeStoredNotification();
 
     state = {
-        ...createFakeRootState(),
+        ...createFakeEmptyRootState(),
         notifications: [note1, note2, note3]
     };
 

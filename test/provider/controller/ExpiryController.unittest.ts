@@ -4,7 +4,7 @@ import {Signal} from 'openfin-service-signal';
 
 import {ExpiryController} from '../../../src/provider/controller/ExpiryController';
 import {createMockServiceStore, useMocksInInjector, getterMock} from '../../utils/unit/mocks';
-import {createFakeRootState, createFakeStoredNotification, createFakeNotificationInternal} from '../../utils/unit/fakes';
+import {createFakeEmptyRootState, createFakeStoredNotification, createFakeNotificationInternal} from '../../utils/unit/fakes';
 import {RootState} from '../../../src/provider/store/State';
 import {ExpireNotification, RemoveNotifications} from '../../../src/provider/store/Actions';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
@@ -41,7 +41,7 @@ test('When the service is started with notification that expired in the past, th
     const expiredNotification = createFakeExpiringStoredNotification(100);
 
     state = {
-        ...createFakeRootState(),
+        ...createFakeEmptyRootState(),
         notifications: [expiredNotification]
     };
 
@@ -58,7 +58,7 @@ test('When the service is started with multiple notifications that expired in th
     const expiredNotification3 = createFakeExpiringStoredNotification(300);
 
     state = {
-        ...createFakeRootState(),
+        ...createFakeEmptyRootState(),
         // Intentionally out of order, so we know expiry ordering is determined by time, and not order in store
         notifications: [expiredNotification2, expiredNotification1, expiredNotification3]
     };

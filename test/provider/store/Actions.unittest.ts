@@ -5,7 +5,7 @@ import {Action} from '../../../src/provider/store/Store';
 import {RootState} from '../../../src/provider/store/State';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
-import {createFakeStoredNotification, createFakeRootState} from '../../utils/unit/fakes';
+import {createFakeStoredNotification, createFakeEmptyRootState} from '../../utils/unit/fakes';
 
 type TestParam = [string, (note: StoredNotification) => Action<RootState>];
 
@@ -18,7 +18,7 @@ beforeEach(() => {
     jest.resetAllMocks();
 
     note = createFakeStoredNotification();
-    state = {...createFakeRootState(), notifications: [note]};
+    state = {...createFakeEmptyRootState(), notifications: [note]};
 
     getterMock(mockServiceStore, 'state').mockImplementation(() => state);
     mockServiceStore.dispatch.mockImplementation(async (action: Action<RootState>) => {

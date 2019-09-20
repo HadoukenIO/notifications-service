@@ -3,6 +3,7 @@ import {MonitorInfo} from 'openfin/_v2/api/system/monitor';
 import {Signal} from 'openfin-service-signal';
 import {JSDOM} from 'jsdom';
 import {Transition, TransitionOptions, Bounds} from 'openfin/_v2/shapes';
+import {Identity} from 'openfin/_v2/main';
 
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {RootState} from '../../../src/provider/store/State';
@@ -11,22 +12,24 @@ import {NotificationInternal} from '../../../src/client/internal';
 import {WebWindow} from '../../../src/provider/model/WebWindow';
 
 /**
- * Utility functions for creating fake data for use in unit tests. These make use of random strings to guard against
- * accidental false positives when comparing data.
+ * Utility functions for creating fake data for use in unit tests. Except functions named 'Empty, repeated calls to
+ * each function will give unique results, to guard against false positives in tests.
  */
+
+let fakeCount = 0;
 
 export function createFakeStoredNotification(): StoredNotification {
     return {
-        id: randomString(),
-        source: {name: `test-window-${randomString()}`, uuid: `test-app-${randomString()}`},
+        id: idString(),
+        source: createFakeIdentity(),
         notification: createFakeNotificationInternal()
     };
 }
 
 export function createFakeNotificationInternal(): NotificationInternal {
     return {
-        id: randomString(),
-        title: `Notification Title ${randomString()}`,
+        id: idString(),
+        title: `Notification Title ${idString()}`,
         body: 'Notification Body',
         category: 'Notification Category',
         icon: 'icon',
@@ -40,7 +43,42 @@ export function createFakeNotificationInternal(): NotificationInternal {
     };
 }
 
-export function createFakeRootState(): RootState {
+export function createFakeUuid(): string {
+    return `test-app-${idString()}`;
+}
+
+export function createFakeIdentity(): Identity {
+    return {name: `test-window-${idString()}`, uuid: createFakeUuid()};
+}
+
+export function createFakeStoredApplication(): StoredApplication {
+    return createFakeManifestStoredApplication();
+}
+
+// Prefer `createFakeStoredApplication`, unless your test absolutely depends on the type of stored application
+export function createFakeManifestStoredApplication(): StoredApplication & {type: 'manifest', manifestUrl: string} {
+    return {
+        type: 'manifest',
+        id: `test-app-${idString()}`,
+        title: `Test App ${idString()}`,
+        manifestUrl: `test-manifest-${idString()}`
+    };
+}
+
+// Prefer `createFakeStoredApplication`, unless your test absolutely depends on the type of stored application
+export function createFakeProgrammaticApplication(): StoredApplication & {type: 'programmatic', initialOptions: ApplicationOption} {
+    const uuid = idString();
+
+    return {
+        type: 'programmatic',
+        id: `test-app-${uuid}`,
+        title: `Test App ${idString()}`,
+        initialOptions: {uuid: `test-app-${uuid}`},
+        parentUuid: `test-parent-app-${idString()}`
+    };
+}
+
+export function createFakeEmptyRootState(): RootState {
     return {
         notifications: [],
         applications: new Map<string, StoredApplication>(),
@@ -50,7 +88,7 @@ export function createFakeRootState(): RootState {
 }
 
 // Considered a 'fake' rather than a 'mock' due to state in `document` that cannot be reset by `jest.resetAllMocks`
-export function createFakeWebWindow(): jest.Mocked<WebWindow> {
+export function createFakeEmptyWebWindow(): jest.Mocked<WebWindow> {
     return {
         onMouseEnter: new Signal<[]>(),
         onMouseLeave: new Signal<[]>(),
@@ -66,34 +104,7 @@ export function createFakeWebWindow(): jest.Mocked<WebWindow> {
     };
 }
 
-export function createFakeStoredApplication(): StoredApplication {
-    return createFakeManifestStoredApplication();
-}
-
-// Prefer `createFakeStoredApplication`, unless your test absolutely depends on the type of stored application
-export function createFakeManifestStoredApplication(): StoredApplication & {type: 'manifest', manifestUrl: string} {
-    return {
-        type: 'manifest',
-        id: `test-app-${randomString()}`,
-        title: `Test App ${randomString()}`,
-        manifestUrl: `test-manifest-${randomString()}`
-    };
-}
-
-// Prefer `createFakeStoredApplication`, unless your test absolutely depends on the type of stored application
-export function createFakeProgrammaticApplication(): StoredApplication & {type: 'programmatic', initialOptions: ApplicationOption} {
-    const uuid = randomString();
-
-    return {
-        type: 'programmatic',
-        id: `test-app-${uuid}`,
-        title: `Test App ${randomString()}`,
-        initialOptions: {uuid: `test-app-${uuid}`},
-        parentUuid: `test-parent-app-${randomString()}`
-    };
-}
-
-export function createFakeMonitorInfo(): MonitorInfo {
+export function createFakeEmptyMonitorInfo(): MonitorInfo {
     return {
         deviceScaleFactor: 1,
         dpi: {x: 1, y: 1},
@@ -104,11 +115,11 @@ export function createFakeMonitorInfo(): MonitorInfo {
                 scaledRect: {bottom: 0, left: 0, top: 0, right: 0}
             },
             availableRect: {bottom: 0, left: 0, top: 0, right: 0},
-            deviceId: randomString(),
+            deviceId: idString(),
             displayDeviceActive: true,
             deviceScaleFactor: 1,
             monitorRect: {bottom: 0, left: 0, top: 0, right: 0},
-            name: randomString(),
+            name: idString(),
             dpi: {x: 1, y: 1},
             monitor: {
                 dipRect: {bottom: 0, left: 0, top: 0, right: 0},
@@ -133,6 +144,6 @@ export function createFakeMonitorInfo(): MonitorInfo {
     };
 }
 
-function randomString(): string {
-    return Math.floor((Math.random() * 9 + 1) * 1e8).toString();
+function idString(): string {
+    return `[${(fakeCount++).toString(16)}]`;
 }

@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import {useMockTime, advanceTime} from '../../utils/unit/time';
 import {ToggleCenterVisibilitySource, ToggleCenterVisibility, BlurCenter} from '../../../src/provider/store/Actions';
 import {createMockServiceStore, getterMock} from '../../utils/unit/mocks';
-import {createFakeRootState} from '../../utils/unit/fakes';
+import {createFakeEmptyRootState} from '../../utils/unit/fakes';
 import {RootState} from '../../../src/provider/store/State';
 import {Action} from '../../../src/provider/store/Store';
 
@@ -32,7 +32,7 @@ describe.each([
     ['closed', false]
 ] as VisibilityTestParam[])('When the Notification Center is %s', (titleParam: string, centerVisible: boolean) => {
     beforeEach(() => {
-        state = {...createFakeRootState(), centerVisible};
+        state = {...createFakeEmptyRootState(), centerVisible};
     });
 
     test('When Notification Center is blurred, the Notification Center will close if not already closed', async () => {

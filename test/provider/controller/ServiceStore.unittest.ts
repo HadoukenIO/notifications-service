@@ -6,7 +6,7 @@ import {StoredNotification} from '../../../src/provider/model/StoredNotification
 import {StoredApplication} from '../../../src/provider/model/Environment';
 import {CollectionMap, Database} from '../../../src/provider/model/database/Database';
 import {DeferredPromise} from '../../../src/provider/common/DeferredPromise';
-import {createFakeStoredNotification, createFakeStoredApplication, createFakeRootState} from '../../utils/unit/fakes';
+import {createFakeStoredNotification, createFakeStoredApplication, createFakeEmptyRootState} from '../../utils/unit/fakes';
 import {normalizeRootState} from '../../utils/unit/normalization';
 import {RootState} from '../../../src/provider/store/State';
 import {Action} from '../../../src/provider/store/Store';
@@ -90,7 +90,7 @@ describe('When the store is initialized', () => {
     });
 
     test('When an action is dispatched, it is reduced synchronously', async () => {
-        const state = {...createFakeRootState(), notifications: [createFakeStoredNotification()]};
+        const state = {...createFakeEmptyRootState(), notifications: [createFakeStoredNotification()]};
         mockAction.reduce.mockReturnValue(state);
 
         const promise = serviceStore.dispatch(mockAction);
@@ -126,7 +126,7 @@ describe('When the store is initialized', () => {
         });
 
         test('Action listeners are called synchronously', async () => {
-            mockAction.reduce.mockReturnValue(createFakeRootState());
+            mockAction.reduce.mockReturnValue(createFakeEmptyRootState());
 
             const promise = serviceStore.dispatch(mockAction);
 
@@ -142,7 +142,7 @@ describe('When the store is initialized', () => {
         });
 
         test('The call only resolves once all action listeners have resolved', async () => {
-            mockAction.reduce.mockReturnValue(createFakeRootState());
+            mockAction.reduce.mockReturnValue(createFakeEmptyRootState());
 
             let resolved = false;
 
