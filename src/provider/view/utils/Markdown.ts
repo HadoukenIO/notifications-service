@@ -1,4 +1,4 @@
-const markdown = require('markdown-it');
+import markdown from 'markdown-it';
 
 const md = markdown('zero', {breaks: true});
 

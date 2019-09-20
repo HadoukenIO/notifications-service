@@ -1,13 +1,8 @@
-// require because this is imported by the tests
-// which have esModuleIntrop = false
-const moment = require('moment');
-
-let localeData = moment.localeData();
+import moment from 'moment';
 
 const language = this.navigator ? navigator.language : 'en';
-localeData = moment.localeData(language);
 
-moment.defineLocale(localeData, {
+moment.updateLocale(language, {
     relativeTime: {
         future: (value: string) => value === 'now' ? 'soon' : 'in ' + value,
         past: (value: string) => value === 'now' ? value : value + ' ago',
@@ -26,7 +21,7 @@ moment.defineLocale(localeData, {
 });
 
 export function getDateTitle(date: Date | number): string {
-    return moment(date).calendar(localeData, {
+    return moment(date).calendar(undefined, {
         sameDay: '[Today]',
         nextDay: '[Tomorrow]',
         nextWeek: 'dddd',
