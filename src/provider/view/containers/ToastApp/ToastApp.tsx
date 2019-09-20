@@ -55,11 +55,13 @@ export function renderApp(
         title: (store.state.applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title
     };
     ReactDOM.render(
-        <WindowProvider value={webWindow.nativeWindow}>
-            <Provider store={store as unknown as Store<RootState>}>
+        // Replace redux store with service store implementation.
+        // This will resolve the interface incompatibility issues.
+        <Provider store={store as unknown as Store<RootState>}>
+            <WindowProvider value={webWindow.nativeWindow}>
                 <Container storeApi={store} notification={titledNotification} setWindowSize={setWindowSize} />
-            </Provider>
-        </WindowProvider>,
+            </WindowProvider>
+        </Provider>,
         webWindow.document.getElementById('react-app')
     );
 }
