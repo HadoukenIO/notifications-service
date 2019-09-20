@@ -183,9 +183,10 @@ export type CustomData = {[key: string]: any};
 export type Notification = Readonly<Required<Omit<NotificationOptions, 'buttons'>> & {readonly buttons: ReadonlyArray<Readonly<Required<ButtonOptions>>>}>;
 
 /**
- * Event fired when an action is raised for a notification UI elements. It is important to note that applications will
- * only receive these events if they indicate to the service that they want to receive these events. See {@link Actions}
- * for a full example of how actions are defined, and how an application can listen to and handle them.
+ * Event fired when an action is raised for a notification due to a specified trigger. It is important to note that
+ * applications will only receive these events if they indicate to the service that they want to receive these events.
+ * See {@link Actions} for a full example of how actions are defined, and how an application can listen to and handle
+ * them.
  *
  * This can be fired due to interaction with notification buttons or the notification itself, the notification being
  * closed (either by user interaction or by API call), or by the notification expiring. Later versions of the service
