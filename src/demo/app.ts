@@ -33,8 +33,8 @@ Some text below. **Bold**. _Italic_.
 
 - Item 1
 - Item 2
-    - A
-    - B
+    1. A
+    2. B
 - Item 3
 
 > Block quote

@@ -52,10 +52,30 @@
             width: 100%;
 
             li {
-                margin-left: 1em;
+                margin-left: 4px;
+                list-style-position: inside;
                 display: list-item;
                 list-style-type: disc;
                 width: 100%;
+            }
+
+        }
+
+        ul ol,
+        ol ul {
+            padding: 4px;
+        }
+
+        ol {
+            padding: 8px;
+            width: 100%;
+            list-style-type: decimal;
+
+            li {
+                margin-left: 4px;
+                list-style-position: inside;
+                display: list-item;
+                list-style-type: decimal;
             }
         }
 
