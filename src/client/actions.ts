@@ -10,9 +10,8 @@
  * event.
  *
  * This event is fired once each time an action is raised, and will contain the
- * {@link NotificationActionResult|action result} the application specified for that trigger. The application may
- * then use the {@link NotificationActionResult|action result} to determine the trigger that occurred and respond
- * appropriately.
+ * {@link NotificationActionResult|action result} the application specified for that trigger. The application may then
+ * use the {@link NotificationActionResult|action result} to determine which trigger occurred and respond appropriately.
  *
  * If an {@link NotificationActionResult|action result} is not specified for a particular trigger, or it is set to
  * `null`, the application will not receive a corresponding {@link NotificationActionEvent|`notification-action`} when
