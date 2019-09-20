@@ -2,8 +2,8 @@ import 'reflect-metadata';
 
 import {EventEmitter} from 'events';
 
-import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
 import {Application} from 'openfin/_v2/main';
+import {ApplicationOption} from 'hadouken-js-adapter/out/types/src/api/application/applicationOption';
 
 import {FinEnvironment} from '../../../src/provider/model/FinEnvironment';
 import {StoredApplication} from '../../../src/provider/model/Environment';
@@ -21,108 +21,67 @@ beforeEach(async () => {
 });
 
 describe('When launching a manifest application', () => {
-    let manifestApp: StoredApplication & {type: 'manifest', manifestUrl: string};
-
-    let mockCreateFromManifest: jest.Mock<Promise<Application>, [string]>;
-
-    beforeEach(() => {
-        manifestApp = createFakeManifestStoredApplication();
-
-        mockCreateFromManifest = mockFin.Application.createFromManifest;
-
-        mockCreateFromManifest.mockResolvedValue(createMockApplication());
-    });
-
-    test('The app is launched through the OpenFin runtime', async () => {
-        await environment.startApplication(manifestApp);
-
-        expect(mockCreateFromManifest).toBeCalledTimes(1);
-        expect(mockCreateFromManifest).toBeCalledWith(manifestApp.manifestUrl);
-    });
-
-    test('Subsequent attempts to launch the same application are ignored', async () => {
-        await environment.startApplication(manifestApp);
-
-        for (let i = 0; i < 10; i++) {
-            await environment.startApplication(manifestApp);
-        }
-
-        expect(mockCreateFromManifest).toBeCalledTimes(1);
-    });
-
-    test('Subsequent attempts to launch a different application are not ignored', async () => {
-        const otherApplication = createFakeManifestStoredApplication();
-
-        await environment.startApplication(manifestApp);
-        await environment.startApplication(otherApplication);
-
-        expect(mockCreateFromManifest).toBeCalledTimes(2);
-        expect(mockCreateFromManifest.mock.calls[1]).toEqual([otherApplication.manifestUrl]);
-    });
-
-    test('Once the app is initialized, we can attempt to launch the app again', async () => {
-        const mockApp = new EventEmitter() as unknown as Application;
-        Object.assign(mockApp, {
-            run: jest.fn<Promise<void>, []>()
-        });
-
-        mockCreateFromManifest.mockResolvedValue(mockApp);
-
-        await environment.startApplication(manifestApp);
-        mockApp.emit('initialized', {uuid: manifestApp.id, type: 'initialized', topic: 'application'});
-        await environment.startApplication(manifestApp);
-
-        expect(mockCreateFromManifest).toBeCalledTimes(2);
-    });
-
-    test('If app launch fails, we can attempt to launch the app again', async () => {
-        mockCreateFromManifest.mockRejectedValueOnce(new Error()).mockResolvedValue(createMockApplication());
-
-        await environment.startApplication(manifestApp);
-        await environment.startApplication(manifestApp);
-
-        expect(mockCreateFromManifest).toBeCalledTimes(2);
-    });
+    testLaunch(
+        mockFin.Application.createFromManifest,
+        createFakeManifestStoredApplication,
+        (application: StoredApplication & {manifestUrl: string}) => application.manifestUrl
+    );
 });
 
 describe('When launching a programmatic application', () => {
-    let programmaticApp: StoredApplication & {type: 'programmatic', initialOptions: ApplicationOption};
+    testLaunch(
+        mockFin.Application.create,
+        createFakeProgrammaticApplication,
+        (application: StoredApplication & {initialOptions: ApplicationOption}) => application.initialOptions
+    );
+});
 
-    let mockCreate: jest.Mock<Promise<Application>, [ApplicationOption]>;
+function testLaunch<TStoredApplication extends StoredApplication, TCreateParam>(
+    mockCreate: jest.Mock<Promise<Application>, [TCreateParam]>,
+    createFakeStoredApplication: () => TStoredApplication,
+    extractLaunchParamer: (param: TStoredApplication) => TCreateParam
+): void {
+    let storedApp: TStoredApplication;
 
     beforeEach(() => {
-        programmaticApp = createFakeProgrammaticApplication();
-
-        mockCreate = mockFin.Application.create;
+        storedApp = createFakeStoredApplication();
 
         mockCreate.mockResolvedValue(createMockApplication());
     });
 
     test('The app is launched through the OpenFin runtime', async () => {
-        await environment.startApplication(programmaticApp);
+        await environment.startApplication(storedApp);
 
         expect(mockCreate).toBeCalledTimes(1);
-        expect(mockCreate).toBeCalledWith(programmaticApp.initialOptions);
+        expect(mockCreate).toBeCalledWith(extractLaunchParamer(storedApp));
     });
 
     test('Subsequent attempts to launch the same application are ignored', async () => {
-        await environment.startApplication(programmaticApp);
+        await environment.startApplication(storedApp);
 
         for (let i = 0; i < 10; i++) {
-            await environment.startApplication(programmaticApp);
+            await environment.startApplication(storedApp);
         }
 
         expect(mockCreate).toBeCalledTimes(1);
     });
 
-    test('Subsequent attempts to launch a different application are not ignored', async () => {
-        const otherApplication = createFakeProgrammaticApplication();
+    test('If app launch fails, we can attempt to launch the app again', async () => {
+        mockCreate.mockRejectedValueOnce(new Error()).mockResolvedValue(createMockApplication());
 
-        await environment.startApplication(programmaticApp);
-        await environment.startApplication(otherApplication);
+        await environment.startApplication(storedApp);
+        await environment.startApplication(storedApp);
 
         expect(mockCreate).toBeCalledTimes(2);
-        expect(mockCreate.mock.calls[1]).toEqual([otherApplication.initialOptions]);
+    });
+
+    test('If app launch fails, we can attempt to launch the app again', async () => {
+        mockCreate.mockRejectedValueOnce(new Error()).mockResolvedValue(createMockApplication());
+
+        await environment.startApplication(storedApp);
+        await environment.startApplication(storedApp);
+
+        expect(mockCreate).toBeCalledTimes(2);
     });
 
     test('Once the app is initialized, we can attempt to launch the app again', async () => {
@@ -133,21 +92,20 @@ describe('When launching a programmatic application', () => {
 
         mockCreate.mockResolvedValue(mockApp);
 
-        await environment.startApplication(programmaticApp);
-        mockApp.emit('initialized', {uuid: programmaticApp.id, type: 'initialized', topic: 'application'});
-        await environment.startApplication(programmaticApp);
+        await environment.startApplication(storedApp);
+        mockApp.emit('initialized', {uuid: storedApp.id, type: 'initialized', topic: 'application'});
+        await environment.startApplication(storedApp);
 
         expect(mockCreate).toBeCalledTimes(2);
     });
 
-    test('If app launch fails, we can attempt to launch the app again', async () => {
-        mockCreate.mockImplementationOnce(async () => {
-            throw new Error();
-        }).mockResolvedValue(createMockApplication());
+    test('Subsequent attempts to launch a different application are not ignored', async () => {
+        const otherApplication = createFakeStoredApplication();
 
-        await environment.startApplication(programmaticApp);
-        await environment.startApplication(programmaticApp);
+        await environment.startApplication(storedApp);
+        await environment.startApplication(otherApplication);
 
         expect(mockCreate).toBeCalledTimes(2);
+        expect(mockCreate.mock.calls[1]).toEqual([extractLaunchParamer(otherApplication)]);
     });
-});
+}
