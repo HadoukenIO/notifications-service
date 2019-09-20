@@ -4,10 +4,10 @@ import * as path from 'path';
 
 import * as mkdirp from 'mkdirp';
 import fetch from 'node-fetch';
-import * as puppeteer from 'puppeteer';
+import {connect, Browser} from 'puppeteer';
 import * as jsAdapter from 'hadouken-js-adapter';
 
-declare const global: NodeJS.Global&{__BROWSER_GLOBAL__: puppeteer.Browser};
+declare const global: NodeJS.Global&{__BROWSER_GLOBAL__: Browser};
 
 const DIR = path.join(os.tmpdir(), 'jest_puppeteer_global_setup');
 
@@ -31,7 +31,7 @@ module.exports = async () => {
     if (!browserWSEndpoint) {
         throw new Error('Could not get webSocket endpoint for puppeteer connection');
     }
-    const browser = await puppeteer.connect({browserWSEndpoint});
+    const browser = await connect({browserWSEndpoint});
 
     // store the browser instance so we can teardown it later
     // this global is only available in the teardown but not in TestEnvironments

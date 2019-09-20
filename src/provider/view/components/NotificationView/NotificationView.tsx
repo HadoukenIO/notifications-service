@@ -1,43 +1,18 @@
 import * as React from 'react';
-import moment from 'moment';
+import {TransitionGroup, CSSTransition} from 'react-transition-group';
 
 import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
-import {GroupingType as GroupingType} from '../../containers/NotificationCenterApp';
-import {StoredNotification} from '../../../model/StoredNotification';
-import {TitledNotification} from '../NotificationCard/NotificationCard';
+import {GroupingType, Group, groupNotifications} from '../../utils/Grouping';
 import {StoredApplicationMap} from '../../../store/State';
-import {Actionable} from '../../../store/Actions';
+import {StoredNotification} from '../../../model/StoredNotification';
+import {TitledNotification, Actionable} from '../../types';
 
-interface NotificationViewProps extends Actionable {
+import './NotificationView.scss';
+
+interface Props extends Actionable {
     notifications: StoredNotification[];
+    groupBy: GroupingType;
     applications: StoredApplicationMap,
-    groupBy?: GroupingType;
-}
-
-/**
- * A notification group - a set of notifications that should be grouped together
- * within the UI.
- *
- * Grouping method can vary, but all grouping methods will produce a set of
- * these groups.
- */
-interface Group {
-    /**
-     * Unique key for this group. Mainly used for storing a date string so as time passes we do not need to recalculate the date to group the notifications by.
-     */
-    key: string;
-    /**
-     * User-visibile title that will be displayed above these notifications
-     */
-    title: string;
-
-    /**
-     * The notifications to display within this group.
-     *
-     * This array should always contain at least one notification. If there are no
-     * notifications that fit within this category then the group should be deleted.
-     */
-    notifications: TitledNotification[];
 }
 
 /**
@@ -48,100 +23,43 @@ interface Group {
  * the only input is a flat list of all notifications.
  * @param props Props
  */
-export function NotificationView(props: NotificationViewProps) {
-    const {notifications, applications, groupBy = GroupingType.APPLICATION, ...rest} = props;
-    // TODO: Use useEffect hook
-    // Sort the notification by groups
-    const groups: Group[] = groupNotifications(notifications, applications, groupBy);
+export function NotificationView(props: Props) {
+    const {notifications, applications, groupBy, ...rest} = props;
+    const [groups, setGroups] = React.useState<Group[]>([]);
+
+    React.useEffect(() => {
+        // Sort the notification by groups
+        setGroups(groupNotifications(notifications, applications, groupBy));
+    }, [notifications, groupBy]);
 
     return (
-        <div className="panel">
+        <TransitionGroup className="view" component="div">
+            <NoNotificationsMessage visible={notifications.length === 0} />
             {
                 groups.map((group: Group) => (
-                    <NotificationGroup
+                    <CSSTransition
                         key={group.key}
-                        name={group.title}
-                        notifications={group.notifications}
-                        {...rest}
-                    />
+                        timeout={200}
+                        classNames="group-item"
+                        exit={groupBy === group.type}
+                    >
+                        <NotificationGroup
+                            key={group.key}
+                            name={group.title}
+                            notifications={group.notifications}
+                            {...rest}
+                        />
+                    </CSSTransition>
                 ))
             }
-        </div>
+        </TransitionGroup>
     );
 }
 
-/**
- * When creating a new notification group, this function determines the
- * user-visible title for the group
- * @param notification Notificiation
- * @param groupingType Grouping method
- */
-function getGroupTitle(notification: TitledNotification, groupingType: GroupingType): string {
-    if (groupingType === GroupingType.APPLICATION) {
-        return notification.title;
-    } else if (groupingType === GroupingType.DATE) {
-        const {date} = notification.notification;
-        return moment(date).calendar(undefined, {
-            sameDay: '[Today]',
-            nextDay: '[Tomorrow]',
-            nextWeek: 'dddd',
-            lastDay: '[Yesterday]',
-            lastWeek: '[Last] dddd',
-            sameElse: 'DD/MM/YYYY'
-        });
-    }
-    throw new Error(`invalid groupMethod : ${groupingType}`);
+export function NoNotificationsMessage({visible}: {visible: boolean}) {
+    return (
+        <div className="no-notes-message" style={{display: visible ? 'block' : 'none'}}>
+            <h3>No new notifications</h3>
+        </div>
+    );
 }
-
-/**
- * Group notifications together based on the given grouping method e.g. application/date.
- * @param notifications List of notifications to sort into groups.
- * @param applications A map of application registry to resolve the notification title
- * @param groupMethod Grouping type to use for sorting.
- */
-function groupNotifications(notifications: StoredNotification[], applications: StoredApplicationMap, groupMethod: GroupingType): Group[] {
-    // TODO: This sorting should be removed and changed to use insert-sort inside the reduce below
-    const groupMap = notifications.map((notification) => {
-        // Map stored notifications to titled notifications
-        return {...notification, title: (applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title};
-    }).sort((a: StoredNotification, b: StoredNotification) => {
-        // Sort notifications by date (groups will then also be sorted by date)
-        return b.notification.date.valueOf() - a.notification.date.valueOf();
-    }).reduce((groups: Map<string, Group>, currentNotification: TitledNotification) => {
-        // Reduce the titled notifications array into a Map of notifications grouped by their title
-        const groupTitle = getGroupTitle(currentNotification, groupMethod);
-        let key: string;
-        if (groupMethod === GroupingType.DATE) {
-            const date = new Date(currentNotification.notification.date);
-            key = [
-                date.getUTCFullYear(),
-                date.getMonth(),
-                date.getDate()
-            ].join('-');
-        } else {
-            key = currentNotification.source.uuid;
-        }
-        // If group title already exists just add it to the group
-        if (groups.has(key)) {
-            const group = groups.get(key)!;
-            groups.set(key, {
-                ...group,
-                notifications: [
-                    ...group.notifications,
-                    currentNotification
-                ]
-            });
-        } else {
-            // Create a new group and add the notification to the group
-            groups.set(key, {
-                key: key,
-                title: groupTitle,
-                notifications: [currentNotification]
-            });
-        }
-        return groups;
-    }, new Map<string, Group>());
-
-    return Array.from(groupMap.values());
-}
-

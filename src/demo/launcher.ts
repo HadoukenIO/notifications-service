@@ -15,7 +15,7 @@ console.log(`creating ${numApps} apps at: ${baseUrl}`);
     await Promise.all(uuids.map(async (uuid: string, index: number) => {
         const conf = {
             uuid,
-            name: `OpenFin Notifications Demo App ${index}`,
+            name: `OpenFin Demo App ${index}`,
             url: `${baseUrl}/app.html`,
             mainWindowOptions: {
                 defaultHeight: 565,

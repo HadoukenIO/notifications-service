@@ -3,7 +3,7 @@ import {injectable, inject} from 'inversify';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastState} from '../model/Toast';
-import {CreateNotification, RemoveNotifications, ToggleCenterVisibility} from '../store/Actions';
+import {CreateNotification, RemoveNotifications, ToggleCenterVisibility, MinimizeToast} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {Action} from '../store/Store';
 import {RootState} from '../store/State';
@@ -154,6 +154,13 @@ export class ToastManager extends AsyncInit {
 
         if (action instanceof ToggleCenterVisibility) {
             this.closeAll();
+        }
+
+        if (action instanceof MinimizeToast) {
+            const toast: Toast | null = this._stack.getToast(action.notification.id);
+            if (toast) {
+                toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
+            }
         }
     }
 
