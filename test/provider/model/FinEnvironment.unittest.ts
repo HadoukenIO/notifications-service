@@ -3,7 +3,6 @@ import 'reflect-metadata';
 import {EventEmitter} from 'events';
 
 import {Application} from 'openfin/_v2/main';
-import {ApplicationOption} from 'hadouken-js-adapter/out/types/src/api/application/applicationOption';
 
 import {FinEnvironment} from '../../../src/provider/model/FinEnvironment';
 import {StoredApplication} from '../../../src/provider/model/Environment';
@@ -24,7 +23,7 @@ describe('When launching a manifest application', () => {
     testLaunch(
         mockFin.Application.createFromManifest,
         createFakeManifestStoredApplication,
-        (application: StoredApplication & {manifestUrl: string}) => application.manifestUrl
+        (application) => application.manifestUrl
     );
 });
 
@@ -32,14 +31,14 @@ describe('When launching a programmatic application', () => {
     testLaunch(
         mockFin.Application.create,
         createFakeProgrammaticApplication,
-        (application: StoredApplication & {initialOptions: ApplicationOption}) => application.initialOptions
+        (application) => application.initialOptions
     );
 });
 
 function testLaunch<TStoredApplication extends StoredApplication, TCreateParam>(
     mockCreate: jest.Mock<Promise<Application>, [TCreateParam]>,
     createFakeStoredApplication: () => TStoredApplication,
-    extractLaunchParamer: (param: TStoredApplication) => TCreateParam
+    extractLaunchParameter: (param: TStoredApplication) => TCreateParam
 ): void {
     let storedApp: TStoredApplication;
 
@@ -53,7 +52,7 @@ function testLaunch<TStoredApplication extends StoredApplication, TCreateParam>(
         await environment.startApplication(storedApp);
 
         expect(mockCreate).toBeCalledTimes(1);
-        expect(mockCreate).toBeCalledWith(extractLaunchParamer(storedApp));
+        expect(mockCreate).toBeCalledWith(extractLaunchParameter(storedApp));
     });
 
     test('Subsequent attempts to launch the same application are ignored', async () => {
@@ -106,6 +105,6 @@ function testLaunch<TStoredApplication extends StoredApplication, TCreateParam>(
         await environment.startApplication(otherApplication);
 
         expect(mockCreate).toBeCalledTimes(2);
-        expect(mockCreate.mock.calls[1]).toEqual([extractLaunchParamer(otherApplication)]);
+        expect(mockCreate.mock.calls[1]).toEqual([extractLaunchParameter(otherApplication)]);
     });
 }
