@@ -68,15 +68,8 @@ export interface NotificationOptions {
      * Notification body text.
      *
      * This is the main notification content, displayed below the notification title. The notification will expand to fit the length of this text.
-     * Markdown is supported and **only** rendered when displaying a notification.
-     * Supported tags:
-     * - hr
-     * - paragraph
-     * - newline
-     * - list heading
-     * - list
-     * - blockquote
-     * - emphasis
+     * Markdown may be used in the body text to control how it is styled when rendered.
+     * With the exception of links, images & code blocks, all basic syntax as documented [here](https://www.markdownguide.org/basic-syntax) is supported.
      */
     body: string;
 
