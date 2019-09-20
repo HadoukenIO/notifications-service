@@ -1,8 +1,8 @@
 /**
  * Actions are the mechanism through which notifications send messages back to the application that created them. The
- * service defines a number of ways in which actions can be raised (user interactions such as a button press, a
- * notification expiring or being closed, etc.), and it is up to each application to decide if it wishes to be informed
- * when each of these triggers occur.
+ * service defines a number of ways in which actions can be raised (a notification being interacted with by the user,
+ * being closed, expiring, etc.), and it is up to each application to decide if it wishes to be informed when each of
+ * these triggers occur.
  *
  * For an action to be raised when one of these triggers occurs, the application must specify an
  * {@link NotificationActionResult|action result} for each trigger it is interested in. The application should then
