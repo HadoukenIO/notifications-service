@@ -54,7 +54,6 @@ export class ClientRegistry {
                     throw new LaunchApplicationError('Could not launch application', error);
                 }
             } else {
-                // eslint-disable-next-line max-len
                 throw new LaunchApplicationError(`Could not find application initialization data for the application with uuid ${appUuid} in the database.`);
             }
         }
