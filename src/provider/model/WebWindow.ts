@@ -12,6 +12,7 @@ export interface WebWindow {
     onBlurred: Signal<[]>;
 
     document: Document;
+    nativeWindow: Window;
 
     show(): Promise<void>;
     showAt(left: number, top: number): Promise<void>;
