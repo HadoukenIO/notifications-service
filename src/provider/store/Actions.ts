@@ -5,10 +5,6 @@ import {ToggleFilter} from '../utils/ToggleFilter';
 import {RootState} from './State';
 import {Action, StoreAPI} from './Store';
 
-export interface Actionable {
-    storeApi: StoreAPI<RootState>;
-}
-
 export const enum ToggleCenterVisibilitySource {
     API,
     TRAY,
@@ -92,8 +88,7 @@ export class ClickNotification extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
-        await super.dispatch(store);
-        await (new RemoveNotifications([this.notification])).dispatch(store);
+        await Promise.all([super.dispatch(store), new RemoveNotifications([this.notification]).dispatch(store)]);
     }
 }
 
@@ -109,8 +104,7 @@ export class ClickButton extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
-        await super.dispatch(store);
-        await (new RemoveNotifications([this.notification])).dispatch(store);
+        await Promise.all([super.dispatch(store), new RemoveNotifications([this.notification]).dispatch(store)]);
     }
 }
 
@@ -202,6 +196,16 @@ export class ExpireNotification extends Action<RootState> {
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         await super.dispatch(store);
         await (new RemoveNotifications([this.notification])).dispatch(store);
+    }
+}
+
+export class MinimizeToast extends Action<RootState> {
+    public readonly type = '@@NOTIFICATION/MINIMIZE_NOTIFICATION';
+    public readonly notification: StoredNotification;
+
+    constructor(notification: StoredNotification) {
+        super();
+        this.notification = notification;
     }
 }
 
