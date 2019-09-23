@@ -23,7 +23,8 @@ function parseEventWithNotification<T extends {notification: NotificationInterna
         ...event,
         notification: {
             ...notification,
-            date: new Date(notification.date)
+            date: new Date(notification.date),
+            expires: notification.expires !== null ? new Date(notification.expires) : null
         }
     };
 }
@@ -67,6 +68,8 @@ export interface NotificationOptions {
      * Notification body text.
      *
      * This is the main notification content, displayed below the notification title. The notification will expand to fit the length of this text.
+     * Markdown may be used in the body text to control how it is styled when rendered.
+     * With the exception of links, images & code blocks, all basic syntax as documented [here](https://www.markdownguide.org/basic-syntax) is supported.
      */
     body: string;
 
@@ -113,6 +116,13 @@ export interface NotificationOptions {
     date?: Date;
 
     /**
+     * The expiry date and time of the notification. If specified, the notification will be removed at this time, or as
+     * soon as possible after. If not specified, the notification will never expire, and will persist until it
+     * is closed.
+     */
+    expires?: Date | null;
+
+    /**
      * A list of buttons to display below the notification text.
      *
      * Notifications support up to four buttons. Attempting to add more than four will result in the notification
@@ -131,7 +141,20 @@ export interface NotificationOptions {
      * See {@link Actions} for more details on notification actions, and receiving interaction events from
      * notifications.
      */
-    onSelect?: ActionDeclaration<never, never>|null;
+    onSelect?: ActionDeclaration<never, never> | null;
+
+    /**
+     * An {@link NotificationActionResult|action result} to be passed back to the application inside the
+     * {@link NotificationActionEvent|`notification-action`} event fired when the notification the expires.
+     *
+     * If `expires` is specified for the notification, this action will be raised when the notification expires. If
+     * `expires` is not specified for the notification, this action will never be raised. Note that if an `onClose`
+     * action result is also specified, both actions will be raised if and when the notification expires.
+     *
+     * See {@link Actions} for more details on notification actions, and receiving interaction events from
+     * notifications.
+     */
+    onExpire?: ActionDeclaration<never, never> | null;
 
     /**
      * An {@link NotificationActionResult|action result} to be passed back to the application inside the
@@ -139,12 +162,13 @@ export interface NotificationOptions {
      *
      * This action will be raised regardless of how the notification is closed. This can be from user interaction
      * (until future revisions allow default click behaviour to be overriden, this will be any click anywhere within
-     * the notification), or from the notification being programmaticially removed, such as a call to `clear`.
+     * the notification), the notification expiring, or from the notification being programmaticially removed, such as
+     * a call to `clear`.
      *
      * See {@link Actions} for more details on notification actions, and receiving interaction events from
      * notifications.
      */
-    onClose?: ActionDeclaration<never, never>|null;
+    onClose?: ActionDeclaration<never, never> | null;
 }
 
 /**
@@ -238,8 +262,9 @@ export interface NotificationActionEvent<T = CustomData> {
 /**
  * Event fired whenever the notification has been closed.
  *
- * This event is fired regardless of how the notification was closed - i.e.: via a call to `clear`/`clearAll`, or by a
- * user clicking either the notification itself, the notification's close button, or a button on the notification.
+ * This event is fired regardless of how the notification was closed - i.e.: via a call to `clear`/`clearAll`, the
+ * notification expiring, or by a user clicking either the notification itself, the notification's close button, or
+ * a button on the notification.
  *
  * @event
  */
@@ -344,8 +369,16 @@ export async function create(options: NotificationOptions): Promise<Notification
         throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
     }
 
-    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {...options, date: options.date && options.date.valueOf()});
-    return {...response, date: new Date(response.date)};
+    if (options.expires !== undefined && options.expires !== null && !(options.expires instanceof Date)) {
+        throw new Error('Invalid arguments passed to create: "expires" must be null or a valid Date object');
+    }
+
+    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {
+        ...options,
+        date: options.date && options.date.valueOf(),
+        expires: options.expires && options.expires.valueOf()
+    });
+    return {...response, date: new Date(response.date), expires: response.expires !== null ? new Date(response.expires) : null};
 }
 
 /**
@@ -382,7 +415,7 @@ export async function clear(id: string): Promise<boolean> {
 export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
     const response = await tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
-    return response.map(note => ({...note, date: new Date(note.date)}));
+    return response.map(note => ({...note, date: new Date(note.date), expires: note.expires !== null ? new Date(note.expires) : null}));
 }
 
 /**

@@ -3,10 +3,11 @@ import 'fake-indexeddb/auto';
 
 import {Identity} from 'openfin/_v2/main';
 
-import {Database, CollectionMap} from '../../../src/provider/model/database/Database';
 import {ClientRegistry} from '../../../src/provider/model/ClientRegistry';
 import {StoredApplication} from '../../../src/provider/model/Environment';
-import {createMockEnvironment, createMockApiHandler, createMockDatabase} from '../../mocks';
+import {createMockEnvironment, createMockApiHandler, createMockServiceStore} from '../../mocks';
+import {PartiallyWritable} from '../../types';
+import {RegisterApplication} from '../../../src/provider/store/Actions';
 
 jest.unmock('../../../src/provider/model/ClientRegistry');
 
@@ -17,29 +18,30 @@ beforeEach(async () => {
 describe('When attemping to launch an app through the client registry', () => {
     const storedApp: StoredApplication = {
         type: 'manifest',
+        title: 'cr test app',
         id: 'cr-test-app',
         manifestUrl: 'some-manifest-url'
     };
 
     const mockApiHandler = createMockApiHandler();
     const mockEnvironment = createMockEnvironment();
+    const mockServiceStore = createMockServiceStore();
 
     let clientRegistry: ClientRegistry;
-    let database: Database;
 
     beforeEach(async () => {
-        const {Database: ActualDatabase} = jest.requireActual('../../../src/provider/model/database/Database');
-        database = await (new ActualDatabase() as Database).delayedInit();
+        const state = {
+            notifications: [],
+            applications: new Map<string, StoredApplication>(),
+            centerVisible: false,
+            centerLocked: false
+        };
 
-        const collection = database.get(CollectionMap.APPLICATIONS);
-        await collection.upsert(storedApp);
+        state.applications.set(storedApp.id, storedApp);
 
-        clientRegistry = new ClientRegistry(mockApiHandler, database, mockEnvironment);
-    });
+        (mockServiceStore as PartiallyWritable<typeof mockServiceStore, 'state'>).state = state;
 
-    afterEach(async () => {
-        const collection = database.get(CollectionMap.APPLICATIONS);
-        await collection.delete((await collection.getAll()).map(app => app.id));
+        clientRegistry = new ClientRegistry(mockApiHandler, mockServiceStore, mockEnvironment);
     });
 
     test('If the app is not running, the client registry will try to start the app from the stored data in the database', async () => {
@@ -71,16 +73,14 @@ describe('When querying windows', () => {
     const mockApp1Window1 = {uuid: mockUuid1, name: 'mock-window-1'};
     const mockApp1Window2 = {uuid: mockUuid1, name: 'mock-window-2'};
 
-    const mockApp2Window1 = {uuid: mockUuid2, name: 'mock-window-1'};
-
     const mockApiHandler = createMockApiHandler();
     const mockEnvironment = createMockEnvironment();
-    const mockDatabase = createMockDatabase();
+    const mockServiceStore = createMockServiceStore();
 
     let clientRegistry: ClientRegistry;
 
     beforeEach(() => {
-        clientRegistry = new ClientRegistry(mockApiHandler, mockDatabase, mockEnvironment);
+        clientRegistry = new ClientRegistry(mockApiHandler, mockServiceStore, mockEnvironment);
     });
 
     test('Apps start not action-ready', () => {
@@ -97,6 +97,14 @@ describe('When querying windows', () => {
     test('When a window removes its action listener, and it is an app\'s only window, the app becomes not action-ready', () => {
         clientRegistry.onAddEventListener('notification-action', mockApp1Window1);
         clientRegistry.onRemoveEventListener('notification-action', mockApp1Window1);
+
+        expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(false);
+    });
+
+    test('When a window with an action listener disconnects, the app becomes not action-ready', () => {
+        clientRegistry.onAddEventListener('notification-action', mockApp1Window1);
+
+        mockApiHandler.onDisconnection.emit(mockApp1Window1);
 
         expect(clientRegistry.isAppActionReady(mockUuid1)).toBe(false);
     });
@@ -145,5 +153,41 @@ describe('When querying windows', () => {
         clientRegistry.onAddEventListener('notification-closed', mockApp1Window1);
 
         expect(listener).toBeCalledTimes(0);
+    });
+});
+
+describe('When an app connects', () => {
+    const mockApiHandler = createMockApiHandler();
+    const mockEnvironment = createMockEnvironment();
+    const mockServiceStore = createMockServiceStore();
+
+    const mockWindow = {name: 'mock-window', uuid: 'mock-app'};
+    const mockStoredApplication: StoredApplication = {
+        type: 'manifest',
+        title: 'mock application',
+        id: mockWindow.uuid,
+        manifestUrl: 'manifest-url'
+    };
+
+    beforeEach(async () => {
+        mockEnvironment.getApplication.mockImplementation(async (uuid: string) => {
+            if (uuid === mockWindow.uuid) {
+                return mockStoredApplication;
+            } else {
+                return null!;
+            }
+        });
+
+        new ClientRegistry(mockApiHandler, mockServiceStore, mockEnvironment);
+    });
+
+    test('The app is registered with the store', async () => {
+        mockApiHandler.onConnection.emit(mockWindow);
+
+        // Give the promises internal to ClientRegistry a chance to resolve
+        await Promise.resolve();
+
+        expect(mockServiceStore.dispatch).toBeCalledTimes(1);
+        expect(mockServiceStore.dispatch).toBeCalledWith(new RegisterApplication(mockStoredApplication));
     });
 });
