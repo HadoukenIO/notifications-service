@@ -74,15 +74,6 @@ function testLaunch<TStoredApplication extends StoredApplication, TCreateParam>(
         expect(mockCreate).toBeCalledTimes(2);
     });
 
-    test('If app launch fails, we can attempt to launch the app again', async () => {
-        mockCreate.mockRejectedValueOnce(new Error()).mockResolvedValue(createMockApplication());
-
-        await environment.startApplication(storedApp);
-        await environment.startApplication(storedApp);
-
-        expect(mockCreate).toBeCalledTimes(2);
-    });
-
     test('Once the app is initialized, we can attempt to launch the app again', async () => {
         const mockApp = new EventEmitter() as unknown as Application;
         Object.assign(mockApp, {
