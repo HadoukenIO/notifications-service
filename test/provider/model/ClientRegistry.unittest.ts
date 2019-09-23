@@ -109,7 +109,7 @@ describe('When querying windows', () => {
         expect(clientRegistry.isAppActionReady(fakeUUid1)).toBe(true);
     });
 
-    test('When two windows of the same app add an action listener, and then both removes their action listener, the app becomes not action-ready', () => {
+    test('When two windows of the same app add an action listener, and then both remove their action listener, the app becomes not action-ready', () => {
         clientRegistry.onAddEventListener('notification-action', fakeApp1Window1);
         clientRegistry.onAddEventListener('notification-action', fakeApp1Window2);
 
