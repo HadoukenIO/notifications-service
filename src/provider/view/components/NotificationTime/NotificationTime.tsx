@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import {getDate} from '../../utils/Time';
+import {WindowContext} from '../Wrappers/WindowContext';
 
 interface Props {
     date: number;
@@ -8,19 +9,18 @@ interface Props {
 
 export function NotificationTime(props: Props) {
     const {date} = props;
-
+    const window = React.useContext(WindowContext);
     const [formattedDate, setFormattedDate] = React.useState<string>(getDate(date));
 
-    // Update timestamp
     React.useEffect(() => {
-        const timer = setInterval(() => {
+        const timer = window.setInterval(() => {
             setFormattedDate(getDate(date));
-        }, 1000 * 60);
+        }, 60 * 1000);
 
         return () => {
-            clearTimeout(timer);
+            window.clearInterval(timer);
         };
-    });
+    }, []);
 
     return (
         <div className="time single-line">
