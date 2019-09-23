@@ -89,9 +89,8 @@ export class ExpiryController {
             this._nextExpiry = null;
         }
 
-        new ExpireNotification(storedNotificaiton).dispatch(this._store).then(() => {
-            this.scheduleEarliestExpiry(now);
-        });
+        new ExpireNotification(storedNotificaiton).dispatch(this._store);
+        this.scheduleEarliestExpiry(now);
     }
 
     private scheduleEarliestExpiry(now: number): void {
