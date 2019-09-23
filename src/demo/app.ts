@@ -22,7 +22,6 @@ const normalNote: NotificationOptions = {
 };
 
 const longNote: NotificationOptions = {
-    // eslint-disable-next-line max-len
     body: `
 # H1 Title
 Some text below.
