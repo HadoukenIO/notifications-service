@@ -1,0 +1,106 @@
+@import '../../styles/_variables.scss';
+@import '../../styles/animations.scss';
+
+.group {
+    align-self: center;
+    margin-bottom: 10px;
+    position: sticky;
+
+    &>.title {
+        position: relative;
+        font-size: 20px;
+        color: var(--primary-text-color);
+        text-transform: capitalize;
+        padding: 6px 0;
+        margin-bottom: 5px;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+
+        .app {
+            display: flex;
+            flex-direction: row;
+            align-content: space-between;
+            justify-content: center;
+            flex-wrap: nowrap;
+            max-width: 300px;
+
+            .name {
+                display: inline-block;
+                flex: 1;
+                flex-wrap: nowrap;
+                align-self: flex-start;
+                text-align: left;
+            }
+
+            .count {
+                color: var(--center-background-color);
+                background: var(--accent-color);
+                display: inline-block;
+                flex: 0 -1 0;
+                flex-direction: row;
+                align-self: flex-end;
+                position: relative;
+                min-width: 18px;
+                top: -6px;
+                height: 16px;
+                margin-left: 6px;
+                text-align: center;
+                line-height: 12px;
+                font-size: 14px;
+                padding: 3px;
+                font-weight: 600;
+                border-radius: 100px;
+            }
+        }
+
+        .icon {
+            justify-self: right;
+            margin-top: -5px;
+            align-self: right;
+            background: none;
+
+            &:hover .image {
+                background-color: var(--accent-color-highlight);
+            }
+        }
+    }
+
+    .notifications {
+        $animationSpeed: 200ms;
+        list-style: none;
+
+        &>li {
+            list-style: none;
+            margin-bottom: 16px;
+
+            &:last-of-type {
+                margin-bottom: 0;
+            }
+        }
+
+        .item-enter {
+            opacity: 0;
+        }
+
+        .item-exit {
+            opacity: 0;
+        }
+
+        .item-enter-done {
+            opacity: 1;
+        }
+
+        .item-enter-active {
+            animation: fadeIn $animationSpeed ease-in forwards;
+        }
+
+        .item-exit-active {
+            animation: fadeOutRight $animationSpeed ease-in;
+            perspective: 1000;
+            pointer-events: none;
+        }
+    }
+}

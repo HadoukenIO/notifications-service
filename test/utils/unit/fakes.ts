@@ -89,11 +89,14 @@ export function createFakeEmptyRootState(): RootState {
 
 // Considered a 'fake' rather than a 'mock' due to state in `document` that cannot be reset by `jest.resetAllMocks`
 export function createFakeEmptyWebWindow(): jest.Mocked<WebWindow> {
+    const jsdom = new JSDOM();
+
     return {
         onMouseEnter: new Signal<[]>(),
         onMouseLeave: new Signal<[]>(),
         onBlurred: new Signal<[]>(),
-        document: new JSDOM().window.document,
+        document: jsdom.window.document,
+        nativeWindow: jsdom.window,
         show: jest.fn<Promise<void>, []>(),
         showAt: jest.fn<Promise<void>, [number, number]>(),
         hide: jest.fn<Promise<void>, []>(),

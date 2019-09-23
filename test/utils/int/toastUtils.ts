@@ -5,6 +5,8 @@ import {SERVICE_IDENTITY} from '../../../src/client/internal';
 
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
+import {querySelector} from './dom';
+import {Duration} from './delay';
 
 export function getToastIdentity(sourceUuid: string, notificationId: string): Identity {
     return {uuid: SERVICE_IDENTITY.uuid, name: `Notification-Toast:${sourceUuid}:${notificationId}`};
@@ -28,35 +30,36 @@ export async function getToastWindow(sourceUuid: string, notificationId: string)
 
 const ofBrowser = new OFPuppeteerBrowser();
 export async function getToastCards(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
-    const toastIdentity = getToastIdentity(sourceUuid, notificationId);
-    const toastPage = await ofBrowser.getPage(toastIdentity);
-
-    if (!toastPage) {
-        return undefined;
-    } else {
-        return toastPage.$$('.notification');
-    }
+    return toastQuerySelector('.notification-card', sourceUuid, notificationId);
 }
 
 export async function getToastButtons(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
-    const toastIdentity = getToastIdentity(sourceUuid, notificationId);
-    const toastPage = await ofBrowser.getPage(toastIdentity);
+    return toastQuerySelector('.button', sourceUuid, notificationId);
+}
 
-    if (!toastPage) {
-        return undefined;
-    } else {
-        return toastPage.$$('.button');
-    }
+export async function getToastMinimizeButton(sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
+    return toastQuerySelector('.minimize', sourceUuid, notificationId);
+}
+
+export async function toastQuerySelector(selector: string, sourceUuid: string, notificationId: string): Promise<ElementHandle[] | undefined> {
+    const target = getToastIdentity(sourceUuid, notificationId);
+    const result = await querySelector(target, selector);
+    return (result === []) ? undefined : result;
 }
 
 export async function getToastName(sourceUuid: string, notificationId: string): Promise<string | undefined> {
-    const toastIdentity = getToastIdentity(sourceUuid, notificationId);
-    const toastPage = await ofBrowser.getPage(toastIdentity);
+    const target = getToastIdentity(sourceUuid, notificationId);
+    const page = await ofBrowser.getPage(target);
 
-    if (!toastPage) {
+    if (!page) {
         return undefined;
     } else {
-        return toastPage.$eval('.app-name', (element) => {
+        try {
+            await page.waitForSelector('.app-name', {timeout: Duration.WAIT_FOR_SELECTOR});
+        } catch (error) {
+            return undefined;
+        }
+        return page.$eval('.app-name', (element) => {
             return element.innerHTML;
         });
     }
