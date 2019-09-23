@@ -1,0 +1,60 @@
+@import '../../styles/_variables.scss';
+
+.prompt {
+    $max-height: 50px;
+    $duration: 200ms;
+    width: 120px;
+    height: auto;
+    background: var(--strip-background-color);
+    position: absolute;
+    right: -25px;
+    top: 100%;
+    display: flex;
+    align-content: space-around;
+    justify-content: center;
+    flex-direction: row;
+    border-radius: 0 0 0 7px;
+    z-index: 100;
+    overflow: hidden;
+
+    &:focus {
+        outline: none;
+    }
+
+    .icon {
+        margin: 4px 5px;
+    }
+
+    &.animate-enter {
+        max-height: 0;
+
+        .icon {
+            transform: scale(0);
+        }
+    }
+
+    &.animate-enter-active {
+        max-height: $max-height;
+        transition: max-height $duration ease-in;
+
+        .icon {
+            transform: scale(1);
+            transition: transform $duration ease-in-out;
+        }
+    }
+
+    &.animate-exit {
+        max-height: $max-height;
+    }
+
+    &.animate-exit-active {
+        max-height: 0;
+        transition: max-height $duration ease-out;
+
+        .icon {
+            transform: scale(0);
+            transition: transform 200ms ease-in-out;
+        }
+    }
+
+}

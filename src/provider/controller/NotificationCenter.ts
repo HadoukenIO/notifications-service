@@ -5,7 +5,7 @@ import {Inject} from '../common/Injectables';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
 import {ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
-import {renderApp} from '../view/containers/NotificationCenterApp';
+import {renderApp} from '../view/containers/NotificationCenterApp/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
 import {TrayIcon} from '../model/TrayIcon';
 import {Action} from '../store/Store';
@@ -26,6 +26,7 @@ const windowOptions: WindowOption = {
     frame: false,
     alwaysOnTop: true,
     icon: 'ui/favicon.ico',
+    backgroundColor: '#373737',
     showTaskbarIcon: false,
     opacity: 0
 };
@@ -144,12 +145,13 @@ export class NotificationCenter extends AsyncInit {
     private async sizeToFit(): Promise<void> {
         const idealWidth = NotificationCenter.WIDTH;
         await this.hideWindow(true);
-        const monitorInfo = this._monitorModel.monitorInfo;
+        const {monitorInfo} = this._monitorModel;
+        const {availableRect} = monitorInfo.primaryMonitor;
         return this._webWindow.setBounds({
-            left: monitorInfo.primaryMonitor.availableRect.right - idealWidth,
-            top: 0,
+            left: availableRect.right - idealWidth,
+            top: availableRect.top,
             width: idealWidth,
-            height: monitorInfo.primaryMonitor.availableRect.bottom
+            height: availableRect.bottom - availableRect.top
         });
     }
 

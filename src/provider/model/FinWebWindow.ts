@@ -2,7 +2,6 @@ import {_Window} from 'openfin/_v2/api/window/window';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {Signal} from 'openfin-service-signal';
 import {Transition, TransitionOptions, Bounds} from 'openfin/_v2/shapes';
-import * as ReactDOM from 'react-dom';
 import {injectable} from 'inversify';
 
 import {WebWindowFactory, WebWindow} from './WebWindow';
@@ -25,8 +24,8 @@ export class FinWebWindowFactory implements WebWindowFactory {
 
         const webWindow = new FinWebWindow(windowV2, document);
 
-        await windowV2.addListener('mouseenter', () => webWindow.onMouseEnter.emit());
-        await windowV2.addListener('mouseleave', () => webWindow.onMouseLeave.emit());
+        document.addEventListener('mouseenter', () => webWindow.onMouseEnter.emit());
+        document.addEventListener('mouseleave', () => webWindow.onMouseLeave.emit());
         await windowV2.addListener('blurred', () => webWindow.onBlurred.emit());
 
         return webWindow;
@@ -34,16 +33,24 @@ export class FinWebWindowFactory implements WebWindowFactory {
 }
 
 export class FinWebWindow implements WebWindow {
-    public readonly onMouseEnter: Signal<[]> = new Signal<[]>();
-    public readonly onMouseLeave: Signal<[]> = new Signal<[]>();
-    public readonly onBlurred: Signal<[]> = new Signal<[]>();
+    public readonly onMouseEnter: Signal<[]> = new Signal();
+    public readonly onMouseLeave: Signal<[]> = new Signal();
+    public readonly onBlurred: Signal<[]> = new Signal();
 
     private readonly _document: Document;
     private readonly _window: _Window;
 
+    private _isActive: boolean;
+    private _closePromise!: Promise<void>;
+
     constructor(window: _Window, document: Document) {
         this._window = window;
         this._document = document;
+
+        this._isActive = true;
+        this._window.addListener('closing', () => {
+            this._isActive = false;
+        });
     }
 
     public get document(): Document {
@@ -51,35 +58,47 @@ export class FinWebWindow implements WebWindow {
     }
 
     public async show(): Promise<void> {
-        return this._window.show();
+        if (this._isActive) {
+            return this._window.show();
+        }
     }
 
     public async showAt(left: number, top: number): Promise<void> {
-        return this._window.showAt(left, top);
+        if (this._isActive) {
+            return this._window.showAt(left, top);
+        }
     }
 
     public async hide(): Promise<void> {
-        return this._window.hide();
+        if (this._isActive) {
+            return this._window.hide();
+        }
     }
 
     public async setAsForeground(): Promise<void> {
         await this._window.setAsForeground();
         // Focus occurs with `setAsForeground` on Windows but not macOS, so do this for consistency and to make sure we can get a blur event later
-        await window.focus();
+        await this._window.focus();
     }
 
     public async animate(transition: Transition, options: TransitionOptions): Promise<void> {
-        return this._window.animate(transition, options);
+        if (this._isActive) {
+            return this._window.animate(transition, options);
+        }
     }
 
     public async setBounds(bounds: Bounds): Promise<void> {
-        return this._window.setBounds(bounds);
+        if (this._isActive) {
+            return this._window.setBounds(bounds);
+        }
     }
 
     public async close(): Promise<void> {
-        // Workaround for race conditions within toast manager. Will address with SERVICE-581.
-        if (this._window.close) {
-            return this._window.close();
+        if (this._isActive) {
+            this._isActive = false;
+            this._closePromise = this._window.close();
         }
+
+        return this._closePromise;
     }
 }

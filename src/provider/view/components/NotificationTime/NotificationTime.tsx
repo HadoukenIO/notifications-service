@@ -1,19 +1,20 @@
 import * as React from 'react';
-import moment from 'moment';
 
-export interface NotificationTimeProps {
+import {getDate} from '../../utils/Time';
+
+interface Props {
     date: number;
 }
 
-export function NotificationTime(props: NotificationTimeProps) {
+export function NotificationTime(props: Props) {
     const {date} = props;
 
-    const [formattedDate, setFormattedDate] = React.useState<string>(moment(date).fromNow());
+    const [formattedDate, setFormattedDate] = React.useState<string>(getDate(date));
 
     // Update timestamp
     React.useEffect(() => {
         const timer = setInterval(() => {
-            setFormattedDate(moment(date).fromNow());
+            setFormattedDate(getDate(date));
         }, 1000 * 60);
 
         return () => {
@@ -22,10 +23,8 @@ export function NotificationTime(props: NotificationTimeProps) {
     });
 
     return (
-        <div className="time">
-            <span>
-                {formattedDate}
-            </span>
+        <div className="time single-line">
+            {formattedDate}
         </div>
     );
 }
