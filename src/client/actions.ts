@@ -1,21 +1,26 @@
 /**
  * Actions are the mechanism through which notifications send messages back to the application that created them. The
- * service defines a number of ways in which actions can be raised (typically user interactions, such as clicking a
- * button), and it is up to each application to decide if it wishes to be informed of these interactions.
+ * service defines a number of ways in which actions can be raised (a notification being interacted with by the user,
+ * being closed, expiring, etc.), and it is up to each application to decide if it wishes to be informed when each of
+ * these triggers occur.
  *
- * For an action to be raised when one of these interactions occurs, the application must specify an
- * {@link NotificationActionResult|action result} for each interaction it is interested in. The application should then
- * listen for when these actions are raised by listening for the {@link NotificationActionEvent|notification-action}
+ * For an action to be raised when one of these triggers occurs, the application must specify an
+ * {@link NotificationActionResult|action result} for each trigger it is interested in. The application should then
+ * listen for when these actions are raised by listening for the {@link NotificationActionEvent|`notification-action`}
  * event.
  *
  * This event is fired once each time an action is raised, and will contain the
- * {@link NotificationActionResult|action result} the application specified for that interaction. The application may
- * then use the {@link NotificationActionResult|action result} to determine the interaction that occurred and respond
- * appropriately.
+ * {@link NotificationActionResult|action result} the application specified for that trigger. The application may then
+ * use the {@link NotificationActionResult|action result} to determine which trigger occurred and respond appropriately.
  *
- * If an {@link NotificationActionResult|action result} is not specified for a particular interaction, or it is set to
- * `null`, the application will not receive a corresponding {@link NotificationActionEvent|`notification-action`} for
- * that interaction.
+ * If an {@link NotificationActionResult|action result} is not specified for a particular trigger, or it is set to
+ * `null`, the application will not receive a corresponding {@link NotificationActionEvent|`notification-action`} when
+ * that trigger occurs.
+ *
+ * Unlike other event types, {@link NotificationActionEvent|`notification-action`} events will be buffered by the
+ * service until the application has added a listener for this event type, at which point it will receive all buffered
+ * {@link NotificationActionEvent|`notification-action`} events. The service will also attempt to restart the
+ * application if it is not running when the event is fired.
  *
  * For an overview of actions, consider the sample notification below:
  * ```ts
@@ -162,7 +167,7 @@ export enum ActionTrigger {
     SELECT = 'select',
 
     /**
-     * The notification was closed, either by user interaction, or programmatically by an application.
+     * The notification was closed, either by user interaction, programmatically by an application, or by the notification expiring.
      */
     CLOSE = 'close',
 
