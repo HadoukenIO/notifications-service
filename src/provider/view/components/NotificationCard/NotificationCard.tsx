@@ -29,6 +29,15 @@ export function NotificationCard(props: Props) {
     const cardRef = React.createRef<HTMLDivElement>();
     const [validClick, finishedClick] = useOnClickOnly(cardRef);
 
+    const handleError = (error: Error) => {
+        ErrorHandler.for(error)
+            .processError(LaunchApplicationError, function (e: LaunchApplicationError) {
+                console.warn('Unable to launch application');
+                this.log(e);
+            })
+            .throwRemaining();
+    };
+
     const handleNotificationClose = async () => {
         setUninteractable(true);
         await new RemoveNotifications([notification]).dispatch(storeApi);
@@ -46,13 +55,8 @@ export function NotificationCard(props: Props) {
         try {
             // Display loading UI
             await new ClickButton(notification, buttonIndex).dispatch(storeApi);
-        } catch (e) {
-            ErrorHandler.for(e)
-                .processError(LaunchApplicationError, function (e: LaunchApplicationError) {
-                    console.warn('Unable to launch application');
-                    this.log(e);
-                })
-                .throwRemaining();
+        } catch (error) {
+            handleError(error);
         }
     };
 
@@ -69,13 +73,8 @@ export function NotificationCard(props: Props) {
         try {
             // Display loading UI
             await new ClickNotification(notification).dispatch(storeApi);
-        } catch (e) {
-            ErrorHandler.for(e)
-                .processError(LaunchApplicationError, function (e: LaunchApplicationError) {
-                    console.warn('Unable to launch application');
-                    this.log(e);
-                })
-                .throwRemaining();
+        } catch (error) {
+            handleError(error);
         }
         finishedClick();
     };
