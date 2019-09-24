@@ -7,7 +7,8 @@ import {RemoveNotifications, ClickButton, ClickNotification, MinimizeToast} from
 import {useOnClickOnly} from '../../hooks/Clicks';
 import {ClassNames} from '../../utils/ClassNames';
 import {TitledNotification, Actionable} from '../../types';
-import {BatchError, LaunchApplicationError} from '../../../model/Errors';
+import {LaunchApplicationError} from '../../../model/Errors';
+import {ErrorHandler} from '../../../model/ErrorHandler';
 
 import {Body} from './Body';
 import {Loading} from './Loading';
@@ -43,19 +44,15 @@ export function NotificationCard(props: Props) {
     const handleButtonClick = async (buttonIndex: number) => {
         setUninteractable(true);
         try {
-            await new ClickButton(notification, buttonIndex).dispatch(storeApi);
             // Display loading UI
+            await new ClickButton(notification, buttonIndex).dispatch(storeApi);
         } catch (e) {
-            BatchError.handleError(e, (batchError: BatchError) => {
-                const launchErrors = batchError.getErrors(LaunchApplicationError);
-                if (launchErrors.length > 0) {
-                    console.warn('Unable to launch application.');
-                    batchError.log();
-                    // Show error in UI
-                } else {
-                    batchError.log();
-                }
-            });
+            ErrorHandler.for(e)
+                .processError(LaunchApplicationError, function (e: LaunchApplicationError) {
+                    console.warn('Unable to launch application');
+                    this.log(e);
+                })
+                .throwRemaining();
         }
     };
 
@@ -70,19 +67,15 @@ export function NotificationCard(props: Props) {
         }
         setUninteractable(true);
         try {
-            await new ClickNotification(notification).dispatch(storeApi);
             // Display loading UI
+            await new ClickNotification(notification).dispatch(storeApi);
         } catch (e) {
-            BatchError.handleError(e, (batchError: BatchError) => {
-                const launchErrors = batchError.getErrors(LaunchApplicationError);
-                if (launchErrors.length > 0) {
-                    console.warn('Unable to launch application.');
-                    batchError.log();
-                    // Show error in UI
-                } else {
-                    batchError.log();
-                }
-            });
+            ErrorHandler.for(e)
+                .processError(LaunchApplicationError, function (e: LaunchApplicationError) {
+                    console.warn('Unable to launch application');
+                    this.log(e);
+                })
+                .throwRemaining();
         }
         finishedClick();
     };
