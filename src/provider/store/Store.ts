@@ -53,17 +53,6 @@ export class Store<S> extends AsyncInit {
         return this.reduceAndSignal(action);
     }
 
-    public subscribe(listener: Listener<S>) {
-        this._listeners.push(listener);
-
-        return () => {
-            const index: number = this._listeners.indexOf(listener);
-            if (index >= 0) {
-                this._listeners.splice(index, 1);
-            }
-        };
-    }
-
     protected async init(): Promise<void> {}
 
     protected setState(state: S): void {
@@ -71,7 +60,7 @@ export class Store<S> extends AsyncInit {
     }
 
     private reduceAndSignal(action: Action<S>): Promise<void> {
-        // emit signal last
+        // Emit signal last
         this.reduce(action);
         return this.onAction.emit(action);
     }
@@ -81,8 +70,20 @@ export class Store<S> extends AsyncInit {
         this._listeners.forEach(listener => listener(() => this._currentState));
     }
 
-    // intended to be used by react-redux only
+    // Intended to be used by react-redux only - use `state` instead
     private getState(): S {
         return this._currentState;
+    }
+
+    // Intended to be used by react-redux only - use `onAction` signal instead
+    private subscribe(listener: Listener<S>) {
+        this._listeners.push(listener);
+
+        return () => {
+            const index: number = this._listeners.indexOf(listener);
+            if (index >= 0) {
+                this._listeners.splice(index, 1);
+            }
+        };
     }
 }
