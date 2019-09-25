@@ -22,7 +22,14 @@ enum Injectable {
     WEB_WINDOW_FACTORY
 }
 
-type InjectableMap = {
+/**
+ * A map type to enforce that we specify a value for every injectable
+ */
+export type InjectableMap<V = object> = {
+    [K in keyof typeof Injectable]: K extends string ? V : never;
+}
+
+type InjectableSelfMap = {
     [K in keyof typeof Injectable]: K extends string ? K : never;
 }
 
@@ -31,7 +38,7 @@ type InjectableMap = {
  *
  * These are used as the keys that control what will get injected into class members.
  */
-export const Inject: InjectableMap = Object.keys(Injectable).filter(k => typeof k === 'string').reduce<InjectableMap>((map, item) => {
+export const Inject: InjectableSelfMap = Object.keys(Injectable).filter(k => typeof k === 'string').reduce<InjectableSelfMap>((map, item) => {
     (map as any)[item] = item;
     return map;
-}, {} as InjectableMap);
+}, {} as InjectableSelfMap);

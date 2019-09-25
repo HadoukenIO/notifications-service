@@ -2,8 +2,8 @@ import {Signal} from 'openfin-service-signal';
 import {MonitorInfo} from 'openfin/_v2/api/system/monitor';
 
 export interface MonitorModel {
-    onMonitorInfoChanged: Signal<[MonitorInfo]>;
-    monitorInfo: MonitorInfo;
+    readonly onMonitorInfoChanged: Signal<[MonitorInfo]>;
+    readonly monitorInfo: MonitorInfo;
 
-    initialized: Promise<this>
+    readonly initialized: Promise<this>
 }
