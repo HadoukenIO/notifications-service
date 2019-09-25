@@ -21,7 +21,7 @@ beforeEach(async () => {
     getterMock(mockApiHandler, 'onDisconnection').mockReturnValue(new Signal<[Identity]>());
 });
 
-describe('When attemping to launch an app through the client registry', () => {
+describe('When attempting to launch an app through the client registry', () => {
     let storedApp: StoredApplication;
 
     let clientRegistry: ClientRegistry;

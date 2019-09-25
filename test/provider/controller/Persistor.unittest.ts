@@ -108,7 +108,7 @@ describe('When the database is not working', () => {
         expect(onAction.emit(new RemoveNotifications([note]))).rejects.toEqual(new DatabaseError(`Unable to delete notification ${[note.id]}`));
     });
 
-    test('When an application is regsitered, a DatabaseError is thrown', () => {
+    test('When an application is registered, a DatabaseError is thrown', () => {
         const app = createFakeStoredApplication();
 
         expect(onAction.emit(new RegisterApplication(app))).rejects.toEqual(new DatabaseError(`Unable to upsert Client info ${app.id}`));

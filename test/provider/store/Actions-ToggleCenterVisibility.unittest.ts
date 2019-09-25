@@ -55,13 +55,13 @@ describe.each([
             expect(state.centerVisible).toBe(centerVisible);
         });
 
-        test('A toggle with visiblity set to false will close the Notification Center if not already closed', async () => {
+        test('A toggle with visibility set to false will close the Notification Center if not already closed', async () => {
             await new ToggleCenterVisibility(source, false).dispatch(mockServiceStore);
 
             expect(state.centerVisible).toBe(false);
         });
 
-        test('A toggle with visiblity set to true will open the Notification Center if not already opened', async () => {
+        test('A toggle with visibility set to true will open the Notification Center if not already opened', async () => {
             await new ToggleCenterVisibility(source, true).dispatch(mockServiceStore);
 
             expect(state.centerVisible).toBe(true);
