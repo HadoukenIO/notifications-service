@@ -41,7 +41,7 @@ export async function restartProvider(snoozeTime: number = 0): Promise<void> {
 
     // A small delay is needed in order for OpenFin to handle the navigateBack call successfully.
     // If a snoozeTime is less than the minimum we enforce the minimum otherwise let it be
-    await delay(snoozeTime <= Duration.NAVIGATE_BACK ? Duration.NAVIGATE_BACK : snoozeTime);
+    await delay(Math.max(snoozeTime, Duration.NAVIGATE_BACK));
 
     await providerAppWindow.navigateBack();
     await providerReady();
@@ -57,7 +57,7 @@ export async function providerReady(): Promise<void> {
     [timedOut] = await withTimeout(TIMEOUT, new Promise<void>(async (resolve) => {
         let initialized = false;
 
-        while (!initialized) {
+        while (!initialized && !timedOut) {
             initialized = await ofBrowser.executeOnWindow(serviceIdentity, async function() {
                 await this.injector.initialized;
             }).then(() => true).catch(() => false);

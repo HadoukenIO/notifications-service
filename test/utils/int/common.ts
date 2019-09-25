@@ -78,32 +78,3 @@ export function setupClosedCenterBookends(): void {
         }
     });
 }
-
-/**
- * Generates an object with the shape that matches a notification in the database.
- */
-export function generateStoredNotification(source: Identity, notificationOptions?: Partial<NotificationInternal>): StoredNotification {
-    const id = notificationOptions && notificationOptions.id || `${source.uuid}:${Math.random()*Math.random()}`;
-
-    const storedNotification: StoredNotification = {
-        id,
-        notification: {
-            id,
-            body: '',
-            buttons: [],
-            category: '',
-            customData: {},
-            date: 1,
-            expires: null,
-            icon: '',
-            onSelect: null,
-            onExpire: null,
-            onClose: null,
-            title: '',
-            ...notificationOptions
-        },
-        source
-    };
-
-    return storedNotification;
-}

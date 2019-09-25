@@ -9,9 +9,7 @@ import {testManagerIdentity, testAppUrlListenersOnStartup} from '../utils/int/co
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {delay, Duration} from '../utils/int/delay';
-import {waitForAppToBeRunning, generateStoredNotification} from '../utils/int/common';
-import {clearDatabase, populateDatabase} from '../utils/int/storageRemote';
-import {CollectionMap} from '../../src/provider/model/database/Database';
+import {waitForAppToBeRunning} from '../utils/int/common';
 
 let testApp: Application;
 let testWindow: _Window;
