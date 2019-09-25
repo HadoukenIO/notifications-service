@@ -84,6 +84,7 @@ export class Main {
     public async register(): Promise<void> {
         Object.assign(window, {
             main: this,
+            injector: Injector,
             config: this._config,
             apiHandler: this._apiHandler,
             center: this._notificationCenter,
@@ -100,8 +101,7 @@ export class Main {
             store: this._store,
             toast: this._toastManager,
             trayIcon: this._trayIcon,
-            webWindowFactory: this._webWindowFactory,
-            injector: Injector
+            webWindowFactory: this._webWindowFactory
         });
 
         // Wait for creation of any injected components that require async initialization

@@ -82,8 +82,8 @@ export function setupClosedCenterBookends(): void {
 /**
  * Generates an object with the shape that matches a notification in the database.
  */
-export function generateStoredNotification(notificationOptions?: Partial<NotificationInternal>): StoredNotification {
-    const id = notificationOptions && notificationOptions.id || `generatedNotification-${Math.random()*Math.random()}`;
+export function generateStoredNotification(source: Identity, notificationOptions?: Partial<NotificationInternal>): StoredNotification {
+    const id = notificationOptions && notificationOptions.id || `${source.uuid}:${Math.random()*Math.random()}`;
 
     const storedNotification: StoredNotification = {
         id,
@@ -102,7 +102,7 @@ export function generateStoredNotification(notificationOptions?: Partial<Notific
             title: '',
             ...notificationOptions
         },
-        source: {uuid: '', name: ''}
+        source
     };
 
     return storedNotification;

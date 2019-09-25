@@ -5,8 +5,9 @@ import {Injector} from '../../../src/provider/common/Injector';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 import {serviceIdentity} from './constants';
-import {delay} from './delay';
+import {delay, Duration} from './delay';
 import {fin} from './fin';
+import {withTimeout} from './common';
 
 export interface ProviderContext extends BaseWindowContext {
     main: {
@@ -28,14 +29,21 @@ export async function clearStoredNotifications(windowIdentity: Identity): Promis
 }
 
 /**
- * Closes all of the service providers child windows and then restarts the main window. Promise resolves once the service is fully initialized.
+ * Closes all of the service providers child windows and then restarts the main window after a provided amount of time.
+ * Resolves once the service is fully initialized.
  * This will not reopen any child windows unless the provider automatically does so.
  */
-export async function restartProvider(): Promise<void> {
+export async function restartProvider(snoozeTime: number = 0): Promise<void> {
     const providerApp = fin.Application.wrapSync(serviceIdentity);
+    const providerAppWindow = await providerApp.getWindow();
     await providerApp.getChildWindows().then(children => children.forEach(win => win.close()));
-    await providerApp.restart();
+    await providerAppWindow.navigate('about:blank');
 
+    // A small delay is needed in order for OpenFin to handle the navigateBack call successfully.
+    // If a snoozeTime is less than the minimum we enforce the minimum otherwise let it be
+    await delay(snoozeTime <= Duration.NAVIGATE_BACK ? Duration.NAVIGATE_BACK : snoozeTime);
+
+    await providerAppWindow.navigateBack();
     await providerReady();
 }
 
@@ -44,24 +52,23 @@ export async function restartProvider(): Promise<void> {
  */
 export async function providerReady(): Promise<void> {
     const TIMEOUT = 5000;
-    const RETRY_TIMEOUT = 250;
+    let timedOut = false;
 
-    await new Promise((resolve, reject) => {
-        let counter: number = 0;
+    [timedOut] = await withTimeout(TIMEOUT, new Promise<void>(async (resolve) => {
+        let initialized = false;
 
-        setInterval(async () => {
-            // Keep retrying until injector is initialized
-            await ofBrowser.executeOnWindow(serviceIdentity, async function() {
+        while (!initialized) {
+            initialized = await ofBrowser.executeOnWindow(serviceIdentity, async function() {
                 await this.injector.initialized;
-            }).then(resolve).catch(() => null);
+            }).then(() => true).catch(() => false);
+        }
 
-            if (counter >= TIMEOUT) {
-                reject(new Error(`Provider has not returned within timeout of: ${TIMEOUT}`));
-            }
+        resolve();
+    }));
 
-            counter += RETRY_TIMEOUT;
-        }, RETRY_TIMEOUT);
-    });
+    if (timedOut) {
+        throw new Error(`Provider has not returned within timeout of: ${TIMEOUT}`);
+    }
 
     // TODO: Remove delay with SERVICE-729
     // Give the service one second to allow for any post injector initialization to process.

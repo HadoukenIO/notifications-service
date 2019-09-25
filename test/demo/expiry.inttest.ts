@@ -28,7 +28,6 @@ const options: NotificationOptions = {
 
 beforeEach(async () => {
     jest.resetAllMocks();
-    clearDatabase();
 
     testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlListenersOnStartup});
     testWindow = await testApp.getWindow();
@@ -282,11 +281,15 @@ describe('When a notification with an expiry is created by an app that then quit
     });
 });
 
-test('When the provider is started and there are notifications with expiries in the past, they are expired on startup', async () => {
-    await populateDatabase(CollectionMap.NOTIFICATIONS, generateStoredNotification({expires: past(seconds(15)).valueOf()}));
-    await providerRemote.restartProvider();
+test.only('When the provider is started and there are notifications with expiries in the past, they are expired on startup', async () => {
+    await notifsRemote.createAndAwait(testWindow.identity, {...options, expires: future(seconds(1))});
+    await providerRemote.restartProvider(seconds(2));
 
     await expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
+
+    // Implement the following listener expects during SERVICE-738
+    // expect(closedListener).toBeCalledTimes(1);
+    // expect(actionListener).toBeCalledTimes(0);
 });
 
 function expectTimeSoonAfter(actualTime: number, expectedTime: number): void {
