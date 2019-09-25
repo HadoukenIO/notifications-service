@@ -8,7 +8,7 @@ import * as notifsRemote from '../utils/int/notificationsRemote';
 import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/int/storageRemote';
 import {delay, Duration} from '../utils/int/delay';
 import {getToastWindow} from '../utils/int/toastUtils';
-import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
+import {assertDOMMatches, CardType, getCardMetadata} from '../utils/int/cardUtils';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
 import {setupOpenCenterBookends} from '../utils/int/common';
@@ -75,6 +75,23 @@ describe('When creating a notification with the center showing', () => {
 
             const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
             expect(toastWindow).toBe(undefined);
+        });
+
+        test.skip('Markdown inside of `body` gets rendered to HTML', async () => {
+            const body = `
+            # Title
+            
+            - item 1
+            - item 2
+            `;
+
+            const note = await notifsRemote.create(testWindow.identity, {...options, body});
+            const card = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
+            const cardValues = await getCardMetadata(card[0]);
+
+            expect(cardValues.body).toBeDefined();
+            expect(cardValues.body!.search(/<h1>Title<\/h1>/)).toBe(true);
+            expect(cardValues.body!.search(/<ul>(\s*<li>([\w\s])*<\/li>\s*)+<\/ul>/)).toBe(true);
         });
     });
 

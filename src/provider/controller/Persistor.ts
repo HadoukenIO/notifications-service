@@ -1,10 +1,12 @@
 import {injectable, inject} from 'inversify';
 
 import {Inject} from '../common/Injectables';
-import {RootAction, CreateNotification, RemoveNotifications, RegisterApplication} from '../store/Actions';
+import {CreateNotification, RemoveNotifications, RegisterApplication} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {Database, CollectionMap} from '../model/database/Database';
 import {DatabaseError} from '../model/Errors';
+import {RootState} from '../store/State';
+import {Action} from '../store/Store';
 
 @injectable()
 export class Persistor {
@@ -20,7 +22,7 @@ export class Persistor {
         this._store.onAction.add(this.onAction, this);
     }
 
-    private async onAction(action: RootAction): Promise<void> {
+    private async onAction(action: Action<RootState>): Promise<void> {
         if (action instanceof CreateNotification) {
             const {notification} = action;
             try {

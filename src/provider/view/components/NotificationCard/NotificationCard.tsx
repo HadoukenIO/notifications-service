@@ -1,67 +1,108 @@
 import * as React from 'react';
 
 import {NotificationTime} from '../NotificationTime/NotificationTime';
-import {Button} from '../Button/Button';
-import {StoredNotification} from '../../../model/StoredNotification';
-import {CloseButton} from '../CloseButton/CloseButton';
-import {RemoveNotifications, ClickButton, ClickNotification} from '../../../store/Actions';
-import {Actionable} from '../../containers/NotificationCenterApp';
+import {Button} from '../Controls/Button/Button';
+import {CircleButton, IconType} from '../CircleButton/CircleButton';
+import {RemoveNotifications, ClickButton, ClickNotification, MinimizeToast} from '../../../store/Actions';
+import {useOnClickOnly} from '../../hooks/Clicks';
+import {ClassNames} from '../../utils/ClassNames';
+import {TitledNotification, Actionable} from '../../types';
 
-interface NotificationCardProps extends Actionable {
-    notification: StoredNotification;
+import {Body} from './Body';
+import {Loading} from './Loading';
+
+import './NotificationCard.scss';
+
+interface Props extends Actionable {
+    notification: TitledNotification;
+    isToast?: boolean;
 }
 
-export function NotificationCard(props: NotificationCardProps) {
-    const {notification, storeDispatch} = props;
+export function NotificationCard(props: Props) {
+    const {notification, storeApi, isToast = false} = props;
     const data = notification.notification;
+    // TODO: [SERVICE-605] use this state to toggle loading/error component.
+    const [loading] = React.useState(false);
+    const [uninteractable, setUninteractable] = React.useState(false);
+    const cardRef = React.createRef<HTMLDivElement>();
+    const [validClick, finishedClick] = useOnClickOnly(cardRef);
 
-    const handleNotificationClose = () => {
-        storeDispatch(new RemoveNotifications([notification]));
+    const handleNotificationClose = async () => {
+        setUninteractable(true);
+        await new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
-    const handleButtonClick = (buttonIndex: number) => {
-        // TODO: Have RemoveNotifications dispatched from inside ClickButton [SERVICE-623]
-        storeDispatch(new ClickButton(notification, buttonIndex));
-        storeDispatch(new RemoveNotifications([notification]));
+    const handleNotificationDismiss = async () => {
+        if (isToast) {
+            setUninteractable(true);
+            await new MinimizeToast(notification).dispatch(storeApi);
+        }
     };
 
-    const handleNotificationClick = (event: React.MouseEvent) => {
+    const handleButtonClick = async (buttonIndex: number) => {
+        setUninteractable(true);
+        await new ClickButton(notification, buttonIndex).dispatch(storeApi);
+    };
+
+    const handleNotificationClick = async (event: React.MouseEvent) => {
         event.stopPropagation();
         event.preventDefault();
-
-        // TODO: Have RemoveNotifications dispatched from inside ClickNotification [SERVICE-623]
-        storeDispatch(new ClickNotification(notification));
-        storeDispatch(new RemoveNotifications([notification]));
+        // Check if the click did not originate from a button
+        // This is to prevent a user clicking a button and holding their mouse down
+        // dragging onto the body and letting go
+        if (!validClick) {
+            return;
+        }
+        setUninteractable(true);
+        await new ClickNotification(notification).dispatch(storeApi);
+        finishedClick();
     };
 
-    return (
-        <div className="notification" data-id={notification.id} onClick={handleNotificationClick}>
-            <CloseButton onClick={handleNotificationClose} />
-            <NotificationTime date={data.date} />
-            <div className="body">
-                <div className="source">
-                    {data.icon && <img src={data.icon} />}
-                    <span className="app-name">
-                        {notification.source.name}
-                    </span>
-                </div>
-                <div className="title">
-                    {data.title}
-                </div>
-                <div className="text">
-                    {data.body}
-                </div>
+    const classNames = new ClassNames('notification-card', 'no-select', ['uninteractable', (loading || uninteractable)], ['toast', isToast]);
 
-                {data.buttons.length > 0 &&
-                    <div className="buttons">
-                        {data.buttons.map((btn, i) => {
-                            return (
-                                <Button key={btn.title + i} onClick={handleButtonClick} buttonIndex={i} text={btn.title} icon={btn.iconUrl} />
-                            );
-                        })}
+    return (
+        <div
+            className={classNames.toString()}
+            onClick={handleNotificationClick}
+            data-id={notification.id}
+            ref={cardRef}
+        >
+            <div className="header">
+                <div className="app-icon" style={{backgroundImage: `url(${data.icon})`}}></div>
+                <div className="app-name single-line">{notification.title}</div>
+                <div className="time-close">
+                    <NotificationTime date={data.date} />
+                    <div className="actions">
+                        {isToast &&
+                            <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationDismiss} alt="Minimize Toast" />
+                        }
+                        <CircleButton type={IconType.CLOSE} onClick={handleNotificationClose} alt="Clear notification" />
                     </div>
-                }
+                </div>
             </div>
-        </div >
+            <div className="content">
+                <div className="title single-line">{data.title}</div>
+                <div className="body no-select">
+                    <Body text={data.body} />
+                </div>
+            </div>
+            {data.buttons.length > 0 &&
+                <div className="buttons">
+                    {data.buttons.map((btn, i) => {
+                        return (
+                            <Button
+                                key={i}
+                                text={btn.title}
+                                onClick={() => {
+                                    handleButtonClick(i);
+                                }}
+                                icon={btn.iconUrl}
+                            />
+                        );
+                    })}
+                </div>
+            }
+            {loading && <Loading />}
+        </div>
     );
 }

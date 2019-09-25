@@ -6,12 +6,11 @@ import {Database, CollectionMap} from '../model/database/Database';
 import {Collection} from '../model/database/Collection';
 import {StoredApplication} from '../model/Environment';
 
-import {RootAction} from './Actions';
 import {RootState} from './State';
 import {Store} from './Store';
 
 @injectable()
-export class ServiceStore extends Store<RootState, RootAction> {
+export class ServiceStore extends Store<RootState> {
     private static INITIAL_STATE: RootState = {
         notifications: [],
         applications: new Map<string, StoredApplication>(),
@@ -35,9 +34,9 @@ export class ServiceStore extends Store<RootState, RootAction> {
         const notificationCollection: Collection<StoredNotification> = this._database.get(CollectionMap.NOTIFICATIONS);
         const notifications: StoredNotification[] = await notificationCollection.getAll();
 
-        const clientsCollection: Collection<StoredApplication> = this._database.get(CollectionMap.APPLICATIONS);
-        const clients: StoredApplication[] = await clientsCollection.getAll();
+        const applicationsCollection: Collection<StoredApplication> = this._database.get(CollectionMap.APPLICATIONS);
+        const applications = new Map<string, StoredApplication>((await applicationsCollection.getAll()).map(application => [application.id, application]));
 
-        return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications, clients});
+        return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications, applications});
     }
 }

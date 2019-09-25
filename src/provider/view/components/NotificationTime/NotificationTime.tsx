@@ -1,31 +1,30 @@
 import * as React from 'react';
-import moment from 'moment';
 
-export interface NotificationTimeProps {
+import {getDate} from '../../utils/Time';
+import {WindowContext} from '../Wrappers/WindowContext';
+
+interface Props {
     date: number;
 }
 
-export function NotificationTime(props: NotificationTimeProps) {
+export function NotificationTime(props: Props) {
     const {date} = props;
+    const window = React.useContext(WindowContext);
+    const [formattedDate, setFormattedDate] = React.useState<string>(getDate(date));
 
-    const [formattedDate, setFormattedDate] = React.useState<string>(moment(date).fromNow());
-
-    // Update timestamp
     React.useEffect(() => {
-        const timer = setInterval(() => {
-            setFormattedDate(moment(date).fromNow());
-        }, 1000 * 60);
+        const timer = window.setInterval(() => {
+            setFormattedDate(getDate(date));
+        }, 60 * 1000);
 
         return () => {
-            clearTimeout(timer);
+            window.clearInterval(timer);
         };
-    });
+    }, []);
 
     return (
-        <div className="time">
-            <span>
-                {formattedDate}
-            </span>
+        <div className="time single-line">
+            {formattedDate}
         </div>
     );
 }

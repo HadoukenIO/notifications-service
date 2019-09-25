@@ -68,6 +68,8 @@ export interface NotificationOptions {
      * Notification body text.
      *
      * This is the main notification content, displayed below the notification title. The notification will expand to fit the length of this text.
+     * Markdown may be used in the body text to control how it is styled when rendered.
+     * With the exception of links, images & code blocks, all basic syntax as documented [here](https://www.markdownguide.org/basic-syntax) is supported.
      */
     body: string;
 
@@ -118,7 +120,7 @@ export interface NotificationOptions {
      * soon as possible after. If not specified, the notification will never expire, and will persist until it
      * is closed.
      */
-    expires?: Date|null;
+    expires?: Date | null;
 
     /**
      * A list of buttons to display below the notification text.
@@ -136,10 +138,9 @@ export interface NotificationOptions {
      * application-defined buttons, and the default 'X' close button) will not trigger a
      * {@link ActionTrigger.SELECT|select} action.
      *
-     * See {@link Actions} for more details on notification actions, and receiving interaction events from
-     * notifications.
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
      */
-    onSelect?: ActionDeclaration<never, never>|null;
+    onSelect?: ActionDeclaration<never, never> | null;
 
     /**
      * An {@link NotificationActionResult|action result} to be passed back to the application inside the
@@ -149,10 +150,9 @@ export interface NotificationOptions {
      * `expires` is not specified for the notification, this action will never be raised. Note that if an `onClose`
      * action result is also specified, both actions will be raised if and when the notification expires.
      *
-     * See {@link Actions} for more details on notification actions, and receiving interaction events from
-     * notifications.
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
      */
-    onExpire?: ActionDeclaration<never, never>|null;
+    onExpire?: ActionDeclaration<never, never> | null;
 
     /**
      * An {@link NotificationActionResult|action result} to be passed back to the application inside the
@@ -163,10 +163,9 @@ export interface NotificationOptions {
      * the notification), the notification expiring, or from the notification being programmaticially removed, such as
      * a call to `clear`.
      *
-     * See {@link Actions} for more details on notification actions, and receiving interaction events from
-     * notifications.
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
      */
-    onClose?: ActionDeclaration<never, never>|null;
+    onClose?: ActionDeclaration<never, never> | null;
 }
 
 /**
@@ -186,16 +185,22 @@ export type CustomData = {[key: string]: any};
 export type Notification = Readonly<Required<Omit<NotificationOptions, 'buttons'>> & {readonly buttons: ReadonlyArray<Readonly<Required<ButtonOptions>>>}>;
 
 /**
- * Event fired for interactions with notification UI elements. It is important to note that applications will only
- * receive these events if they indicate to the service that they want to receive these events. See {@link Actions} for
- * a full example of how actions are defined, and how an application can listen to and handle them.
+ * Event fired when an action is raised for a notification due to a specified trigger. It is important to note that
+ * applications will only receive these events if they indicate to the service that they want to receive these events.
+ * See {@link Actions} for a full example of how actions are defined, and how an application can listen to and handle
+ * them.
  *
- * This can be fired due to interaction with notification buttons, or the notification itself. Later versions of the
- * service will add additional control types. All actions, for all control types, will be returned to the application
- * via the same `notification-action` event type.
+ * This can be fired due to interaction with notification buttons or the notification itself, the notification being
+ * closed (either by user interaction or by API call), or by the notification expiring. Later versions of the service
+ * will add additional control types that may raise actions from user interaction. All actions, for all control types,
+ * will be returned to the application via the same `notification-action` event type.
  *
  * The event object will contain the application-defined {@link NotificationActionResult|metadata} that allowed this
  * action to be raised, and details on what triggered this action and which control the user interacted with.
+ *
+ * Unlike other event types, `notification-action` events will be buffered by the service until the application has
+ * added a listener for this event type, at which point it will receive all buffered `notification-action` events. The
+ * service will also attempt to restart the application if it is not running when the event is fired.
  *
  * This type includes a generic type argument, should applications wish to define their own interface for action
  * results. See {@link NotificationActionResult} for details.
@@ -248,8 +253,8 @@ export interface NotificationActionEvent<T = CustomData> {
     /**
      * Application-defined metadata that this event is passing back to the application.
      *
-     * A `notification-action` event is only fired for an interaction with a notification if the
-     * {@link NotificationOptions|notification options} included an action result for that interaction.
+     * A `notification-action` event is only fired for a given trigger if the
+     * {@link NotificationOptions|notification options} included an action result for that trigger.
      *
      * See the comment on the {@link NotificationActionEvent} type for an example of buttons that do and don't raise
      * actions.
