@@ -7,7 +7,7 @@ import {ClientRegistry} from '../../../src/provider/model/ClientRegistry';
 import {StoredApplication} from '../../../src/provider/model/Environment';
 import {createMockEnvironment, createMockApiHandler, createMockServiceStore, getterMock} from '../../utils/unit/mocks';
 import {RegisterApplication} from '../../../src/provider/store/Actions';
-import {createFakeStoredApplication, createFakeUuid, createFakeEmptyWebWindow, createFakeIdentity} from '../../utils/unit/fakes';
+import {createFakeStoredApplication, createFakeUuid, createFakeIdentity} from '../../utils/unit/fakes';
 import {resolvePromiseChain} from '../../utils/unit/time';
 
 const mockApiHandler = createMockApiHandler();
