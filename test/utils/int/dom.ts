@@ -10,15 +10,24 @@ export async function getElementById(target: Identity, id: string): Promise<Elem
     return (await querySelector(target, `#${id}`))[0]!;
 }
 
-export async function querySelector(target: Identity, selector: string): Promise<ElementHandle[]> {
+export async function querySelector(target: Identity, selector: string, expectedToExist: boolean = true): Promise<ElementHandle[]> {
     const centerPage = await ofBrowser.getPage(target);
     if (centerPage) {
-        try {
-            await centerPage.waitForSelector(selector, {timeout: Duration.WAIT_FOR_SELECTOR});
-        } catch (error) {
+        if (expectedToExist) {
+            try {
+                await centerPage.waitForSelector(selector, {timeout: Duration.WAIT_FOR_SELECTOR});
+            } catch (error) {
+                return [];
+            }
+            return centerPage.$$(selector);
+        } else {
+            try {
+                await centerPage.waitForSelector(selector, {timeout: Duration.WAIT_FOR_SELECTOR, hidden: true});
+            } catch (error) {
+                return centerPage.$$(selector);
+            }
             return [];
         }
-        return centerPage.$$(selector);
     }
     return [];
 }

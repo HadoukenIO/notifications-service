@@ -2,7 +2,7 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, CustomData, NotificationClosedEvent, NotificationActionEvent, Notification} from '../../src/client';
 import {ActionTrigger} from '../../src/client/actions';
-import {getCenterCardsByNotification, getCenterCardsByApp} from '../utils/int/centerUtils';
+import {getCenterCardsByNotification, getCenterCardsByApp, hasNoCardsByNotification} from '../utils/int/centerUtils';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {delay, Duration} from '../utils/int/delay';
 import * as notifsRemote from '../utils/int/notificationsRemote';
@@ -121,11 +121,9 @@ describe.each([
 
         if (centerVisibility === 'center-open') {
             test('The expected card has been removed from the Notification Center', async () => {
-                await delay(Duration.EVENT_PROPAGATED);
+                await expect(hasNoCardsByNotification(testApp.identity.uuid, notes[indexToClear].id)).resolves.toBe(true);
 
                 await expect(getCenterCardsByApp(testApp.identity.uuid)).resolves.toHaveLength(notes.length - 1);
-
-                await expect(getCenterCardsByNotification(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual([]);
 
                 for (const note of notes.filter((note, index) => index !== indexToClear)) {
                     await expect(getCenterCardsByNotification(testApp.identity.uuid, note.id)).resolves.toBeTruthy();

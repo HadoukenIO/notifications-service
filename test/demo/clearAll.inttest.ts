@@ -8,7 +8,7 @@ import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {setupCenterBookends, CenterState} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
-import {getCenterCardsByApp} from '../utils/int/centerUtils';
+import {hasNoCardsByApp} from '../utils/int/centerUtils';
 import {getToastWindowsByApp} from '../utils/int/toastUtils';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
@@ -116,8 +116,7 @@ describe.each([
 
         if (centerVisibility === 'center-open') {
             test('The Notification Center contains no cards', async () => {
-                await delay(Duration.EVENT_PROPAGATED);
-                await expect(getCenterCardsByApp(testApp.identity.uuid)).resolves.toHaveLength(0);
+                await expect(hasNoCardsByApp(testApp.identity.uuid)).resolves.toBe(true);
             });
         } else {
             test('No toast windows are showing', async () => {

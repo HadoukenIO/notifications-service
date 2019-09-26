@@ -17,8 +17,18 @@ export async function getCenterCardsByApp(sourceUuid: string): Promise<ElementHa
     return querySelector(CENTER_IDENTITY, `${CARDS_SELECTOR}[data-id*="${sourceUuid}"]`);
 }
 
+export async function hasNoCardsByApp(sourceUuid: string): Promise<boolean> {
+    const cards = await querySelector(CENTER_IDENTITY, `${CARDS_SELECTOR}[data-id*="${sourceUuid}"]`, false);
+    return cards.length === 0;
+}
+
 export async function getCenterCardsByNotification(sourceUuid: string, notificationId: string): Promise<ElementHandle[]> {
     return querySelector(CENTER_IDENTITY, `${CARDS_SELECTOR}[data-id="${sourceUuid}:${notificationId}"]`);
+}
+
+export async function hasNoCardsByNotification(sourceUuid: string, notificationId: string): Promise<boolean> {
+    const cards = await querySelector(CENTER_IDENTITY, `${CARDS_SELECTOR}[data-id="${sourceUuid}:${notificationId}"]`);
+    return cards.length === 0;
 }
 
 export async function getCenterCloseButton(): Promise<ElementHandle> {
