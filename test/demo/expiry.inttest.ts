@@ -279,10 +279,10 @@ describe('When a notification with an expiry is created by an app that then quit
     });
 });
 
-test.only('When the provider is started and there are notifications with expiries in the past, they are expired on startup', async () => {
+test('When the provider is started and there are notifications with expiries in the past, they are expired on startup', async () => {
     const note = (await notifsRemote.createAndAwait(testWindow.identity, {...options,
         onExpire: {task: 'expired'},
-        expires: future(seconds(1))
+        expires: future(seconds(2))
     })).note;
 
     await testApp.quit();
