@@ -53,7 +53,7 @@ export function NotificationCard(props: Props) {
     const handleButtonClick = async (buttonIndex: number) => {
         setUninteractable(true);
         try {
-            // Display loading UI
+            // TODO: [SERVICE-605] set loading state
             await new ClickButton(notification, buttonIndex).dispatch(storeApi);
         } catch (error) {
             handleError(error);
@@ -71,7 +71,7 @@ export function NotificationCard(props: Props) {
         }
         setUninteractable(true);
         try {
-            // Display loading UI
+            // TODO: [SERVICE-605] set loading state
             await new ClickNotification(notification).dispatch(storeApi);
         } catch (error) {
             handleError(error);
