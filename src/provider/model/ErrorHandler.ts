@@ -2,29 +2,24 @@ import {BatchError, ErrorConstructor} from './Errors';
 
 export class ErrorHandler {
     private errors: Error[];
-    private nonErrors: unknown[];
     private handledErrors: Error[];
     private unhandledErrors: Error[];
 
     private constructor(error: Error) {
         if (error instanceof BatchError) {
             this.errors = [];
-            this.nonErrors = [];
 
             error.errors.forEach(value => {
                 if (value instanceof Error) {
                     this.errors.push(value);
                 } else {
-                    // TODO: What to do with non-errors
-                    this.nonErrors.push(value);
+                    this.errors.push(new Error(value));
                 }
             });
         } else if (error instanceof Error) {
             this.errors = [error];
-            this.nonErrors = [];
         } else {
             this.errors = [];
-            this.nonErrors = [error];
         }
         this.handledErrors = [];
         this.unhandledErrors = this.errors.slice();
@@ -90,13 +85,17 @@ export class ErrorHandler {
         }
     }
 
-    public log(error: Error): void {
+    public log(): void {
         const ERROR_CSS = 'border: 1px solid #FFD6D6; background: #FFF0F0; color: blue; width: 100%;';
-        console.groupCollapsed('%cBatch Error', ERROR_CSS);
+        console.groupCollapsed(`%cBatch Error (${this.errors.length})`, ERROR_CSS);
         this.errors.forEach(error => {
-            console.groupCollapsed(error.name, error.message);
-            console.log(error.stack);
-            console.groupEnd();
+            if (error instanceof BatchError) {
+                new ErrorHandler(error).log();
+            } else {
+                console.groupCollapsed(error.name, error.message);
+                console.log(error.stack);
+                console.groupEnd();
+            }
         });
         console.groupEnd();
     }

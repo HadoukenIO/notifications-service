@@ -33,7 +33,7 @@ export function NotificationCard(props: Props) {
         ErrorHandler.for(error)
             .processError(LaunchApplicationError, function (e: LaunchApplicationError) {
                 console.warn('Unable to launch application');
-                this.log(e);
+                this.log();
             })
             .throwRemaining();
     };
