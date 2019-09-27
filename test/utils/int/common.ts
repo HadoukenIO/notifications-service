@@ -1,8 +1,5 @@
 import {Identity} from 'hadouken-js-adapter';
 
-import {NotificationInternal} from '../../../src/client/internal';
-import {StoredNotification} from '../../../src/provider/model/StoredNotification';
-
 import {fin} from './fin';
 import {delay} from './delay';
 import {Duration} from './delay';

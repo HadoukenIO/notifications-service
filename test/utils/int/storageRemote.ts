@@ -3,7 +3,7 @@ import {Identity} from 'hadouken-js-adapter';
 import {SERVICE_IDENTITY} from '../../../src/client/internal';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {Notification} from '../../../src/client';
-import {Database, CollectionMap, Collections} from '../../../src/provider/model/database/Database';
+import {Database, CollectionMap} from '../../../src/provider/model/database/Database';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 
