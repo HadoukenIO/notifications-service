@@ -25,17 +25,17 @@ export class CreateNotification extends Action<RootState> {
 
         const notifications: StoredNotification[] = state.notifications.slice();
 
-        // All notification ID's must be unique. The custom dispatch logic of the `CreateNotification` event should
-        // enusure this, but to avoid significant side-effects, also adding a sanity check here.
+        // All notification IDs must be unique. The custom dispatch logic of the `CreateNotification` event should
+        // ensure this, but to avoid significant side-effects, also adding a sanity check here.
         const index: number = state.notifications.findIndex(n => n.id === notification.id);
         if (index >= 0) {
             // Replace existing notification with this ID
             console.warn(`Attempted to add a notitification with duplicate id '${notification.id}'. Will replace existing notification.`);
             notifications[index] = notification;
+        } else {
+            // Add new notification (ordering within array doesn't matter)
+            notifications.push(notification);
         }
-
-        // Add new notification (ordering within array doesn't matter)
-        notifications.push(notification);
 
         return {
             ...state,

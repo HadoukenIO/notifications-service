@@ -1,16 +1,13 @@
-import 'jest';
 import 'fake-indexeddb/auto';
 
 import {Database, CollectionMap} from '../../../src/provider/model/database/Database';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
-import {NotificationInternal} from '../../../src/client/internal';
 import {Collection} from '../../../src/provider/model/database/Collection';
-
-jest.unmock('../../../src/provider/model/database/Database');
+import {createFakeStoredNotification} from '../../utils/unit/fakes';
+import {normalizeStoredNotifications} from '../../utils/unit/normalization';
 
 let database: Database;
 let collection: Collection<StoredNotification>;
-let generatedNotificationCount: number = 0;
 
 beforeAll(async () => {
     database = await new Database().delayedInit();
@@ -46,7 +43,7 @@ describe('Collection Methods', () => {
         let note: StoredNotification;
 
         beforeEach(async () =>{
-            note = generateNotification();
+            note = createFakeStoredNotification();
             await collection.upsert(note);
         });
 
@@ -63,11 +60,11 @@ describe('Collection Methods', () => {
 
     describe('GetAll', () => {
         test('Returns all records from collection', async () => {
-            const notes = [generateNotification(), generateNotification(), generateNotification()];
+            const notes = [createFakeStoredNotification(), createFakeStoredNotification(), createFakeStoredNotification()];
             await collection.upsert(notes);
 
             const results = await collection.getAll();
-            expect(results).toEqual(notes);
+            expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(notes));
         });
 
         test('Returns an empty array when no records are in the collection', async () => {
@@ -80,7 +77,7 @@ describe('Collection Methods', () => {
         let notes: StoredNotification[];
 
         beforeEach(async () => {
-            notes = [generateNotification(), generateNotification(), generateNotification()];
+            notes = [createFakeStoredNotification(), createFakeStoredNotification(), createFakeStoredNotification()];
             await collection.upsert(notes);
         });
 
@@ -88,7 +85,7 @@ describe('Collection Methods', () => {
             const notesToGet = [notes[0], notes[1]];
             const results = await collection.getMany(notesToGet.map(note => note.id));
 
-            expect(results).toEqual(notesToGet);
+            expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(notesToGet));
         });
 
         test('Returns an empty array for array of invalid IDs passed in', async () => {
@@ -102,20 +99,20 @@ describe('Collection Methods', () => {
             const notesToGet = [notes[0], notes[1]];
             const results = await collection.getMany([...notesToGet.map(note => note.id), 'INVALID ID']);
 
-            expect(results).toEqual(notesToGet);
+            expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(notesToGet));
         });
     });
 
     describe('Upsert', () => {
         test('Adds a new record', async () => {
-            const note = generateNotification();
+            const note = createFakeStoredNotification();
 
             await collection.upsert(note);
             expect(await collection.getAll()).toEqual([note]);
         });
 
         test('Adds many records from array', async () => {
-            const notes = [generateNotification(), generateNotification(), generateNotification()];
+            const notes = [createFakeStoredNotification(), createFakeStoredNotification(), createFakeStoredNotification()];
             await collection.upsert(notes);
 
             const results = await collection.getAll();
@@ -123,7 +120,10 @@ describe('Collection Methods', () => {
         });
 
         test('Updates an existing record', async () => {
-            const [note1, note2] = [generateNotification({id: 'updateable'}), generateNotification({id: 'updateable', title: 'title'})];
+            const [note1, note2] = [
+                {...createFakeStoredNotification(), id: 'updateable'},
+                {...createFakeStoredNotification(), id: 'updateable'}
+            ];
 
             await collection.upsert(note1);
             await collection.upsert(note2);
@@ -133,28 +133,32 @@ describe('Collection Methods', () => {
         });
 
         test('Updates many existing records from array', async () => {
-            const expectedTitle = 'updated title';
-            const notes = [generateNotification({id: 'updateable'}), generateNotification({id: 'updateable2'}), generateNotification()];
+            const notes = [
+                {...createFakeStoredNotification(), id: 'updateable'},
+                {...createFakeStoredNotification(), id: 'updateable2'},
+                createFakeStoredNotification()
+            ];
             await collection.upsert(notes);
 
-            const updatedNotes = [generateNotification({id: 'updateable', title: expectedTitle}),
-                generateNotification({id: 'updateable2', title: expectedTitle})];
+            const updatedNotes = [
+                {...createFakeStoredNotification(), id: 'updateable'},
+                {...createFakeStoredNotification(), id: 'updateable2'}
+            ];
             await collection.upsert(updatedNotes);
 
-            const filteredNotes = (await collection.getAll()).filter(note => note.notification.title === expectedTitle);
+            const filteredNotes = (await collection.getAll()).filter(note => note.id === 'updateable' || note.id === 'updateable2');
             expect(filteredNotes.length).toEqual(updatedNotes.length);
         });
 
         test('Updates existing records and adds new records from array', async () => {
-            const expectedTitle = 'updated title';
-            await collection.upsert(generateNotification({id: 'updateable'}));
+            await collection.upsert({...createFakeStoredNotification(), id: 'updateable'});
 
-            const newAndUpdatedNotes = [generateNotification(), generateNotification({id: 'updateable', title: expectedTitle})];
+            const newAndUpdatedNotes = [createFakeStoredNotification(), {...createFakeStoredNotification(), id: 'updateable'}];
             await collection.upsert(newAndUpdatedNotes);
 
             const results = await collection.getAll();
 
-            expect(results).toEqual(newAndUpdatedNotes);
+            expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(newAndUpdatedNotes));
         });
     });
 
@@ -162,15 +166,15 @@ describe('Collection Methods', () => {
         let notes: StoredNotification[];
 
         beforeEach(()=> {
-            notes = [generateNotification(), generateNotification(), generateNotification()];
+            notes = [createFakeStoredNotification(), createFakeStoredNotification(), createFakeStoredNotification()];
         });
 
         test('Deletes a single record', async () => {
-            const noteToDelete = generateNotification();
+            const noteToDelete = createFakeStoredNotification();
             await collection.upsert([...notes, noteToDelete]);
             await collection.delete(noteToDelete.id);
 
-            expect(await collection.getAll()).toEqual(notes);
+            expect(normalizeStoredNotifications(await collection.getAll())).toEqual(normalizeStoredNotifications(notes));
         });
 
         test('Deletes many records from array', async () => {
@@ -186,42 +190,16 @@ describe('Collection Methods', () => {
             await collection.delete(['INVALID']);
 
             const results = await collection.getAll();
-            expect(results).toEqual(preDeleteCollection);
+            expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(preDeleteCollection));
         });
 
         test('Deletes valid IDs from an array of valid and invalid IDs', async () => {
-            const notesToDelete = [generateNotification(), generateNotification()];
+            const notesToDelete = [createFakeStoredNotification(), createFakeStoredNotification()];
             await collection.upsert([...notes, ...notesToDelete]);
             await collection.delete(['INVALID', ...notesToDelete.map(note => note.id), 'INVALID']);
 
             const results = await collection.getAll();
-            expect(results).toEqual(notes);
+            expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(notes));
         });
     });
 });
-
-function generateNotification(notificationOptions?: Partial<NotificationInternal>): StoredNotification {
-    const id = notificationOptions && notificationOptions.id || `generatedNotification-${++generatedNotificationCount}`;
-
-    const storedNotification: StoredNotification = {
-        id,
-        notification: {
-            id,
-            body: '',
-            buttons: [],
-            category: '',
-            customData: {},
-            date: 1,
-            expires: null,
-            icon: '',
-            onSelect: null,
-            onExpire: null,
-            onClose: null,
-            title: '',
-            ...notificationOptions
-        },
-        source: {uuid: '', name: ''}
-    };
-
-    return storedNotification;
-}
