@@ -36,7 +36,6 @@ $minus: url('../../../../../res/provider/ui/image/shapes/minus.svg');
         display: inline-block;
         background-color: var(--accent-color);
         background-blend-mode: multiply;
-        margin-left: -1px;
         -webkit-mask: $closeIcon;
         -webkit-mask-position: center center;
         -webkit-mask-size: 70%;
