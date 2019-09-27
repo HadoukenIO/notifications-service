@@ -116,6 +116,7 @@ describe.each([
 
         if (centerVisibility === 'center-open') {
             test('The Notification Center contains no cards', async () => {
+                await delay(Duration.EVENT_PROPAGATED);
                 await expect(getCenterCardsByApp(testApp.identity.uuid)).resolves.toHaveLength(0);
             });
         } else {
