@@ -23,7 +23,7 @@ import {FinTrayIcon} from '../model/FinTrayIcon';
 import {ExpiryController} from '../controller/ExpiryController';
 import {ClientEventController} from '../controller/ClientEventController';
 
-import {Inject} from './Injectables';
+import {Inject, InjectableMap} from './Injectables';
 import {DeferredPromise} from './DeferredPromise';
 
 /**
@@ -53,7 +53,7 @@ type Types = {
  * Using a type here will configure injectify to instantiate a class and inject it as a singleton.
  * Using a value here will inject that instance.
  */
-const Bindings = {
+const Bindings: InjectableMap = {
     [Inject.API_HANDLER]: APIHandler,
     [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController,
     [Inject.CLIENT_REGISTRY]: ClientRegistry,
@@ -86,14 +86,11 @@ export class Injector {
         const promises: Promise<unknown>[] = [];
 
         Object.keys(Bindings).forEach(k => {
-            const key: Keys = k as any;
-            const proto = (Bindings[key] as Function).prototype;
+            const key = k as Keys;
 
-            if (proto && proto.hasOwnProperty('init')) {
-                const instance = (container.get(Inject[key]) as AsyncInit);
-                if (instance.delayedInit) {
-                    promises.push(instance.delayedInit());
-                }
+            const value = container.get(Inject[key]);
+            if (value instanceof AsyncInit) {
+                promises.push(value.delayedInit());
             }
         });
 
@@ -112,6 +109,12 @@ export class Injector {
         return Injector._container.rebind<Types[K]>(type);
     }
 
+    public static reset(): void {
+        Injector._initialized = new DeferredPromise();
+        Injector._ready = false;
+        Injector._container = Injector.createContainer();
+    }
+
     /**
      * Fetches an instance of a pre-defined injectable type/value.
      *
@@ -123,6 +126,7 @@ export class Injector {
         if (!Injector._ready) {
             throw new Error('Injector not initialised');
         }
+
         return Injector._container.get<Types[K]>(type);
     }
 
