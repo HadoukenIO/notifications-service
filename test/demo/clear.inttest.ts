@@ -121,6 +121,8 @@ describe.each([
 
         if (centerVisibility === 'center-open') {
             test('The expected card has been removed from the Notification Center', async () => {
+                await delay(Duration.EVENT_PROPAGATED);
+
                 await expect(getCenterCardsByApp(testApp.identity.uuid)).resolves.toHaveLength(notes.length - 1);
 
                 await expect(getCenterCardsByNotification(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual([]);
