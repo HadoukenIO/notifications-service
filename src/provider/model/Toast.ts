@@ -265,12 +265,18 @@ export class Toast implements LayoutItem {
     public async setTransform(transform: ReadonlyRectangle): Promise<void> {
         Object.assign(this._origin, transform.origin);
 
-        return this.trackAnimation((await this._webWindow).setBounds({
+        // TODO [SERVICE-739] This is a fix for setBounds not working on hidden windows.
+        await (await this._webWindow).showAt(transform.origin.x, transform.origin.y);
+
+        await this.trackAnimation((await this._webWindow).setBounds({
             left: transform.origin.x,
             top: transform.origin.y,
             width: transform.size.x,
             height: transform.size.y
         }));
+
+        // TODO [SERVICE-739] This is a fix for setBounds not working on hidden windows.
+        return (await this._webWindow).hide();
     }
 
     /**
