@@ -84,6 +84,7 @@ export class Main {
     public async register(): Promise<void> {
         Object.assign(window, {
             main: this,
+            injector: Injector,
             config: this._config,
             apiHandler: this._apiHandler,
             center: this._notificationCenter,
