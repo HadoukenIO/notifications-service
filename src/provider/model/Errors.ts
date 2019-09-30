@@ -40,13 +40,13 @@ export class BatchError extends CustomError {
 }
 
 export class DatabaseError extends CustomError {
-    constructor(message: string = '', innerError?: Error) {
+    constructor(message: string, innerError?: Error) {
         super('DatabaseError', message, innerError);
     }
 }
 
 export class LaunchApplicationError extends CustomError {
-    constructor(message: string = '', innerError?: Error) {
+    constructor(message: string, innerError?: Error) {
         super('LaunchApplicationError', message, innerError);
     }
 }

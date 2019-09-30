@@ -1,6 +1,13 @@
 import {BatchError, ErrorConstructor} from './Errors';
 
+/**
+ * Util for consicely handling both errors (both singular and batches).
+ */
 export class ErrorHandler {
+    public static for(error: Error): ErrorHandler {
+        return new ErrorHandler(error);
+    }
+
     private errors: Error[];
     private handledErrors: Error[];
     private unhandledErrors: Error[];
@@ -25,10 +32,6 @@ export class ErrorHandler {
         this.unhandledErrors = this.errors.slice();
     }
 
-    public static for(error: Error): ErrorHandler {
-        return new ErrorHandler(error);
-    }
-
     /**
      * Calls a handler function for each instance of a particular error.
      * Will only trigger handler if there are one or more errors of the given type.
@@ -36,16 +39,8 @@ export class ErrorHandler {
      * @param errorType Error type
      * @param handler Error Handler
      */
-    public processError<T extends Error>(errorType: ErrorConstructor<T>, handler: (this: ErrorHandler, error: T) => void): this {
-        const matchingErrors: T[] = this.errors.filter((error): error is T => {
-            const isInstance = error instanceof errorType;
-
-            if (isInstance && !this.handledErrors.includes(error)) {
-                this.handledErrors.push(error);
-            }
-
-            return isInstance;
-        });
+    public processError<T extends Error>(errorType: ErrorConstructor<T>, handler: (this: ErrorHandler, error: Readonly<T>) => void): this {
+        const matchingErrors: ReadonlyArray<T> = this.handleErrorsOfType(errorType);
 
         matchingErrors.forEach(handler.bind(this));
 
@@ -59,8 +54,8 @@ export class ErrorHandler {
      * @param errorType Error type
      * @param handler Error Handler
      */
-    public processErrors<T extends Error>(errorType: ErrorConstructor<T>, handler: (this: ErrorHandler, errors: T[]) => void): this {
-        const matchingErrors: T[] = this.getErrorsOfType(errorType);
+    public processErrors<T extends Error>(errorType: ErrorConstructor<T>, handler: (this: ErrorHandler, errors: ReadonlyArray<T>) => void): this {
+        const matchingErrors: T[] = this.handleErrorsOfType(errorType);
 
         if (matchingErrors.length > 0) {
             handler.call(this, matchingErrors);
@@ -69,14 +64,27 @@ export class ErrorHandler {
         return this;
     }
 
-    public processRemaining(handler: (errors: unknown[]) => void): this {
-        handler(this.errors);
+    /**
+     * Calls a handler function with all remaining unhandled errors, regardless of error type.
+     * Will only trigger handler if there are one or more unhandled errors.
+     *
+     * @param handler Error Handler
+     */
+    public processRemaining(handler: (errors: ReadonlyArray<Error>) => void): this {
+        if (this.unhandledErrors.length > 0) {
+            handler(this.unhandledErrors);
+        }
 
         return this;
     }
 
+    /**
+     * Will throw any remaining unhandled errors, so they can be re-caught higher up the stack.
+     *
+     * Will only throw if there are unhandled errors.
+     */
     public throwRemaining(): void {
-        const unhandledErrors = this.errors.filter(error => !this.handledErrors.includes(error));
+        const unhandledErrors = this.unhandledErrors;
 
         if (unhandledErrors.length > 1) {
             throw new BatchError(unhandledErrors);
@@ -87,7 +95,7 @@ export class ErrorHandler {
 
     public log(): void {
         const ERROR_CSS = 'border: 1px solid #FFD6D6; background: #FFF0F0; color: blue; width: 100%;';
-        console.groupCollapsed(`%cBatch Error (${this.errors.length})`, ERROR_CSS);
+        console.groupCollapsed(`%cError (${this.errors.length})`, ERROR_CSS);
         this.errors.forEach(error => {
             if (error instanceof BatchError) {
                 new ErrorHandler(error).log();
@@ -100,8 +108,15 @@ export class ErrorHandler {
         console.groupEnd();
     }
 
-    private getErrorsOfType<T extends Error>(errorType: ErrorConstructor<T>): T[] {
-        return this.unhandledErrors.filter((error): error is T => {
+    /**
+     * Returns a list of all unhandled errors of the given type, whilst also moving them from the `unhandledErrors` list
+     * to the `handledErrors` list.
+     *
+     * @param errorType The error type to filter by
+     */
+    private handleErrorsOfType<T extends Error>(errorType: ErrorConstructor<T>): T[] {
+        const unhandledErrors = this.unhandledErrors.slice();
+        return unhandledErrors.filter((error): error is T => {
             const isInstance = error instanceof errorType;
 
             if (isInstance && !this.handledErrors.includes(error)) {
