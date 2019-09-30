@@ -266,13 +266,16 @@ export class Toast implements LayoutItem {
         Object.assign(this._origin, transform.origin);
 
         // TODO [SERVICE-739] This is a fix for setBounds not working on hidden windows.
-        const track = Promise.all([(await this._webWindow).showAt(transform.origin.x, transform.origin.y), (await this._webWindow).setBounds({
-            left: transform.origin.x,
-            top: transform.origin.y,
-            width: transform.size.x,
-            height: transform.size.y
-        })]);
-        return this.trackAnimation(track);
+        const webWindow = await this._webWindow;
+        const animation = webWindow.showAt(transform.origin.x, transform.origin.y)
+            .then(() => webWindow.setBounds({
+                left: transform.origin.x,
+                top: transform.origin.y,
+                width: transform.size.x,
+                height: transform.size.y
+            }));
+
+        return this.trackAnimation(animation);
     }
 
     /**
