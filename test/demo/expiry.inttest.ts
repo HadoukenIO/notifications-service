@@ -279,8 +279,30 @@ describe('When a notification with an expiry is created by an app that then quit
     });
 });
 
-// TODO: [SERVICE-619]
-test.todo('When the provider is started and there are notifications with expiries in the past, they are expired on startup');
+test('When the provider is started and there are notifications with expiries in the past, they are expired on startup', async () => {
+    const note = (await notifsRemote.createAndAwait(testWindow.identity, {...options,
+        onExpire: {task: 'expired'},
+        expires: future(seconds(2))
+    })).note;
+
+    await testApp.quit();
+    await providerRemote.restartProvider(seconds(3));
+
+    await waitForAppToBeRunning(testApp.identity);
+    expect(await testApp.isRunning()).toBe(true);
+
+    await delay(Duration.EVENT_PROPAGATED);
+
+    const receivedActionEvents = await notifsRemote.getReceivedEvents((await testApp.getWindow()).identity, 'notification-action');
+    await expect(notifsRemote.getAll(testWindow.identity)).resolves.toEqual([]);
+
+    expect(receivedActionEvents).toEqual([{
+        type: 'notification-action',
+        notification: note,
+        trigger: ActionTrigger.EXPIRE,
+        result: {task: 'expired'}
+    }]);
+});
 
 function expectTimeSoonAfter(actualTime: number, expectedTime: number): void {
     expect(actualTime - expectedTime).toBeGreaterThan(0);
