@@ -14,6 +14,9 @@ import {ButtonOptions, ControlOptions} from './controls';
 import {APITopic, Events, NotificationInternal, Omit} from './internal';
 import {EventRouter, Transport} from './EventRouter';
 
+export * from './actions';
+export * from './controls';
+
 const eventHandler: EventRouter<Events> = getEventRouter();
 
 function parseEventWithNotification<T extends {notification: NotificationInternal}>(event: T): T & {notification: Notification} {

@@ -10,5 +10,6 @@ export enum Duration {
     EVENT_PROPAGATED = 1000,
     CENTER_TOGGLED = 500,
     APP_STARTUP_TIME = 30 * 1000,
+    NAVIGATE_BACK = 750,
     WAIT_FOR_SELECTOR = 1000
 }
