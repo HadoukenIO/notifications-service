@@ -172,7 +172,7 @@ export class Main {
 
     private async clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
         const notifications = this.getAppNotifications(sender.uuid);
-        await new RemoveNotifications(notifications).dispatch(this._store);
+        await (new RemoveNotifications(notifications)).dispatch(this._store);
 
         return notifications.length;
     }

@@ -7,6 +7,8 @@ import {RemoveNotifications, ClickButton, ClickNotification, MinimizeToast} from
 import {useOnClickOnly} from '../../hooks/Clicks';
 import {ClassNames} from '../../utils/ClassNames';
 import {TitledNotification, Actionable} from '../../types';
+import {LaunchApplicationError} from '../../../model/Errors';
+import {ErrorHandler} from '../../../model/ErrorHandler';
 
 import {Body} from './Body';
 import {Loading} from './Loading';
@@ -27,12 +29,21 @@ export function NotificationCard(props: Props) {
     const cardRef = React.createRef<HTMLDivElement>();
     const [validClick, finishedClick] = useOnClickOnly(cardRef);
 
+    const handleError = (error: Error) => {
+        ErrorHandler.for(error)
+            .processError(LaunchApplicationError, function (e: LaunchApplicationError) {
+                console.warn('Unable to launch application');
+                this.log();
+            })
+            .throwRemaining();
+    };
+
     const handleNotificationClose = async () => {
         setUninteractable(true);
         await new RemoveNotifications([notification]).dispatch(storeApi);
     };
 
-    const handleNotificationDismiss = async () => {
+    const handleNotificationMinimize = async () => {
         if (isToast) {
             setUninteractable(true);
             await new MinimizeToast(notification).dispatch(storeApi);
@@ -41,7 +52,12 @@ export function NotificationCard(props: Props) {
 
     const handleButtonClick = async (buttonIndex: number) => {
         setUninteractable(true);
-        await new ClickButton(notification, buttonIndex).dispatch(storeApi);
+        try {
+            // TODO: [SERVICE-605] set loading state
+            await new ClickButton(notification, buttonIndex).dispatch(storeApi);
+        } catch (error) {
+            handleError(error);
+        }
     };
 
     const handleNotificationClick = async (event: React.MouseEvent) => {
@@ -54,7 +70,12 @@ export function NotificationCard(props: Props) {
             return;
         }
         setUninteractable(true);
-        await new ClickNotification(notification).dispatch(storeApi);
+        try {
+            // TODO: [SERVICE-605] set loading state
+            await new ClickNotification(notification).dispatch(storeApi);
+        } catch (error) {
+            handleError(error);
+        }
         finishedClick();
     };
 
@@ -74,7 +95,7 @@ export function NotificationCard(props: Props) {
                     <NotificationTime date={data.date} />
                     <div className="actions">
                         {isToast &&
-                            <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationDismiss} alt="Minimize Toast" />
+                            <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationMinimize} alt="Minimize Toast" />
                         }
                         <CircleButton type={IconType.CLOSE} onClick={handleNotificationClose} alt="Clear notification" />
                     </div>
