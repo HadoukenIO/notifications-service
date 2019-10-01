@@ -147,12 +147,20 @@ export class NotificationCenter extends AsyncInit {
         await this.hideWindow(true);
         const {monitorInfo} = this._monitorModel;
         const {availableRect} = monitorInfo.primaryMonitor;
-        return this._webWindow.setBounds({
-            left: availableRect.right - idealWidth,
-            top: availableRect.top,
+        const left = availableRect.right - idealWidth;
+        const top = availableRect.top;
+        // TODO [SERVICE-739] This is a fix for setBounds not working on hidden windows.
+        await this._webWindow.showAt(left, top);
+
+        await this._webWindow.setBounds({
+            left,
+            top,
             width: idealWidth,
             height: availableRect.bottom - availableRect.top
         });
+
+        // TODO [SERVICE-739] This is a fix for setBounds not working on hidden windows.
+        await this._webWindow.hide();
     }
 
     private async hideWindowOffscreen() {
