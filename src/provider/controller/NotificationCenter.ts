@@ -74,7 +74,7 @@ export class NotificationCenter extends AsyncInit {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
         });
         try {
-            await fin.GlobalHotkey.register('ctrl+alt+n', async () => {
+            await fin.GlobalHotkey.register('commandorcontrol+alt+n', async () => {
                 new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
             });
         } catch (error) {
