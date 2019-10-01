@@ -52,6 +52,8 @@
     "fake-indexeddb": "^2.1.1",
     "hadouken-js-adapter": "^1.44.1",
     "inversify": "^5.0.1",
+    "jest": "^24.8.0",
+    "jest-cli": "^24.8.0",
     "jsdom": "^15.1.1",
     "markdown-it": "^9.1.0",
     "mkdirp": "^0.5.1",
