@@ -9,6 +9,7 @@ import {RegisterApplication} from '../store/Actions';
 
 import {APIHandler} from './APIHandler';
 import {Environment, StoredApplication} from './Environment';
+import {LaunchApplicationError} from './Errors';
 
 /**
  * Client registry is responsible for keeping track of active clients, storing information about them
@@ -44,13 +45,16 @@ export class ClientRegistry {
      */
     public async tryLaunchApplication(appUuid: string): Promise<void> {
         const isRunning = await this._environment.isApplicationRunning(appUuid);
-
         if (!isRunning) {
             const storedApplication = this._store.state.applications.get(appUuid);
             if (storedApplication) {
-                await this._environment.startApplication(storedApplication);
+                try {
+                    await this._environment.startApplication(storedApplication);
+                } catch (error) {
+                    throw new LaunchApplicationError('Could not launch application', error);
+                }
             } else {
-                console.warn('Could not find application initialization data for the application with uuid ' + appUuid + ' in the database.');
+                throw new LaunchApplicationError(`Could not find application initialization data for the application with uuid ${appUuid} in the database.`);
             }
         }
     }
@@ -84,7 +88,7 @@ export class ClientRegistry {
 
     private async onClientConnection(app: Identity): Promise<void> {
         const application: StoredApplication = await this._environment.getApplication(app.uuid);
-        new RegisterApplication(application).dispatch(this._store);
+        await (new RegisterApplication(application)).dispatch(this._store);
     }
 
     private removeActiveClient(client: Identity): void {

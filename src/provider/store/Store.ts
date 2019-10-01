@@ -1,6 +1,7 @@
-import {Signal, Aggregators} from 'openfin-service-signal';
+import {Signal} from 'openfin-service-signal';
 
 import {AsyncInit} from '../controller/AsyncInit';
+import {ErrorAggregator} from '../model/Errors';
 
 export abstract class Action<S> {
     public abstract readonly type: string;
@@ -33,7 +34,7 @@ type Listener<S> = (getState: () => S) => void;
 export type StoreAPI<S> = Pick<Store<S>, 'dispatch' | 'state'>;
 
 export class Store<S> extends AsyncInit {
-    public readonly onAction: Signal<[Action<S>], Promise<void>, Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
+    public readonly onAction: Signal<[Action<S>], Promise<void>, Promise<void>> = new Signal(ErrorAggregator);
 
     private _currentState!: S;
     private readonly _listeners: Listener<S>[] = [];

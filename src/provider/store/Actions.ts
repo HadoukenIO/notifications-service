@@ -45,14 +45,15 @@ export class CreateNotification extends Action<RootState> {
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         const notification = this.notification;
-
+        const promises = [];
         // First remove any existing notifications with this ID, to ensure ID uniqueness
         // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
         const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
         if (existingNotifications.length) {
-            await new RemoveNotifications(existingNotifications).dispatch(store);
+            promises.push(new RemoveNotifications(existingNotifications).dispatch(store));
         }
-        super.dispatch(store);
+        promises.push(super.dispatch(store));
+        await Promise.all(promises);
     }
 }
 
@@ -194,8 +195,7 @@ export class ExpireNotification extends Action<RootState> {
     }
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
-        super.dispatch(store);
-        new RemoveNotifications([this.notification]).dispatch(store);
+        await Promise.all([super.dispatch(store), new RemoveNotifications([this.notification]).dispatch(store)]);
     }
 }
 

@@ -17,8 +17,8 @@ interface Props extends Actionable {
 
 export function NotificationGroup(props: Props) {
     const {notifications, storeApi, name} = props;
-    const handleClearAll = () => {
-        new RemoveNotifications(notifications).dispatch(storeApi);
+    const handleClearAll = async () => {
+        await new RemoveNotifications(notifications).dispatch(storeApi);
     };
 
     return (

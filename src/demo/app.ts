@@ -107,18 +107,18 @@ fin.desktop.main(async () => {
             });
         });
 
-        document.getElementById(`clearbutton${index}`)!.addEventListener('click', () => {
-            clear(`1q2w3e4r${index}`);
+        document.getElementById(`clearbutton${index}`)!.addEventListener('click', async () => {
+            await clear(`1q2w3e4r${index}`);
         });
     }
 
     // Press 1-9 to create a notification, ctrl+1-9 to remove notification
-    document.addEventListener('keydown', (event: KeyboardEvent) => {
+    document.addEventListener('keydown', async (event: KeyboardEvent) => {
         const index = parseInt(event.key);
 
         if (index >= 1) {
             if (event.ctrlKey) {
-                clear(`1q2w3e4r${index}`);
+                await clear(`1q2w3e4r${index}`);
             } else {
                 makeNoteOfType(index);
             }
@@ -156,8 +156,8 @@ fin.desktop.main(async () => {
             logMessage(`${notifications.length} notifications received from the Notification Center`);
         });
     });
-    document.getElementById('toggleNotificationCenter')!.addEventListener('click', () => {
-        toggleNotificationCenter();
+    document.getElementById('toggleNotificationCenter')!.addEventListener('click', async () => {
+        await toggleNotificationCenter();
     });
 
     const queryParams = new URLSearchParams(location.search);

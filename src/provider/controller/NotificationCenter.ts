@@ -109,7 +109,7 @@ export class NotificationCenter extends AsyncInit {
 
     private async onAction(action: Action<RootState>): Promise<void> {
         if (action instanceof ToggleCenterVisibility || action instanceof BlurCenter) {
-            this.toggleWindow(this._store.state.centerVisible);
+            await this.toggleWindow(this._store.state.centerVisible);
         }
     }
 
