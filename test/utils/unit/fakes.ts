@@ -12,7 +12,7 @@ import {NotificationInternal} from '../../../src/client/internal';
 import {WebWindow} from '../../../src/provider/model/WebWindow';
 
 /**
- * Utility functions for creating fake data for use in unit tests. Except functions named 'Empty, repeated calls to
+ * Utility functions for creating fake data for use in unit tests. Except functions named 'Empty', repeated calls to
  * each function will give unique results, to guard against false positives in tests.
  */
 
