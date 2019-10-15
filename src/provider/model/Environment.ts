@@ -1,4 +1,6 @@
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
+import {Signal} from 'openfin-service-signal';
+import {Identity} from 'openfin/_v2/main';
 
 import {Immutable} from '../store/State';
 
@@ -20,6 +22,8 @@ type ManifestApplication = {
 }
 
 export interface Environment {
+    onWindowClosed: Signal<[Identity]>;
+
     isApplicationRunning(uuid: string): Promise<boolean>;
     getApplication(uuid: string): Promise<StoredApplication>;
     startApplication(application: StoredApplication): Promise<void>;

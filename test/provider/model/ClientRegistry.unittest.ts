@@ -19,6 +19,7 @@ beforeEach(async () => {
 
     getterMock(mockApiHandler, 'onConnection').mockReturnValue(new Signal<[Identity]>());
     getterMock(mockApiHandler, 'onDisconnection').mockReturnValue(new Signal<[Identity]>());
+    getterMock(mockEnvironment, 'onWindowClosed').mockReturnValue(new Signal<[Identity]>());
 });
 
 describe('When attempting to launch an app through the client registry', () => {

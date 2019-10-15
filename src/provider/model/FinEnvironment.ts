@@ -1,5 +1,8 @@
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
 import {injectable} from 'inversify';
+import {Identity} from 'openfin/_v2/main';
+import {Signal} from 'openfin-service-signal';
+import {WindowEvent} from 'openfin/_v2/api/events/base';
 
 import {mutable} from '../store/State';
 
@@ -7,7 +10,16 @@ import {Environment, StoredApplication} from './Environment';
 
 @injectable()
 export class FinEnvironment implements Environment {
+    public readonly onWindowClosed: Signal<[Identity]> = new Signal();
+
     private _startingUpAppUuids: string[] = [];
+
+    constructor() {
+        fin.System.addListener('window-closed', (event: WindowEvent<'system', 'window-closed'>) => {
+            const identity: Identity = {uuid: event.uuid, name: event.name};
+            this.onWindowClosed.emit(identity);
+        });
+    }
 
     public async isApplicationRunning(uuid: string): Promise<boolean> {
         if (this._startingUpAppUuids.some(startingUuid => startingUuid === uuid)) {

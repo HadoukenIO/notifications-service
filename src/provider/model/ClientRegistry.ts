@@ -36,6 +36,7 @@ export class ClientRegistry {
 
         this._store = store;
         this._environment = environment;
+        this._environment.onWindowClosed.add(this.removeActiveClient, this);
     }
 
     /**
