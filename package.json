@@ -26,14 +26,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openfin/Notification-Service.git"
+    "url": "git+https://github.com/HadoukenIO/notifications-service.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/openfin/Notification-Service/issues"
+    "url": "https://github.com/HadoukenIO/notifications-service/issues"
   },
-  "homepage": "https://github.com/openfin/Notification-Service#readme",
+  "homepage": "https://github.com/HadoukenIO/notifications-service#readme",
   "devDependencies": {
     "@types/markdown-it": "0.0.8",
     "@types/mkdirp": "^0.5.2",
