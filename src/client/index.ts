@@ -11,8 +11,11 @@
 import {ActionDeclaration, NotificationActionResult, ActionTrigger} from './actions';
 import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
-import {APITopic, Events, NotificationInternal} from './internal';
+import {APITopic, Events, NotificationInternal, Omit} from './internal';
 import {EventRouter, Transport} from './EventRouter';
+
+export * from './actions';
+export * from './controls';
 
 const eventHandler: EventRouter<Events> = getEventRouter();
 
@@ -23,7 +26,8 @@ function parseEventWithNotification<T extends {notification: NotificationInterna
         ...event,
         notification: {
             ...notification,
-            date: new Date(notification.date)
+            date: new Date(notification.date),
+            expires: notification.expires !== null ? new Date(notification.expires) : null
         }
     };
 }
@@ -38,7 +42,7 @@ eventHandler.registerDeserializer<NotificationActionEvent>('notification-action'
     const {controlSource, controlIndex, ...rest} = parseEventWithNotification(event);
 
     if (event.trigger === ActionTrigger.CONTROL) {
-        const control: ControlOptions = event.notification[controlSource!][controlIndex!] as ControlOptions;
+        const control = event.notification[controlSource!][controlIndex!];
         return {...rest, control};
     } else {
         return rest;
@@ -67,6 +71,8 @@ export interface NotificationOptions {
      * Notification body text.
      *
      * This is the main notification content, displayed below the notification title. The notification will expand to fit the length of this text.
+     * Markdown may be used in the body text to control how it is styled when rendered.
+     * With the exception of links, images & code blocks, all basic syntax as documented [here](https://www.markdownguide.org/basic-syntax) is supported.
      */
     body: string;
 
@@ -113,6 +119,13 @@ export interface NotificationOptions {
     date?: Date;
 
     /**
+     * The expiry date and time of the notification. If specified, the notification will be removed at this time, or as
+     * soon as possible after. If not specified, the notification will never expire, and will persist until it
+     * is closed.
+     */
+    expires?: Date | null;
+
+    /**
      * A list of buttons to display below the notification text.
      *
      * Notifications support up to four buttons. Attempting to add more than four will result in the notification
@@ -128,11 +141,34 @@ export interface NotificationOptions {
      * application-defined buttons, and the default 'X' close button) will not trigger a
      * {@link ActionTrigger.SELECT|select} action.
      *
-     * If omitted or `null`, applications will not receive a {@link NotificationActionEvent|`notification-action`}
-     * event when the notification is clicked. See {@link Actions} for more details on notification actions, and
-     * receiving interaction events from notifications.
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
      */
-    onSelect?: ActionDeclaration<never, never>|null;
+    onSelect?: ActionDeclaration<never, never> | null;
+
+    /**
+     * An {@link NotificationActionResult|action result} to be passed back to the application inside the
+     * {@link NotificationActionEvent|`notification-action`} event fired when the notification the expires.
+     *
+     * If `expires` is specified for the notification, this action will be raised when the notification expires. If
+     * `expires` is not specified for the notification, this action will never be raised. Note that if an `onClose`
+     * action result is also specified, both actions will be raised if and when the notification expires.
+     *
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
+     */
+    onExpire?: ActionDeclaration<never, never> | null;
+
+    /**
+     * An {@link NotificationActionResult|action result} to be passed back to the application inside the
+     * {@link NotificationActionEvent|`notification-action`} event fired when the notification is closed.
+     *
+     * This action will be raised regardless of how the notification is closed. This can be from user interaction
+     * (until future revisions allow default click behaviour to be overriden, this will be any click anywhere within
+     * the notification), the notification expiring, or from the notification being programmaticially removed, such as
+     * a call to `clear`.
+     *
+     * See {@link Actions} for more details on notification actions, and receiving action events from notifications.
+     */
+    onClose?: ActionDeclaration<never, never> | null;
 }
 
 /**
@@ -149,19 +185,25 @@ export type CustomData = {[key: string]: any};
  * This object should be treated as immutable. Modifying its state will not have any effect on the notification or the
  * state of the service.
  */
-export type Notification = Readonly<Required<NotificationOptions>>;
+export type Notification = Readonly<Required<Omit<NotificationOptions, 'buttons'>> & {readonly buttons: ReadonlyArray<Readonly<Required<ButtonOptions>>>}>;
 
 /**
- * Event fired for interactions with notification UI elements. It is important to note that applications will only
- * receive these events if they indicate to the service that they want to receive these events. See {@link Actions} for
- * a full example of how actions are defined, and how an application can listen to and handle them.
+ * Event fired when an action is raised for a notification due to a specified trigger. It is important to note that
+ * applications will only receive these events if they indicate to the service that they want to receive these events.
+ * See {@link Actions} for a full example of how actions are defined, and how an application can listen to and handle
+ * them.
  *
- * This can be fired due to interaction with notification buttons, or the notification itself. Later versions of the
- * service will add additional control types. All actions, for all control types, will be returned to the application
- * via the same `notification-action` event type.
+ * This can be fired due to interaction with notification buttons or the notification itself, the notification being
+ * closed (either by user interaction or by API call), or by the notification expiring. Later versions of the service
+ * will add additional control types that may raise actions from user interaction. All actions, for all control types,
+ * will be returned to the application via the same `notification-action` event type.
  *
  * The event object will contain the application-defined {@link NotificationActionResult|metadata} that allowed this
  * action to be raised, and details on what triggered this action and which control the user interacted with.
+ *
+ * Unlike other event types, `notification-action` events will be buffered by the service until the application has
+ * added a listener for this event type, at which point it will receive all buffered `notification-action` events. The
+ * service will also attempt to restart the application if it is not running when the event is fired.
  *
  * This type includes a generic type argument, should applications wish to define their own interface for action
  * results. See {@link NotificationActionResult} for details.
@@ -209,13 +251,13 @@ export interface NotificationActionEvent<T = CustomData> {
      * }
      * ```
      */
-    control?: Readonly<ControlOptions>;
+    control?: Readonly<Required<ControlOptions>>;
 
     /**
      * Application-defined metadata that this event is passing back to the application.
      *
-     * A `notification-action` event is only fired for an interaction with a notification if the
-     * {@link NotificationOptions|notification options} included an action result for that interaction.
+     * A `notification-action` event is only fired for a given trigger if the
+     * {@link NotificationOptions|notification options} included an action result for that trigger.
      *
      * See the comment on the {@link NotificationActionEvent} type for an example of buttons that do and don't raise
      * actions.
@@ -226,8 +268,9 @@ export interface NotificationActionEvent<T = CustomData> {
 /**
  * Event fired whenever the notification has been closed.
  *
- * This event is fired regardless of how the notification was closed - i.e.: via a call to `clear`/`clearAll`, or by a
- * user clicking either the notification itself, the notification's close button, or a button on the notification.
+ * This event is fired regardless of how the notification was closed - i.e.: via a call to `clear`/`clearAll`, the
+ * notification expiring, or by a user clicking either the notification itself, the notification's close button, or
+ * a button on the notification.
  *
  * @event
  */
@@ -273,7 +316,11 @@ export function addEventListener<E extends Events>(eventType: E['type'], listene
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
+    const count = eventEmitter.listenerCount(eventType);
     eventEmitter.addListener(eventType, listener);
+    if (count === 0 && eventEmitter.listenerCount(eventType) === 1) {
+        tryServiceDispatch(APITopic.ADD_EVENT_LISTENER, eventType);
+    }
 }
 
 export function removeEventListener(eventType: 'notification-action', listener: (event: NotificationActionEvent) => void): void;
@@ -293,7 +340,11 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
         throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
     }
 
+    const count = eventEmitter.listenerCount(eventType);
     eventEmitter.removeListener(eventType, listener);
+    if (count === 1 && eventEmitter.listenerCount(eventType) === 0) {
+        tryServiceDispatch(APITopic.REMOVE_EVENT_LISTENER, eventType);
+    }
 }
 
 /**
@@ -324,8 +375,16 @@ export async function create(options: NotificationOptions): Promise<Notification
         throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
     }
 
-    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {...options, date: options.date && options.date.valueOf()});
-    return {...response, date: new Date(response.date)};
+    if (options.expires !== undefined && options.expires !== null && !(options.expires instanceof Date)) {
+        throw new Error('Invalid arguments passed to create: "expires" must be null or a valid Date object');
+    }
+
+    const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {
+        ...options,
+        date: options.date && options.date.valueOf(),
+        expires: options.expires && options.expires.valueOf()
+    });
+    return {...response, date: new Date(response.date), expires: response.expires !== null ? new Date(response.expires) : null};
 }
 
 /**
@@ -362,7 +421,7 @@ export async function clear(id: string): Promise<boolean> {
 export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
     const response = await tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
-    return response.map(note => ({...note, date: new Date(note.date)}));
+    return response.map(note => ({...note, date: new Date(note.date), expires: note.expires !== null ? new Date(note.expires) : null}));
 }
 
 /**

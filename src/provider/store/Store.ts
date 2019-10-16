@@ -1,122 +1,89 @@
-import {injectable, inject} from 'inversify';
-import {composeWithDevTools} from 'remote-redux-devtools';
-import {Store as ReduxStore, applyMiddleware, createStore, StoreEnhancer, Dispatch, Unsubscribe} from 'redux';
-import {Signal, Aggregators} from 'openfin-service-signal';
+import {Signal} from 'openfin-service-signal';
 
-import {Inject} from '../common/Injectables';
-import {StoredNotification} from '../model/StoredNotification';
-import {Database, CollectionMap} from '../model/database/Database';
 import {AsyncInit} from '../controller/AsyncInit';
-import {Collection} from '../model/database/Collection';
+import {ErrorAggregator} from '../model/Errors';
 
-import {ActionHandlerMap, ActionHandler, RootAction, Action, ActionOf, CustomAction} from './Actions';
-import {RootState} from './State';
+export abstract class Action<S> {
+    public abstract readonly type: string;
 
-export type StoreChangeObserver<T> = (oldValue: T, newValue: T) => void;
+    public async dispatch(store: StoreAPI<S>): Promise<void> {
+        await store.dispatch(this);
+    }
 
-/**
- * Subset of properties of `Store` that are safe for use from actions and components.
- */
-export interface StoreAPI {
-    state: RootState;
-    dispatch(action: RootAction): Promise<void>;
+    public reduce(state: S): S {
+        return state;
+    }
 }
 
-@injectable()
-export class Store extends AsyncInit implements StoreAPI {
-    private static INITIAL_STATE: RootState = {
-        notifications: [],
-        windowVisible: false
-    };
+export class Init<S> extends Action<S> {
+    public readonly type = '@@INIT';
+    private readonly initialState: S;
 
-    public readonly onAction: Signal<[RootAction], Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
-
-    private readonly _database: Database;
-    private _actionHandlerMap: ActionHandlerMap;
-    private _store!: ReduxStore<RootState, RootAction>;
-
-    constructor(@inject(Inject.ACTION_HANDLER_MAP) actionHandlerMap: ActionHandlerMap, @inject(Inject.DATABASE) database: Database) {
+    constructor(initialState: S) {
         super();
-
-        this._database = database;
-        this._actionHandlerMap = actionHandlerMap;
+        this.initialState = initialState;
     }
 
-    protected async init(): Promise<void> {
-        await this._database.initialized;
-        this._store = createStore<RootState, RootAction, {}, {}>(this.reduce.bind(this), await this.getInitialState(), this.createEnhancer());
+    public reduce(state: S): S {
+        return this.initialState;
+    }
+}
+
+type Listener<S> = (getState: () => S) => void;
+
+export type StoreAPI<S> = Pick<Store<S>, 'dispatch' | 'state'>;
+
+export class Store<S> extends AsyncInit {
+    public readonly onAction: Signal<[Action<S>], Promise<void>, Promise<void>> = new Signal(ErrorAggregator);
+
+    private _currentState!: S;
+    private readonly _listeners: Listener<S>[] = [];
+
+    constructor(initialState: S) {
+        super();
+        // This is used by dev tools
+        new Init(initialState).dispatch(this);
     }
 
-    public get state(): RootState {
-        return this._store.getState() as RootState;
+    public get state(): S {
+        return this._currentState;
     }
 
-    public async dispatch(action: RootAction): Promise<void> {
-        if (action instanceof CustomAction) {
-            // Action has custom dispatch logic
-            await action.dispatch(this);
-        } else {
-            // Pass straight through to redux store
-            await this._store.dispatch({...action});
-        }
+    public dispatch(action: Action<S>): Promise<void> {
+        return this.reduceAndSignal(action);
     }
 
-    public watchForChange<T>(getObject: (state: RootState) => T, observer: StoreChangeObserver<T>): Unsubscribe {
-        const watcher = this.watch<T>(() => this.state, getObject);
-        return this._store.subscribe(watcher(observer));
+    protected async init(): Promise<void> {}
+
+    protected setState(state: S): void {
+        this._currentState = state;
     }
 
-    private watch<T>(getState: () => any, getObject: (state: RootState) => T): (observer: StoreChangeObserver<T>) => () => void {
-        let currentValue = getObject(getState());
-        return function w(observer: StoreChangeObserver<T>) {
-            return function () {
-                const newValue: T = getObject(getState());
-                if (currentValue !== newValue) {
-                    const oldValue = currentValue;
-                    currentValue = newValue;
-                    observer(oldValue, newValue);
-                }
-            };
+    private reduceAndSignal(action: Action<S>): Promise<void> {
+        // Emit signal last
+        this.reduce(action);
+        return this.onAction.emit(action);
+    }
+
+    private reduce(action: Action<S>): void {
+        this._currentState = action.reduce(this.state);
+        this._listeners.forEach(listener => listener(() => this._currentState));
+    }
+
+    // Intended to be used by react-redux only - use `state` instead
+    private getState(): S {
+        return this._currentState;
+    }
+
+    // Intended to be used by react-redux only - use `onAction` signal instead
+    private subscribe(listener: Listener<S>) {
+        this._listeners.push(listener);
+
+        return () => {
+            const index: number = this._listeners.indexOf(listener);
+            if (index >= 0) {
+                this._listeners.splice(index, 1);
+            }
         };
-    }
-
-    private reduce<T extends Action>(state: RootState | undefined, action: ActionOf<T>): RootState {
-        const handler: ActionHandler<T> | undefined = this._actionHandlerMap[action.type] as ActionHandler<T>;
-
-        if (handler) {
-            return handler(state!, action);
-        } else {
-            // No handler registered for this action - action does not modify the store's state
-            return state!;
-        }
-    }
-
-    private createEnhancer(): StoreEnhancer {
-        let enhancer: StoreEnhancer = applyMiddleware(this.createMiddleware.bind(this));
-
-        if (process.env.NODE_ENV !== 'production') {
-            const devTools = composeWithDevTools({
-                // @ts-ignore: Property 'suppressConnectErrors' missing from type definitions
-                realtime: true, port: 9950, suppressConnectErrors: true, sendOnError: 2
-            });
-            enhancer = devTools(enhancer);
-        }
-
-        return enhancer;
-    }
-
-    private createMiddleware(): (next: Dispatch<RootAction>) => (action: RootAction) => Promise<RootAction> {
-        return (next: Dispatch<RootAction>) => async (action: RootAction): Promise<RootAction> => {
-            await this.onAction.emit(action);
-
-            return next(action);
-        };
-    }
-
-    private async getInitialState(): Promise<RootState> {
-        const notificationCollection: Collection<StoredNotification> = this._database.get(CollectionMap.NOTIFICATIONS);
-        const notifications: StoredNotification[] = await notificationCollection.getAll();
-
-        return Object.assign({}, Store.INITIAL_STATE, {notifications});
     }
 }

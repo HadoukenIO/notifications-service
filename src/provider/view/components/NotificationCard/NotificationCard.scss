@@ -1,0 +1,176 @@
+@import '../../styles/_variables.scss';
+
+.notification-card {
+    width: 340px;
+    align-self: center;
+    background: var(--card-background-color);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease-in-out;
+    color: white;
+    position: relative;
+
+    &:not(.toast) {
+        border-radius: 7px;
+        box-shadow: 0px 0px 0px 1px var(--card-border-color);
+
+        &:hover {
+            box-shadow: 0px 0px 0px 2px var(--accent-color);
+        }
+    }
+
+    &.toast {
+        .text {
+            max-height: $toast-max-height !important;
+        }
+
+        .header {
+            padding-bottom: 9px !important;
+
+            .time {
+                top: 1px !important;
+            }
+        }
+    }
+
+    &.uninteractable {
+        pointer-events: none;
+    }
+
+    .loading-screen {
+        position: absolute;
+        display: flex;
+        align-items: stretch;
+        align-content: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        top: 0%;
+        left: 0%;
+        background: rgba(0, 0, 0, 0.81);
+
+        &.hidden {
+            display: none;
+        }
+
+        .throbber {
+            margin: auto;
+            display: block;
+        }
+
+        .error {
+            margin: auto;
+            display: block;
+            color: red;
+        }
+    }
+
+    &:hover .actions {
+        display: inline-block !important;
+    }
+
+    &:hover .time {
+        display: none !important;
+    }
+
+    .header {
+        padding: 10px;
+        padding-bottom: 5px;
+        color: white;
+        display: flex;
+        width: 100%;
+        align-content: space-between;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        line-height: 20px;
+        height: 38px;
+
+        &>* {
+            vertical-align: middle;
+        }
+
+        .app-icon {
+            $size: 20px;
+            height: $size;
+            min-width: $size;
+            max-width: $size;
+            display: inline-block;
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-right: 8px;
+        }
+
+        .app-name {
+            text-transform: capitalize;
+            display: inline-block;
+            font-weight: 500;
+            user-select: none;
+            flex: 1 1 150px;
+        }
+
+        .time-close {
+            align-self: flex-end;
+            display: inline-block;
+            flex: 1 1 1;
+            flex-direction: row;
+            color: var(--secondary-text-color);
+            padding-left: 8px;
+
+            &>* {
+                vertical-align: middle;
+            }
+
+            .time {
+                display: none;
+                display: inline-block;
+                position: relative;
+                top: -3px;
+                margin-right: 4px;
+            }
+
+            .actions {
+                display: none;
+
+                .icon {
+                    $size: 18px;
+                    width: $size;
+                    height: $size;
+                    margin-right: 8px;
+                    background-color: var(--secondary-text-color);
+
+                    .image {
+                        background-color: var(--card-background-color);
+                    }
+
+                    &.minimize:hover {
+                        background-color: #DEA837;
+                    }
+
+                    &.close:hover {
+                        background-color: #CB7070;
+                    }
+
+                    &:last-of-type {
+                        margin-right: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .content {
+        padding: 0 10px 8px 10px;
+
+        .title {
+            margin-bottom: 4px;
+        }
+    }
+
+    .buttons {
+        max-height: 40px;
+        display: flex;
+        justify-content: space-around;
+        flex-direction: row;
+        border-top: var(--card-border-color) solid 1px;
+    }
+}

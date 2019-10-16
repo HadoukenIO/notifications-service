@@ -1,0 +1,14 @@
+@import '../../styles/_variables.scss';
+
+
+body,
+html {
+    background: var(--center-background-color);
+}
+
+.notification-center {
+    width: $window-width;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}

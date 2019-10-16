@@ -5,53 +5,107 @@ import {Identity} from 'openfin/_v2/main';
 import moment from 'moment';
 
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
-import {NotificationClosedEvent, NotificationActionEvent, NotificationCreatedEvent} from '../client';
-import {ButtonOptions} from '../client/controls';
-import {Transport, Targeted} from '../client/EventRouter';
-import {ActionTrigger} from '../client/actions';
+import {ActionDeclaration} from '../client/actions';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
 import {NotificationCenter} from './controller/NotificationCenter';
 import {ToastManager} from './controller/ToastManager';
+import {ExpiryController} from './controller/ExpiryController';
 import {APIHandler} from './model/APIHandler';
 import {StoredNotification} from './model/StoredNotification';
-import {Action, RootAction, CreateNotification, RemoveNotifications, ToggleVisibility} from './store/Actions';
+import {CreateNotification, RemoveNotifications, ToggleCenterVisibility, ToggleCenterVisibilitySource} from './store/Actions';
 import {mutable} from './store/State';
-import {Store} from './store/Store';
+import {EventPump} from './model/EventPump';
+import {ClientRegistry} from './model/ClientRegistry';
 import {Database} from './model/database/Database';
+import {ServiceStore} from './store/ServiceStore';
+import {Persistor} from './controller/Persistor';
+import {ClientEventController} from './controller/ClientEventController';
+import {TrayIcon} from './model/TrayIcon';
+import {WebWindowFactory} from './model/WebWindow';
+import {Environment} from './model/Environment';
+import {Layouter} from './controller/Layouter';
+import {MonitorModel} from './model/MonitorModel';
 
 @injectable()
 export class Main {
     private _config = null;
+    private readonly _apiHandler: APIHandler<APITopic, Events>;
+    private readonly _clientEventController: ClientEventController;
+    private readonly _clientRegistry: ClientRegistry;
+    private readonly _database: Database;
+    private readonly _environment: Environment;
+    private readonly _eventPump: EventPump;
+    private readonly _expiryController: ExpiryController;
+    private readonly _layouter: Layouter;
+    private readonly _monitorModel: MonitorModel;
+    private readonly _notificationCenter: NotificationCenter;
+    private readonly _persistor: Persistor;
+    private readonly _store: ServiceStore;
+    private readonly _toastManager: ToastManager;
+    private readonly _trayIcon: TrayIcon;
+    private readonly _webWindowFactory: WebWindowFactory;
 
-    @inject(Inject.API_HANDLER)
-    private _apiHandler!: APIHandler<APITopic, Events>;
-
-    @inject(Inject.STORE)
-    private _store!: Store;
-
-    @inject(Inject.NOTIFICATION_CENTER)
-    private _notificationCenter!: NotificationCenter;
-
-    @inject(Inject.TOAST_MANAGER)
-    private _toastManager!: ToastManager;
-
-    @inject(Inject.DATABASE)
-    private _database!: Database;
+    constructor(
+        @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
+        @inject(Inject.CLIENT_EVENT_CONTROLLER) clientEventController: ClientEventController,
+        @inject(Inject.CLIENT_REGISTRY) clientRegistry: ClientRegistry,
+        @inject(Inject.DATABASE) database: Database,
+        @inject(Inject.ENVIRONMENT) environment: Environment,
+        @inject(Inject.EVENT_PUMP) eventPump: EventPump,
+        @inject(Inject.EXPIRY_CONTROLLER) expiryController: ExpiryController,
+        @inject(Inject.LAYOUTER) layouter: Layouter,
+        @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
+        @inject(Inject.NOTIFICATION_CENTER) notificationCenter: NotificationCenter,
+        @inject(Inject.PERSISTOR) persistor: Persistor,
+        @inject(Inject.STORE) store: ServiceStore,
+        @inject(Inject.TOAST_MANAGER) toastManager: ToastManager,
+        @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
+        @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
+    ) {
+        this._apiHandler = apiHandler;
+        this._clientEventController = clientEventController;
+        this._clientRegistry = clientRegistry;
+        this._database = database;
+        this._environment = environment;
+        this._eventPump = eventPump;
+        this._expiryController = expiryController;
+        this._layouter = layouter;
+        this._monitorModel = monitorModel;
+        this._notificationCenter = notificationCenter;
+        this._persistor = persistor;
+        this._store = store;
+        this._toastManager = toastManager;
+        this._trayIcon = trayIcon;
+        this._webWindowFactory = webWindowFactory;
+    }
 
     public async register(): Promise<void> {
         Object.assign(window, {
             main: this,
+            injector: Injector,
             config: this._config,
-            store: this._store,
+            apiHandler: this._apiHandler,
             center: this._notificationCenter,
+            clientEventController: this._clientEventController,
+            clientRegistry: this._clientRegistry,
+            database: this._database,
+            environment: this._environment,
+            eventPump: this._eventPump,
+            expiryController: this._expiryController,
+            layouter: this._layouter,
+            monitorModel: this._monitorModel,
+            notificationCenter: this._notificationCenter,
+            persitor: this._persistor,
+            store: this._store,
             toast: this._toastManager,
-            database: this._database
+            trayIcon: this._trayIcon,
+            webWindowFactory: this._webWindowFactory
         });
 
         // Wait for creation of any injected components that require async initialization
-        await Injector.initialized;
+        await Injector.init();
 
         // Current API
         this._apiHandler.registerListeners<API>({
@@ -59,59 +113,9 @@ export class Main {
             [APITopic.CLEAR_NOTIFICATION]: this.clearNotification.bind(this),
             [APITopic.GET_APP_NOTIFICATIONS]: this.fetchAppNotifications.bind(this),
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
-            [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this)
-        });
-
-        this._store.onAction.add(async (action: RootAction): Promise<void> => {
-            if (action.type === Action.CREATE) {
-                const {notification, source} = action.notification;
-                const event: Targeted<Transport<NotificationCreatedEvent>> = {
-                    target: 'default',
-                    type: 'notification-created',
-                    notification: mutable(notification)
-                };
-                this._apiHandler.dispatchEvent<NotificationCreatedEvent>(source, event);
-            } else if (action.type === Action.REMOVE) {
-                const {notifications} = action;
-                notifications.forEach((storedNotification: StoredNotification) => {
-                    const {notification, source} = storedNotification;
-                    const event: Targeted<Transport<NotificationClosedEvent>> = {
-                        target: 'default',
-                        type: 'notification-closed',
-                        notification: mutable(notification)
-                    };
-                    this._apiHandler.dispatchEvent<NotificationClosedEvent>(source, event);
-                });
-            } else if (action.type === Action.CLICK_BUTTON) {
-                const {notification, source} = action.notification;
-                const button: ButtonOptions = notification.buttons[action.buttonIndex];
-
-                if (button && button.onClick !== undefined) {
-                    const event: Targeted<Transport<NotificationActionEvent>> = {
-                        target: 'default',
-                        type: 'notification-action',
-                        trigger: ActionTrigger.CONTROL,
-                        notification: mutable(notification),
-                        controlSource: 'buttons',
-                        controlIndex: action.buttonIndex,
-                        result: button.onClick
-                    };
-                    this._apiHandler.dispatchEvent(source, event);
-                }
-            } else if (action.type === Action.CLICK_NOTIFICATION) {
-                const {notification, source} = action.notification;
-
-                if (notification.onSelect) {
-                    const event: Targeted<Transport<NotificationActionEvent>> = {
-                        target: 'default',
-                        type: 'notification-action',
-                        trigger: ActionTrigger.SELECT,
-                        notification: mutable(notification),
-                        result: notification.onSelect
-                    };
-                    this._apiHandler.dispatchEvent(source, event);
-                }
-            }
+            [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
+            [APITopic.ADD_EVENT_LISTENER]: this._clientRegistry.onAddEventListener.bind(this._clientRegistry),
+            [APITopic.REMOVE_EVENT_LISTENER]: this._clientRegistry.onRemoveEventListener.bind(this._clientRegistry)
         });
 
         console.log('Service Initialised');
@@ -125,7 +129,8 @@ export class Main {
     private async createNotification(payload: CreatePayload, sender: ProviderIdentity): Promise<NotificationInternal> {
         // Explicitly create the identity object to avoid storing other unneeded info from ProviderIdentity
         const notification = this.hydrateNotification(payload, {uuid: sender.uuid, name: sender.name});
-        this._store.dispatch(new CreateNotification(notification));
+        await new CreateNotification(notification).dispatch(this._store);
+
         return mutable(notification.notification);
     }
 
@@ -135,7 +140,7 @@ export class Main {
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
     private async toggleNotificationCenter(payload: undefined, sender: ProviderIdentity): Promise<void> {
-        this._store.dispatch(new ToggleVisibility());
+        await new ToggleCenterVisibility(ToggleCenterVisibilitySource.API).dispatch(this._store);
     }
 
     /**
@@ -148,7 +153,7 @@ export class Main {
         const id = this.encodeID(payload.id, sender);
         const notification = this._store.state.notifications.find(n => n.id === id);
         if (notification) {
-            this._store.dispatch(new RemoveNotifications([notification]));
+            await new RemoveNotifications([notification]).dispatch(this._store);
             return true;
         }
         return false;
@@ -167,7 +172,7 @@ export class Main {
 
     private async clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
         const notifications = this.getAppNotifications(sender.uuid);
-        await this._store.dispatch(new RemoveNotifications(notifications));
+        await (new RemoveNotifications(notifications)).dispatch(this._store);
 
         return notifications.length;
     }
@@ -246,8 +251,16 @@ export class Main {
             icon: payload.icon || '',
             customData: payload.customData !== undefined ? payload.customData : {},
             date: payload.date || Date.now(),
-            onSelect: payload.onSelect || null,
-            buttons: payload.buttons ? payload.buttons.map(btn => ({...btn, type: 'button', iconUrl: btn.iconUrl || ''})) : []
+            expires: payload.expires !== undefined ? payload.expires : null,
+            onSelect: this.hydrateAction(payload.onSelect),
+            onExpire: this.hydrateAction(payload.onExpire),
+            onClose: this.hydrateAction(payload.onClose),
+            buttons: payload.buttons ? payload.buttons.map(btn => ({
+                ...btn,
+                type: 'button',
+                iconUrl: btn.iconUrl || '',
+                onClick: this.hydrateAction(btn.onClick)
+            })) : []
         };
 
         const storedNotification: StoredNotification = {
@@ -267,6 +280,10 @@ export class Main {
      */
     private generateId(): string {
         return Math.floor((Math.random() * 9 + 1) * 1e8).toString();
+    }
+
+    private hydrateAction(action: ActionDeclaration<never, never> | null | undefined): ActionDeclaration<never, never> | null {
+        return action || null;
     }
 }
 

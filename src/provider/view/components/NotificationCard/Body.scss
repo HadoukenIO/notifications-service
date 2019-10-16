@@ -1,0 +1,94 @@
+@import '../../styles/variables';
+
+.test {
+    color: red;
+}
+
+.body {
+    .text {
+        display: block;
+        overflow: scroll;
+        font-size: 14px;
+        max-height: 400px;
+        color: #dddddd;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: var(--accent-color);
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        h3 {
+            font-weight: 300;
+        }
+
+        p {
+            margin: 3px 0;
+
+            &:last-of-type {
+                margin-bottom: 0;
+            }
+        }
+
+        ul {
+            padding: 8px;
+            width: 100%;
+
+            li {
+                margin-left: 4px;
+                list-style-position: inside;
+                display: list-item;
+                list-style-type: disc;
+                width: 100%;
+            }
+
+        }
+
+        ul ol,
+        ol ul {
+            padding: 4px;
+        }
+
+        ol {
+            padding: 8px;
+            width: 100%;
+            list-style-type: decimal;
+
+            li {
+                margin-left: 4px;
+                list-style-position: inside;
+                display: list-item;
+                list-style-type: decimal;
+            }
+        }
+
+        blockquote {
+            border-left: .25em solid #dfe2e5;
+            padding: 0 10px;
+        }
+
+        img {
+            display: block;
+            object-fit: contain;
+            width: 100%;
+            max-height: 350px;
+        }
+    }
+}

@@ -1,42 +1,52 @@
 import * as React from 'react';
+import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
 import {NotificationCard} from '../NotificationCard/NotificationCard';
-import {StoredNotification} from '../../../model/StoredNotification';
-import {CloseButton} from '../CloseButton/CloseButton';
-import {Actionable} from '../../containers/NotificationCenterApp';
 import {RemoveNotifications} from '../../../store/Actions';
+import {CircleButton, Size, IconType} from '../CircleButton/CircleButton';
+import {TitledNotification, Actionable} from '../../types';
 
-export interface NotificationGroupProps extends Actionable {
+import './NotificationGroup.scss';
+
+interface Props extends Actionable {
     // Group name
     name: string;
     // Notifications in this group
-    notifications: StoredNotification[];
+    notifications: TitledNotification[];
 }
 
-export function NotificationGroup(props: NotificationGroupProps) {
-    const {notifications, storeDispatch} = props;
-    const handleClearAll = () => {
-        storeDispatch(new RemoveNotifications(notifications));
+export function NotificationGroup(props: Props) {
+    const {notifications, storeApi, name} = props;
+    const handleClearAll = async () => {
+        await new RemoveNotifications(notifications).dispatch(storeApi);
     };
+
     return (
         <div className="group">
-            <div className="header">
-                <div className="title">
-                    {props.name.toUpperCase()}
-                </div>
-                <CloseButton onClick={handleClearAll} />
+            <div className="title">
+                <span className="app">
+                    <span className="name single-line">{name}</span>
+                    <span className="count">{notifications.length}</span>
+                </span>
+                <CircleButton type={IconType.CLOSE} size={Size.SMALL} onClick={handleClearAll} alt="Clear notifications" />
             </div>
-            <ul>
+            <TransitionGroup className="notifications" component="ul">
                 {
-                    notifications.map((notification, i) => {
+                    notifications.map((notification) => {
                         return (
-                            <li key={i + notification.id}>
-                                <NotificationCard notification={notification} storeDispatch={storeDispatch} />
-                            </li>
+                            <CSSTransition
+                                key={notification.id + notification.notification.date}
+                                timeout={200}
+                                classNames="item"
+                            >
+                                <li key={notification.id + notification.notification.date}>
+                                    <NotificationCard notification={notification} storeApi={storeApi} />
+                                </li>
+                            </CSSTransition>
                         );
                     })
                 }
-            </ul>
+            </TransitionGroup>
         </div>
     );
 }

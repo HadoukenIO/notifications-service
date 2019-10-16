@@ -1,12 +1,15 @@
 import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
 
-import * as ofnotes from '../client/index';
-import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll} from '../client/index';
+import * as api from '../client/index';
+import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll, toggleNotificationCenter, ActionTrigger} from '../client/index';
+import {Events} from '../client/internal';
 
 addSpawnListeners();
 
-// Mount createWindow and createApp on the window to be used by puppeteer
-Object.assign(window, {createWindow, createApp, notifications: ofnotes});
+const receivedEvents: Events[] = [];
+
+// Mount functions and objects used by puppeteer
+Object.assign(window, {createWindow, createApp, notifications: api, receivedEvents});
 
 const normalNote: NotificationOptions = {
     title: 'Notification Title',
@@ -19,8 +22,23 @@ const normalNote: NotificationOptions = {
 };
 
 const longNote: NotificationOptions = {
-    // eslint-disable-next-line max-len
-    body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    body: `
+# H1 Title
+Some text below.
+
+# H2 Title
+Some text below. **Bold**. _Italic_.
+
+- Item 1
+- Item 2
+    1. A
+    2. B
+- Item 3
+
+> Block quote
+Paragraph: Ut enim ad minim veniam, quis nostrud *exercitation* ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Paragraph: Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
     category: 'Long',
     title: 'Notification Title ',
     icon: 'favicon.ico',
@@ -42,18 +60,39 @@ const buttonNote: NotificationOptions = {
     ]
 };
 
+// Counts how many times each type of notification has been created
+const notificationCounter: Map<number, number> = new Map();
+
 function makeNoteOfType(index: number) {
+    let options: NotificationOptions;
     if (index % 3 === 1) {
-        return create({id: `1q2w3e4r${index}`, date: new Date(), ...normalNote});
+        options = {id: `1q2w3e4r${index}`, date: new Date(), ...normalNote};
     } else if (index % 3 === 2) {
-        return create({id: `1q2w3e4r${index}`, date: new Date(), ...longNote});
+        options = {id: `1q2w3e4r${index}`, date: new Date(), ...longNote};
+    } else if (index === 6) {
+        options = {id: `1q2w3e4r${index}`, date: new Date(), expires: new Date(Date.now() + 30 * 1000), onExpire: {foo: 'bar'}, ...buttonNote};
     } else {
-        return create({id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote});
+        options = {id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote};
     }
+
+    if (notificationCounter.has(index)) {
+        // Increment counter
+        const count = notificationCounter.get(index)! + 1;
+        notificationCounter.set(index, count);
+
+        // Include count within title
+        options.title += ` (x${count})`;
+    } else {
+        notificationCounter.set(index, 1);
+    }
+
+    return create(options);
 }
 
 fin.desktop.main(async () => {
     const clientResponse = document.getElementById('clientResponse')!;
+
+    document.title = fin.Window.me.uuid;
 
     function logMessage(msg: string) {
         const logEntry = document.createElement('div');
@@ -61,52 +100,94 @@ fin.desktop.main(async () => {
         clientResponse.insertBefore(logEntry, clientResponse.firstChild);
     }
 
-    for (let index = 1; index < 7; index++) {
+    for (let index = 1; index <= 6; index++) {
         document.getElementById(`button${index}`)!.addEventListener('click', () => {
             makeNoteOfType(index).catch((err) => {
                 logMessage(`Error creating notification: ${err}`);
             });
         });
 
-        document.getElementById(`clearbutton${index}`)!.addEventListener('click', () => {
-            clear(`1q2w3e4r${index}`);
+        document.getElementById(`clearbutton${index}`)!.addEventListener('click', async () => {
+            await clear(`1q2w3e4r${index}`);
         });
     }
 
     // Press 1-9 to create a notification, ctrl+1-9 to remove notification
-    document.addEventListener('keydown', (event: KeyboardEvent) => {
+    document.addEventListener('keydown', async (event: KeyboardEvent) => {
         const index = parseInt(event.key);
 
         if (index >= 1) {
             if (event.ctrlKey) {
-                clear(`1q2w3e4r${index}`);
+                await clear(`1q2w3e4r${index}`);
             } else {
                 makeNoteOfType(index);
             }
         }
     });
 
+    document.getElementById('create2')!.addEventListener('click', () => {
+        for (let i = 1; i <= 2; i++) {
+            makeNoteOfType(100 + Math.floor(Math.random() * 1000));
+        }
+    });
+    document.getElementById('create5')!.addEventListener('click', () => {
+        for (let i = 1; i <= 5; i++) {
+            makeNoteOfType(100 + Math.floor(Math.random() * 1000));
+        }
+    });
+    document.getElementById('clear2')!.addEventListener('click', async () => {
+        const notifications = await getAll();
+        for (let i = 0; i < 2 && notifications.length > 0; i++) {
+            const index = Math.floor(Math.random() * notifications.length);
+            await clear(notifications[index].id);
+            notifications.splice(index, 1);
+        }
+    });
+    document.getElementById('clear5')!.addEventListener('click', async () => {
+        const notifications = await getAll();
+        for (let i = 0; i < 5 && notifications.length > 0; i++) {
+            const index = Math.floor(Math.random() * notifications.length);
+            await clear(notifications[index].id);
+            notifications.splice(index, 1);
+        }
+    });
     document.getElementById('fetchAppNotifications')!.addEventListener('click', () => {
         getAll().then((notifications) => {
             logMessage(`${notifications.length} notifications received from the Notification Center`);
         });
     });
-
-    addEventListener('notification-created', (event: NotificationCreatedEvent) => {
-        logMessage(`CREATE action received from notification ${event.notification.id}`);
+    document.getElementById('toggleNotificationCenter')!.addEventListener('click', async () => {
+        await toggleNotificationCenter();
     });
-    addEventListener('notification-closed', (event: NotificationClosedEvent) => {
-        logMessage(`CLOSE action received from notification ${event.notification.id}`);
-    });
-    addEventListener('notification-action', (event: NotificationActionEvent) => {
-        const {notification, trigger, control} = event;
 
-        if (trigger === 'select') {
-            logMessage(`SELECT action received from notification ${event.notification.id}`);
-        } else if (control && control.type === 'button') {
-            const buttonIndex = notification.buttons.indexOf(control);
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get('inttest') === null) {
+        addEventListener('notification-created', (event: NotificationCreatedEvent) => {
+            logMessage(`created event received from notification ${event.notification.id}`);
+        });
+        addEventListener('notification-closed', (event: NotificationClosedEvent) => {
+            logMessage(`closed event received from notification ${event.notification.id}`);
+        });
+        addEventListener('notification-action', (event: NotificationActionEvent) => {
+            const {notification, trigger, control} = event;
 
-            logMessage(`CONTROL action on button ${control.title} (Index: ${buttonIndex}) on notification ${notification.id}`);
-        }
-    });
+            if (trigger !== ActionTrigger.CONTROL) {
+                logMessage(`action event received from notification ${event.notification.id} (trigger: ${trigger.toUpperCase()})`);
+            } else if (control && control.type === 'button') {
+                const buttonIndex = notification.buttons.indexOf(control);
+
+                logMessage(`action event on button ${control.title} from ${notification.id} (trigger: ${trigger.toUpperCase()}, buttonIndex: ${buttonIndex})`);
+            }
+        });
+    } else if (queryParams.get('inttest') === 'listeners-on-startup') {
+        addEventListener('notification-action', (event) => {
+            receivedEvents.push(event);
+        });
+        addEventListener('notification-created', (event) => {
+            receivedEvents.push(event);
+        });
+        addEventListener('notification-closed', (event) => {
+            receivedEvents.push(event);
+        });
+    }
 });

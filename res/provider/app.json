@@ -17,7 +17,7 @@
         }
     },
    "runtime": {
-        "arguments": "--enable-aggressive-domstorage-flushing",
-        "version": "10.66.39.43"
+        "arguments": "--enable-aggressive-domstorage-flushing --security-realm=of-notifications-service --enable-mesh",
+        "version": "13.76.44.21"
     }
 }

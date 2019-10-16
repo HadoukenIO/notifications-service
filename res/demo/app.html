@@ -8,7 +8,7 @@
     <title>Notification Client</title>
     <script src="app-bundle.js"></script>
     <link href="app.css" rel="stylesheet">
-    
+
 </head>
 
 <body>
@@ -65,13 +65,34 @@
 
     <div class="row">
         <button id="button6">
-            Create Notification 6
+            Create Expiring Notification
         </button>
     
         <button id="clearbutton6">
-            Clear Notification 6
+            Clear Expiring Notification
         </button>
     </div>
+
+    <hr />
+    
+    <div class="row">
+        <button id="create2">
+            Create Random (x2)
+        </button>
+        <button id="create5">
+            Create Random (x5)
+        </button>
+    </div>
+    <div class="row">
+        <button id="clear2">
+            Clear Random (x2)
+        </button>
+        <button id="clear5">
+            Clear Random (x5)
+        </button>
+    </div>
+
+    <hr />
 
     <div class="row">
         <button id="fetchAppNotifications">
@@ -79,7 +100,12 @@
         </button>
     </div>
 
-    
+    <div class="row">
+        <button id="toggleNotificationCenter">
+            Toggle Center
+        </button>
+    </div>
+
     <div id="clientResponse"></div>
 
 </body>

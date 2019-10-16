@@ -5,16 +5,31 @@
  * `Injector.ts`. These mappings can be programmatically overridden by calling the methods of the {@link Injector} util.
  */
 enum Injectable {
-    ACTION_HANDLER_MAP,
     API_HANDLER,
+    CLIENT_EVENT_CONTROLLER,
+    CLIENT_REGISTRY,
     DATABASE,
+    ENVIRONMENT,
+    EVENT_PUMP,
+    EXPIRY_CONTROLLER,
     LAYOUTER,
+    MONITOR_MODEL,
     NOTIFICATION_CENTER,
+    PERSISTOR,
     STORE,
-    TOAST_MANAGER
+    TOAST_MANAGER,
+    TRAY_ICON,
+    WEB_WINDOW_FACTORY
 }
 
-type InjectableMap = {
+/**
+ * A map type to enforce that we specify a value for every injectable
+ */
+export type InjectableMap<V = object> = {
+    [K in keyof typeof Injectable]: K extends string ? V : never;
+}
+
+type InjectableSelfMap = {
     [K in keyof typeof Injectable]: K extends string ? K : never;
 }
 
@@ -23,7 +38,7 @@ type InjectableMap = {
  *
  * These are used as the keys that control what will get injected into class members.
  */
-export const Inject: InjectableMap = Object.keys(Injectable).filter(k => typeof k === 'string').reduce<InjectableMap>((map, item) => {
+export const Inject: InjectableSelfMap = Object.keys(Injectable).filter(k => typeof k === 'string').reduce<InjectableSelfMap>((map, item) => {
     (map as any)[item] = item;
     return map;
-}, {} as InjectableMap);
+}, {} as InjectableSelfMap);

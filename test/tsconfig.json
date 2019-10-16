@@ -11,8 +11,7 @@
         "dom",
         "es7"
       ],
-      "types": ["node"],
-      "esModuleInterop": false,
+      "types": ["node", "openfin"]
     },
     "exclude": [
       "../node_modules",

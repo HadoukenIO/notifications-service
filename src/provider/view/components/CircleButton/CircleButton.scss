@@ -1,0 +1,125 @@
+@import '../../styles/_variables.scss';
+@import '../../styles/animations.scss';
+
+[class^="icon-"],
+[class*="icon-"] {
+    display: inline-block;
+    width: 100%;
+}
+
+$closeIcon: url('../../../../../res/provider/ui/image/shapes/close.svg');
+$arrowDownIcon: url('../../../../../res/provider/ui/image/shapes/arrowDown.svg');
+$check: url('../../../../../res/provider/ui/image/shapes/check.svg');
+$minus: url('../../../../../res/provider/ui/image/shapes/minus.svg');
+
+.icon {
+    $size: 18px;
+    background-color: var(--strip-background-color);
+    width: $size;
+    height: $size;
+    min-width: $size;
+    min-height: $size;
+    align-self: center;
+    display: inline-block;
+    align-content: center;
+    justify-content: center;
+    border-radius: $size;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.1s ease-in-out;
+    transform: scale(1);
+    transition: transform 0.2s ease-out 0s;
+
+    .image {
+        width: 100%;
+        height: 100%;
+        display: inline-block;
+        background-color: var(--accent-color);
+        background-blend-mode: multiply;
+        -webkit-mask: $closeIcon;
+        -webkit-mask-position: center center;
+        -webkit-mask-size: 70%;
+        -webkit-mask-repeat: no-repeat;
+    }
+
+    &:active {
+        transform: scale(0.9);
+    }
+
+    &:active:not(:hover) {
+        transform: scale(1);
+    }
+
+    &:hover {
+        transition: background-color 0.2s ease-in-out;
+        background-color: var(--secondary-text-color-highlight);
+    }
+
+    &.large {
+        $size: 32px;
+        width: $size;
+        height: $size;
+    }
+
+    &.accept {
+        $color: #95D154;
+        background-color: $color;
+
+        .image {
+            -webkit-mask: $check;
+            -webkit-mask-position: center center;
+            -webkit-mask-size: 70%;
+            -webkit-mask-repeat: no-repeat;
+
+            background-color: var(--strip-background-color);
+        }
+
+        &:hover {
+            background-color: lighten(saturate($color, 40%), 10%);
+        }
+    }
+
+    &.cancel {
+        $color: #DF5353;
+        background-color: $color;
+
+        .image {
+            background-color: var(--strip-background-color);
+        }
+
+        &:hover {
+            background-color: lighten(saturate($color, 40%), 10%);
+        }
+    }
+
+    &.close {
+        &:hover {
+            background-color: rgb(233, 128, 128);
+        }
+    }
+
+    &.minimize {
+        .image {
+            -webkit-mask: $minus;
+            -webkit-mask-position: center center;
+            -webkit-mask-size: 70%;
+            -webkit-mask-repeat: no-repeat;
+        }
+    }
+
+    &.hide {
+        background-color: var(--accent-color);
+
+        .image {
+            -webkit-mask: $arrowDownIcon;
+            -webkit-mask-position: center center;
+            -webkit-mask-size: 120%;
+            transform: rotate(-90deg);
+            background-color: var(--strip-background-color);
+        }
+
+        &:hover {
+            background-color: var(--accent-color-highlight);
+        }
+    }
+}

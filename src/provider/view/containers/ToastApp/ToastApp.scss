@@ -1,0 +1,15 @@
+@import '../../styles/variables';
+
+body,
+html {
+    background: var(--card-background-color);
+}
+
+#toast-container {
+    background: var(--card-background-color);
+    margin: 0;
+    display: inline-block;
+    user-select: none;
+    cursor: pointer;
+    overflow: hidden !important;
+}
