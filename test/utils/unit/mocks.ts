@@ -1,8 +1,9 @@
-import {Identity} from 'openfin/_v2/main';
+import {Identity, System} from 'openfin/_v2/main';
 import {TrayInfo, Application} from 'openfin/_v2/api/application/application';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {ApplicationOption} from 'openfin/_v2/api/application/applicationOption';
 import {SubOptions} from 'openfin/_v2/api/base';
+import {SystemEvents} from 'openfin/_v2/api/events/system';
 
 import {Environment, StoredApplication} from '../../../src/provider/model/Environment';
 import {APIHandler} from '../../../src/provider/model/APIHandler';
@@ -59,6 +60,8 @@ const toastManagerPath = '../../../src/provider/controller/ToastManager';
 const collectionPath = '../../../src/provider/model/database/Collection';
 const actionPath = '../../../src/provider/store/Store';
 
+type AddListenerParams = [string, (...args: any[]) => void, SubOptions];
+
 export function createMockApiHandler(): jest.Mocked<APIHandler<APITopic, Events>> {
     const {APIHandler} = jest.requireMock(apiHandlerPath);
 
@@ -96,11 +99,16 @@ export function createMockDatabase(): jest.Mocked<Database> {
 }
 
 export function createMockEnvironment(): jest.Mocked<Environment> {
-    return {
+    const env: jest.Mocked<Environment> = {
+        onWindowClosed: null!,
         isApplicationRunning: jest.fn<Promise<boolean>, [string]>(),
         getApplication: jest.fn<Promise<StoredApplication>, [string]>(),
         startApplication: jest.fn<Promise<void>, [StoredApplication]>()
     };
+
+    assignMockGetter(env, 'onWindowClosed');
+
+    return env;
 }
 
 export function createMockEventPump(): jest.Mocked<EventPump> {
@@ -214,6 +222,9 @@ export function createMockFin(): MockFin {
             wrapSync: jest.fn<Promise<Application>, [Identity]>(),
             createFromManifest: jest.fn<Promise<Application>, [string]>(),
             create: jest.fn<Promise<Application>, [ApplicationOption]>()
+        },
+        System: {
+            addListener: jest.fn<Promise<System>, AddListenerParams>()
         }
     };
 
@@ -223,8 +234,6 @@ export function createMockFin(): MockFin {
 }
 
 export function createMockApplication(): jest.Mocked<Application> {
-    type AddListenerParams = [string, (...args: any[]) => void, SubOptions];
-
     return {
         addListener: jest.fn<Promise<Application>, AddListenerParams>(),
         run: jest.fn<Promise<void>, []>()
