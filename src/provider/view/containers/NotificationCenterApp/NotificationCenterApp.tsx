@@ -31,7 +31,7 @@ export function NotificationCenterApp(props: Props) {
     });
 
     return (
-        <div className='notification-center'>
+        <div className="notification-center">
             <Header
                 groupBy={groupBy}
                 handleGroupBy={setGroupBy}

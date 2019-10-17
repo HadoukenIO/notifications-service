@@ -65,7 +65,7 @@ export function NotificationCard(props: Props) {
         event.preventDefault();
         // Check if the click did not originate from a button
         // This is to prevent a user clicking a button and holding their mouse down
-        // dragging onto the body and letting go
+        // Dragging onto the body and letting go
         if (!validClick) {
             return;
         }

@@ -1,8 +1,8 @@
-export type ErrorConstructor<T extends Error> = {new(...args: any[]): T};
+export type ErrorConstructor<T extends Error> = new(...args: any[]) => T;
 
 export async function ErrorAggregator(items: Promise<void>[]): Promise<void> {
     const errors: Error[] = [];
-    const promises = items.map(item => item.catch((error: Error) => errors.push(error)));
+    const promises = items.map((item) => item.catch((error: Error) => errors.push(error)));
     await Promise.all(promises);
     if (errors.length > 0) {
         throw new BatchError(errors);
@@ -35,7 +35,7 @@ export class BatchError extends CustomError {
     }
 
     private static generateMessage(errors: Error[]): string {
-        return `${errors.map(e => e.name).join(', ')}`;
+        return `${errors.map((e) => e.name).join(', ')}`;
     }
 }
 

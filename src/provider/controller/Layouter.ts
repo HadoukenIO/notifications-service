@@ -25,7 +25,7 @@ export class Layouter extends AsyncInit {
     private readonly _monitorModel: MonitorModel;
     private _availableRect!: ReadonlyRectangle;
     private _spawnPosition!: Point;
-    private _config: LayouterConfig;
+    private readonly _config: LayouterConfig;
 
     public onLayoutRequired: Signal<[]> = new Signal();
 

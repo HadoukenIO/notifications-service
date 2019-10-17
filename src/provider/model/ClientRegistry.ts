@@ -66,7 +66,7 @@ export class ClientRegistry {
      * @param appUuid Uuid of the app.
      */
     public isAppActionReady(appUuid: string): boolean {
-        return this._actionReadyWindows.some(client => client.uuid === appUuid);
+        return this._actionReadyWindows.some((client) => client.uuid === appUuid);
     }
 
     public async onAddEventListener(eventType: Events['type'], sender: Identity): Promise<void> {
@@ -93,6 +93,6 @@ export class ClientRegistry {
     }
 
     private removeActiveClient(client: Identity): void {
-        this._actionReadyWindows = this._actionReadyWindows.filter(activeClient => activeClient.uuid !== client.uuid || activeClient.name !== client.name);
+        this._actionReadyWindows = this._actionReadyWindows.filter((activeClient) => activeClient.uuid !== client.uuid || activeClient.name !== client.name);
     }
 }

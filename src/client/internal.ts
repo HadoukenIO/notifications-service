@@ -38,7 +38,7 @@ export const enum APITopic {
     REMOVE_EVENT_LISTENER = 'remove-event-listener'
 }
 
-export type API = {
+export interface API {
     [APITopic.CREATE_NOTIFICATION]: [CreatePayload, NotificationInternal];
     [APITopic.CLEAR_NOTIFICATION]: [ClearPayload, boolean];
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
@@ -46,16 +46,16 @@ export type API = {
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
     [APITopic.ADD_EVENT_LISTENER]: [Events['type'], void];
     [APITopic.REMOVE_EVENT_LISTENER]: [Events['type'], void];
-};
+}
 
 export type Events = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;
 
 export type TransportMappings<T> =
     T extends NotificationActionEvent ? NotificationActionEventTransport :
-    never;
+        never;
 export type TransportMemberMappings<T> =
     T extends Notification ? NotificationInternal :
-    T;
+        T;
 
 export interface CreatePayload extends Omit<NotificationOptions, 'date' | 'expires'> {
     date?: number;
@@ -73,7 +73,7 @@ export interface ClearPayload {
 
 export interface NotificationActionEventTransport {
     type: 'notification-action';
-    notification: Readonly<NotificationInternal>
+    notification: Readonly<NotificationInternal>;
     result: NotificationActionResult;
     trigger: ActionTrigger;
 

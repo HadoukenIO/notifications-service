@@ -116,15 +116,15 @@ export class Toast implements LayoutItem {
     public readonly onStateChange: Signal<[Toast, ToastState], Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
 
     private _state: ToastState;
-    private _webWindow: Readonly<Promise<WebWindow>>;
+    private readonly _webWindow: Readonly<Promise<WebWindow>>;
     private _timeout: number;
-    private _id: string;
+    private readonly _id: string;
 
-    private _origin: Point;
-    private _size: Point;
+    private readonly _origin: Point;
+    private readonly _size: Point;
 
     private _currentTransition: DeferredPromise | null;
-    private _activeTransitions: Promise<void>[];
+    private readonly _activeTransitions: Promise<void>[];
 
     /**
      * The id of the notification this Toast represents.
@@ -205,7 +205,7 @@ export class Toast implements LayoutItem {
             const expectingAnimation = (state === ToastState.ACTIVE || state === ToastState.TRANSITION_OUT);
             if (expectingAnimation && this._currentTransition === null) {
                 // We want the return value of this promise to capture the animation that will be triggered by this state
-                // change, but it hasn't yet started. Pre-create the transition promise in expectation of call to animate
+                // Change, but it hasn't yet started. Pre-create the transition promise in expectation of call to animate
                 this._currentTransition = new DeferredPromise();
             }
 
@@ -321,7 +321,7 @@ export class Toast implements LayoutItem {
                 Object.assign(this._size, size);
 
                 // Note: State change will intentionally fail (to become a no-op) in cases
-                // where the toast was destroyed immediately after creation
+                // Where the toast was destroyed immediately after creation
                 this.setState(ToastState.QUEUED);
             }
         );
@@ -340,16 +340,16 @@ export class Toast implements LayoutItem {
         }
     }
 
-    private timeoutHandler = (): void => {
+    private readonly timeoutHandler = (): void => {
         this._timeout = 0;
         this.setState(ToastState.TRANSITION_OUT);
     };
 
-    private mouseEnterHandler = (): void => {
+    private readonly mouseEnterHandler = (): void => {
         Toast.onFreezeToggle.emit(true);
     };
 
-    private mouseLeaveHandler = (): void => {
+    private readonly mouseLeaveHandler = (): void => {
         Toast.onFreezeToggle.emit(false);
     };
 

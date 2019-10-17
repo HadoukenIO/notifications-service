@@ -5,5 +5,5 @@ export interface MonitorModel {
     readonly onMonitorInfoChanged: Signal<[MonitorInfo]>;
     readonly monitorInfo: MonitorInfo;
 
-    readonly initialized: Promise<this>
+    readonly initialized: Promise<this>;
 }

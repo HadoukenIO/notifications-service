@@ -11,7 +11,7 @@ import {Store} from './Store';
 
 @injectable()
 export class ServiceStore extends Store<RootState> {
-    private static INITIAL_STATE: RootState = {
+    private static readonly INITIAL_STATE: RootState = {
         notifications: [],
         applications: new Map<string, StoredApplication>(),
         centerVisible: false,
@@ -35,8 +35,8 @@ export class ServiceStore extends Store<RootState> {
         const notifications: StoredNotification[] = await notificationCollection.getAll();
 
         const applicationsCollection: Collection<StoredApplication> = this._database.get(CollectionMap.APPLICATIONS);
-        const applications = new Map<string, StoredApplication>((await applicationsCollection.getAll()).map(application => [application.id, application]));
+        const applications = new Map<string, StoredApplication>((await applicationsCollection.getAll()).map((application) => [application.id, application]));
 
-        return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications, applications});
+        return {...ServiceStore.INITIAL_STATE, notifications, applications};
     }
 }

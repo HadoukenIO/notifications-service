@@ -49,7 +49,7 @@ export class ToastManager extends AsyncInit {
      */
     public async closeAll(): Promise<void> {
         const toasts = this._stack.items.slice();
-        await Promise.all(toasts.map(toast => this.closeToast(toast)));
+        await Promise.all(toasts.map((toast) => this.closeToast(toast)));
 
         this._stack.clear();
     }

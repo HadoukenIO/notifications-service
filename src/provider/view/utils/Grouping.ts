@@ -76,7 +76,7 @@ export function groupNotifications(notifications: StoredNotification[], applicat
             group.notifications.push(currentNotification);
         } else {
             groups.set(key, {
-                key: key,
+                key,
                 type: groupMethod,
                 title: getGroupTitle(currentNotification, groupMethod),
                 notifications: [currentNotification]

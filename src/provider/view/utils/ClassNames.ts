@@ -6,8 +6,8 @@ export class ClassNames {
 
     constructor(...names: (string | [string, boolean])[]) {
         this._names = names
-            .filter(x => typeof x === 'string' || x[1])
-            .map(x => typeof x === 'string' ? x : x[0]);
+            .filter((x) => typeof x === 'string' || x[1])
+            .map((x) => typeof x === 'string' ? x : x[0]);
     }
 
     public add(name: string): string[] {
@@ -15,7 +15,7 @@ export class ClassNames {
     }
 
     public remove(name: string): string[] {
-        return this._names = this._names.filter(x => x !== name);
+        return this._names = this._names.filter((x) => x !== name);
     }
 
     public toString(): string {

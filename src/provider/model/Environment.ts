@@ -6,15 +6,15 @@ import {Immutable} from '../store/State';
 
 export type StoredApplication = Immutable<ProgrammaticApplication> | Immutable<ManifestApplication>;
 
-type ProgrammaticApplication = {
+interface ProgrammaticApplication {
     type: 'programmatic';
     id: string;
     title: string;
-    initialOptions: ApplicationOption
+    initialOptions: ApplicationOption;
     parentUuid: string;
 }
 
-type ManifestApplication = {
+interface ManifestApplication {
     type: 'manifest';
     id: string;
     title: string;

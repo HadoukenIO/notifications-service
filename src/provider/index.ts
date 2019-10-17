@@ -30,7 +30,7 @@ import {MonitorModel} from './model/MonitorModel';
 
 @injectable()
 export class Main {
-    private _config = null;
+    private readonly _config = null;
     private readonly _apiHandler: APIHandler<APITopic, Events>;
     private readonly _clientEventController: ClientEventController;
     private readonly _clientRegistry: ClientRegistry;
@@ -122,7 +122,7 @@ export class Main {
     }
 
     /**
-     * createNotification Create the notification and dispatch it to the UI
+     * Create the notification and dispatch it to the UI
      * @param payload The contents to be dispatched to the UI
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
@@ -151,7 +151,7 @@ export class Main {
      */
     private async clearNotification(payload: ClearPayload, sender: ProviderIdentity): Promise<boolean> {
         const id = this.encodeID(payload.id, sender);
-        const notification = this._store.state.notifications.find(n => n.id === id);
+        const notification = this._store.state.notifications.find((n) => n.id === id);
         if (notification) {
             await new RemoveNotifications([notification]).dispatch(this._store);
             return true;
@@ -167,7 +167,7 @@ export class Main {
     private fetchAppNotifications(payload: undefined, sender: ProviderIdentity): NotificationInternal[] {
         const notifications = this.getAppNotifications(sender.uuid);
 
-        return notifications.map(notification => mutable(notification.notification));
+        return notifications.map((notification) => mutable(notification.notification));
     }
 
     private async clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
@@ -179,7 +179,7 @@ export class Main {
 
     private getAppNotifications(uuid: string): StoredNotification[] {
         const notifications = this._store.state.notifications;
-        return notifications.filter(n => n.source.uuid === uuid);
+        return notifications.filter((n) => n.source.uuid === uuid);
     }
 
     /**
@@ -255,7 +255,7 @@ export class Main {
             onSelect: this.hydrateAction(payload.onSelect),
             onExpire: this.hydrateAction(payload.onExpire),
             onClose: this.hydrateAction(payload.onClose),
-            buttons: payload.buttons ? payload.buttons.map(btn => ({
+            buttons: payload.buttons ? payload.buttons.map((btn) => ({
                 ...btn,
                 type: 'button',
                 iconUrl: btn.iconUrl || '',

@@ -12,7 +12,7 @@ import './NotificationView.scss';
 interface Props extends Actionable {
     notifications: StoredNotification[];
     groupBy: GroupingType;
-    applications: StoredApplicationMap,
+    applications: StoredApplicationMap;
 }
 
 /**

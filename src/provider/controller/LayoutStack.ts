@@ -56,11 +56,11 @@ export class LayoutStack {
     }
 
     public existsWithinStack(id: string): boolean {
-        return this._items.findIndex(toast => toast.id === id) >= 0;
+        return this._items.findIndex((toast) => toast.id === id) >= 0;
     }
 
     public existsWithinQueue(id: string): boolean {
-        return this._queue.findIndex(toast => toast.id === id) >= 0;
+        return this._queue.findIndex((toast) => toast.id === id) >= 0;
     }
 
     public addToQueue(toast: Toast): void {
@@ -76,7 +76,7 @@ export class LayoutStack {
     }
 
     public moveToStack(toast: Toast): boolean {
-        const index = this._queue.findIndex(t => t.id === toast.id);
+        const index = this._queue.findIndex((t) => t.id === toast.id);
 
         if (index >= 0) {
             this._queue.splice(index, 1);
@@ -92,8 +92,8 @@ export class LayoutStack {
 
     public remove(toast: Toast): boolean {
         const id = toast.id;
-        const itemsIndex = this._items.findIndex(toast => toast.id === id);
-        const queueIndex = this._queue.findIndex(toast => toast.id === id);
+        const itemsIndex = this._items.findIndex((toast) => toast.id === id);
+        const queueIndex = this._queue.findIndex((toast) => toast.id === id);
 
         if (itemsIndex >= 0) {
             this._items.splice(itemsIndex, 1);

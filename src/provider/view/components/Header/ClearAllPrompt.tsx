@@ -18,8 +18,9 @@ export function ClearAllPrompt(props: Props) {
 
     const togglePrompt = (visibility?: boolean, action?: () => void) => {
         setClearAllPromptVisible(visibility || !clearAllPromptVisible);
-        if (action)
+        if (action) {
             action();
+        }
     };
 
     const handleBlur = () => {
@@ -32,8 +33,9 @@ export function ClearAllPrompt(props: Props) {
         if (!centerVisible) {
             setClearAllPromptVisible(false);
         }
-        if (clearAllPromptVisible)
+        if (clearAllPromptVisible) {
             divRef.current!.focus();
+        }
     }, [clearAllPromptVisible, centerVisible]);
 
     // Blur and click event both fire when trying to close the prompt by clicking "Clear All".
