@@ -22,7 +22,8 @@
     "test:unit": "svc-tools test unit",
     "zip": "svc-tools zip",
     "start": "svc-tools start",
-    "start:redux": "redux-devtools --open --port=9950"
+    "start:redux": "redux-devtools --open --port=9950",
+    "tttt": "echo"
   },
   "repository": {
     "type": "git",
@@ -60,7 +61,7 @@
     "moment": "^2.22.1",
     "node-fetch": "^2.6.0",
     "openfin-service-signal": "^1.0.0",
-    "openfin-service-tooling": "1.0.19",
+    "openfin-service-tooling": "file:../service-tooling/dist/openfin-service-tooling-1.1.25.tgz",
     "pre-commit": "^1.2.2",
     "puppeteer": "1.17.0",
     "react": "^16.8.6",
@@ -74,7 +75,7 @@
   },
   "precommit": {
     "run": [
-      "check"
+      "tttt"
     ]
   }
 }
