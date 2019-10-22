@@ -75,7 +75,7 @@
   },
   "precommit": {
     "run": [
-      "tttt"
+      "check"
     ]
   }
 }
