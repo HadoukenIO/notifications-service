@@ -1,13 +1,12 @@
 import {Identity} from 'hadouken-js-adapter';
 
 import {fin} from './fin';
-import {delay} from './delay';
-import {Duration} from './delay';
+import {delay, Duration} from './delay';
 import * as notifsRemote from './notificationsRemote';
 import {isCenterShowing} from './centerUtils';
 import {testManagerIdentity} from './constants';
 
-export type CenterState = 'center-open' | 'center-closed'
+export type CenterState = 'center-open' | 'center-closed';
 
 /**
  * Races a given promise against a timeout, and resolves to a `[didTimeout, value?]` tuple indicating
@@ -16,8 +15,8 @@ export type CenterState = 'center-open' | 'center-closed'
  * @param promise Promise to race against the timeout
  */
 export function withTimeout<T>(timeoutMs: number, promise: Promise<T>): Promise<[boolean, T | undefined]> {
-    const timeout = new Promise<[boolean, undefined]>(res => setTimeout(() => res([true, undefined]), timeoutMs));
-    const p = promise.then(value => ([false, value] as [boolean, T]));
+    const timeout = new Promise<[boolean, undefined]>((res) => setTimeout(() => res([true, undefined]), timeoutMs));
+    const p = promise.then((value) => ([false, value] as [boolean, T]));
     return Promise.race([timeout, p]);
 }
 

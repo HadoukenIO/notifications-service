@@ -53,7 +53,7 @@ export function getServicePromise(): Promise<ChannelClient> {
                 const eventRouter = getEventRouter();
 
                 // Register service listeners
-                channel.register('WARN', (payload: any) => console.warn(payload));
+                channel.register('WARN', (payload: unknown) => console.warn(payload));
                 channel.register('event', (event: Targeted<Transport<Events>>) => {
                     eventRouter.dispatchEvent(event);
                 });

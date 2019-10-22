@@ -14,7 +14,7 @@ interface ProviderWindow extends BaseWindowContext {
 const ofBrowser = new OFPuppeteerBrowser<ProviderWindow>();
 
 export async function getAllStoredNotifications(): Promise<StoredNotification[]> {
-    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(): Promise<StoredNotification[]> {
+    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function (): Promise<StoredNotification[]> {
         const allNotes: StoredNotification[] = await this.database.get(CollectionMap.NOTIFICATIONS).getAll();
 
         return allNotes;
@@ -22,9 +22,9 @@ export async function getAllStoredNotifications(): Promise<StoredNotification[]>
 }
 
 export async function getStoredNotificationsByApp(uuid: string): Promise<StoredNotification[]> {
-    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(appUuid: string): Promise<StoredNotification[]> {
+    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function (appUuid: string): Promise<StoredNotification[]> {
         const allNotes: StoredNotification[] = (await this.database.get(CollectionMap.NOTIFICATIONS).getAll())
-            .filter(noteObject => noteObject.source.uuid === appUuid);
+            .filter((noteObject) => noteObject.source.uuid === appUuid);
 
         return allNotes;
     }, uuid);
@@ -49,7 +49,7 @@ export async function assertNotificationStored(source: Identity, note: Notificat
  * Returns `undefined` if no notification is stored with given ID.
  */
 async function getStoredNotification(id: string): Promise<StoredNotification | undefined> {
-    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function(remoteID: string): Promise<StoredNotification | undefined> {
+    return ofBrowser.executeOnWindow(SERVICE_IDENTITY, async function (remoteID: string): Promise<StoredNotification | undefined> {
         const note = await this.database.get(CollectionMap.NOTIFICATIONS).get(remoteID);
 
         return note;

@@ -12,7 +12,7 @@ export const enum ToggleCenterVisibilitySource {
 }
 
 export class CreateNotification extends Action<RootState> {
-    public readonly type = '@@NOTIFICATION/CREATE_NOTIFICATION';
+    public readonly type: string = '@@NOTIFICATION/CREATE_NOTIFICATION';
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
@@ -58,7 +58,7 @@ export class CreateNotification extends Action<RootState> {
 }
 
 export class RemoveNotifications extends Action<RootState> {
-    public readonly type = '@@NOTIFICATION/REMOVE_NOTIFICATIONS';
+    public readonly type: string = '@@NOTIFICATION/REMOVE_NOTIFICATIONS';
     public readonly notifications: StoredNotification[];
 
     constructor(notifications: StoredNotification[]) {
@@ -80,7 +80,7 @@ export class RemoveNotifications extends Action<RootState> {
 }
 
 export class ClickNotification extends Action<RootState> {
-    public readonly type = '@@NOTIFICATION/CLICK_NOTIFICATION';
+    public readonly type: string = '@@NOTIFICATION/CLICK_NOTIFICATION';
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {

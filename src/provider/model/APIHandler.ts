@@ -93,10 +93,10 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
     }
 
     public async registerListeners<S extends APISpecification<T>>(actionHandlerMap: APIImplementation<T, S>): Promise<void> {
-        const providerChannel: ChannelProvider = this._providerChannel = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
+        this._providerChannel = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
 
-        providerChannel.onConnection(this.onConnectionHandler.bind(this));
-        providerChannel.onDisconnection(this.onDisconnectionHandler.bind(this));
+        this._providerChannel.onConnection(this.onConnectionHandler.bind(this));
+        this._providerChannel.onDisconnection(this.onDisconnectionHandler.bind(this));
 
         for (const action in actionHandlerMap) {
             if (actionHandlerMap.hasOwnProperty(action)) {

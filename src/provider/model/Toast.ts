@@ -309,7 +309,7 @@ export class Toast implements LayoutItem {
 
         // Show window offscreen so it can render and then hide it
         const {virtualScreen} = monitorModel.monitorInfo;
-        await webWindow.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
+        await webWindow.showAt(virtualScreen.left - (windowOptions.defaultWidth! * 2), virtualScreen.top - (windowOptions.defaultHeight! * 2));
         await webWindow.hide();
 
         // Wait for the React component to render and then get the dimensions of it to resize the window.
@@ -329,12 +329,12 @@ export class Toast implements LayoutItem {
         return webWindow;
     }
 
-    private async freeze(): Promise<void> {
+    private freeze(): void {
         clearTimeout(this._timeout);
         this._timeout = 0;
     }
 
-    private async unfreeze(): Promise<void> {
+    private unfreeze(): void {
         if (this._state <= ToastState.ACTIVE) {
             this._timeout = window.setTimeout(this.timeoutHandler, Toast.TIMEOUT);
         }

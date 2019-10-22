@@ -27,7 +27,7 @@ beforeEach(async () => {
 
     mockServiceStore.dispatch.mockImplementation(async (action: Action<RootState>) => {
         if (action instanceof RemoveNotifications) {
-            state = {...state, notifications: state.notifications.filter(note => !action.notifications.includes(note))};
+            state = {...state, notifications: state.notifications.filter((note) => !action.notifications.includes(note))};
         }
     });
 

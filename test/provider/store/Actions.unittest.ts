@@ -12,13 +12,13 @@ type TestParam = [string, (note: StoredNotification) => Action<RootState>];
 const mockServiceStore = createMockServiceStore();
 
 let state: RootState;
-let note: StoredNotification;
+let precreatedNote: StoredNotification;
 
 beforeEach(() => {
     jest.resetAllMocks();
 
-    note = createFakeStoredNotification();
-    state = {...createFakeEmptyRootState(), notifications: [note]};
+    precreatedNote = createFakeStoredNotification();
+    state = {...createFakeEmptyRootState(), notifications: [precreatedNote]};
 
     getterMock(mockServiceStore, 'state').mockImplementation(() => state);
     mockServiceStore.dispatch.mockImplementation(async (action: Action<RootState>) => {
@@ -33,11 +33,11 @@ test.each([
 ] as TestParam[])(
     'When %s, it removed synchronously from the store',
     async (titleParam: string, actionFactory: (note: StoredNotification) => Action<RootState>) => {
-        const action = actionFactory(note);
+        const action = actionFactory(precreatedNote);
 
         const promise = action.dispatch(mockServiceStore);
 
-        expect(mockServiceStore.dispatch).toBeCalledWith(new RemoveNotifications([note]));
+        expect(mockServiceStore.dispatch).toBeCalledWith(new RemoveNotifications([precreatedNote]));
 
         await promise;
     }

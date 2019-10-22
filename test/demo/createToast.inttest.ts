@@ -25,7 +25,7 @@ describe('When calling createNotification with the Notification Center not showi
     let testWindow: Window;
 
     let createPromise: Promise<Notification>;
-    let note: Notification;
+    let pregeneratedNote: Notification;
 
     setupClosedCenterBookends();
 
@@ -33,7 +33,7 @@ describe('When calling createNotification with the Notification Center not showi
         testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
         testWindow = await testApp.getWindow();
 
-        ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
+        ({createPromise, note: pregeneratedNote} = await notifsRemote.createAndAwait(testWindow.identity, options));
     });
 
     afterEach(async () => {
@@ -42,8 +42,9 @@ describe('When calling createNotification with the Notification Center not showi
     });
 
     test('The promise resolves to the fully hydrated notification object', async () => {
+        // eslint-disable-next-line
         await expect(createPromise).resolves;
-        assertHydratedCorrectly(options, note);
+        assertHydratedCorrectly(options, pregeneratedNote);
     });
 
     test('A toast is shown for the notification', async () => {
@@ -51,7 +52,7 @@ describe('When calling createNotification with the Notification Center not showi
         // delay to allow the toast time to spawn.
         await delay(Duration.TOAST_DOM_LOADED);
 
-        const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
+        const toastWindow = await getToastWindow(testApp.identity.uuid, pregeneratedNote.id);
         expect(toastWindow).not.toBe(undefined);
     });
 
@@ -60,12 +61,12 @@ describe('When calling createNotification with the Notification Center not showi
         // delay to allow the toast time to spawn.
         await delay(Duration.TOAST_DOM_LOADED);
 
-        const toastCards = await getToastCards(testApp.identity.uuid, note.id);
+        const toastCards = await getToastCards(testApp.identity.uuid, pregeneratedNote.id);
 
         expect(Array.isArray(toastCards)).toBe(true);
         expect(toastCards).toHaveLength(1);
 
-        await assertDOMMatches(CardType.TOAST, testApp.identity.uuid, note);
+        await assertDOMMatches(CardType.TOAST, testApp.identity.uuid, pregeneratedNote);
     });
 
     test('A card is added to the center with correct data', async () => {

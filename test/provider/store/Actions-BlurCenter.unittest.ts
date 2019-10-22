@@ -12,7 +12,7 @@ type VisibilityTestParam = [string, boolean];
 const mockServiceStore = createMockServiceStore();
 let state: RootState;
 
-beforeEach(async () => {
+beforeEach(() => {
     jest.resetAllMocks();
     useMockTime();
 

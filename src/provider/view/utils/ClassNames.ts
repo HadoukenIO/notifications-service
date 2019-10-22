@@ -11,14 +11,17 @@ export class ClassNames {
     }
 
     public add(name: string): string[] {
-        return this._names = [...this.remove(name), name];
+        this._names = [...this.remove(name), name];
+        return this._names;
     }
 
     public remove(name: string): string[] {
-        return this._names = this._names.filter((x) => x !== name);
+        this._names = this._names.filter((x) => x !== name);
+        return this._names;
     }
 
     public toString(): string {
-        return this._names.join(' ');
+        const joined = this._names.join(' ');
+        return joined;
     }
 }

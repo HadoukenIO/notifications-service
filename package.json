@@ -61,7 +61,7 @@
     "moment": "^2.22.1",
     "node-fetch": "^2.6.0",
     "openfin-service-signal": "^1.0.0",
-    "openfin-service-tooling": "file:../service-tooling/dist/openfin-service-tooling-1.1.25.tgz",
+    "openfin-service-tooling": "1.0.20-alpha.73",
     "pre-commit": "^1.2.2",
     "puppeteer": "1.17.0",
     "react": "^16.8.6",

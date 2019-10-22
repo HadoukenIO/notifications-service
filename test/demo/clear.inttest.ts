@@ -75,7 +75,7 @@ describe.each([
     ['When clearing a notification with the Notification Center closed', 'center-closed']
 ] as EnvironmentTestParam[])('%s', (
     titleParam: string,
-    centerVisibility: CenterState,
+    centerVisibility: CenterState
 ) => {
     let testApp: Application;
     let testWindow: Window;
@@ -102,7 +102,7 @@ describe.each([
     });
 
     describe.each(clearCallTestParams)('%s', (
-        titleParam: string,
+        title: string,
         noteOptions: NotificationOptions[],
         indexToClear: number,
         expectedResults: (CustomData | undefined)[]
@@ -127,7 +127,7 @@ describe.each([
 
                 await expect(getCenterCardsByNotification(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual([]);
 
-                for (const note of notes.filter((note, index) => index !== indexToClear)) {
+                for (const note of notes.filter((search, index) => index !== indexToClear)) {
                     await expect(getCenterCardsByNotification(testApp.identity.uuid, note.id)).resolves.toBeTruthy();
                 }
             });
@@ -139,7 +139,7 @@ describe.each([
 
                 await expect(getToastWindow(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual(undefined);
 
-                for (const note of notes.filter((note, index) => index !== indexToClear)) {
+                for (const note of notes.filter((search, index) => index !== indexToClear)) {
                     await expect(getToastWindow(testApp.identity.uuid, note.id)).resolves.toBeTruthy();
                 }
             });
@@ -177,7 +177,7 @@ describe.each([
 
             expect(result).toHaveLength(notes.length - 1);
 
-            for (const note of notes.filter((note, index) => index !== indexToClear)) {
+            for (const note of notes.filter((search, index) => index !== indexToClear)) {
                 expect(result).toContainEqual(note);
             }
         });

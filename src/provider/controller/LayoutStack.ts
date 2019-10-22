@@ -92,8 +92,8 @@ export class LayoutStack {
 
     public remove(toast: Toast): boolean {
         const id = toast.id;
-        const itemsIndex = this._items.findIndex((toast) => toast.id === id);
-        const queueIndex = this._queue.findIndex((toast) => toast.id === id);
+        const itemsIndex = this._items.findIndex((item) => item.id === id);
+        const queueIndex = this._queue.findIndex((queue) => queue.id === id);
 
         if (itemsIndex >= 0) {
             this._items.splice(itemsIndex, 1);

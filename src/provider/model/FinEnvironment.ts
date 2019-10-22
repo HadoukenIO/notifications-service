@@ -44,6 +44,7 @@ export class FinEnvironment implements Environment {
                 parentUuid: info.parentUuid!
             };
         } else {
+            // eslint-disable-next-line camelcase
             const manifest: {startup_app?: {name: string}; shortcut?: {name?: string}} = info.manifest;
             return {
                 type: 'manifest',

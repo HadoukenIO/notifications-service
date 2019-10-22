@@ -255,12 +255,14 @@ export class Main {
             onSelect: this.hydrateAction(payload.onSelect),
             onExpire: this.hydrateAction(payload.onExpire),
             onClose: this.hydrateAction(payload.onClose),
-            buttons: payload.buttons ? payload.buttons.map((btn) => ({
-                ...btn,
-                type: 'button',
-                iconUrl: btn.iconUrl || '',
-                onClick: this.hydrateAction(btn.onClick)
-            })) : []
+            buttons: payload.buttons
+                ? payload.buttons.map((btn) => ({
+                    ...btn,
+                    type: 'button',
+                    iconUrl: btn.iconUrl || '',
+                    onClick: this.hydrateAction(btn.onClick)
+                }))
+                : []
         };
 
         const storedNotification: StoredNotification = {
@@ -279,7 +281,7 @@ export class Main {
      * IDs to be.
      */
     private generateId(): string {
-        return Math.floor((Math.random() * 9 + 1) * 1e8).toString();
+        return Math.floor(((Math.random() * 9) + 1) * 1e8).toString();
     }
 
     private hydrateAction(action: ActionDeclaration<never, never> | null | undefined): ActionDeclaration<never, never> | null {

@@ -5,7 +5,7 @@ import {NotificationGroup} from '../NotificationGroup/NotificationGroup';
 import {GroupingType, Group, groupNotifications} from '../../utils/Grouping';
 import {StoredApplicationMap} from '../../../store/State';
 import {StoredNotification} from '../../../model/StoredNotification';
-import {TitledNotification, Actionable} from '../../types';
+import {Actionable} from '../../types';
 
 import './NotificationView.scss';
 
