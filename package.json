@@ -22,8 +22,7 @@
     "test:unit": "svc-tools test unit",
     "zip": "svc-tools zip",
     "start": "svc-tools start",
-    "start:redux": "redux-devtools --open --port=9950",
-    "tttt": "echo"
+    "start:redux": "redux-devtools --open --port=9950"
   },
   "repository": {
     "type": "git",
