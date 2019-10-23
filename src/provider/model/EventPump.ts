@@ -10,7 +10,7 @@ import {APIHandler} from './APIHandler';
 import {ClientRegistry} from './ClientRegistry';
 
 type DeferrableEvent = Targeted<Transport<NotificationActionEvent>>;
-type DeferredEvent = {targetUuid: string, event: DeferrableEvent};
+interface DeferredEvent {targetUuid: string; event: DeferrableEvent}
 
 /**
  * Notification event message handler. EventPump internally handles the events added

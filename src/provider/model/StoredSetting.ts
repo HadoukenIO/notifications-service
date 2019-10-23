@@ -8,6 +8,6 @@ export const enum SettingsMap {
  * Shape of the internal settings stored in the database.
  */
 export interface StoredSetting {
-    id: SettingsMap,
+    id: SettingsMap;
     value: any;
 }

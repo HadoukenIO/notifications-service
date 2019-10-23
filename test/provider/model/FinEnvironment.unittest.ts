@@ -7,13 +7,13 @@ import {Application} from 'openfin/_v2/main';
 import {FinEnvironment} from '../../../src/provider/model/FinEnvironment';
 import {StoredApplication} from '../../../src/provider/model/Environment';
 import {createMockFin, createMockApplication} from '../../utils/unit/mocks';
-import {createFakeManifestStoredApplication as createFakeManifestStoredApplication, createFakeProgrammaticApplication} from '../../utils/unit/fakes';
+import {createFakeManifestStoredApplication, createFakeProgrammaticApplication} from '../../utils/unit/fakes';
 
 const mockFin = createMockFin();
 
 let environment: FinEnvironment;
 
-beforeEach(async () => {
+beforeEach(() => {
     jest.resetAllMocks();
 
     environment = new FinEnvironment();

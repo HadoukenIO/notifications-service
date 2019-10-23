@@ -35,11 +35,11 @@ export function NotificationGroup(props: Props) {
                     notifications.map((notification) => {
                         return (
                             <CSSTransition
-                                key={notification.id + notification.notification.date}
+                                key={`${notification.id}${notification.notification.date}`}
                                 timeout={200}
                                 classNames="item"
                             >
-                                <li key={notification.id + notification.notification.date}>
+                                <li key={`${notification.id}${notification.notification.date}`}>
                                     <NotificationCard notification={notification} storeApi={storeApi} />
                                 </li>
                             </CSSTransition>

@@ -11,18 +11,18 @@ import {withTimeout} from './common';
 
 export interface ProviderContext extends BaseWindowContext {
     main: {
-        clearNotification: (payload: {id: string}, identity: Identity) => Promise<boolean>
-    }
+        clearNotification: (payload: {id: string}, identity: Identity) => Promise<boolean>;
+    };
     store: ServiceStore;
     injector: typeof Injector;
 }
 
 const ofBrowser = new OFPuppeteerBrowser<ProviderContext>();
 export async function clearStoredNotifications(windowIdentity: Identity): Promise<void> {
-    await ofBrowser.executeOnWindow<Identity[], void>(serviceIdentity, async function(sourceWindow: Identity) {
+    await ofBrowser.executeOnWindow<Identity[], void>(serviceIdentity, function (sourceWindow: Identity) {
         this.store.state.notifications.filter((notification) => {
             return notification.source.uuid === sourceWindow.uuid;
-        }).forEach(n => {
+        }).forEach((n) => {
             this.main.clearNotification({id: n.notification.id}, sourceWindow);
         });
     }, windowIdentity);
@@ -36,7 +36,7 @@ export async function clearStoredNotifications(windowIdentity: Identity): Promis
 export async function restartProvider(snoozeTime: number = 0): Promise<void> {
     const providerApp = fin.Application.wrapSync(serviceIdentity);
     const providerAppWindow = await providerApp.getWindow();
-    await providerApp.getChildWindows().then(children => children.forEach(win => win.close()));
+    await providerApp.getChildWindows().then((children) => children.forEach((win) => win.close()));
     await providerAppWindow.navigate('about:blank');
 
     // A small delay is needed in order for OpenFin to handle the navigateBack call successfully.
@@ -58,7 +58,7 @@ export async function providerReady(): Promise<void> {
         let initialized = false;
 
         while (!initialized && !timedOut) {
-            initialized = await ofBrowser.executeOnWindow(serviceIdentity, async function() {
+            initialized = await ofBrowser.executeOnWindow(serviceIdentity, async function () {
                 await this.injector.initialized;
             }).then(() => true).catch(() => false);
         }

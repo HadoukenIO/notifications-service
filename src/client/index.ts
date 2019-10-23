@@ -174,7 +174,7 @@ export interface NotificationOptions {
 /**
  * Application-defined context data that can be attached to notifications.
  */
-export type CustomData = {[key: string]: any};
+export interface CustomData {[key: string]: any}
 
 /**
  * A fully-hydrated form of {@link NotificationOptions}.
@@ -370,7 +370,7 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
  */
 export async function create(options: NotificationOptions): Promise<Notification> {
     // Most validation logic is handled on the provider, but need an early check here
-    // as we call date.valueOf when converting into a CreatePayload
+    // As we call date.valueOf when converting into a CreatePayload
     if (options.date !== undefined && !(options.date instanceof Date)) {
         throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
     }
@@ -421,7 +421,7 @@ export async function clear(id: string): Promise<boolean> {
 export async function getAll(): Promise<Notification[]> {
     // Should have some sort of input validation here...
     const response = await tryServiceDispatch(APITopic.GET_APP_NOTIFICATIONS, undefined);
-    return response.map(note => ({...note, date: new Date(note.date), expires: note.expires !== null ? new Date(note.expires) : null}));
+    return response.map((note) => ({...note, date: new Date(note.date), expires: note.expires !== null ? new Date(note.expires) : null}));
 }
 
 /**

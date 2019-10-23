@@ -10,7 +10,6 @@ import {ActionTrigger} from '../../client/actions';
 import {StoredNotification} from '../model/StoredNotification';
 import {EventPump} from '../model/EventPump';
 import {ServiceStore} from '../store/ServiceStore';
-import {LaunchApplicationError} from '../model/Errors';
 
 /**
  * Translates store actions to events to be dispatched to the client.

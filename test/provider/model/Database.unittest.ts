@@ -16,12 +16,12 @@ beforeAll(async () => {
 
 describe('Database Methods', () => {
     describe('Get', () => {
-        test('Returns a collection when given a valid name', async () => {
+        test('Returns a collection when given a valid name', () => {
             const localCollection: Collection<StoredNotification> = database.get(CollectionMap.NOTIFICATIONS);
             expect(localCollection).toBeDefined();
         });
 
-        test('Throws an error when given an invalid name', async () => {
+        test('Throws an error when given an invalid name', () => {
             expect(() => {
                 database.get('INVALID COLLECTION' as any);
             }).toThrowError();
@@ -32,7 +32,7 @@ describe('Database Methods', () => {
 describe('Collection Methods', () => {
     afterEach(async () => {
         const records = await collection.getAll();
-        await Promise.all(records.map(record => collection.delete(record.id)));
+        await Promise.all(records.map((record) => collection.delete(record.id)));
 
         if ((await collection.getAll()).length !== 0) {
             throw new Error('Collection cleanup failed: Collection not cleared!');
@@ -42,7 +42,7 @@ describe('Collection Methods', () => {
     describe('Get', () => {
         let note: StoredNotification;
 
-        beforeEach(async () =>{
+        beforeEach(async () => {
             note = createFakeStoredNotification();
             await collection.upsert(note);
         });
@@ -83,7 +83,7 @@ describe('Collection Methods', () => {
 
         test('Returns an array of all records for valid IDs passed in', async () => {
             const notesToGet = [notes[0], notes[1]];
-            const results = await collection.getMany(notesToGet.map(note => note.id));
+            const results = await collection.getMany(notesToGet.map((note) => note.id));
 
             expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(notesToGet));
         });
@@ -97,7 +97,7 @@ describe('Collection Methods', () => {
 
         test('Returns an array of only valid notifications when valid and invalid IDs passed in', async () => {
             const notesToGet = [notes[0], notes[1]];
-            const results = await collection.getMany([...notesToGet.map(note => note.id), 'INVALID ID']);
+            const results = await collection.getMany([...notesToGet.map((note) => note.id), 'INVALID ID']);
 
             expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(notesToGet));
         });
@@ -146,7 +146,7 @@ describe('Collection Methods', () => {
             ];
             await collection.upsert(updatedNotes);
 
-            const filteredNotes = (await collection.getAll()).filter(note => note.id === 'updateable' || note.id === 'updateable2');
+            const filteredNotes = (await collection.getAll()).filter((note) => note.id === 'updateable' || note.id === 'updateable2');
             expect(filteredNotes.length).toEqual(updatedNotes.length);
         });
 
@@ -165,7 +165,7 @@ describe('Collection Methods', () => {
     describe('Delete', () => {
         let notes: StoredNotification[];
 
-        beforeEach(()=> {
+        beforeEach(() => {
             notes = [createFakeStoredNotification(), createFakeStoredNotification(), createFakeStoredNotification()];
         });
 
@@ -179,7 +179,7 @@ describe('Collection Methods', () => {
 
         test('Deletes many records from array', async () => {
             await collection.upsert(notes);
-            await collection.delete(notes.map(note => note.id));
+            await collection.delete(notes.map((note) => note.id));
 
             expect(await collection.getAll()).toEqual([]);
         });
@@ -196,7 +196,7 @@ describe('Collection Methods', () => {
         test('Deletes valid IDs from an array of valid and invalid IDs', async () => {
             const notesToDelete = [createFakeStoredNotification(), createFakeStoredNotification()];
             await collection.upsert([...notes, ...notesToDelete]);
-            await collection.delete(['INVALID', ...notesToDelete.map(note => note.id), 'INVALID']);
+            await collection.delete(['INVALID', ...notesToDelete.map((note) => note.id), 'INVALID']);
 
             const results = await collection.getAll();
             expect(normalizeStoredNotifications(results)).toEqual(normalizeStoredNotifications(notes));

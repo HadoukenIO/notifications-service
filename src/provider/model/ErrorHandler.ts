@@ -8,15 +8,15 @@ export class ErrorHandler {
         return new ErrorHandler(error);
     }
 
-    private errors: Error[];
-    private handledErrors: Error[];
-    private unhandledErrors: Error[];
+    private readonly errors: Error[];
+    private readonly handledErrors: Error[];
+    private readonly unhandledErrors: Error[];
 
     private constructor(error: Error) {
         if (error instanceof BatchError) {
             this.errors = [];
 
-            error.errors.forEach(value => {
+            error.errors.forEach((value) => {
                 if (value instanceof Error) {
                     this.errors.push(value);
                 } else {
@@ -96,7 +96,7 @@ export class ErrorHandler {
     public log(): void {
         const ERROR_CSS = 'border: 1px solid #FFD6D6; background: #FFF0F0; color: blue; width: 100%;';
         console.groupCollapsed(`%cError (${this.errors.length})`, ERROR_CSS);
-        this.errors.forEach(error => {
+        this.errors.forEach((error) => {
             if (error instanceof BatchError) {
                 new ErrorHandler(error).log();
             } else {

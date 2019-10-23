@@ -7,16 +7,17 @@ import {uuidv4} from './uuidv4';
 declare const global: NodeJS.Global & {__BROWSER__: Browser};
 
 // Helper type. Works better with puppeteer than the builtin Function type
+// eslint-disable-next-line
 type AnyFunction = (...args: any[]) => any;
 
 export type BaseWindowContext = Window & {fin: Fin};
 
 export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWindowContext> {
-    private _pageIdentityCache: Map<Page, Identity>;
-    private _identityPageCache: Map<string, Page>;
-    private _mountedFunctionCache: Map<Page, Map<Function, JSHandle>>;
-    private _browser: Browser;
-    private _ready: Promise<void>;
+    private readonly _pageIdentityCache: Map<Page, Identity>;
+    private readonly _identityPageCache: Map<string, Page>;
+    private readonly _mountedFunctionCache: Map<Page, Map<Function, JSHandle>>;
+    private readonly _browser: Browser;
+    private readonly _ready: Promise<void>;
 
     constructor() {
         this._pageIdentityCache = new Map<Page, Identity>();
@@ -52,6 +53,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
         return undefined;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public async executeOnWindow<T extends any[], R, C extends WindowContext = WindowContext>(
         executionTarget: Identity,
         fn: (this: C, ...args: T) => R,
@@ -59,7 +61,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
     ): Promise<R> {
         const page = await this.getPage(executionTarget);
         if (!page) {
-            throw new Error('could not find specified executionTarget: ' + JSON.stringify(executionTarget));
+            throw new Error(`could not find specified executionTarget: ${JSON.stringify(executionTarget)}`);
         }
         return page.evaluate(fn, ...args);
     }
@@ -67,7 +69,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
     public async getOrMountRemoteFunction(executionTarget: Identity, fn: AnyFunction): Promise<JSHandle> {
         const page = await this.getPage(executionTarget);
         if (!page) {
-            throw new Error('could not find specified executionTarget: ' + JSON.stringify(executionTarget));
+            throw new Error(`could not find specified executionTarget: ${JSON.stringify(executionTarget)}`);
         }
         const cachedHandle = this.getRemoteFunctionHandle(page, fn);
         if (cachedHandle) {
@@ -75,7 +77,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
         } else {
             const name = uuidv4();
             await page.exposeFunction(name, fn);
-            const newHandle = await page.evaluateHandle(function(this: {[k: string]: AnyFunction}, remoteName) {
+            const newHandle = await page.evaluateHandle(function (this: {[k: string]: AnyFunction}, remoteName) {
                 return this[remoteName];
             }, name);
             if (!this._mountedFunctionCache.get(page)) {
@@ -93,7 +95,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
             return this._pageIdentityCache.get(page);
         }
 
-        const identity: Identity|undefined = await page.evaluate(function(this: BaseWindowContext): Identity|undefined {
+        const identity: Identity|undefined = await page.evaluate(function (this: BaseWindowContext): Identity|undefined {
             // Could be devtools or other non-fin-enabled windows so need a guard
             if (!this.fin) {
                 return undefined;
@@ -112,8 +114,8 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
     }
 
     private async registerCleanupListener() {
-        const fin = await connect({address: `ws://localhost:${process.env.OF_PORT}`, uuid: 'TEST-puppeteer-' + Math.random().toString()});
-        fin.System.addListener('window-closing', win => {
+        const fin = await connect({address: `ws://localhost:${process.env.OF_PORT}`, uuid: `TEST-puppeteer-${Math.random().toString()}`});
+        fin.System.addListener('window-closing', (win) => {
             const page = this._identityPageCache.get(getIdString(win));
             if (page) {
                 this._identityPageCache.delete(getIdString(win));

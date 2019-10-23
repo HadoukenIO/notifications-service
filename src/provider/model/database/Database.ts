@@ -15,11 +15,11 @@ export const enum CollectionMap {
     APPLICATIONS = 'applications'
 }
 
-export type Collections = {
+export interface Collections {
     [CollectionMap.NOTIFICATIONS]: StoredNotification;
     [CollectionMap.SETTINGS]: StoredSetting;
     [CollectionMap.APPLICATIONS]: StoredApplication;
-};
+}
 
 @injectable()
 export class Database extends AsyncInit {
@@ -59,7 +59,7 @@ export class Database extends AsyncInit {
     }
 
     private createCollections(tables: Dexie.Table<Collections[keyof Collections], string>[]): void {
-        tables.forEach(table => {
+        tables.forEach((table) => {
             this._collections.set(table.name as CollectionMap, new Collection(table));
         });
     }

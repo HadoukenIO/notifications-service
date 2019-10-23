@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {Container} from 'inversify';
 import {interfaces as inversify} from 'inversify/dts/interfaces/interfaces';
 
@@ -29,7 +31,7 @@ import {DeferredPromise} from './DeferredPromise';
 /**
  * For each entry in `Inject`, defines the type that will be injected for that key.
  */
-type Types = {
+interface Types {
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
     [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController;
     [Inject.CLIENT_REGISTRY]: ClientRegistry;
@@ -45,7 +47,7 @@ type Types = {
     [Inject.TOAST_MANAGER]: ToastManager;
     [Inject.TRAY_ICON]: TrayIcon;
     [Inject.WEB_WINDOW_FACTORY]: WebWindowFactory;
-};
+}
 
 /**
  * Default injector mappings. Used at startup to initialise injectify.
@@ -85,7 +87,7 @@ export class Injector {
         const container: Container = Injector._container;
         const promises: Promise<unknown>[] = [];
 
-        Object.keys(Bindings).forEach(k => {
+        Object.keys(Bindings).forEach((k) => {
             const key = k as Keys;
 
             const value = container.get(Inject[key]);
@@ -146,7 +148,7 @@ export class Injector {
     private static createContainer(): Container {
         const container = new Container();
 
-        Object.keys(Bindings).forEach(k => {
+        Object.keys(Bindings).forEach((k) => {
             const key: Keys = k as any;
 
             if (typeof Bindings[key] === 'function') {

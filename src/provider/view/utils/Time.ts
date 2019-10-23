@@ -4,8 +4,8 @@ const language = this.navigator ? navigator.language : 'en';
 
 moment.updateLocale(language, {
     relativeTime: {
-        future: (value: string) => value === 'now' ? 'soon' : 'in ' + value,
-        past: (value: string) => value === 'now' ? value : value + ' ago',
+        future: (value: string) => value === 'now' ? 'soon' : `in ${value}`,
+        past: (value: string) => value === 'now' ? value : `${value} ago`,
         s: 'now',
         m: '1m',
         mm: '%dm',

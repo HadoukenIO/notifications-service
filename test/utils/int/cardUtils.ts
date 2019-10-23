@@ -17,7 +17,7 @@ export interface NotificationCardMetadata {
     sourceApp?: string;
     timeString?: string;
     icon: string;
-    buttons?: ButtonMetadata[]
+    buttons?: ButtonMetadata[];
 }
 
 /**
@@ -45,7 +45,7 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
     const expectedMetadata: NotificationCardMetadata = {
         title: note.title,
         body: renderMarkdown(note.body),
-        buttons: note.buttons.map(button => ({title: button.title, iconUrl: button.iconUrl || ''})),
+        buttons: note.buttons.map((button) => ({title: button.title, iconUrl: button.iconUrl || ''})),
         icon: note.icon,
         sourceApp: sourceUuid,
         timeString: getDate(note.date)
@@ -102,11 +102,11 @@ async function getStyleBySelector(rootElement: ElementHandle, selectorString: st
         return undefined;
     }
 
-    const style = await (await queryElement.getProperty('style'));
+    const style = await queryElement.getProperty('style');
     const styleProp = await style.getProperty(styleAttribute);
     let value: string = await styleProp.jsonValue() || '';
     // strip url(\"\") from strings
-    value = value.match(/\(['"](.*?)['"]\)/)![1];
+    value = /\(['"](.*?)['"]\)/.exec(value)![1];
 
     return value;
 }

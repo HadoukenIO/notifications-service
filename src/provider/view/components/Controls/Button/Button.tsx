@@ -16,8 +16,9 @@ export function Button(props: Props) {
     const handleClick = (event: React.MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
-        if (onClick)
+        if (onClick) {
             onClick();
+        }
     };
 
     usePreventMouseDownPropagating(ref);

@@ -19,7 +19,7 @@ import {ActionDeclaration} from './actions';
 /**
  * Helper to make the `type` field required on any type that defines it as being optional.
  */
-type WithExplicitType<T extends {type?: string}> = T & {type: string;};
+type WithExplicitType<T extends {type?: string}> = T & {type: string};
 
 /**
  * *Not yet implemented*

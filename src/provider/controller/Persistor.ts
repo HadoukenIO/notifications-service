@@ -32,7 +32,7 @@ export class Persistor {
             }
         } else if (action instanceof RemoveNotifications) {
             const {notifications} = action;
-            const ids = notifications.map(note => note.id);
+            const ids = notifications.map((note) => note.id);
             try {
                 await this._database.get(CollectionMap.NOTIFICATIONS).delete(ids);
             } catch (error) {

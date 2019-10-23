@@ -1,5 +1,5 @@
 export async function delay(duration: Duration) {
-    return new Promise(res => setTimeout(res, duration));
+    return new Promise((res) => setTimeout(res, duration));
 }
 
 // TODO: Investigate TOAST_DOM_LOADED and TOAST_CLOSE needing to be increased for tests to pass on CI [SERVICE-730]

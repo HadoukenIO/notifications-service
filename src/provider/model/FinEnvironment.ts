@@ -22,7 +22,7 @@ export class FinEnvironment implements Environment {
     }
 
     public async isApplicationRunning(uuid: string): Promise<boolean> {
-        if (this._startingUpAppUuids.some(startingUuid => startingUuid === uuid)) {
+        if (this._startingUpAppUuids.some((startingUuid) => startingUuid === uuid)) {
             return true;
         }
 
@@ -44,7 +44,8 @@ export class FinEnvironment implements Environment {
                 parentUuid: info.parentUuid!
             };
         } else {
-            const manifest: {startup_app?: {name: string}, shortcut?: {name?: string}} = info.manifest;
+            // eslint-disable-next-line camelcase
+            const manifest: {startup_app?: {name: string}; shortcut?: {name?: string}} = info.manifest;
             return {
                 type: 'manifest',
                 id: uuid,
@@ -58,7 +59,7 @@ export class FinEnvironment implements Environment {
     }
 
     public async startApplication(application: StoredApplication): Promise<void> {
-        if (this._startingUpAppUuids.some(startingUuid => startingUuid === application.id)) {
+        if (this._startingUpAppUuids.some((startingUuid) => startingUuid === application.id)) {
             return;
         }
 
@@ -72,11 +73,11 @@ export class FinEnvironment implements Environment {
                 finApplication = await fin.Application.create(mutable(application.initialOptions));
             }
             await finApplication.addListener('initialized', (event) => {
-                this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== event.uuid);
+                this._startingUpAppUuids = this._startingUpAppUuids.filter((startingUuid) => startingUuid !== event.uuid);
             });
             finApplication.run();
         } catch (error) {
-            this._startingUpAppUuids = this._startingUpAppUuids.filter(startingUuid => startingUuid !== application.id);
+            this._startingUpAppUuids = this._startingUpAppUuids.filter((startingUuid) => startingUuid !== application.id);
             console.error(`Error starting app ${application.id} [${error.message}]`);
         }
     }

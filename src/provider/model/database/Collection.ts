@@ -5,7 +5,7 @@ import {Collections} from './Database';
 type Key<T extends Collections[keyof Collections]> = T['id'];
 
 export class Collection<T extends Collections[keyof Collections]> {
-    private _table: Dexie.Table<T, Key<T>>;
+    private readonly _table: Dexie.Table<T, Key<T>>;
 
     constructor(table: Dexie.Table<T, Key<T>>) {
         this._table = table;

@@ -4,8 +4,6 @@ import {AsyncInit} from '../controller/AsyncInit';
 import {ErrorAggregator} from '../model/Errors';
 
 export abstract class Action<S> {
-    public abstract readonly type: string;
-
     public async dispatch(store: StoreAPI<S>): Promise<void> {
         await store.dispatch(this);
     }
@@ -13,6 +11,8 @@ export abstract class Action<S> {
     public reduce(state: S): S {
         return state;
     }
+
+    public abstract readonly type: string;
 }
 
 export class Init<S> extends Action<S> {
@@ -67,7 +67,7 @@ export class Store<S> extends AsyncInit {
 
     private reduce(action: Action<S>): void {
         this._currentState = action.reduce(this.state);
-        this._listeners.forEach(listener => listener(() => this._currentState));
+        this._listeners.forEach((listener) => listener(() => this._currentState));
     }
 
     // Intended to be used by react-redux only - use `state` instead

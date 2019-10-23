@@ -166,7 +166,7 @@ export class NotificationCenter extends AsyncInit {
     private async hideWindowOffscreen() {
         const {virtualScreen, primaryMonitor} = this._monitorModel.monitorInfo;
         const height = primaryMonitor.availableRect.bottom;
-        await this._webWindow.showAt(virtualScreen.left - NotificationCenter.WIDTH * 2, virtualScreen.top - height * 2);
+        await this._webWindow.showAt(virtualScreen.left - (NotificationCenter.WIDTH * 2), virtualScreen.top - (height * 2));
         await this._webWindow.hide();
     }
 

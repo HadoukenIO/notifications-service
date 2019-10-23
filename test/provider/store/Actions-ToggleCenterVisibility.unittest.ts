@@ -13,7 +13,7 @@ type VisibilityTestParam = [string, boolean];
 const mockServiceStore = createMockServiceStore();
 let state: RootState;
 
-beforeEach(async () => {
+beforeEach(() => {
     jest.resetAllMocks();
     useMockTime();
 
@@ -24,7 +24,7 @@ beforeEach(async () => {
     getterMock(mockServiceStore, 'state').mockImplementation(() => state);
 });
 
-afterEach(async () => {
+afterEach(() => {
     jest.runAllTimers();
 });
 
@@ -36,7 +36,7 @@ describe.each([
     describe.each([
         ['open', true],
         ['closed', false]
-    ] as VisibilityTestParam[])('When the Notification Center is %s', (titleParam: string, centerVisible: boolean) => {
+    ] as VisibilityTestParam[])('When the Notification Center is %s', (title: string, centerVisible: boolean) => {
         beforeEach(() => {
             state = {...createFakeEmptyRootState(), centerVisible};
         });

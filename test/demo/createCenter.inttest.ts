@@ -40,32 +40,33 @@ describe('When creating a notification with the center showing', () => {
         };
 
         let createPromise: Promise<Notification>;
-        let note: Notification;
+        let pregeneratedNote: Notification;
         beforeEach(async () => {
-            ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
+            ({createPromise, note: pregeneratedNote} = await notifsRemote.createAndAwait(testWindow.identity, options));
         });
 
         test('The promise resolves to the fully hydrated notification object', async () => {
+            // eslint-disable-next-line
             await expect(createPromise).resolves;
-            assertHydratedCorrectly(options, note);
+            assertHydratedCorrectly(options, pregeneratedNote);
         });
 
         test('One card appears in the Notification Center', async () => {
-            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
+            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, pregeneratedNote.id);
             expect(noteCards).toHaveLength(1);
         });
 
         test('The card has the same data as the returned notification object', async () => {
-            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, note);
+            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, pregeneratedNote);
         });
 
         test('The notification is added to the persistence store', async () => {
-            await assertNotificationStored(testWindow.identity, note);
+            await assertNotificationStored(testWindow.identity, pregeneratedNote);
         });
 
         test('The notification is included in the result of a getAll call', async () => {
             const appNotes = await notifsRemote.getAll(testWindow.identity);
-            expect(appNotes).toContainEqual(note);
+            expect(appNotes).toContainEqual(pregeneratedNote);
         });
 
         test('No toast is shown for the created notification', async () => {
@@ -73,7 +74,7 @@ describe('When creating a notification with the center showing', () => {
             // a slight delay to allow time for the toast to spawn.
             await delay(Duration.TOAST_CREATE);
 
-            const toastWindow = await getToastWindow(testApp.identity.uuid, note.id);
+            const toastWindow = await getToastWindow(testApp.identity.uuid, pregeneratedNote.id);
             expect(toastWindow).toBe(undefined);
         });
 
@@ -140,6 +141,7 @@ describe('When creating a notification with the center showing', () => {
         test('The notification is created as expected with a randomly generated ID', async () => {
             const {createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options);
 
+            // eslint-disable-next-line
             await expect(createPromise).resolves;
             assertHydratedCorrectly(options, note);
 
@@ -155,7 +157,7 @@ describe('When creating a notification with the center showing', () => {
         });
     });
 
-    describe.each([1, 2, 3])('With %i button(s)', numButtons => {
+    describe.each([1, 2, 3])('With %i button(s)', (numButtons) => {
         const options: NotificationOptions = {
             body: 'Test Notification Body',
             title: 'Test Notification Title',
@@ -165,28 +167,29 @@ describe('When creating a notification with the center showing', () => {
 
         for (let i = 0; i < numButtons; i++) {
             // options.buttons is assigned immediatly before this, but we need the ! because typescript doesn't realize.
-            options.buttons!.push({title: 'Button ' + i});
+            options.buttons!.push({title: `Button ${i}`});
         }
 
         let createPromise: Promise<Notification>;
-        let note: Notification;
+        let pregeneratedNote: Notification;
         beforeEach(async () => {
-            ({createPromise, note} = await notifsRemote.createAndAwait(testWindow.identity, options));
+            ({createPromise, note: pregeneratedNote} = await notifsRemote.createAndAwait(testWindow.identity, options));
         });
 
         test('The notification is created as expected', async () => {
+            // eslint-disable-next-line
             await expect(createPromise).resolves;
-            assertHydratedCorrectly(options, note);
+            assertHydratedCorrectly(options, pregeneratedNote);
 
             // Card is created
-            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, note.id);
+            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, pregeneratedNote.id);
             expect(noteCards).toHaveLength(1);
 
             // Card is correct
-            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, note);
+            await assertDOMMatches(CardType.CENTER, testApp.identity.uuid, pregeneratedNote);
 
             // Notification is persisted
-            await assertNotificationStored(testWindow.identity, note);
+            await assertNotificationStored(testWindow.identity, pregeneratedNote);
         });
 
         test('The notification card has the correct number of button elements', async () => {

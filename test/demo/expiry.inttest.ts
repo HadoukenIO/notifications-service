@@ -14,7 +14,7 @@ import {waitForAppToBeRunning} from '../utils/int/common';
 let testApp: Application;
 let testWindow: _Window;
 
-let eventLog: {event: Events, time: number}[];
+let eventLog: {event: Events; time: number}[];
 let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 let actionListener: jest.Mock<void, [NotificationActionEvent]>;
 
@@ -317,6 +317,6 @@ function past(duration: number): Date {
     return new Date(Date.now() - duration);
 }
 
-function seconds(seconds: number): Duration {
-    return (seconds * 1000) as Duration;
+function seconds(duration: number): Duration {
+    return (duration * 1000) as Duration;
 }

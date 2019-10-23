@@ -101,7 +101,7 @@ describe.each([
         await testApp.quit();
     });
 
-    describe.each(clearAllCallTestParam)('%s', (titleParam: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
+    describe.each(clearAllCallTestParam)('%s', (title: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
         const notes: Notification[] = [];
 
         beforeEach(async () => {
@@ -131,7 +131,7 @@ describe.each([
         });
 
         test('The `notification-action` event has been fired with the expected payload', async () => {
-            expect(actionListener).toBeCalledTimes(expectedResults.filter(result => result !== undefined).length);
+            expect(actionListener).toBeCalledTimes(expectedResults.filter((result) => result !== undefined).length);
 
             for (let i = 0; i < notes.length; i++) {
                 const note = notes[i];

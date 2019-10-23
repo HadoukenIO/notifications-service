@@ -146,7 +146,10 @@ describe('When the store is initialized', () => {
 
             let resolved = false;
 
-            const promise = serviceStore.dispatch(mockAction).then(() => resolved = true);
+            const promise = serviceStore.dispatch(mockAction).then(() => {
+                resolved = true;
+                return resolved;
+            });
             await resolvePromiseChain();
             expect(resolved).toBeFalsy();
 

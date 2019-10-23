@@ -12,7 +12,7 @@ export const enum ToggleCenterVisibilitySource {
 }
 
 export class CreateNotification extends Action<RootState> {
-    public readonly type = '@@NOTIFICATION/CREATE_NOTIFICATION';
+    public readonly type: string = '@@NOTIFICATION/CREATE_NOTIFICATION';
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
@@ -26,8 +26,8 @@ export class CreateNotification extends Action<RootState> {
         const notifications: StoredNotification[] = state.notifications.slice();
 
         // All notification IDs must be unique. The custom dispatch logic of the `CreateNotification` event should
-        // ensure this, but to avoid significant side-effects, also adding a sanity check here.
-        const index: number = state.notifications.findIndex(n => n.id === notification.id);
+        // Ensure this, but to avoid significant side-effects, also adding a sanity check here.
+        const index: number = state.notifications.findIndex((n) => n.id === notification.id);
         if (index >= 0) {
             // Replace existing notification with this ID
             console.warn(`Attempted to add a notitification with duplicate id '${notification.id}'. Will replace existing notification.`);
@@ -48,7 +48,7 @@ export class CreateNotification extends Action<RootState> {
         const promises = [];
         // First remove any existing notifications with this ID, to ensure ID uniqueness
         // Should only ever be at-most one notification with this ID, using filter over find as an additional sanity check
-        const existingNotifications = store.state.notifications.filter(x => x.id === notification.id);
+        const existingNotifications = store.state.notifications.filter((x) => x.id === notification.id);
         if (existingNotifications.length) {
             promises.push(new RemoveNotifications(existingNotifications).dispatch(store));
         }
@@ -58,7 +58,7 @@ export class CreateNotification extends Action<RootState> {
 }
 
 export class RemoveNotifications extends Action<RootState> {
-    public readonly type = '@@NOTIFICATION/REMOVE_NOTIFICATIONS';
+    public readonly type: string = '@@NOTIFICATION/REMOVE_NOTIFICATIONS';
     public readonly notifications: StoredNotification[];
 
     constructor(notifications: StoredNotification[]) {
@@ -68,19 +68,19 @@ export class RemoveNotifications extends Action<RootState> {
 
     public reduce(state: RootState): RootState {
         const {notifications} = this;
-        const idsToRemove = notifications.map(n => {
+        const idsToRemove = notifications.map((n) => {
             return n.id;
         });
 
         return {
             ...state,
-            notifications: state.notifications.filter(n => idsToRemove.indexOf(n.id) === -1)
+            notifications: state.notifications.filter((n) => idsToRemove.indexOf(n.id) === -1)
         };
     }
 }
 
 export class ClickNotification extends Action<RootState> {
-    public readonly type = '@@NOTIFICATION/CLICK_NOTIFICATION';
+    public readonly type: string = '@@NOTIFICATION/CLICK_NOTIFICATION';
     public readonly notification: StoredNotification;
 
     constructor(notification: StoredNotification) {
@@ -141,7 +141,7 @@ export class BlurCenter extends Action<RootState> {
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
-        // properly [SERVICE-614]
+        // Properly [SERVICE-614]
         if (toggleFilter.recordBlur()) {
             await super.dispatch(store);
         }
