@@ -452,3 +452,16 @@ export async function clearAll(): Promise<number> {
 export async function toggleNotificationCenter(): Promise<void> {
     return tryServiceDispatch(APITopic.TOGGLE_NOTIFICATION_CENTER, undefined);
 }
+
+/**
+ * Returns the version of the Notification Center.
+ *
+ * ```ts
+ * import {getVersion} from 'openfin-notifications';
+ *
+ * getVersion();
+ * ```
+ */
+export async function getVersion(): Promise<string> {
+    return tryServiceDispatch(APITopic.GET_VERSION, undefined);
+}

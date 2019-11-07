@@ -27,6 +27,7 @@ import {WebWindowFactory} from './model/WebWindow';
 import {Environment} from './model/Environment';
 import {Layouter} from './controller/Layouter';
 import {MonitorModel} from './model/MonitorModel';
+import {getVersion} from './utils/version';
 
 @injectable()
 export class Main {
@@ -115,7 +116,8 @@ export class Main {
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
             [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
             [APITopic.ADD_EVENT_LISTENER]: this._clientRegistry.onAddEventListener.bind(this._clientRegistry),
-            [APITopic.REMOVE_EVENT_LISTENER]: this._clientRegistry.onRemoveEventListener.bind(this._clientRegistry)
+            [APITopic.REMOVE_EVENT_LISTENER]: this._clientRegistry.onRemoveEventListener.bind(this._clientRegistry),
+            [APITopic.GET_VERSION]: this.getVersion.bind(this)
         });
 
         console.log('Service Initialised');
@@ -180,6 +182,10 @@ export class Main {
     private getAppNotifications(uuid: string): StoredNotification[] {
         const notifications = this._store.state.notifications;
         return notifications.filter((n) => n.source.uuid === uuid);
+    }
+
+    private getVersion(): string {
+        return getVersion();
     }
 
     /**
