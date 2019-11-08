@@ -4,7 +4,7 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
 import moment from 'moment';
 
-import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
+import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events, ProviderStatus} from '../client/internal';
 import {ActionDeclaration} from '../client/actions';
 
 import {Injector} from './common/Injector';
@@ -117,7 +117,7 @@ export class Main {
             [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
             [APITopic.ADD_EVENT_LISTENER]: this._clientRegistry.onAddEventListener.bind(this._clientRegistry),
             [APITopic.REMOVE_EVENT_LISTENER]: this._clientRegistry.onRemoveEventListener.bind(this._clientRegistry),
-            [APITopic.GET_VERSION]: this.getVersion.bind(this)
+            [APITopic.GET_PROVIDER_STATUS]: this.getStatus.bind(this)
         });
 
         console.log('Service Initialised');
@@ -184,8 +184,11 @@ export class Main {
         return notifications.filter((n) => n.source.uuid === uuid);
     }
 
-    private getVersion(): string {
-        return getVersion();
+    private getStatus(): ProviderStatus {
+        return {
+            connected: true,
+            version: getVersion()
+        };
     }
 
     /**

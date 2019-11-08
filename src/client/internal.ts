@@ -36,7 +36,7 @@ export const enum APITopic {
     TOGGLE_NOTIFICATION_CENTER = 'toggle-notification-center',
     ADD_EVENT_LISTENER = 'add-event-listener',
     REMOVE_EVENT_LISTENER = 'remove-event-listener',
-    GET_VERSION = 'get-version'
+    GET_PROVIDER_STATUS = 'get-provider-status'
 }
 
 export interface API {
@@ -47,7 +47,7 @@ export interface API {
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
     [APITopic.ADD_EVENT_LISTENER]: [Events['type'], void];
     [APITopic.REMOVE_EVENT_LISTENER]: [Events['type'], void];
-    [APITopic.GET_VERSION]: [undefined, string];
+    [APITopic.GET_PROVIDER_STATUS]: [undefined, ProviderStatus];
 }
 
 export type Events = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;
@@ -82,4 +82,9 @@ export interface NotificationActionEventTransport {
     // Following are present only if trigger is `ActionTrigger.CONTROL`
     controlSource?: 'buttons';  // Additional sources will be added in future release
     controlIndex?: number;      // The index of the originating control, within notification[controlSource]
+}
+
+export interface ProviderStatus {
+    connected: boolean;
+    version: string | null;
 }

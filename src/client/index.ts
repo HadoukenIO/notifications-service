@@ -13,9 +13,24 @@ import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
 import {APITopic, Events, NotificationInternal, Omit} from './internal';
 import {EventRouter, Transport} from './EventRouter';
+import * as provider from './provider';
 
 export * from './actions';
 export * from './controls';
+
+export {provider};
+
+/**
+ * The version of the NPM package.
+ *
+ * Webpack replaces any instances of this constant with a hard-coded string at build time.
+ */
+declare const PACKAGE_VERSION: string;
+
+/**
+ * The Clients' version number.
+ */
+export const VERSION = PACKAGE_VERSION;
 
 const eventHandler: EventRouter<Events> = getEventRouter();
 
@@ -451,17 +466,4 @@ export async function clearAll(): Promise<number> {
  */
 export async function toggleNotificationCenter(): Promise<void> {
     return tryServiceDispatch(APITopic.TOGGLE_NOTIFICATION_CENTER, undefined);
-}
-
-/**
- * Returns the version of the Notification Center.
- *
- * ```ts
- * import {getVersion} from 'openfin-notifications';
- *
- * getVersion();
- * ```
- */
-export async function getVersion(): Promise<string> {
-    return tryServiceDispatch(APITopic.GET_VERSION, undefined);
 }
