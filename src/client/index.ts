@@ -28,7 +28,7 @@ export {provider};
 declare const PACKAGE_VERSION: string;
 
 /**
- * The Notification Client libraries version in semver format.
+ * The Notification Client library's version in semver format.
  *
  * This is the version which you are currently using.
  */

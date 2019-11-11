@@ -4,8 +4,9 @@ import {ProviderIdentity} from 'openfin/_v2/api/interappbus/channel/channel';
 import {Identity} from 'openfin/_v2/main';
 import moment from 'moment';
 
-import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events, ProviderStatus} from '../client/internal';
+import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
 import {ActionDeclaration} from '../client/actions';
+import {ProviderStatus} from '../client/provider';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';

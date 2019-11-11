@@ -30,10 +30,9 @@ export interface ProviderStatus {
 }
 
 /**
- * Retrieves the status of the Service Provider.
+ * Retrieves the connection status and version semver of the Service Provider in the shape of a {@link ProviderStatus} object.
  *
- * If the Provider is connected, you will receive a {@link ProviderStatus} object containing the Providers version number and connection indication.
- * If not, this will be null.
+ * If the Provider is connected, its' version number will be supplied in the returned object. If not, `version` will be `null`.
  *
  * ```ts
  * import {getStatus} from 'openfin-notifications';
