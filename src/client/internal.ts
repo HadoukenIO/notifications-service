@@ -10,6 +10,7 @@
  */
 
 import {NotificationActionResult, ActionTrigger} from './actions';
+import {ProviderStatus} from './provider';
 
 import {NotificationOptions, Notification, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
 
@@ -82,9 +83,4 @@ export interface NotificationActionEventTransport {
     // Following are present only if trigger is `ActionTrigger.CONTROL`
     controlSource?: 'buttons';  // Additional sources will be added in future release
     controlIndex?: number;      // The index of the originating control, within notification[controlSource]
-}
-
-export interface ProviderStatus {
-    connected: boolean;
-    version: string | null;
 }

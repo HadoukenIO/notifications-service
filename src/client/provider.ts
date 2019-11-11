@@ -10,15 +10,30 @@
  */
 import semverCompare from 'semver-compare';
 
-import {withStrictTimeout} from '../provider/common/async';
-
+import {withStrictTimeout} from './async';
 import {tryServiceDispatch} from './connection';
-import {APITopic, ProviderStatus} from './internal';
+import {APITopic} from './internal';
+
+/**
+ * Status object returned by the Provider.
+ */
+export interface ProviderStatus {
+    /**
+     * The current connection status from the Client to the Provider.
+     */
+    connected: boolean;
+
+    /**
+     * The version number of the Provider. If the Provider is not connected, this will be `null`.
+     */
+    version: string | null;
+}
 
 /**
  * Retrieves the status of the Service Provider.
  *
- * If the Provider is connected, you will receive the Providers version number. If not, this will be null.
+ * If the Provider is connected, you will receive a {@link ProviderStatus} object containing the Providers version number and connection indication.
+ * If not, this will be null.
  *
  * ```ts
  * import {getStatus} from 'openfin-notifications';
@@ -42,13 +57,15 @@ export function getStatus(): Promise<ProviderStatus> {
  *
  * This will return `true` if the Provider version is greater than or equal to the provided version. If not, `false` will be returned.
  *
+ * If the Provider is not connected, `false` will be returned.
+ *
  * ```ts
  * import {isConnectedToAtLeast, VERSION} from 'openfin-notifications';
  *
  * isConnectedToAtLeast(VERSION);
  * ```
  *
- * @param version Version to compare against the Provider version.
+ * @param version Version to compare against the Provider version. This should be in semvar format.
  */
 export async function isConnectedToAtLeast(version: string): Promise<boolean> {
     const status = await getStatus();
