@@ -47,6 +47,7 @@
     "@types/react-dom": "^16.8.2",
     "@types/react-redux": "^7.0.8",
     "@types/react-transition-group": "^4.2.2",
+    "@types/semver-compare": "^1.0.0",
     "dexie": "^2.0.4",
     "express": "^4.16.2",
     "fake-indexeddb": "^2.1.1",
@@ -70,6 +71,7 @@
     "redux": "^4.0.1",
     "redux-devtools-cli": "0.0.1-1",
     "reflect-metadata": "^0.1.13",
+    "semver-compare": "^1.0.0",
     "typescript": "3.4.5"
   },
   "precommit": {

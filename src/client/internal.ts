@@ -10,6 +10,7 @@
  */
 
 import {NotificationActionResult, ActionTrigger} from './actions';
+import {ProviderStatus} from './provider';
 
 import {NotificationOptions, Notification, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
 
@@ -35,7 +36,8 @@ export const enum APITopic {
     CLEAR_APP_NOTIFICATIONS = 'clear-app-notifications',
     TOGGLE_NOTIFICATION_CENTER = 'toggle-notification-center',
     ADD_EVENT_LISTENER = 'add-event-listener',
-    REMOVE_EVENT_LISTENER = 'remove-event-listener'
+    REMOVE_EVENT_LISTENER = 'remove-event-listener',
+    GET_PROVIDER_STATUS = 'get-provider-status'
 }
 
 export interface API {
@@ -46,6 +48,7 @@ export interface API {
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
     [APITopic.ADD_EVENT_LISTENER]: [Events['type'], void];
     [APITopic.REMOVE_EVENT_LISTENER]: [Events['type'], void];
+    [APITopic.GET_PROVIDER_STATUS]: [undefined, ProviderStatus];
 }
 
 export type Events = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;

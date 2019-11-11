@@ -13,9 +13,26 @@ import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
 import {APITopic, Events, NotificationInternal, Omit} from './internal';
 import {EventRouter, Transport} from './EventRouter';
+import * as provider from './provider';
 
 export * from './actions';
 export * from './controls';
+
+export {provider};
+
+/**
+ * The version of the NPM package.
+ *
+ * Webpack replaces any instances of this constant with a hard-coded string at build time.
+ */
+declare const PACKAGE_VERSION: string;
+
+/**
+ * The Notification Client library's version in semver format.
+ *
+ * This is the version which you are currently using.
+ */
+export const VERSION = PACKAGE_VERSION;
 
 const eventHandler: EventRouter<Events> = getEventRouter();
 
