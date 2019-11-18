@@ -1,11 +1,12 @@
 import 'reflect-metadata';
 
+import {DeferredPromise} from 'openfin-async-utils';
+
 import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {createMockDatabase, createMockCollection, getterMock, createMockAction} from '../../utils/unit/mocks';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {StoredApplication} from '../../../src/provider/model/Environment';
 import {CollectionMap, Database} from '../../../src/provider/model/database/Database';
-import {DeferredPromise} from '../../../src/provider/common/DeferredPromise';
 import {createFakeStoredNotification, createFakeStoredApplication, createFakeEmptyRootState} from '../../utils/unit/fakes';
 import {normalizeRootState} from '../../utils/unit/normalization';
 import {RootState} from '../../../src/provider/store/State';

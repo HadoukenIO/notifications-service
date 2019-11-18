@@ -72,7 +72,8 @@
     "redux-devtools-cli": "0.0.1-1",
     "reflect-metadata": "^0.1.13",
     "semver-compare": "^1.0.0",
-    "typescript": "3.4.5"
+    "typescript": "3.4.5",
+    "openfin-async-utils": "../async-utils/dist/openfin-async-utils-0.0.2.tgz"
   },
   "precommit": {
     "run": [
