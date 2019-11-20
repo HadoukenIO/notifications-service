@@ -26,7 +26,7 @@ import {ExpiryController} from '../controller/ExpiryController';
 import {ClientEventController} from '../controller/ClientEventController';
 
 import {Inject, InjectableMap} from './Injectables';
-import {DeferredPromise} from 'openfin-async-utils';
+import {DeferredPromise} from 'openfin-service-async';
 
 /**
  * For each entry in `Inject`, defines the type that will be injected for that key.

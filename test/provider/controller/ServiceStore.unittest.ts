@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {DeferredPromise} from 'openfin-async-utils';
+import {DeferredPromise} from 'openfin-service-async';
 
 import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {createMockDatabase, createMockCollection, getterMock, createMockAction} from '../../utils/unit/mocks';

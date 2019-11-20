@@ -1,5 +1,5 @@
 import {ElementHandle} from 'puppeteer';
-import {parallelMap} from 'openfin-async-utils';
+import {parallelMap} from 'openfin-service-async';
 
 import {Notification} from '../../../src/client';
 import {getDate} from '../../../src/provider/view/utils/Time';

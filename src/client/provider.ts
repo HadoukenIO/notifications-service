@@ -9,7 +9,7 @@
  * @hidden
  */
 import semverCompare from 'semver-compare';
-import {withStrictTimeout} from 'openfin-async-utils';
+import {withStrictTimeout} from 'openfin-service-async';
 
 import {tryServiceDispatch} from './connection';
 import {APITopic} from './internal';
