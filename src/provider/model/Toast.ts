@@ -1,9 +1,9 @@
 import {Signal, Aggregators} from 'openfin-service-signal';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {Opacity} from 'openfin/_v2/shapes';
+import {DeferredPromise} from 'openfin-service-async';
 
 import {renderApp} from '../view/containers/ToastApp/ToastApp';
-import {DeferredPromise} from '../common/DeferredPromise';
 import {LayoutItem} from '../controller/Layouter';
 import {LayouterConfig} from '../controller/LayouterConfig';
 import {ServiceStore} from '../store/ServiceStore';
