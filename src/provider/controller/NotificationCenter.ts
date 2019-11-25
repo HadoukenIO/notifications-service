@@ -68,11 +68,15 @@ export class NotificationCenter extends AsyncInit {
             console.error('Notification Center window could not be created!', error.message);
             throw error;
         }
+
         await this.hideWindowOffscreen();
-        this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
+
+        this._trayIcon.setIcon(require('../../../res/provider/ui/image/shapes/trayIcon.svg'));
+
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
         });
+
         try {
             await fin.GlobalHotkey.register('commandorcontrol+alt+n', async () => {
                 new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
@@ -80,6 +84,7 @@ export class NotificationCenter extends AsyncInit {
         } catch (error) {
             console.error('Global hotkey could not be created. ', error.message);
         }
+
         await this.sizeToFit();
         await this.addListeners();
 
