@@ -41,7 +41,7 @@
     "@types/moment": "^2.13.0",
     "@types/node": "^9.4.6",
     "@types/node-fetch": "^2.3.4",
-    "@types/openfin": "^43.0.1",
+    "@types/openfin": "^45.0.1",
     "@types/puppeteer": "~1.19.1",
     "@types/react": "^16.8.6",
     "@types/react-dom": "^16.8.2",
