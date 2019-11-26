@@ -71,7 +71,8 @@ export class NotificationCenter extends AsyncInit {
 
         await this.hideWindowOffscreen();
 
-        this._trayIcon.setIcon(require('../../../res/provider/ui/image/shapes/trayIcon.svg'));
+        // Requiring a file will give us the result as a Data URL/base64 string. Runtime does not support this so we strip the Data URL portion.
+        this._trayIcon.setIcon(/,(.+)/.exec(require('../../../res/provider/ui/image/shapes/trayIcon.svg'))![1]);
 
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
