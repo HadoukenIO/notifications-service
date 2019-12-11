@@ -65,6 +65,12 @@ export function getServicePromise(): Promise<ChannelClient> {
                 // Any unregistered action will simply return false
                 channel.setDefaultAction(() => false);
 
+                channel.onDisconnection(() => {
+                    // Reset to undefined
+                    channelPromise = undefined!;
+                    getServicePromise();
+                });
+
                 return channel;
             });
         }
