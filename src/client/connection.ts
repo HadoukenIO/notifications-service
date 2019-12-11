@@ -35,9 +35,11 @@ export const eventEmitter = new EventEmitter();
  */
 export let channelPromise: Promise<ChannelClient>;
 
-if (typeof fin !== 'undefined') {
-    getServicePromise();
-}
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof fin !== 'undefined') {
+        getServicePromise();
+    }
+});
 
 export function getServicePromise(): Promise<ChannelClient> {
     if (!channelPromise) {
@@ -49,7 +51,10 @@ export function getServicePromise(): Promise<ChannelClient> {
             // That includes this, but for now it is easier to put a guard in place.
             channelPromise = Promise.reject(new Error('Trying to connect to provider from provider'));
         } else {
-            channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
+            channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {
+                wait: true,
+                payload: {version: PACKAGE_VERSION}
+            }).then((channel: ChannelClient) => {
                 const eventRouter = getEventRouter();
 
                 // Register service listeners
