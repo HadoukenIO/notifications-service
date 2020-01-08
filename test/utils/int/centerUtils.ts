@@ -3,6 +3,7 @@ import {ElementHandle} from 'puppeteer';
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
 import {getElementById, querySelector} from './dom';
+import {delay, Duration} from './delay';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 const CARDS_SELECTOR = '.group:not([class*="exit"]) li:not([class*="exit"]) .notification-card';
@@ -29,4 +30,11 @@ export async function isCenterShowing(): Promise<boolean> {
     const center = fin.Window.wrapSync(CENTER_IDENTITY);
     const centerOpacity = (await center.getOptions()).opacity;
     return (await center.isShowing()) && centerOpacity === 1;
+}
+
+export async function toggleCenterLocked(): Promise<void> {
+    const lockButton = await getElementById(CENTER_IDENTITY, 'lock-link');
+
+    await lockButton.click();
+    await delay(Duration.EVENT_PROPAGATED);
 }

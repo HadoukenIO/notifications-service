@@ -74,3 +74,9 @@ export async function providerReady(): Promise<void> {
     // Give the service one second to allow for any post injector initialization to process.
     await delay(1000);
 }
+
+export function isCenterLocked(): Promise<boolean> {
+    return ofBrowser.executeOnWindow(serviceIdentity, function () {
+        return this.store.state.centerLocked;
+    });
+}
