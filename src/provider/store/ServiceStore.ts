@@ -5,6 +5,7 @@ import {StoredNotification} from '../model/StoredNotification';
 import {Database, CollectionMap} from '../model/database/Database';
 import {Collection} from '../model/database/Collection';
 import {StoredApplication} from '../model/Environment';
+import {StoredSetting, SettingsMap} from '../model/StoredSetting';
 
 import {RootState} from './State';
 import {Store} from './Store';
@@ -15,7 +16,8 @@ export class ServiceStore extends Store<RootState> {
         notifications: [],
         applications: new Map<string, StoredApplication>(),
         centerVisible: false,
-        centerLocked: false
+        centerLocked: false,
+        notificationsMuted: false
     };
 
     private readonly _database: Database;
@@ -37,6 +39,16 @@ export class ServiceStore extends Store<RootState> {
         const applicationsCollection: Collection<StoredApplication> = this._database.get(CollectionMap.APPLICATIONS);
         const applications = new Map<string, StoredApplication>((await applicationsCollection.getAll()).map((application) => [application.id, application]));
 
-        return {...ServiceStore.INITIAL_STATE, notifications, applications};
+        const settingsCollection: Collection<StoredSetting> = this._database.get(CollectionMap.SETTINGS);
+        const storedCenterLocked = (await settingsCollection.get(SettingsMap.CenterLocked));
+        const storedNotificationsMuted = (await settingsCollection.get(SettingsMap.NotificationsMuted));
+
+        return {
+            ...ServiceStore.INITIAL_STATE,
+            notifications,
+            applications,
+            centerLocked: storedCenterLocked ? storedCenterLocked.value as boolean : ServiceStore.INITIAL_STATE.centerLocked,
+            notificationsMuted: storedNotificationsMuted ? storedNotificationsMuted.value as boolean : ServiceStore.INITIAL_STATE.notificationsMuted
+        };
     }
 }

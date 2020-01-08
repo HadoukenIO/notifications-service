@@ -155,12 +155,22 @@ export class BlurCenter extends Action<RootState> {
     }
 }
 
-export class ToggleLockCenter extends Action<RootState> {
-    public readonly type = '@@CENTER/TOGGLE_LOCK_CENTER';
+export class ToggleCenterLocked extends Action<RootState> {
+    public readonly type = '@@CENTER/TOGGLE_CENTER_LOCKED';
     public reduce(state: RootState): RootState {
         return {
             ...state,
             centerLocked: !state.centerLocked
+        };
+    }
+}
+
+export class TogglNotificationsMuted extends Action<RootState> {
+    public readonly type = '@@CENTER/TOGGLE_NOTIFICATIONS_MUTED';
+    public reduce(state: RootState): RootState {
+        return {
+            ...state,
+            notificationsMuted: !state.notificationsMuted
         };
     }
 }

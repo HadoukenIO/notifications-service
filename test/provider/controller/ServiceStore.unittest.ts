@@ -61,7 +61,9 @@ describe('When the store is uninitialized', () => {
             notifications: [note1, note2, note3],
             applications: new Map([[app1.id, app1], [app2.id, app2], [app3.id, app3]]),
             centerVisible: false,
-            centerLocked: false}));
+            centerLocked: false,
+            notificationsMuted: false
+        }));
     });
 
     test('When creating the store, and the database is empty, the state is set from the database', async () => {
@@ -74,7 +76,8 @@ describe('When the store is uninitialized', () => {
             notifications: [],
             applications: new Map([]),
             centerVisible: false,
-            centerLocked: false}));
+            centerLocked: false,
+            notificationsMuted: false}));
     });
 });
 

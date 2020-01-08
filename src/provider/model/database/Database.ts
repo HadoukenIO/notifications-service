@@ -31,7 +31,7 @@ export class Database extends AsyncInit {
         this._database = new Dexie('notifications-service');
         this._collections = new Map<CollectionMap, Collection<any>>();
 
-        this._database.version(1).stores({
+        this._database.version(2).stores({
             [CollectionMap.NOTIFICATIONS]: '&id',
             [CollectionMap.SETTINGS]: '&id',
             [CollectionMap.APPLICATIONS]: '&id'

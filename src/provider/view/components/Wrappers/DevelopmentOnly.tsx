@@ -1,11 +1,13 @@
+import * as React from 'react';
+
 interface DevelopementOnlyProps {
-    children?: React.ReactElement;
+    children?: React.ReactNode;
 }
 
 export function DevelopmentOnly(props: DevelopementOnlyProps): React.ReactElement | null {
     if (process.env.NODE_ENV === 'production') {
         return null;
     } else {
-        return props.children ? props.children : null;
+        return props.children ? <React.Fragment>{props.children}</React.Fragment> : null;
     }
 }
