@@ -17,7 +17,7 @@ describe.each(testParams)('When the Notification Center is open and %s', (titleP
     let testWindow: Window;
 
     beforeAll(async () => {
-        // Ensure center is unlocked
+        // Ensure center is unlocked/locked
         if (await isCenterLocked() !== locked) {
             await toggleCenterLocked();
         }

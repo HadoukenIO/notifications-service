@@ -62,7 +62,7 @@ describe('When the store is uninitialized', () => {
             applications: new Map([[app1.id, app1], [app2.id, app2], [app3.id, app3]]),
             centerVisible: false,
             centerLocked: false,
-            notificationsMuted: false
+            centerMuted: false
         }));
     });
 
@@ -77,7 +77,7 @@ describe('When the store is uninitialized', () => {
             applications: new Map([]),
             centerVisible: false,
             centerLocked: false,
-            notificationsMuted: false}));
+            centerMuted: false}));
     });
 });
 

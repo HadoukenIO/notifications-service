@@ -8,7 +8,7 @@ export type RootState = Readonly<{
     applications: StoredApplicationMap;
     centerVisible: boolean;
     centerLocked: boolean;
-    notificationsMuted: boolean;
+    centerMuted: boolean;
 }>;
 
 export type Immutable<T> = {

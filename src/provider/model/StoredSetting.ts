@@ -3,7 +3,7 @@
  */
 export const enum SettingsMap {
     CenterLocked,
-    NotificationsMuted
+    CenterMuted
 }
 
 /**

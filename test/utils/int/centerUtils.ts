@@ -1,9 +1,11 @@
 import {ElementHandle} from 'puppeteer';
 
+import * as notifsRemote from './notificationsRemote';
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
 import {getElementById, querySelector} from './dom';
 import {delay, Duration} from './delay';
+import {testManagerIdentity} from './constants';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 const CARDS_SELECTOR = '.group:not([class*="exit"]) li:not([class*="exit"]) .notification-card';
@@ -33,8 +35,26 @@ export async function isCenterShowing(): Promise<boolean> {
 }
 
 export async function toggleCenterLocked(): Promise<void> {
-    const lockButton = await getElementById(CENTER_IDENTITY, 'lock-link');
+    await toggleCenterSetting('lock-link');
+}
 
+export async function toggleCenterMuted(): Promise<void> {
+    await toggleCenterSetting('mute-link');
+}
+
+async function toggleCenterSetting(elementId: string): Promise<void> {
+    const hidden = !(await isCenterShowing());
+    if (hidden) {
+        await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+        await delay(Duration.CENTER_TOGGLED);
+    }
+
+    const lockButton = await getElementById(CENTER_IDENTITY, elementId);
     await lockButton.click();
     await delay(Duration.EVENT_PROPAGATED);
+
+    if (hidden) {
+        await notifsRemote.toggleNotificationCenter(testManagerIdentity);
+        await delay(Duration.CENTER_TOGGLED);
+    }
 }

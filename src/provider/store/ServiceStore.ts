@@ -17,7 +17,7 @@ export class ServiceStore extends Store<RootState> {
         applications: new Map<string, StoredApplication>(),
         centerVisible: false,
         centerLocked: false,
-        notificationsMuted: false
+        centerMuted: false
     };
 
     private readonly _database: Database;
@@ -41,14 +41,14 @@ export class ServiceStore extends Store<RootState> {
 
         const settingsCollection: Collection<StoredSetting> = this._database.get(CollectionMap.SETTINGS);
         const storedCenterLocked = (await settingsCollection.get(SettingsMap.CenterLocked));
-        const storedNotificationsMuted = (await settingsCollection.get(SettingsMap.NotificationsMuted));
+        const storedCenterMuted = (await settingsCollection.get(SettingsMap.CenterMuted));
 
         return {
             ...ServiceStore.INITIAL_STATE,
             notifications,
             applications,
             centerLocked: storedCenterLocked ? storedCenterLocked.value as boolean : ServiceStore.INITIAL_STATE.centerLocked,
-            notificationsMuted: storedNotificationsMuted ? storedNotificationsMuted.value as boolean : ServiceStore.INITIAL_STATE.notificationsMuted
+            centerMuted: storedCenterMuted ? storedCenterMuted.value as boolean : ServiceStore.INITIAL_STATE.centerMuted
         };
     }
 }

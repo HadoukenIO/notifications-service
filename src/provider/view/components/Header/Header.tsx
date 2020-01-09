@@ -3,7 +3,7 @@ import * as React from 'react';
 import {GroupingType} from '../../utils/Grouping';
 import {CircleButton, IconType, Size} from '../CircleButton/CircleButton';
 import {DevelopmentOnly} from '../Wrappers/DevelopmentOnly';
-import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleCenterLocked, TogglNotificationsMuted} from '../../../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleCenterLocked, ToggleCenterMuted} from '../../../store/Actions';
 import {Actionable} from '../../types';
 
 import {ClearAllPrompt} from './ClearAllPrompt';
@@ -15,12 +15,12 @@ interface Props extends Actionable {
     groupBy: GroupingType;
     handleGroupBy: (groupBy: GroupingType) => void;
     centerLocked: boolean;
-    notificationsMuted: boolean;
+    centerMuted: boolean;
     onClearAll: () => void;
 }
 
 export function Header(props: Props): React.ReactElement {
-    const {groupBy, centerVisible, handleGroupBy, centerLocked, notificationsMuted, onClearAll, storeApi} = props;
+    const {groupBy, centerVisible, handleGroupBy, centerLocked, centerMuted, onClearAll, storeApi} = props;
     const handleHideWindow = () => {
         new ToggleCenterVisibility(ToggleCenterVisibilitySource.BUTTON, false).dispatch(storeApi);
     };
@@ -32,7 +32,7 @@ export function Header(props: Props): React.ReactElement {
                     {/* Layout space, in the future place filter/settings here */}
                     <DevelopmentOnly>
                         <Lock centerLocked={centerLocked} storeApi={storeApi} />
-                        <Mute notificationsMuted={notificationsMuted} storeApi={storeApi} />
+                        <Mute centerMuted={centerMuted} storeApi={storeApi} />
                     </DevelopmentOnly>
                 </div>
                 <CircleButton id="hide-center" type={IconType.HIDE} size={Size.LARGE} onClick={handleHideWindow} alt="Hide center" />
@@ -68,7 +68,7 @@ interface LockProps extends Actionable {
 }
 
 interface MuteProps extends Actionable {
-    notificationsMuted: boolean;
+    centerMuted: boolean;
 }
 
 function Lock(props: LockProps): React.ReactElement {
@@ -82,11 +82,11 @@ function Lock(props: LockProps): React.ReactElement {
 }
 
 function Mute(props: MuteProps): React.ReactElement {
-    const {storeApi, notificationsMuted} = props;
+    const {storeApi, centerMuted} = props;
 
-    const handleMuteNotifications = () => {
-        new TogglNotificationsMuted().dispatch(storeApi);
+    const handleMuteCenter = () => {
+        new ToggleCenterMuted().dispatch(storeApi);
     };
 
-    return <a id="mute-link" className="developmentOnly2" onClick={handleMuteNotifications}>{notificationsMuted ? '🔈' : '🔊'}</a>;
+    return <a id="mute-link" className="developmentOnly2" onClick={handleMuteCenter}>{centerMuted ? '🔈' : '🔊'}</a>;
 }

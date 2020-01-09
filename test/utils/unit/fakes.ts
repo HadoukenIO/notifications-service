@@ -84,7 +84,7 @@ export function createFakeEmptyRootState(): RootState {
         applications: new Map<string, StoredApplication>(),
         centerVisible: false,
         centerLocked: false,
-        notificationsMuted: false
+        centerMuted: false
     };
 }
 

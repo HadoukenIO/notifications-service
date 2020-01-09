@@ -1,7 +1,7 @@
 import {injectable, inject} from 'inversify';
 
 import {Inject} from '../common/Injectables';
-import {CreateNotification, RemoveNotifications, RegisterApplication, ToggleCenterLocked, TogglNotificationsMuted} from '../store/Actions';
+import {CreateNotification, RemoveNotifications, RegisterApplication, ToggleCenterLocked, ToggleCenterMuted} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {Database, CollectionMap} from '../model/database/Database';
 import {DatabaseError} from '../model/Errors';
@@ -52,16 +52,17 @@ export class Persistor {
             try {
                 const collection = this._database.get(CollectionMap.SETTINGS);
                 await collection.upsert({id: SettingsMap.CenterLocked, value: centerLocked});
+                console.log('toggling lock', centerLocked);
             } catch (error) {
-                throw new DatabaseError(`Unable to upset centerLocked setting to ${centerLocked}`, error);
+                throw new DatabaseError(`Unable to upsert centerLocked setting to ${centerLocked}`, error);
             }
-        } else if (action instanceof TogglNotificationsMuted) {
-            const notificationsMuted = this._store.state.notificationsMuted;
+        } else if (action instanceof ToggleCenterMuted) {
+            const centerMuted = this._store.state.centerMuted;
             try {
                 const collection = this._database.get(CollectionMap.SETTINGS);
-                await collection.upsert({id: SettingsMap.NotificationsMuted, value: notificationsMuted});
+                await collection.upsert({id: SettingsMap.CenterMuted, value: centerMuted});
             } catch (error) {
-                throw new DatabaseError(`Unable to upset notificationsMuted setting to ${notificationsMuted}`, error);
+                throw new DatabaseError(`Unable to upsert centerMuted setting to ${centerMuted}`, error);
             }
         }
     }

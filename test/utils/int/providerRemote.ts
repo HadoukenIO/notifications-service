@@ -80,3 +80,9 @@ export function isCenterLocked(): Promise<boolean> {
         return this.store.state.centerLocked;
     });
 }
+
+export function isCenterMuted(): Promise<boolean> {
+    return ofBrowser.executeOnWindow(serviceIdentity, function () {
+        return this.store.state.centerMuted;
+    });
+}

@@ -165,12 +165,12 @@ export class ToggleCenterLocked extends Action<RootState> {
     }
 }
 
-export class TogglNotificationsMuted extends Action<RootState> {
-    public readonly type = '@@CENTER/TOGGLE_NOTIFICATIONS_MUTED';
+export class ToggleCenterMuted extends Action<RootState> {
+    public readonly type = '@@CENTER/TOGGLE_CENTER_MUTED';
     public reduce(state: RootState): RootState {
         return {
             ...state,
-            notificationsMuted: !state.notificationsMuted
+            centerMuted: !state.centerMuted
         };
     }
 }
