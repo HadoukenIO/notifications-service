@@ -78,7 +78,7 @@ function Lock(props: LockProps): React.ReactElement {
         new ToggleCenterLocked().dispatch(storeApi);
     };
 
-    return <a id="lock-link" className="developmentOnly2" onClick={handleLockCenter}>{centerLocked ? '🔒' : '🔓'}</a>;
+    return <a id="lock-link" className="developmentOnly" onClick={handleLockCenter}>{centerLocked ? '🔒' : '🔓'}</a>;
 }
 
 function Mute(props: MuteProps): React.ReactElement {
@@ -88,5 +88,5 @@ function Mute(props: MuteProps): React.ReactElement {
         new ToggleCenterMuted().dispatch(storeApi);
     };
 
-    return <a id="mute-link" className="developmentOnly2" onClick={handleMuteCenter}>{centerMuted ? '🔈' : '🔊'}</a>;
+    return <a id="mute-link" className="developmentOnly" onClick={handleMuteCenter}>{centerMuted ? '🔈' : '🔊'}</a>;
 }
