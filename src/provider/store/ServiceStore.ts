@@ -40,8 +40,8 @@ export class ServiceStore extends Store<RootState> {
         const applications = new Map<string, StoredApplication>((await applicationsCollection.getAll()).map((application) => [application.id, application]));
 
         const settingsCollection: Collection<StoredSetting> = this._database.get(CollectionMap.SETTINGS);
-        const storedCenterLocked = (await settingsCollection.get(SettingsMap.CenterLocked));
-        const storedCenterMuted = (await settingsCollection.get(SettingsMap.CenterMuted));
+        const storedCenterLocked = await settingsCollection.get(SettingsMap.CenterLocked);
+        const storedCenterMuted = await settingsCollection.get(SettingsMap.CenterMuted);
 
         return {
             ...ServiceStore.INITIAL_STATE,
