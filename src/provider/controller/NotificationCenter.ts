@@ -13,6 +13,8 @@ import {RootState} from '../store/State';
 
 import {AsyncInit} from './AsyncInit';
 
+const trayIconImage = require('../../../res/provider/ui/image/shapes/trayIcon.png');
+
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
     url: 'ui/notification-center.html',
@@ -69,7 +71,7 @@ export class NotificationCenter extends AsyncInit {
             throw error;
         }
         await this.hideWindowOffscreen();
-        this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
+        this._trayIcon.setIcon(trayIconImage);
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
         });
