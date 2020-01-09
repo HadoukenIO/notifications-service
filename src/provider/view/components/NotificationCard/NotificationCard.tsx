@@ -94,10 +94,10 @@ export function NotificationCard(props: Props) {
                 <div className="time-close">
                     <NotificationTime date={data.date} />
                     <div className="actions">
-                        {isToast &&
-                            <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationMinimize} alt="Minimize Toast" />
+                        {isToast
+                            ? <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationMinimize} alt="Minimize Toast" />
+                            : <CircleButton type={IconType.CLOSE} onClick={handleNotificationClose} alt="Clear notification" />
                         }
-                        <CircleButton type={IconType.CLOSE} onClick={handleNotificationClose} alt="Clear notification" />
                     </div>
                 </div>
             </div>
