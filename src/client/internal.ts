@@ -84,3 +84,13 @@ export interface NotificationActionEventTransport {
     controlSource?: 'buttons';  // Additional sources will be added in future release
     controlIndex?: number;      // The index of the originating control, within notification[controlSource]
 }
+
+export interface OpenFinChannelConnectionEvent {
+    channelId: string;
+    channelName: string;
+    isExternal: boolean;
+    name: string;
+    topic: string;
+    type: string;
+    uuid: string;
+}

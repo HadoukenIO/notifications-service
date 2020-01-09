@@ -14,8 +14,9 @@
 import {EventEmitter} from 'events';
 
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
+import {DeferredPromise} from 'openfin-service-async';
 
-import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events} from './internal';
+import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events, OpenFinChannelConnectionEvent} from './internal';
 import {EventRouter, Targeted, Transport} from './EventRouter';
 
 /**
@@ -33,13 +34,27 @@ export const eventEmitter = new EventEmitter();
 /**
  * Promise to the channel object that allows us to connect to the client
  */
-export let channelPromise: Promise<ChannelClient>;
+export let channelPromise: Promise<ChannelClient> | null;
+const hasDOMContentLoaded = new DeferredPromise<void>();
 
 if (typeof fin !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        hasDOMContentLoaded.resolve();
+    });
+
+    fin.InterApplicationBus.Channel.onChannelDisconnect((event: OpenFinChannelConnectionEvent) => {
+        const {uuid, name, channelName} = event;
+        if (uuid === SERVICE_IDENTITY.uuid && name === SERVICE_IDENTITY.name && channelName === SERVICE_CHANNEL) {
+            channelPromise = null;
+            getServicePromise();
+        }
+    });
+
     getServicePromise();
 }
 
-export function getServicePromise(): Promise<ChannelClient> {
+export async function getServicePromise(): Promise<ChannelClient> {
+    await hasDOMContentLoaded.promise;
     if (!channelPromise) {
         if (typeof fin === 'undefined') {
             const msg: string = 'fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.';
@@ -49,7 +64,11 @@ export function getServicePromise(): Promise<ChannelClient> {
             // That includes this, but for now it is easier to put a guard in place.
             channelPromise = Promise.reject(new Error('Trying to connect to provider from provider'));
         } else {
-            channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
+            channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {
+                wait: true,
+                payload: {version: PACKAGE_VERSION}
+            }).then((channel: ChannelClient) => {
+                console.info('Connected to the provider');
                 const eventRouter = getEventRouter();
 
                 // Register service listeners
@@ -59,7 +78,6 @@ export function getServicePromise(): Promise<ChannelClient> {
                 });
                 // Any unregistered action will simply return false
                 channel.setDefaultAction(() => false);
-
                 return channel;
             });
         }
@@ -74,7 +92,7 @@ export function getServicePromise(): Promise<ChannelClient> {
  * @param payload Data payload to send to the provider.
  */
 export async function tryServiceDispatch<T extends APITopic>(action: T, payload: API[T][0]): Promise<API[T][1]> {
-    const channel: ChannelClient = await channelPromise;
+    const channel: ChannelClient = await getServicePromise();
     return channel.dispatch(action, payload) as Promise<API[T][1]>;
 }
 
