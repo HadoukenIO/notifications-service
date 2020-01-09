@@ -9,7 +9,7 @@ import {testManagerIdentity, testAppUrlListenersOnStartup} from '../utils/int/co
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {delay, Duration} from '../utils/int/delay';
-import {waitForAppToBeRunning} from '../utils/int/common';
+import {waitForAppToBeRunning, setupCommonBookends} from '../utils/int/common';
 
 let testApp: Application;
 let testWindow: _Window;
@@ -23,6 +23,8 @@ const options: NotificationOptions = {
     title: 'Test Notification Title',
     category: 'Test Notification Category'
 };
+
+setupCommonBookends();
 
 beforeEach(async () => {
     jest.resetAllMocks();

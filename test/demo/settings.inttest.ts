@@ -1,6 +1,7 @@
 
 import {toggleCenterLocked, toggleCenterMuted} from '../utils/int/centerUtils';
 import {isCenterLocked, isCenterMuted, restartProvider} from '../utils/int/providerRemote';
+import {setupCommonBookends} from '../utils/int/common';
 
 type TestParam = [string, boolean];
 
@@ -16,6 +17,8 @@ afterAll(async () => {
         await toggleCenterMuted();
     }
 });
+
+setupCommonBookends();
 
 describe.each(lockTestParams)('When the Notification Center is %s, the setting is preserved', (titleParam: string, locked: boolean) => {
     beforeAll(async () => {

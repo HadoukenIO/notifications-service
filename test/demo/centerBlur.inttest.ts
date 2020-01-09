@@ -7,16 +7,19 @@ import {isCenterShowing, getCenterCloseButton, toggleCenterLocked} from '../util
 import {delay, Duration} from '../utils/int/delay';
 import {getElementById} from '../utils/int/dom';
 import {isCenterLocked} from '../utils/int/providerRemote';
+import {setupCommonBookends} from '../utils/int/common';
 
 type TestParam = [string, boolean];
 
 const testParams: TestParam[] = [['unlocked', false], ['locked', true]];
 
+setupCommonBookends();
+
 describe.each(testParams)('When the Notification Center is open and %s', (titleParam: string, locked: boolean) => {
     let testApp: Application;
     let testWindow: Window;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         // Ensure center is unlocked/locked
         if (await isCenterLocked() !== locked) {
             await toggleCenterLocked();
@@ -24,6 +27,11 @@ describe.each(testParams)('When the Notification Center is open and %s', (titleP
     });
 
     afterAll(async () => {
+        // Ensure center finishes locked
+        if (!locked) {
+            await toggleCenterLocked();
+        }
+
         // Close center when we're done
         if (await isCenterShowing()) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);

@@ -9,7 +9,7 @@ import {delay, Duration} from '../utils/int/delay';
 import {getToastWindow, getToastCards, getToastMinimizeButton} from '../utils/int/toastUtils';
 import {assertNotificationStored} from '../utils/int/storageRemote';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
-import {setupClosedCenterBookends} from '../utils/int/common';
+import {setupClosedCenterBookends, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const options: NotificationOptions = {
@@ -17,6 +17,8 @@ const options: NotificationOptions = {
     title: 'Test Notification Title',
     category: 'Test Notification Category'
 };
+
+setupCommonBookends();
 
 describe('When minimizing a toast', () => {
     let testApp: Application;

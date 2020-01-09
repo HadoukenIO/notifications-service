@@ -16,7 +16,7 @@ export class ServiceStore extends Store<RootState> {
         notifications: [],
         applications: new Map<string, StoredApplication>(),
         centerVisible: false,
-        centerLocked: false,
+        centerLocked: true,
         centerMuted: false
     };
 

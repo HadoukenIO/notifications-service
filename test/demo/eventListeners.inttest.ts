@@ -7,7 +7,7 @@ import {getCenterCardsByNotification} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
-import {setupOpenCenterBookends} from '../utils/int/common';
+import {setupOpenCenterBookends, setupCommonBookends} from '../utils/int/common';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -19,6 +19,8 @@ const defaultNoteOptions: NotificationOptions = {
         {title: 'Button 1', onClick: {task: 'click'}}
     ]
 };
+
+setupCommonBookends();
 
 describe('Click listeners', () => {
     setupOpenCenterBookends();
