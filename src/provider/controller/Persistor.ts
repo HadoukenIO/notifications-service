@@ -52,7 +52,6 @@ export class Persistor {
             try {
                 const collection = this._database.get(CollectionMap.SETTINGS);
                 await collection.upsert({id: SettingsMap.CenterLocked, value: centerLocked});
-                console.log('toggling lock', centerLocked);
             } catch (error) {
                 throw new DatabaseError(`Unable to upsert centerLocked setting to ${centerLocked}`, error);
             }
