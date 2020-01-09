@@ -13,8 +13,6 @@ import {RootState} from '../store/State';
 
 import {AsyncInit} from './AsyncInit';
 
-const trayIconImage = require('../../../res/provider/ui/image/shapes/trayIcon.png');
-
 const windowOptions: WindowOption = {
     name: 'Notification-Center',
     url: 'ui/notification-center.html',
@@ -71,7 +69,7 @@ export class NotificationCenter extends AsyncInit {
             throw error;
         }
         await this.hideWindowOffscreen();
-        this._trayIcon.setIcon(trayIconImage);
+        this._trayIcon.setIcon(require('../../../res/provider/ui/image/shapes/trayIcon.png'));
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
         });
