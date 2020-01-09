@@ -9,7 +9,7 @@ const lockTestParams: TestParam[] = [['unlocked', false], ['locked', true]];
 const muteTestParams: TestParam[] = [['unmuted', false], ['muted', true]];
 
 afterAll(async () => {
-    if (await isCenterLocked()) {
+    if (!(await isCenterLocked())) {
         await toggleCenterLocked();
     }
 
