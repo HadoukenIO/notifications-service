@@ -69,7 +69,9 @@ export class NotificationCenter extends AsyncInit {
             throw error;
         }
         await this.hideWindowOffscreen();
-        this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
+
+        this._trayIcon.setIcon(`${window.location.href.split('/').slice(0, -1).join('/')}/ui/image/shapes/trayIcon.png`);
+
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
         });
