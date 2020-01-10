@@ -48,25 +48,6 @@ export async function restartProvider(snoozeTime: number = 0): Promise<void> {
     await restartTestManager();
 }
 
-export async function restartTestManager(snoozeTime: number = 0): Promise<void> {
-    const testManager = fin.Application.wrapSync(testManagerIdentity);
-    const testManagerWindow = await testManager.getWindow();
-    await testManagerWindow.navigate('about:blank');
-
-    // A small delay is needed in order for OpenFin to handle the navigateBack call successfully.
-    // If a snoozeTime is less than the minimum we enforce the minimum otherwise let it be
-    await delay(Math.max(snoozeTime, Duration.NAVIGATE_BACK));
-
-    await testManagerWindow.navigateBack();
-    await ofBrowser.executeOnWindow(testManagerIdentity, function () {
-        if (this.document.readyState === 'loading') {
-            return new Promise((res) => this.document.addEventListener('DOMContentLoaded', res));
-        } else {
-            return;
-        }
-    });
-}
-
 /**
  * Checks that the provider is ready and has been initialized.
  */
@@ -104,5 +85,23 @@ export function isCenterLocked(): Promise<boolean> {
 export function isCenterMuted(): Promise<boolean> {
     return ofBrowser.executeOnWindow(serviceIdentity, function () {
         return this.store.state.centerMuted;
+    });
+}
+
+async function restartTestManager(): Promise<void> {
+    const testManager = fin.Application.wrapSync(testManagerIdentity);
+    const testManagerWindow = await testManager.getWindow();
+    await testManagerWindow.navigate('about:blank');
+
+    // A small delay is needed in order for OpenFin to handle the navigateBack call successfully.
+    await delay(Duration.NAVIGATE_BACK);
+
+    await testManagerWindow.navigateBack();
+    await ofBrowser.executeOnWindow(testManagerIdentity, function () {
+        if (this.document.readyState === 'loading') {
+            return new Promise((res) => this.document.addEventListener('DOMContentLoaded', res));
+        } else {
+            return;
+        }
     });
 }
