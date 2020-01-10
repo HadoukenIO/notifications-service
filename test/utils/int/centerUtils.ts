@@ -49,8 +49,8 @@ async function toggleCenterSetting(elementId: string): Promise<void> {
         await delay(Duration.CENTER_TOGGLED);
     }
 
-    const lockButton = await getElementById(CENTER_IDENTITY, elementId);
-    await lockButton.click();
+    const settingButton = await getElementById(CENTER_IDENTITY, elementId);
+    await settingButton.click();
     await delay(Duration.EVENT_PROPAGATED);
 
     if (hidden) {
