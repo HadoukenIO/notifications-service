@@ -59,7 +59,7 @@ export async function restartTestManager(snoozeTime: number = 0): Promise<void> 
 
     await testManagerWindow.navigateBack();
 
-    await delay(1000);
+    await delay(2500);
 }
 
 /**
