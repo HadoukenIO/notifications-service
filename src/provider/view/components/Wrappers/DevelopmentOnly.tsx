@@ -8,6 +8,6 @@ export function DevelopmentOnly(props: DevelopementOnlyProps): React.ReactElemen
     if (process.env.NODE_ENV !== 'production') {
         return null;
     } else {
-        return props.children ? <div className="developmentOnly">{props.children}</div> : null;
+        return <div className="developmentOnly">{props.children}</div>;
     }
 }
