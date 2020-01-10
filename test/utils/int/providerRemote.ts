@@ -63,7 +63,9 @@ export async function restartTestManager(snoozeTime: number = 0): Promise<void> 
         if (this.document.readyState === 'complete') {
             return;
         } else {
-            return new Promise((res) => this.document.addEventListener('DOMContentLoaded', res));
+            return new Promise((res) => {
+                this.window.onload = res;
+            });
         }
     });
 }
