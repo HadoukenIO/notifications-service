@@ -59,15 +59,7 @@ export async function restartTestManager(snoozeTime: number = 0): Promise<void> 
 
     await testManagerWindow.navigateBack();
 
-    await ofBrowser.executeOnWindow(testManagerIdentity, function () {
-        if (this.document.readyState === 'complete') {
-            return;
-        } else {
-            return new Promise((res) => {
-                this.window.onload = res;
-            });
-        }
-    });
+    await delay(1000);
 }
 
 /**
