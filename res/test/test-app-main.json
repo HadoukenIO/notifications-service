@@ -17,6 +17,6 @@
     ],
     "runtime": {
         "arguments": "--security-realm=of-notifications-service --enable-mesh",
-        "version": "14.78.47.23"
+        "version": "14.78.45.31"
     }
 }

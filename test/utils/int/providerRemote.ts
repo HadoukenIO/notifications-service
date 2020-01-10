@@ -4,7 +4,7 @@ import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {Injector} from '../../../src/provider/common/Injector';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
-import {serviceIdentity, testManagerIdentity} from './constants';
+import {serviceIdentity} from './constants';
 import {delay, Duration} from './delay';
 import {fin} from './fin';
 import {withTimeout} from './common';
@@ -45,26 +45,6 @@ export async function restartProvider(snoozeTime: number = 0): Promise<void> {
 
     await providerAppWindow.navigateBack();
     await providerReady();
-    await restartTestManager();
-}
-
-export async function restartTestManager(snoozeTime: number = 0): Promise<void> {
-    const testManager = fin.Application.wrapSync(testManagerIdentity);
-    const testManagerWindow = await testManager.getWindow();
-    await testManagerWindow.navigate('about:blank');
-
-    // A small delay is needed in order for OpenFin to handle the navigateBack call successfully.
-    // If a snoozeTime is less than the minimum we enforce the minimum otherwise let it be
-    await delay(Math.max(snoozeTime, Duration.NAVIGATE_BACK));
-
-    await testManagerWindow.navigateBack();
-    await ofBrowser.executeOnWindow(testManagerIdentity, function () {
-        if (this.document.readyState === 'loading') {
-            return new Promise((res) => this.document.addEventListener('DOMContentLoaded', res));
-        } else {
-            return;
-        }
-    });
 }
 
 /**
