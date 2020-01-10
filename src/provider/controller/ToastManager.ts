@@ -3,7 +3,7 @@ import {injectable, inject} from 'inversify';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastState} from '../model/Toast';
-import {CreateNotification, RemoveNotifications, ToggleCenterVisibility, MinimizeToast} from '../store/Actions';
+import {CreateNotification, RemoveNotifications, ToggleCenterVisibility, MinimizeToast, ToggleCenterMuted} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {Action} from '../store/Store';
 import {RootState} from '../store/State';
@@ -54,27 +54,26 @@ export class ToastManager extends AsyncInit {
 
     private async onAction(action: Action<RootState>): Promise<void> {
         if (action instanceof CreateNotification) {
-            this.create(action.notification);
-        }
-
-        if (action instanceof RemoveNotifications) {
+            if (!this._store.state.centerMuted) {
+                this.create(action.notification);
+            }
+        } else if (action instanceof RemoveNotifications) {
             action.notifications.forEach((notification: StoredNotification) => {
                 const toast: Toast | null = this._stack.getToast(notification.id);
 
                 if (toast) {
-                    toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
+                    retireToast(toast);
                 }
             });
-        }
-
-        if (action instanceof ToggleCenterVisibility) {
+        } else if (action instanceof ToggleCenterMuted) {
+            this._stack.items.forEach((toast: Toast) => retireToast(toast));
+        } else if (action instanceof ToggleCenterVisibility) {
             this.closeAll();
-        }
-
-        if (action instanceof MinimizeToast) {
+        } else if (action instanceof MinimizeToast) {
             const toast: Toast | null = this._stack.getToast(action.notification.id);
+
             if (toast) {
-                toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
+                retireToast(toast);
             }
         }
     }
@@ -206,4 +205,8 @@ export class ToastManager extends AsyncInit {
             }
         }));
     }
+}
+
+function retireToast(toast: Toast): void {
+    toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
 }
