@@ -100,7 +100,7 @@ export class OFPuppeteerBrowser<WindowContext extends BaseWindowContext = BaseWi
             if (!this.fin) {
                 return undefined;
             } else {
-                return this.fin.Window.getCurrentSync().identity;
+                return this.fin.Window.me;
             }
         });
 
