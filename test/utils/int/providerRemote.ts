@@ -58,13 +58,15 @@ export async function restartTestManager(snoozeTime: number = 0): Promise<void> 
     await delay(Math.max(snoozeTime, Duration.NAVIGATE_BACK));
 
     await testManagerWindow.navigateBack();
-    await ofBrowser.executeOnWindow(testManagerIdentity, function () {
-        if (this.document.readyState === 'loading') {
-            return new Promise((res) => this.document.addEventListener('DOMContentLoaded', res));
-        } else {
-            return;
-        }
-    });
+    // await ofBrowser.executeOnWindow(testManagerIdentity, function () {
+    //     if (this.document.readyState === 'loading') {
+    //         return new Promise((res) => this.document.addEventListener('DOMContentLoaded', res));
+    //     } else {
+    //         return;
+    //     }
+    // });
+
+    await delay(1000);
 }
 
 /**
