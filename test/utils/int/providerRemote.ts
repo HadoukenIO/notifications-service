@@ -4,7 +4,7 @@ import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {Injector} from '../../../src/provider/common/Injector';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
-import {serviceIdentity, testManagerIdentity} from './constants';
+import {serviceIdentity} from './constants';
 import {delay, Duration} from './delay';
 import {fin} from './fin';
 import {withTimeout} from './common';
@@ -45,7 +45,6 @@ export async function restartProvider(snoozeTime: number = 0): Promise<void> {
 
     await providerAppWindow.navigateBack();
     await providerReady();
-    await restartTestManager();
 }
 
 /**
@@ -85,23 +84,5 @@ export function isCenterLocked(): Promise<boolean> {
 export function isCenterMuted(): Promise<boolean> {
     return ofBrowser.executeOnWindow(serviceIdentity, function () {
         return this.store.state.centerMuted;
-    });
-}
-
-async function restartTestManager(): Promise<void> {
-    const testManager = fin.Application.wrapSync(testManagerIdentity);
-    const testManagerWindow = await testManager.getWindow();
-    await testManagerWindow.navigate('about:blank');
-
-    // A small delay is needed in order for OpenFin to handle the navigateBack call successfully.
-    await delay(Duration.NAVIGATE_BACK);
-
-    await testManagerWindow.navigateBack();
-    await ofBrowser.executeOnWindow(testManagerIdentity, function () {
-        if (this.document.readyState === 'loading') {
-            return new Promise((res) => this.document.addEventListener('DOMContentLoaded', res));
-        } else {
-            return;
-        }
     });
 }
