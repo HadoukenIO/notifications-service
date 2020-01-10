@@ -45,7 +45,7 @@ export async function restartProvider(snoozeTime: number = 0): Promise<void> {
 
     await providerAppWindow.navigateBack();
     await providerReady();
-    await restartTestManager();
+    // await restartTestManager();
 }
 
 export async function restartTestManager(snoozeTime: number = 0): Promise<void> {
