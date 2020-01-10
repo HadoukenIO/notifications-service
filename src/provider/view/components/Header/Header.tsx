@@ -3,7 +3,7 @@ import * as React from 'react';
 import {GroupingType} from '../../utils/Grouping';
 import {CircleButton, IconType, Size} from '../CircleButton/CircleButton';
 import {DevelopmentOnly} from '../Wrappers/DevelopmentOnly';
-import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleLockCenter} from '../../../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleCenterLocked, ToggleCenterMuted} from '../../../store/Actions';
 import {Actionable} from '../../types';
 
 import {ClearAllPrompt} from './ClearAllPrompt';
@@ -15,11 +15,12 @@ interface Props extends Actionable {
     groupBy: GroupingType;
     handleGroupBy: (groupBy: GroupingType) => void;
     centerLocked: boolean;
+    centerMuted: boolean;
     onClearAll: () => void;
 }
 
 export function Header(props: Props): React.ReactElement {
-    const {groupBy, centerVisible, handleGroupBy, centerLocked, onClearAll, storeApi} = props;
+    const {groupBy, centerVisible, handleGroupBy, centerLocked, centerMuted, onClearAll, storeApi} = props;
     const handleHideWindow = () => {
         new ToggleCenterVisibility(ToggleCenterVisibilitySource.BUTTON, false).dispatch(storeApi);
     };
@@ -31,6 +32,7 @@ export function Header(props: Props): React.ReactElement {
                     {/* Layout space, in the future place filter/settings here */}
                     <DevelopmentOnly>
                         <Lock centerLocked={centerLocked} storeApi={storeApi} />
+                        <Mute centerMuted={centerMuted} storeApi={storeApi} />
                     </DevelopmentOnly>
                 </div>
                 <CircleButton id="hide-center" type={IconType.HIDE} size={Size.LARGE} onClick={handleHideWindow} alt="Hide center" />
@@ -65,12 +67,26 @@ interface LockProps extends Actionable {
     centerLocked: boolean;
 }
 
+interface MuteProps extends Actionable {
+    centerMuted: boolean;
+}
+
 function Lock(props: LockProps): React.ReactElement {
     const {storeApi, centerLocked} = props;
 
-    const handleLockWindow = () => {
-        new ToggleLockCenter().dispatch(storeApi);
+    const handleLockCenter = () => {
+        new ToggleCenterLocked().dispatch(storeApi);
     };
 
-    return <a id="lock-link" onClick={handleLockWindow}>{centerLocked ? '🔒' : '🔓'}</a>;
+    return <a id="lock-link" onClick={handleLockCenter}>{centerLocked ? '🔒' : '🔓'}</a>;
+}
+
+function Mute(props: MuteProps): React.ReactElement {
+    const {storeApi, centerMuted} = props;
+
+    const handleMuteCenter = () => {
+        new ToggleCenterMuted().dispatch(storeApi);
+    };
+
+    return <a id="mute-link" onClick={handleMuteCenter}>{centerMuted ? '🔈' : '🔊'}</a>;
 }

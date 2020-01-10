@@ -11,8 +11,10 @@ import {getToastWindow} from '../utils/int/toastUtils';
 import {assertDOMMatches, CardType, getCardMetadata} from '../utils/int/cardUtils';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
-import {setupOpenCenterBookends} from '../utils/int/common';
+import {setupOpenCenterBookends, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
+
+setupCommonBookends();
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;

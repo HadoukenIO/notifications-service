@@ -5,11 +5,11 @@
     color: var(--primary-text-color);
     user-select: none;
 
-    #lock-link {
+    .developmentOnly {
         visibility: hidden;
     }
 
-    &:hover #lock-link {
+    &:hover .developmentOnly {
         visibility: visible;
     }
 

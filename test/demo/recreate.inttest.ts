@@ -10,7 +10,7 @@ import {fin} from '../utils/int/fin';
 import {getToastIdentity} from '../utils/int/toastUtils';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
-import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {setupCenterBookends, CenterState, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const firstOptions: NotificationOptions = {
@@ -26,6 +26,8 @@ const secondOptions: NotificationOptions = {
     title: 'Second Notification Title',
     category: 'Test Notification Category'
 };
+
+setupCommonBookends();
 
 describe('When creating a notification with an ID that already exists but different options', () => {
     describe.each(['center-open', 'center-closed'] as CenterState[])('Center showing: %s', (centerVisibility) => {

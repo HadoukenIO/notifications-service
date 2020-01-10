@@ -11,7 +11,7 @@ import {assertNotificationStored} from '../utils/int/storageRemote';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
-import {setupClosedCenterBookends} from '../utils/int/common';
+import {setupClosedCenterBookends, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const options: NotificationOptions = {
@@ -19,6 +19,8 @@ const options: NotificationOptions = {
     title: 'Test Notification Title',
     category: 'Test Notification Category'
 };
+
+setupCommonBookends();
 
 describe('When calling createNotification with the Notification Center not showing', () => {
     let testApp: Application;
