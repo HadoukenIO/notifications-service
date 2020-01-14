@@ -1,9 +1,7 @@
 import * as React from 'react';
 import {RouteComponentProps} from 'react-router-dom';
-import {connect} from 'react-redux';
 import {MemoryHistory} from 'history';
 
-import {RootState} from '../../../../store/State';
 import {Header} from '../../../components/Header/Header';
 import {SettingsView} from '../../../components/SettingsView/SettingsView';
 import {ClassNameBuilder} from '../../../utils/ClassNameBuilder';
@@ -12,11 +10,7 @@ import SettingsIcon from '../../../../../../res/provider/ui/image/shapes/Setting
 
 import * as Styles from './SettingsPanel.module.scss';
 
-interface Props extends RouteComponentProps {
-
-}
-
-const SettingsPanelComponent: React.FC<Props> = (props) => {
+export const SettingsPanel: React.FC<RouteComponentProps> = (props) => {
     const {history} = props;
 
     return (
@@ -31,8 +25,3 @@ const SettingsPanelComponent: React.FC<Props> = (props) => {
         </div>
     );
 };
-
-const mapStateToProps = (state: RootState) => ({
-});
-
-export const SettingsPanel = connect(mapStateToProps)(SettingsPanelComponent);
