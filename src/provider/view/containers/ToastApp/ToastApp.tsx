@@ -16,9 +16,7 @@ interface ToastAppProps extends Actionable{
     setWindowSize: (dimensions: Point) => void;
 }
 
-type Props = ToastAppProps;
-
-const ToastAppComponent: React.FC<Props> = (props: Props) => {
+const ToastAppComponent: React.FC<ToastAppProps> = (props) => {
     const {notification, setWindowSize, storeApi} = props;
     const window = React.useContext(WindowContext);
     const titledNotification: TitledNotification = {
@@ -38,8 +36,7 @@ const ToastAppComponent: React.FC<Props> = (props: Props) => {
 };
 
 const mapStateToProps = (state: RootState, ownProps: ToastAppProps) => ({
-    ...ownProps,
-    notification: state.notifications.find((n) => n.id === ownProps.notification.id)!
+    ...ownProps
 });
 
 export const ToastApp = connect(mapStateToProps)(ToastAppComponent);
