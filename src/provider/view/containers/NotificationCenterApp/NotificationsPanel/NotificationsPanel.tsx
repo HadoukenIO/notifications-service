@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {RouteComponentProps} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {MemoryHistory} from 'history';
 
@@ -13,10 +12,17 @@ import {ClassNameBuilder} from '../../../utils/ClassNameBuilder';
 import {ROUTES} from '../../../routes';
 import {Icon} from '../../../components/Icon/Icon';
 import SettingsIcon from '../../../../../../res/provider/ui/image/shapes/Settings.svg';
+import {StoredNotification} from '../../../../model/StoredNotification';
+import {StoredApplication} from '../../../../model/Environment';
 
 import * as Styles from './NotificationsPanel.module.scss';
 
-type Props = ReturnType<typeof mapStateToProps> & RouteComponentProps;
+interface Props {
+    history: MemoryHistory;
+    notifications: StoredNotification[];
+    applications: ReadonlyMap<string, StoredApplication>;
+    centerLocked: boolean;
+}
 
 const NotificationsPanelComponent: React.FC<Props> = (props) => {
     const {notifications, applications, history} = props;

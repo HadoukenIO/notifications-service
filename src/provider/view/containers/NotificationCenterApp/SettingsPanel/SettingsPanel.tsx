@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {RouteComponentProps} from 'react-router-dom';
 import {MemoryHistory} from 'history';
 
 import {Header} from '../../../components/Header/Header';
@@ -10,12 +9,16 @@ import SettingsIcon from '../../../../../../res/provider/ui/image/shapes/Setting
 
 import * as Styles from './SettingsPanel.module.scss';
 
-export const SettingsPanel: React.FC<RouteComponentProps> = (props) => {
+interface Props {
+    history: MemoryHistory;
+}
+
+export const SettingsPanel: React.FC<Props> = (props) => {
     const {history} = props;
 
     return (
         <div className="notification-center">
-            <Header history={history as MemoryHistory}>
+            <Header history={history}>
                 <div className={ClassNameBuilder.join(Styles, 'strip-content')}>
                     <span>Settings</span>
                     <Icon className={ClassNameBuilder.join(Styles, 'icon')} src={SettingsIcon} />
