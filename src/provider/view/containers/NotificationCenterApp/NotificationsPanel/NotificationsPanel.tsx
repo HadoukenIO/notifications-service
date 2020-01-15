@@ -36,7 +36,7 @@ const NotificationsPanelComponent: React.FC<Props> = (props) => {
 
     return (
         <div className="notification-center">
-            <Header history={history as MemoryHistory}>
+            <Header history={history}>
                 <div className={Styles['strip-content']}>
                     <ul className={ClassNameBuilder.join(Styles, 'options')}>
                         <li className={ClassNameBuilder.join(Styles, 'detail')}>
