@@ -35,6 +35,9 @@ export const Header: React.FC<Props> = (props) => {
             <div className={ClassNameBuilder.join(Styles, 'actions')}>
                 <div className={navigateButtonClassName.toString()}>
                     <CircleButton id="hide-center" type={IconType.HIDE} size={Size.NORMAL} onClick={handleNavigateClick} alt={tooltip} />
+
+                </div>
+                <div style={{position: 'absolute', left: '50%'}}>
                     <DevelopmentOnly>
                         <Lock centerLocked={storeApi.state.centerLocked} storeApi={storeApi} />
                         <Mute centerMuted={storeApi.state.centerMuted} storeApi={storeApi} />
