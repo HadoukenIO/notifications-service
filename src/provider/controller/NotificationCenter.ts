@@ -45,7 +45,7 @@ export class NotificationCenter extends AsyncInit {
     private _webWindow!: WebWindow;
 
     public constructor(
-        @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
+    @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
         @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory

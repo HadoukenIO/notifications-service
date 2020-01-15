@@ -24,7 +24,7 @@ export class ToastManager extends AsyncInit {
     private readonly _stack: LayoutStack = new LayoutStack();
 
     constructor(
-        @inject(Inject.STORE) store: ServiceStore,
+    @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.LAYOUTER) layouter: Layouter,
         @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
         @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
