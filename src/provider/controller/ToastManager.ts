@@ -66,7 +66,9 @@ export class ToastManager extends AsyncInit {
                 }
             });
         } else if (action instanceof ToggleCenterMuted) {
-            this._stack.items.forEach((toast: Toast) => retireToast(toast));
+            if (this._store.state.centerMuted) {
+                this._stack.items.forEach((toast: Toast) => retireToast(toast));
+            }
         } else if (action instanceof ToggleCenterVisibility) {
             this.closeAll();
         } else if (action instanceof MinimizeToast) {
