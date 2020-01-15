@@ -21,16 +21,4 @@
     &.click {
         cursor: pointer;
     }
-
-    &.disabled {
-        background: var(--color-blurred);
-    }
-
-    &.active {
-        background: var(--color-accent);
-    }
-
-    &.active:hover {
-        background: var(--color-foreground);
-    }
 }
