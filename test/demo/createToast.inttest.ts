@@ -4,7 +4,7 @@ import {Application, Window} from 'hadouken-js-adapter';
 
 import {NotificationOptions, Notification} from '../../src/client';
 import * as notifsRemote from '../utils/int/notificationsRemote';
-import {getCenterCardsByNotification} from '../utils/int/centerUtils';
+import {getCenterCardsByNotification, toggleCenterMuted} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
 import {getToastWindow, getToastCards} from '../utils/int/toastUtils';
 import {assertNotificationStored} from '../utils/int/storageRemote';
@@ -20,29 +20,28 @@ const options: NotificationOptions = {
     category: 'Test Notification Category'
 };
 
+let testApp: Application;
+let testWindow: Window;
+
+let createPromise: Promise<Notification>;
+let pregeneratedNote: Notification;
+
 setupCommonBookends();
+setupClosedCenterBookends();
 
-describe('When calling createNotification with the Notification Center not showing', () => {
-    let testApp: Application;
-    let testWindow: Window;
+beforeEach(async () => {
+    testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
+    testWindow = await testApp.getWindow();
 
-    let createPromise: Promise<Notification>;
-    let pregeneratedNote: Notification;
+    ({createPromise, note: pregeneratedNote} = await notifsRemote.createAndAwait(testWindow.identity, options));
+});
 
-    setupClosedCenterBookends();
+afterEach(async () => {
+    await notifsRemote.clearAll(testWindow.identity);
+    await testApp.quit();
+});
 
-    beforeEach(async () => {
-        testApp = await createAppInServiceRealm(testManagerIdentity, {url: testAppUrlDefault});
-        testWindow = await testApp.getWindow();
-
-        ({createPromise, note: pregeneratedNote} = await notifsRemote.createAndAwait(testWindow.identity, options));
-    });
-
-    afterEach(async () => {
-        await notifsRemote.clearAll(testWindow.identity);
-        await testApp.quit();
-    });
-
+describe('When calling createNotification with the Notification Center not showing and not muted', () => {
     test('The promise resolves to the fully hydrated notification object', async () => {
         // eslint-disable-next-line
         await expect(createPromise).resolves;
@@ -85,5 +84,19 @@ describe('When calling createNotification with the Notification Center not showi
         const note = await notifsRemote.create(testWindow.identity, options);
 
         await assertNotificationStored(testWindow.identity, note);
+    });
+});
+
+describe('When calling createNotification with the Notification Center muted and not showing', () => {
+    beforeAll(toggleCenterMuted);
+    afterAll(toggleCenterMuted);
+
+    test('No toast is shown for the notification', async () => {
+        // The toast creation is not awaited as part of notes.create, so we add a small
+        // delay to allow the toast time to spawn.
+        await delay(Duration.TOAST_DOM_LOADED);
+
+        const toastWindow = await getToastWindow(testApp.identity.uuid, pregeneratedNote.id);
+        expect(toastWindow).toBe(undefined);
     });
 });
