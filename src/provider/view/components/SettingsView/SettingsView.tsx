@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import {usePreduxStore} from '../../utils/usePreduxStore';
+import {ToggleCenterLocked, ToggleCenterMuted} from '../../../store/Actions';
 import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 import {Toggle} from '../Controls/Toggle/Toggle';
 import {FeedSettings, Feed} from '../FeedSettings/FeedSettings';
@@ -15,17 +17,23 @@ const mockFeed: Feed = {
 const mockFeeds = new Array(5).fill(mockFeed);
 
 export const SettingsView: React.FC = (props) => {
+    const storeApi = usePreduxStore();
+
     return (
         <div className={ClassNameBuilder.join(Styles, 'settings-view')}>
             <div className={ClassNameBuilder.join(Styles, 'notifications', 'section')}>
                 <ul>
                     <li>
                         <span>Auto-hide center</span>
-                        <Toggle state={false} />
+                        <Toggle state={!storeApi.state.centerLocked} onChange={() => {
+                            new ToggleCenterLocked().dispatch(storeApi);
+                        }} />
                     </li>
                     <li>
                         <span>Do not disturb</span>
-                        <Toggle state={false} />
+                        <Toggle state={storeApi.state.centerMuted} onChange={() => {
+                            new ToggleCenterMuted().dispatch(storeApi);
+                        }} />
                     </li>
                 </ul>
             </div>
