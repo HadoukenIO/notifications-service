@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {NotificationTime} from '../NotificationTime/NotificationTime';
-import {Button} from '../NotificationControls/Button/Button';
+import {Button} from '../NotificationButton/NotificationButton';
 import {CircleButton, IconType} from '../CircleButton/CircleButton';
 import {RemoveNotifications, ClickButton, ClickNotification, MinimizeToast} from '../../../store/Actions';
 import {useOnClickOnly} from '../../hooks/Clicks';

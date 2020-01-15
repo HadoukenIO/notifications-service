@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {usePreventMouseDownPropagating} from '../../../hooks/Clicks';
-import './Button.scss';
+import {usePreventMouseDownPropagating} from '../../hooks/Clicks';
+import './NotificationButton.scss';
 
 interface Props {
     text?: string;
