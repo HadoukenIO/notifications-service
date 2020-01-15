@@ -24,7 +24,7 @@ export const SettingsPanel: React.FC<Props> = (props) => {
                     <Icon className={ClassNameBuilder.join(Styles, 'icon')} src={SettingsIcon} />
                 </div>
             </Header>
-            <SettingsView />
+            <SettingsView history={history} />
         </div>
     );
 };

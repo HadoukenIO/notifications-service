@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="15px" viewBox="0 0 16 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 61.2 (101010) - https://sketch.com -->
+    <title>2730B636-3CD1-4587-B8F6-A25BB3C519A3</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <path d="M6.58710927,0 C10.2250693,0 13.1742185,2.94914927 13.1742185,6.58710927 C13.1742185,10.2250693 10.2250693,13.1742185 6.58710927,13.1742185 C2.94914927,13.1742185 0,10.2250693 0,6.58710927 C0,2.94914927 2.94914927,0 6.58710927,0 Z M7.21874993,2.52656244 L5.95546871,2.52656244 L5.955,5.955 L2.70703113,5.95546888 L2.70703113,7.2187501 L5.955,7.218 L5.95546871,10.4671877 L7.21874993,10.4671877 L7.218,7.218 L10.6476564,7.2187501 L10.6476564,5.95546888 L7.218,5.955 L7.21874993,2.52656244 Z" id="path-1"></path>
+    </defs>
+    <g id="Asset-Artboard-Page" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icons/minus-circ-copy-icons/plus-circ" transform="translate(0.750002, 0.000000)">
+            <g id="color" transform="translate(0.902344, 0.902344)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <use id="Combined-Shape" fill="#FFFFFF" xlink:href="#path-1"></use>
+                <g id="color-fills/plutino" mask="url(#mask-2)" fill="#6D6D6D">
+                    <g transform="translate(-0.902344, -0.902344)" id="Rectangle">
+                        <rect x="0" y="0" width="15" height="15"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

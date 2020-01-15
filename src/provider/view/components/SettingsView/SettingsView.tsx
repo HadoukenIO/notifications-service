@@ -1,9 +1,11 @@
 import * as React from 'react';
+import {MemoryHistory} from 'history';
 
 import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 import {Toggle} from '../Controls/Toggle/Toggle';
 import {FeedSettings, Feed} from '../FeedSettings/FeedSettings';
 import {Button} from '../Controls/Button/Button';
+import {ROUTES} from '../../routes';
 
 import * as Styles from './SettingsView.module.scss';
 
@@ -14,7 +16,17 @@ const mockFeed: Feed = {
 
 const mockFeeds = new Array(5).fill(mockFeed);
 
-export const SettingsView: React.FC = (props) => {
+interface Props {
+    history: MemoryHistory;
+}
+
+export const SettingsView: React.FC<Props> = (props) => {
+    const {history} = props;
+
+    function onAddFeedButtonClick(): void {
+        history.push(ROUTES.FEEDS);
+    }
+
     return (
         <div className={ClassNameBuilder.join(Styles, 'settings-view')}>
             <div className={ClassNameBuilder.join(Styles, 'notifications', 'section')}>
@@ -34,7 +46,7 @@ export const SettingsView: React.FC = (props) => {
                 <ul>
                     {mockFeeds.map((f, i) => <li key={i}><FeedSettings {...f} /></li>)}
                 </ul>
-                <Button>Add a Feed</Button>
+                <Button onClick={onAddFeedButtonClick}>Add a Feed</Button>
             </div>
         </div>
     );
