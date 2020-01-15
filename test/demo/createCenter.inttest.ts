@@ -74,7 +74,7 @@ describe('When creating a notification with the center showing', () => {
         test('No toast is shown for the created notification', async () => {
             // The notification is created immediately before this, so we need
             // a slight delay to allow time for the toast to spawn.
-            await delay(Duration.TOAST_CREATE);
+            await delay(Duration.TOAST_DOM_LOADED);
 
             const toastWindow = await getToastWindow(testApp.identity.uuid, pregeneratedNote.id);
             expect(toastWindow).toBe(undefined);
@@ -92,7 +92,7 @@ describe('When creating a notification with the center showing', () => {
             test('No toast is shown for the created notification', async () => {
                 // The notification is created immediately before this, so we need
                 // a slight delay to allow time for the toast to spawn.
-                await delay(Duration.TOAST_CREATE);
+                await delay(Duration.TOAST_DOM_LOADED);
 
                 const toastWindow = await getToastWindow(testApp.identity.uuid, pregeneratedNote.id);
                 expect(toastWindow).toBe(undefined);
