@@ -11,7 +11,7 @@ import '../../styles/main.scss';
 import './ToastApp.scss';
 import {StoredNotification} from '../../../model/StoredNotification';
 
-interface ToastAppProps extends Actionable{
+interface ToastAppProps extends Actionable {
     notification: StoredNotification;
     setWindowSize: (dimensions: Point) => void;
 }
