@@ -63,7 +63,7 @@
     "node-fetch": "^2.6.0",
     "openfin-service-async": "^1.0.1",
     "openfin-service-signal": "^1.0.0",
-    "openfin-service-tooling": "^1.0.24",
+    "openfin-service-tooling": "1.0.24",
     "pre-commit": "^1.2.2",
     "puppeteer": "1.17.0",
     "react": "^16.8.6",
