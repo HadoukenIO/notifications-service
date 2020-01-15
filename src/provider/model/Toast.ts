@@ -3,7 +3,8 @@ import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {Opacity} from 'openfin/_v2/shapes';
 import {DeferredPromise} from 'openfin-service-async';
 
-import {renderApp} from '../view/containers/ToastApp/ToastApp';
+import {ToastApp} from '../view/containers/ToastApp/ToastApp';
+import {renderComponentInWindow} from '../view/utils/RenderApp';
 import {LayoutItem} from '../controller/Layouter';
 import {LayouterConfig} from '../controller/LayouterConfig';
 import {ServiceStore} from '../store/ServiceStore';
@@ -311,21 +312,20 @@ export class Toast implements LayoutItem {
         const {virtualScreen} = monitorModel.monitorInfo;
         await webWindow.showAt(virtualScreen.left - (windowOptions.defaultWidth! * 2), virtualScreen.top - (windowOptions.defaultHeight! * 2));
         await webWindow.hide();
-
-        // Wait for the React component to render and then get the dimensions of it to resize the window.
-        renderApp(
+        const props = {
             notification,
-            webWindow,
-            store,
-            (size: Point) => {
+            setWindowSize: (size: Point) => {
                 Object.assign(this._size, size);
 
                 // Note: State change will intentionally fail (to become a no-op) in cases
                 // Where the toast was destroyed immediately after creation
                 this.setState(ToastState.QUEUED);
-            }
-        );
+            },
+            storeApi: store
+        };
 
+        // Wait for the React component to render and then get the dimensions of it to resize the window.
+        renderComponentInWindow(ToastApp, webWindow, store, webWindow.document.getElementById('react-app')!, props);
         return webWindow;
     }
 

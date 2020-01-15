@@ -6,6 +6,6 @@
         "preserveConstEnums": true
     },
     "include": [
-        "./*.ts"
+        "./**/*.ts"
     ]
 }

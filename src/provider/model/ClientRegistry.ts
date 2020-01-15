@@ -26,7 +26,7 @@ export class ClientRegistry {
     private _actionReadyWindows: Identity[] = [];
 
     constructor(
-        @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
+    @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.ENVIRONMENT) environment: Environment
     ) {

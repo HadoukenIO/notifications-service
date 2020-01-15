@@ -1,0 +1,35 @@
+@import './variables.scss';
+
+:root {
+    --name: Dracula;
+    --color-accent: #9391ff;
+    --color-background-normal: #262626;
+    --color-background-light: #3a3a3a;
+    --color-background-dark: #121212;
+    --color-background-medium: #343434;
+    --color-light: #999999;
+    --color-blurred: #7b7f8b;
+    --color-foreground: #f8f8f2;
+    --color-highlight: #504cff;
+    --color-selection: #44475a;
+    --color-success: #50fa7b;
+    --color-warning: #ff5555;
+    --text-primary-color: #f8f8f2;
+    --text-secondary-color: #848484;
+    --text-primary-font: impact;
+    --text-links-color: #f1fa8c;
+    --color-button-normal: #717171;
+    /* OLD */
+    --accent-color: #{$accent-color};
+    --accent-color-highlight: #{$accent-color-highlight};
+    --center-background-color: #373737;
+    --card-background-color: #424242;
+    --card-border-color: #6E6E6E;
+    --header-color: #121212;
+    --primary-text-color: white;
+    --secondary-text-color: #898989;
+    --secondary-text-color-highlight: #b4b4b4;
+    --body-text-color: #ddd;
+    --strip-background-color: #121212;
+    --dark-text: darken(white, 40%)
+}

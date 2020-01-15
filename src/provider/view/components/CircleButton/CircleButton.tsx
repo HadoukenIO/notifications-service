@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import {usePreventMouseDownPropagating} from '../../hooks/Clicks';
 import './CircleButton.scss';
-import {ClassNames} from '../../utils/ClassNames';
+import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 
 export enum IconType {
     ACCEPT = 'accept',
@@ -30,7 +30,7 @@ export interface Props {
 export function CircleButton(props: Props) {
     const {onClick, type, size = Size.NORMAL, alt, id} = props;
     const ref = React.createRef<HTMLDivElement>();
-    const classNames = new ClassNames('icon', type, size);
+    const classNames = new ClassNameBuilder(undefined, 'icon', type, size);
 
     const handleClick = (event: React.MouseEvent) => {
         event.stopPropagation();

@@ -1,4 +1,4 @@
-@import './_variables.scss';
+@import './variables.scss';
 
 @font-face {
     font-family: "Nunito";
@@ -28,6 +28,13 @@ body {
         width: 100vw;
         height: 100vh;
     }
+}
+
+.notification-center {
+    width: $window-width;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
 }
 
 #react-app {

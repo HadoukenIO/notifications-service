@@ -1,0 +1,62 @@
+.strip-content {
+    display: flex;
+    flex: 1;
+
+    span {
+        letter-spacing: 1px;
+    }
+
+    .options {
+        display: flex;
+        flex: 1;
+        height: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        vertical-align: middle;
+
+        li {
+            cursor: auto;
+            align-self: center;
+            display: inline-block;
+            color: var(--secondary-text-color);
+            margin-right: 5px;
+
+            &.active {
+                color: var(--primary-text-color);
+                cursor: auto !important;
+
+                &:hover {
+                    color: var(--primary-text-color-highlight);
+                }
+            }
+
+            &.sort-button {
+                cursor: pointer;
+                font-weight: 500;
+
+                &:hover {
+                    color: var(--secondary-text-color-highlight);
+                }
+            }
+
+            &.settings {
+                cursor: pointer;
+                display: flex;
+                margin-left: auto;
+                align-items: center;
+
+                .icon {
+                    margin-left: 0.5em;
+                    max-width: 1.5em;
+                    background-color: var(--color-accent);
+                }
+            }
+
+            &.detail {
+                text-transform: uppercase;
+                color: var(--color-accent);
+            }
+        }
+    }
+}

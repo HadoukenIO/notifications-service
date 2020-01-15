@@ -15,7 +15,7 @@ export class Persistor {
     private readonly _database: Database;
 
     constructor(
-        @inject(Inject.STORE) store: ServiceStore,
+    @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.DATABASE) database: Database
     ) {
         this._store = store;

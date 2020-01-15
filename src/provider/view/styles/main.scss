@@ -1,0 +1,33 @@
+@import './properties.scss';
+@import './dot-stretching.scss';
+@import './base.scss';
+
+body {
+    caret-color: var(--color-foreground);
+    font-family: 'Nunito',
+        sans-serif;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background: var(--color-accent);
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+::-webkit-scrollbar-track-piece {
+    border-radius: 6px;
+    background-color: var(--color-background-dark);
+}
+
+ul, li {
+    list-style: none;
+}
