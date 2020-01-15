@@ -53,6 +53,8 @@ export class ToastManager extends AsyncInit {
     }
 
     private async onAction(action: Action<RootState>): Promise<void> {
+        const retireToast = (toast: Toast) => toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
+
         if (action instanceof CreateNotification) {
             if (!this._store.state.centerMuted) {
                 this.create(action.notification);
@@ -207,8 +209,4 @@ export class ToastManager extends AsyncInit {
             }
         }));
     }
-}
-
-function retireToast(toast: Toast): void {
-    toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
 }
