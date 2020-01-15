@@ -3,7 +3,7 @@ import {injectable, inject} from 'inversify';
 import {Inject} from '../common/Injectables';
 import {StoredNotification} from '../model/StoredNotification';
 import {Toast, ToastState} from '../model/Toast';
-import {CreateNotification, RemoveNotifications, ToggleCenterVisibility, MinimizeToast} from '../store/Actions';
+import {CreateNotification, RemoveNotifications, ToggleCenterVisibility, MinimizeToast, ToggleCenterMuted} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {Action} from '../store/Store';
 import {RootState} from '../store/State';
@@ -45,9 +45,47 @@ export class ToastManager extends AsyncInit {
     }
 
     /**
+     * Signal callback for layout required event. This signal is emitted by Layouter in events like
+     * monitor info is changed, etc.
+     */
+    private onLayoutRequired(): void {
+        this._layouter.layout(this._stack);
+    }
+
+    private async onAction(action: Action<RootState>): Promise<void> {
+        const retireToast = (toast: Toast) => toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
+
+        if (action instanceof CreateNotification) {
+            if (!this._store.state.centerMuted) {
+                this.create(action.notification);
+            }
+        } else if (action instanceof RemoveNotifications) {
+            action.notifications.forEach((notification: StoredNotification) => {
+                const toast: Toast | null = this._stack.getToast(notification.id);
+
+                if (toast) {
+                    retireToast(toast);
+                }
+            });
+        } else if (action instanceof ToggleCenterMuted) {
+            if (this._store.state.centerMuted) {
+                this._stack.items.forEach((toast: Toast) => retireToast(toast));
+            }
+        } else if (action instanceof ToggleCenterVisibility) {
+            this.closeAll();
+        } else if (action instanceof MinimizeToast) {
+            const toast: Toast | null = this._stack.getToast(action.notification.id);
+
+            if (toast) {
+                retireToast(toast);
+            }
+        }
+    }
+
+    /**
      * Instantly closes all toasts (without transition animation) and resets the stack.
      */
-    public async closeAll(): Promise<void> {
+    private async closeAll(): Promise<void> {
         const toasts = this._stack.items.slice();
         await Promise.all(toasts.map((toast) => this.closeToast(toast)));
 
@@ -65,7 +103,7 @@ export class ToastManager extends AsyncInit {
      *
      * @param notification The notification to display in the created toast.
      */
-    public async create(notification: StoredNotification): Promise<void> {
+    private async create(notification: StoredNotification): Promise<void> {
         const state = this._store.state;
 
         if (state.centerVisible) {
@@ -126,41 +164,6 @@ export class ToastManager extends AsyncInit {
         // Refresh toast positions
         if (state >= ToastState.ACTIVE) {
             this._layouter.layout(this._stack);
-        }
-    }
-
-    /**
-     * Signal callback for layout required event. This signal is emitted by Layouter in events like
-     * monitor info is changed, etc.
-     */
-    private onLayoutRequired(): void {
-        this._layouter.layout(this._stack);
-    }
-
-    private async onAction(action: Action<RootState>): Promise<void> {
-        if (action instanceof CreateNotification) {
-            this.create(action.notification);
-        }
-
-        if (action instanceof RemoveNotifications) {
-            action.notifications.forEach((notification: StoredNotification) => {
-                const toast: Toast | null = this._stack.getToast(notification.id);
-
-                if (toast) {
-                    toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
-                }
-            });
-        }
-
-        if (action instanceof ToggleCenterVisibility) {
-            this.closeAll();
-        }
-
-        if (action instanceof MinimizeToast) {
-            const toast: Toast | null = this._stack.getToast(action.notification.id);
-            if (toast) {
-                toast.setState(toast.state >= ToastState.ACTIVE ? ToastState.TRANSITION_OUT : ToastState.CLOSED);
-            }
         }
     }
 
