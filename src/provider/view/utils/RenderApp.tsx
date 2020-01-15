@@ -12,6 +12,11 @@ import {WebWindowProvider} from '../contexts/WebWindowContext';
 
 /**
  * Render a component into a window.
+ * @param Component Component to render.
+ * @param webWindow Target window.
+ * @param store Provider store.
+ * @param target DOM element to render to.
+ * @param props Props to pass to the Component.
  */
 export function renderComponentInWindow<T>(
     Component: (props: T) => React.ReactElement<T> | null,
@@ -35,6 +40,8 @@ export function renderComponentInWindow<T>(
  * @param routes Routes to display.
  * @param webWindow Target window.
  * @param store Provider store.
+ * @param history History state to use for the router.
+ * @param target DOM element to render to.
  */
 export function renderRouterInWindow(
     routes: AppRoute[],
