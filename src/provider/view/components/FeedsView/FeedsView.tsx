@@ -25,6 +25,8 @@ const Card: React.FC<NotificationFeed> = (props) => {
         }
     }
 
+    const buttonClassNameBuilder = new ClassNameBuilder(Styles, ['minus', subscribed], ['plus', !subscribed]);
+
     return (
         <div className={ClassNameBuilder.join(Styles, 'card')}>
             <div className={ClassNameBuilder.join(Styles, 'left')}>
@@ -39,7 +41,7 @@ const Card: React.FC<NotificationFeed> = (props) => {
                 </div>
             </div>
             <div className={ClassNameBuilder.join(Styles, 'right')}>
-                {<Icon src={subscribed ? minus : plus} size={16} onClick={onSubscribeButtonClick} />}
+                {<Icon className={buttonClassNameBuilder.toString()} src={subscribed ? minus : plus} size={16} onClick={onSubscribeButtonClick} />}
             </div>
         </div>
     );
