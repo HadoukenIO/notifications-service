@@ -39,9 +39,8 @@
             align-items: flex-start;
             justify-content: center;
 
-            .plus-minus-icon {
-                width: 15px;
-                height: 15px;
+            &>* {
+                cursor: pointer;
             }
         }
 
