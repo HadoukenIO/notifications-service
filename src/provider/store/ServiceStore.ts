@@ -45,6 +45,7 @@ export class ServiceStore extends Store<RootState> {
         const storedCenterLocked = await settingsCollection.get(SettingsMap.CenterLocked);
         const storedCenterMuted = await settingsCollection.get(SettingsMap.CenterMuted);
 
+        // TODO (SERVICE-TBD): Make this actually get the list of feeds from somewhere once the server side is built
         const feeds: NotificationFeed[] = mockFeeds;
 
         return {
