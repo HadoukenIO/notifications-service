@@ -1,14 +1,14 @@
 import * as React from 'react';
+import {connect} from 'react-redux';
 
 import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 import {Icon} from '../Icon/Icon';
 import minus from '../../../../../res/provider/ui/image/shapes/minus-circ.svg';
 import plus from '../../../../../res/provider/ui/image/shapes/plus-circ.svg';
+import {NotificationFeed} from '../../../model/NotificationFeed';
+import {RootState} from '../../../store/State';
 
 import * as Styles from './FeedsView.module.scss';
-import Logo from './logo.svg';
-
-const LOREM_IPSUM_TEXT = 'Lorem ipsum dolor sit amet, has cu dico natum. Ius veri patrioque ne. Eu mea suas appetere, quem constituto eam cu.';
 
 interface CardProps {
     logo: string;
@@ -42,18 +42,26 @@ const Card: React.FC<CardProps> = (props) => {
     );
 };
 
-const feeds: CardProps[] = [
-    {subscribed: false, logo: Logo, name: 'Feed 1', description: LOREM_IPSUM_TEXT},
-    {subscribed: true, logo: Logo, name: 'Feed 2', description: LOREM_IPSUM_TEXT},
-    {subscribed: true, logo: Logo, name: 'Feed 3', description: LOREM_IPSUM_TEXT},
-    {subscribed: false, logo: Logo, name: 'Feed 4', description: LOREM_IPSUM_TEXT},
-    {subscribed: true, logo: Logo, name: 'Feed 5', description: LOREM_IPSUM_TEXT}
-];
+interface Props {
+    feeds: NotificationFeed[];
+}
 
-export const FeedsView: React.FC = (props) => {
+function mapStateToProps(state: RootState): Props {
+    return {
+        feeds: state.feeds
+    };
+}
+
+const FeedsViewComponent: React.FC<Props> = (props) => {
+    const {feeds} = props;
+
     return (
         <div className={ClassNameBuilder.join(Styles, 'feeds-view')}>
-            {feeds.map((feed) => <Card {...feed} key={feed.name} />)}
+            {feeds.length > 0
+                ? feeds.map((feed) => <Card {...feed} key={feed.id} />)
+                : <div className={ClassNameBuilder.join(Styles, 'placeholder-text')}>No feeds available</div>}
         </div>
     );
 };
+
+export const FeedsView = connect(mapStateToProps)(FeedsViewComponent);
