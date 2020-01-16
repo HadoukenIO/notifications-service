@@ -43,7 +43,9 @@ const SettingsViewComponent: React.FC<Props> = (props) => {
             <div className={ClassNameBuilder.join(Styles, 'feed', 'section')}>
                 <h1>Notifications</h1>
                 <ul>
-                    {subscibedFeeds.map((f, i) => <li key={i}><FeedSettings {...f} /></li>)}
+                    {subscibedFeeds.length > 0
+                        ? subscibedFeeds.map((f, i) => <li key={i}><FeedSettings {...f} /></li>)
+                        : <div className={ClassNameBuilder.join(Styles, 'placeholder-text')}>You are not subscribed to any feeds</div>}
                 </ul>
                 <Button onClick={onAddFeedButtonClick}>Add a Feed</Button>
             </div>
