@@ -11,10 +11,11 @@ interface Props {
     size?: string | number;
     src: string;
     title?: string;
+    id?: string;
 }
 
 export const Icon: React.FC<Props> = React.memo((props) => {
-    const {className = '', size, src, color, title, onClick} = props;
+    const {className = '', size, src, color, title, onClick, id} = props;
     const sizeStr = typeof props.size === 'string' ? size : `${size}px`;
     const classes = new ClassNameBuilder(Styles, 'icon', [className, !!className])
         .add(['click', !!onClick]);
@@ -31,7 +32,7 @@ export const Icon: React.FC<Props> = React.memo((props) => {
     }
 
     return (
-        <div title={title} className={classes.toString()} style={style} onClick={onClick}></div>
+        <div id={id} title={title} className={classes.toString()} style={style} onClick={onClick}></div>
     );
 });
 

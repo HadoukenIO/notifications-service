@@ -35,7 +35,7 @@ export const Header: React.FC<Props> = (props) => {
         <div className={ClassNameBuilder.join(Styles, 'header')}>
             <div className={ClassNameBuilder.join(Styles, 'actions')}>
                 <div className={navigateButtonClassName.toString()}>
-                    <Icon src={ArrowIcon} onClick={handleNavigateClick} title={tooltip} size={25} />
+                    <Icon id={navigateIsHide ? 'hide-center' : ''} src={ArrowIcon} onClick={handleNavigateClick} title={tooltip} size={25} />
 
                 </div>
                 <div style={{position: 'absolute', left: '50%'}}>
