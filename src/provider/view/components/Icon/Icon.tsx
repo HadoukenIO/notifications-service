@@ -24,6 +24,7 @@ export const Icon: React.FC<Props> = React.memo((props) => {
     };
     if (size) {
         style.width = sizeStr;
+        style.height = sizeStr;
     }
     if (color) {
         style.color = color;
