@@ -7,20 +7,23 @@ import minus from '../../../../../res/provider/ui/image/shapes/minus-circ.svg';
 import plus from '../../../../../res/provider/ui/image/shapes/plus-circ.svg';
 import {NotificationFeed} from '../../../model/NotificationFeed';
 import {RootState} from '../../../store/State';
+import {usePreduxStore} from '../../utils/usePreduxStore';
+import {UnsubscribeFeed, SubscribeFeed} from '../../../store/Actions';
 
 import * as Styles from './FeedsView.module.scss';
 
-interface CardProps {
-    logo: string;
-    name: string;
-    description: string;
-    subscribed: boolean;
-}
+const Card: React.FC<NotificationFeed> = (props) => {
+    const {logo, name, description, subscribed, id} = props;
 
-// className={ClassNameBuilder.join(Styles, 'settings-view')}
+    const store = usePreduxStore();
 
-const Card: React.FC<CardProps> = (props) => {
-    const {logo, name, description, subscribed} = props;
+    function onSubscribeButtonClick() {
+        if (subscribed) {
+            new UnsubscribeFeed(id).dispatch(store);
+        } else {
+            new SubscribeFeed(id).dispatch(store);
+        }
+    }
 
     return (
         <div className={ClassNameBuilder.join(Styles, 'card')}>
@@ -36,7 +39,7 @@ const Card: React.FC<CardProps> = (props) => {
                 </div>
             </div>
             <div className={ClassNameBuilder.join(Styles, 'right')}>
-                {<Icon src={subscribed ? minus : plus} size={16} />}
+                {<Icon src={subscribed ? minus : plus} size={16} onClick={onSubscribeButtonClick} />}
             </div>
         </div>
     );
