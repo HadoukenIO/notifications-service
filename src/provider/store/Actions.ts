@@ -237,7 +237,9 @@ export class SubscribeFeed extends Action<RootState> {
         }
         return {
             ...state,
-            feeds
+            feeds: [
+                ...feeds
+            ]
         };
     }
 }
@@ -260,7 +262,9 @@ export class UnsubscribeFeed extends Action<RootState> {
         }
         return {
             ...state,
-            feeds
+            feeds: [
+                ...feeds
+            ]
         };
     }
 }
