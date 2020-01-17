@@ -33,13 +33,13 @@ export const SettingsViewComponent: React.FC<Props> = (props) => {
                 <ul>
                     <li>
                         <span>Auto-hide center</span>
-                        <Toggle state={!centerLocked} onChange={() => {
+                        <Toggle id="lock-link" state={!centerLocked} onChange={() => {
                             new ToggleCenterLocked().dispatch(storeApi);
                         }} />
                     </li>
                     <li>
                         <span>Do not disturb</span>
-                        <Toggle state={centerMuted} onChange={() => {
+                        <Toggle id="mute-link" state={centerMuted} onChange={() => {
                             new ToggleCenterMuted().dispatch(storeApi);
                         }} />
                     </li>

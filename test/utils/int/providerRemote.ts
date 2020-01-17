@@ -2,6 +2,7 @@ import {Identity} from 'hadouken-js-adapter';
 
 import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {Injector} from '../../../src/provider/common/Injector';
+import {centerHistory} from '../../../src/provider/view/contexts/CenterHistory';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 import {serviceIdentity} from './constants';
@@ -15,6 +16,7 @@ export interface ProviderContext extends BaseWindowContext {
     };
     store: ServiceStore;
     injector: typeof Injector;
+    centerHistory: typeof centerHistory;
 }
 
 const ofBrowser = new OFPuppeteerBrowser<ProviderContext>();
@@ -85,4 +87,10 @@ export function isCenterMuted(): Promise<boolean> {
     return ofBrowser.executeOnWindow(serviceIdentity, function () {
         return this.store.state.centerMuted;
     });
+}
+
+export function navigateCenter(route: string): Promise<void> {
+    return ofBrowser.executeOnWindow(serviceIdentity, function (remoteRoute: string) {
+        return this.centerHistory.push(remoteRoute);
+    }, route);
 }
