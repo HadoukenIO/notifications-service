@@ -29,6 +29,7 @@ import {Environment} from './model/Environment';
 import {Layouter} from './controller/Layouter';
 import {MonitorModel} from './model/MonitorModel';
 import {getVersion} from './utils/version';
+import {centerHistory} from './view/contexts/CenterHistory';
 
 @injectable()
 export class Main {
@@ -103,7 +104,8 @@ export class Main {
             store: this._store,
             toast: this._toastManager,
             trayIcon: this._trayIcon,
-            webWindowFactory: this._webWindowFactory
+            webWindowFactory: this._webWindowFactory,
+            centerHistory
         });
 
         // Wait for creation of any injected components that require async initialization
