@@ -25,7 +25,7 @@ const FeedsViewComponent: React.FC<Props> = (props) => {
         <div className={ClassNameBuilder.join(Styles, 'feeds-view')}>
             {feeds.length > 0
                 ? feeds.map((feed) => <FeedCard {...feed} key={feed.id} />)
-                : <div className={ClassNameBuilder.join(Styles, 'placeholder-text')}>No feeds available</div>}
+                : <div className={ClassNameBuilder.join(Styles, 'no-feeds-text')}>No feeds available</div>}
         </div>
     );
 };
