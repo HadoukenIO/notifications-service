@@ -2,6 +2,8 @@ import * as React from 'react';
 import {MemoryHistory} from 'history';
 import {connect} from 'react-redux';
 
+import {ToggleCenterLocked, ToggleCenterMuted} from '../../../store/Actions';
+import {usePreduxStore} from '../../utils/usePreduxStore';
 import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 import {Toggle} from '../Controls/Toggle/Toggle';
 import {FeedSettings} from '../FeedSettings/FeedSettings';
@@ -15,10 +17,13 @@ import * as Styles from './SettingsView.module.scss';
 interface Props {
     history: MemoryHistory;
     feeds: NotificationFeed[];
+    centerLocked: boolean;
+    centerMuted: boolean;
 }
 
 const SettingsViewComponent: React.FC<Props> = (props) => {
-    const {history, feeds} = props;
+    const {history, feeds, centerLocked, centerMuted} = props;
+    const storeApi = usePreduxStore();
 
     const subscibedFeeds = feeds.filter((feed) => feed.subscribed);
 
@@ -32,11 +37,15 @@ const SettingsViewComponent: React.FC<Props> = (props) => {
                 <ul>
                     <li>
                         <span>Auto-hide center</span>
-                        <Toggle state={false} />
+                        <Toggle id="lock-link" state={!centerLocked} onChange={() => {
+                            new ToggleCenterLocked().dispatch(storeApi);
+                        }} />
                     </li>
                     <li>
                         <span>Do not disturb</span>
-                        <Toggle state={false} />
+                        <Toggle id="mute-link" state={centerMuted} onChange={() => {
+                            new ToggleCenterMuted().dispatch(storeApi);
+                        }} />
                     </li>
                 </ul>
             </div>
@@ -53,10 +62,10 @@ const SettingsViewComponent: React.FC<Props> = (props) => {
     );
 };
 
-function mapStateToProps(state: RootState) {
-    return {
-        feeds: state.feeds
-    };
-}
+const mapStateToProps = (state: RootState) => ({
+    centerLocked: state.centerLocked,
+    centerMuted: state.centerMuted,
+    feeds: state.feeds
+});
 
 export const SettingsView = connect(mapStateToProps)(SettingsViewComponent);

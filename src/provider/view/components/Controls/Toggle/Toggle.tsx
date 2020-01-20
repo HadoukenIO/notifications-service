@@ -7,11 +7,12 @@ import * as Styles from './Toggle.module.scss';
 interface Props {
     state: boolean;
     className?: string;
+    id?: string;
     onChange?: (state: boolean) => void;
 }
 
 export const Toggle: React.FC<Props> = (props) => {
-    const {state, onChange, className = ''} = props;
+    const {state, onChange, id, className = ''} = props;
     const [toggleState, setToggleState] = React.useState(state);
     const toggleClassName = new ClassNameBuilder(Styles, 'toggle', ['on', toggleState], ['off', !toggleState]);
     toggleClassName.add(className, undefined);
@@ -32,7 +33,7 @@ export const Toggle: React.FC<Props> = (props) => {
     };
 
     return (
-        <div className={toggleClassName.toString()} onClick={handleToggle} onKeyPress={handleKeyPress} tabIndex={0}>
+        <div id={id} className={toggleClassName.toString()} onClick={handleToggle} onKeyPress={handleKeyPress} tabIndex={0}>
             <div className={Styles['inner']}>
                 <div className={Styles['knob']} ></div>
             </div>

@@ -1,11 +1,14 @@
 import {ElementHandle} from 'puppeteer';
 
+import {ROUTES} from '../../../src/provider/view/routes';
+
 import * as notifsRemote from './notificationsRemote';
 import {OFPuppeteerBrowser} from './ofPuppeteer';
 import {fin} from './fin';
 import {getElementById, querySelector} from './dom';
 import {delay, Duration} from './delay';
 import {testManagerIdentity} from './constants';
+import {navigateCenter} from './providerRemote';
 
 const CENTER_IDENTITY = {uuid: 'notifications-service', name: 'Notification-Center'};
 const CARDS_SELECTOR = '.group:not([class*="exit"]) li:not([class*="exit"]) .notification-card';
@@ -49,9 +52,13 @@ async function toggleCenterSetting(elementId: string): Promise<void> {
         await delay(Duration.CENTER_TOGGLED);
     }
 
+    await navigateCenter(ROUTES.SETTINGS);
+
     const settingButton = await getElementById(CENTER_IDENTITY, elementId);
     await settingButton.click();
     await delay(Duration.EVENT_PROPAGATED);
+
+    await navigateCenter(ROUTES.NOTIFICATIONS);
 
     if (hidden) {
         await notifsRemote.toggleNotificationCenter(testManagerIdentity);

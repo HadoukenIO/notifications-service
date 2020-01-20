@@ -10,7 +10,8 @@ import {TrayIcon} from '../model/TrayIcon';
 import {Action} from '../store/Store';
 import {RootState} from '../store/State';
 import {renderRouterInWindow} from '../view/utils/RenderApp';
-import {CenterRoutes, ROUTES} from '../view/routes';
+import {CenterRoutes} from '../view/routeMappings';
+import {ROUTES} from '../view/routes';
 import {centerHistory} from '../view/contexts/CenterHistory';
 
 import {AsyncInit} from './AsyncInit';

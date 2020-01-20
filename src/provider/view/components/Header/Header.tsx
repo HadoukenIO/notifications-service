@@ -1,12 +1,10 @@
 import * as React from 'react';
 import {MemoryHistory} from 'history';
 
-import {ToggleCenterVisibility, ToggleCenterVisibilitySource, ToggleCenterLocked, ToggleCenterMuted} from '../../../store/Actions';
+import {ToggleCenterVisibility, ToggleCenterVisibilitySource} from '../../../store/Actions';
 import {ROUTES} from '../../routes';
 import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 import {usePreduxStore} from '../../utils/usePreduxStore';
-import {Actionable} from '../../types';
-import {DevelopmentOnly} from '../Wrappers/DevelopmentOnly';
 import {Icon} from '../Icon/Icon';
 import ArrowIcon from '../../../../../res/provider/ui/image/shapes/arrow-circ.svg';
 
@@ -38,12 +36,6 @@ export const Header: React.FC<Props> = (props) => {
                     <Icon id={navigateIsHide ? 'hide-center' : ''} src={ArrowIcon} onClick={handleNavigateClick} title={tooltip} size={25} />
 
                 </div>
-                <div style={{position: 'absolute', left: '50%'}}>
-                    <DevelopmentOnly>
-                        <Lock centerLocked={storeApi.state.centerLocked} storeApi={storeApi} />
-                        <Mute centerMuted={storeApi.state.centerMuted} storeApi={storeApi} />
-                    </DevelopmentOnly>
-                </div>
             </div>
             <div className={ClassNameBuilder.join(Styles, 'strip')}>
                 {children}
@@ -51,31 +43,3 @@ export const Header: React.FC<Props> = (props) => {
         </div>
     );
 };
-
-interface LockProps extends Actionable {
-    centerLocked: boolean;
-}
-
-interface MuteProps extends Actionable {
-    centerMuted: boolean;
-}
-
-function Lock(props: LockProps): React.ReactElement {
-    const {storeApi, centerLocked} = props;
-
-    const handleLockCenter = () => {
-        new ToggleCenterLocked().dispatch(storeApi);
-    };
-
-    return <a id="lock-link" onClick={handleLockCenter}>{centerLocked ? '🔒' : '🔓'}</a>;
-}
-
-function Mute(props: MuteProps): React.ReactElement {
-    const {storeApi, centerMuted} = props;
-
-    const handleMuteCenter = () => {
-        new ToggleCenterMuted().dispatch(storeApi);
-    };
-
-    return <a id="mute-link" onClick={handleMuteCenter}>{centerMuted ? '🔈' : '🔊'}</a>;
-}
