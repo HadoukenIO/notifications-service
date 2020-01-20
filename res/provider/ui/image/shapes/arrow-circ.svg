@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128px" height="128px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.2 (89653) - https://sketch.com -->
+    <title>icons/arrow-circ</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M47.8472374,56.6689444 L72.8929596,31.6232223 L65.2703485,24.0006112 L32.6020152,56.6689444 L65.2703485,89.3372777 L72.8929596,81.7146666 L47.8472374,56.6689444 L47.8472374,56.6689444 Z M96.5694873,96.8664722 C74.6181169,118.817843 39.0279134,118.817843 17.076543,96.8664722 C-4.87482746,74.9151017 -4.87482746,39.3248983 17.076543,17.3735278 C39.0279134,-4.57784261 74.6181169,-4.57784261 96.5694873,17.3735278 C118.520858,39.3248983 118.520858,74.9151017 96.5694873,96.8664722 Z" id="path-1"></path>
+    </defs>
+    <g id="icons/arrow-circ" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="color" transform="translate(7.000000, 7.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="Mask" fill="#FFFFFF" transform="translate(56.823015, 57.120000) rotate(-360.000000) translate(-56.823015, -57.120000) " xlink:href="#path-1"></use>
+            <g id="fills/comet" mask="url(#mask-2)" fill="#E7E7E7">
+                <g transform="translate(57.000000, 57.000000) rotate(-360.000000) translate(-57.000000, -57.000000) translate(-7.000000, -7.000000)" id="Rectangle">
+                    <rect x="0" y="0" width="128" height="128"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

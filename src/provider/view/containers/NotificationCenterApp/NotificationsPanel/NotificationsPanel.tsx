@@ -58,7 +58,7 @@ const NotificationsPanelComponent: React.FC<Props> = (props) => {
                         }
                         <li className={ClassNameBuilder.join(Styles, 'detail', 'settings')} onClick={() => history.push(ROUTES.SETTINGS)}>
                             <span>Settings</span>
-                            <Icon className={ClassNameBuilder.join(Styles, 'icon')} src={SettingsIcon} />
+                            <Icon className={ClassNameBuilder.join(Styles, 'icon')} src={SettingsIcon} size={14} />
                         </li>
                     </ul>
                 </div>

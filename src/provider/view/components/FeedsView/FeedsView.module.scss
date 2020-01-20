@@ -1,0 +1,11 @@
+.feeds-view {
+    user-select: none;
+    height: 100%;
+    background: var(--color-background-light);
+    color: var(--color-light);
+
+    .no-feeds-text {
+        text-align: center;
+        margin: 20% 0;
+    }
+}
