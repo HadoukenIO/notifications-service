@@ -16,7 +16,7 @@ import {EventEmitter} from 'events';
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
 import {DeferredPromise} from 'openfin-service-async';
 
-import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events, OpenFinChannelConnectionEvent} from './internal';
+import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events} from './internal';
 import {EventRouter, Targeted, Transport} from './EventRouter';
 
 /**
@@ -36,21 +36,14 @@ export const eventEmitter = new EventEmitter();
  */
 export let channelPromise: Promise<ChannelClient> | null;
 const hasDOMContentLoaded = new DeferredPromise<void>();
+let hasChannelDisconnectListener = false;
 
 if (typeof fin !== 'undefined') {
+    getServicePromise();
+
     document.addEventListener('DOMContentLoaded', () => {
         hasDOMContentLoaded.resolve();
     });
-
-    fin.InterApplicationBus.Channel.onChannelDisconnect((event: OpenFinChannelConnectionEvent) => {
-        const {uuid, name, channelName} = event;
-        if (uuid === SERVICE_IDENTITY.uuid && name === SERVICE_IDENTITY.name && channelName === SERVICE_CHANNEL) {
-            channelPromise = null;
-            getServicePromise();
-        }
-    });
-
-    getServicePromise();
 }
 
 export async function getServicePromise(): Promise<ChannelClient> {
@@ -68,7 +61,6 @@ export async function getServicePromise(): Promise<ChannelClient> {
                 wait: true,
                 payload: {version: PACKAGE_VERSION}
             }).then((channel: ChannelClient) => {
-                console.info('Connected to the provider');
                 const eventRouter = getEventRouter();
 
                 // Register service listeners
@@ -78,6 +70,14 @@ export async function getServicePromise(): Promise<ChannelClient> {
                 });
                 // Any unregistered action will simply return false
                 channel.setDefaultAction(() => false);
+
+                if (!hasChannelDisconnectListener) {
+                    channel.onDisconnection(() => {
+                        channelPromise = null;
+                        setTimeout(getServicePromise, 300);
+                    });
+                    hasChannelDisconnectListener = true;
+                }
                 return channel;
             });
         }
