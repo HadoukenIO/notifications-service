@@ -10,6 +10,7 @@ import {delay, Duration} from '../utils/int/delay';
 import {getToastCards, getToastButtons} from '../utils/int/toastUtils';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
+import {setupCommonBookends} from '../utils/int/common';
 
 const notificationOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -19,6 +20,8 @@ const notificationOptions: NotificationOptions = {
     onSelect: {task: 'Selected'},
     buttons: [{title: 'testButton', onClick: {btn: 'testAction'}}]
 };
+
+setupCommonBookends();
 
 describe('When an app that uses notification-service is created', () => {
     let eventOrdering: string[];

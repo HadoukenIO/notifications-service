@@ -3,10 +3,39 @@ import {Identity} from 'hadouken-js-adapter';
 import {fin} from './fin';
 import {delay, Duration} from './delay';
 import * as notifsRemote from './notificationsRemote';
-import {isCenterShowing} from './centerUtils';
+import {isCenterShowing, toggleCenterLocked, toggleCenterMuted} from './centerUtils';
 import {testManagerIdentity} from './constants';
+import {isCenterLocked, isCenterMuted} from './providerRemote';
 
 export type CenterState = 'center-open' | 'center-closed';
+
+export function setupCommonBookends(): void {
+    beforeAll(async () => {
+        if (!(await isCenterLocked())) {
+            await toggleCenterLocked();
+        }
+
+        if (await isCenterMuted()) {
+            await toggleCenterMuted();
+        }
+    });
+
+    afterAll(async () => {
+        const centerLocked = await isCenterLocked();
+        const centerMuted = await isCenterMuted();
+
+        if (!centerLocked) {
+            await toggleCenterLocked();
+        }
+
+        if (centerMuted) {
+            await toggleCenterMuted();
+        }
+
+        expect(centerLocked).toBe(true);
+        expect(centerMuted).toBe(false);
+    });
+}
 
 /**
  * Races a given promise against a timeout, and resolves to a `[didTimeout, value?]` tuple indicating

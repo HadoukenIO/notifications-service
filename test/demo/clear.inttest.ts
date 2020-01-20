@@ -8,7 +8,7 @@ import {delay, Duration} from '../utils/int/delay';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {getToastWindow, getToastWindowsByApp} from '../utils/int/toastUtils';
-import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {setupCenterBookends, CenterState, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
@@ -69,6 +69,8 @@ const clearCallTestParams: ClearCallTestParam[] = [
         [undefined, {task: 'close-2'}]
     ]
 ];
+
+setupCommonBookends();
 
 describe.each([
     ['When clearing a notification with the Notification Center open', 'center-open'],

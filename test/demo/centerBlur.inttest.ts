@@ -3,15 +3,35 @@ import {Application, Window} from 'hadouken-js-adapter';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
-import {isCenterShowing, getCenterCloseButton} from '../utils/int/centerUtils';
+import {isCenterShowing, getCenterCloseButton, toggleCenterLocked} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
 import {getElementById} from '../utils/int/dom';
+import {isCenterLocked} from '../utils/int/providerRemote';
+import {setupCommonBookends} from '../utils/int/common';
 
-describe('When the Notification Center is open', () => {
+type TestParam = [string, boolean];
+
+const testParams: TestParam[] = [['unlocked', false], ['locked', true]];
+
+setupCommonBookends();
+
+describe.each(testParams)('When the Notification Center is open and %s', (titleParam: string, locked: boolean) => {
     let testApp: Application;
     let testWindow: Window;
 
+    beforeEach(async () => {
+        // Ensure center is unlocked/locked
+        if (await isCenterLocked() !== locked) {
+            await toggleCenterLocked();
+        }
+    });
+
     afterAll(async () => {
+        // Ensure center finishes locked
+        if (!locked) {
+            await toggleCenterLocked();
+        }
+
         // Close center when we're done
         if (await isCenterShowing()) {
             await notifsRemote.toggleNotificationCenter(testManagerIdentity);
@@ -35,10 +55,10 @@ describe('When the Notification Center is open', () => {
         await testApp.quit();
     });
 
-    test('The Notification Center is closed when it loses focus', async () => {
+    test(`The Notification Center is ${locked ? 'not ' : ''}closed when it loses focus`, async () => {
         await testWindow.focus();
         await delay(Duration.EVENT_PROPAGATED);
-        await expect(isCenterShowing()).resolves.toBe(false);
+        await expect(isCenterShowing()).resolves.toBe(locked);
     });
 
     test('If the Notification Center loses focus due to a click on a \'Toggle Visibility\' button, the Center is closed and remains closed', async () => {

@@ -1,12 +1,13 @@
 import {injectable, inject} from 'inversify';
 
 import {Inject} from '../common/Injectables';
-import {CreateNotification, RemoveNotifications, RegisterApplication} from '../store/Actions';
+import {CreateNotification, RemoveNotifications, RegisterApplication, ToggleCenterLocked, ToggleCenterMuted} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
 import {Database, CollectionMap} from '../model/database/Database';
 import {DatabaseError} from '../model/Errors';
 import {RootState} from '../store/State';
 import {Action} from '../store/Store';
+import {SettingsMap} from '../model/StoredSetting';
 
 @injectable()
 export class Persistor {
@@ -14,7 +15,7 @@ export class Persistor {
     private readonly _database: Database;
 
     constructor(
-        @inject(Inject.STORE) store: ServiceStore,
+    @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.DATABASE) database: Database
     ) {
         this._store = store;
@@ -45,6 +46,22 @@ export class Persistor {
                 await collection.upsert(application);
             } catch (error) {
                 throw new DatabaseError(`Unable to upsert Client info ${application.id}`, error);
+            }
+        } else if (action instanceof ToggleCenterLocked) {
+            const centerLocked = this._store.state.centerLocked;
+            try {
+                const collection = this._database.get(CollectionMap.SETTINGS);
+                await collection.upsert({id: SettingsMap.CenterLocked, value: centerLocked});
+            } catch (error) {
+                throw new DatabaseError(`Unable to upsert centerLocked setting to ${centerLocked}`, error);
+            }
+        } else if (action instanceof ToggleCenterMuted) {
+            const centerMuted = this._store.state.centerMuted;
+            try {
+                const collection = this._database.get(CollectionMap.SETTINGS);
+                await collection.upsert({id: SettingsMap.CenterMuted, value: centerMuted});
+            } catch (error) {
+                throw new DatabaseError(`Unable to upsert centerMuted setting to ${centerMuted}`, error);
             }
         }
     }

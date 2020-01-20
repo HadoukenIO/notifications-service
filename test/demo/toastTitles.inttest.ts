@@ -9,6 +9,7 @@ import {delay, Duration} from '../utils/int/delay';
 import {testManagerIdentity, testAppUrlListenersOnStartup} from '../utils/int/constants';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 import {getToastName} from '../utils/int/toastUtils';
+import {setupCommonBookends} from '../utils/int/common';
 
 const notificationOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -29,6 +30,8 @@ type TestParam = [
     string | undefined,
     string | undefined
 ];
+
+setupCommonBookends();
 
 describe.each([
     ['When an application which has a shortcut name and an application name creates a notifiction',

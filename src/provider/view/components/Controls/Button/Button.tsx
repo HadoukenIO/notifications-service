@@ -1,35 +1,47 @@
-import React from 'react';
+import * as React from 'react';
 
-import {usePreventMouseDownPropagating} from '../../../hooks/Clicks';
-import './Button.scss';
+import {ClassNameBuilder} from '../../../utils/ClassNameBuilder';
+
+import * as Styles from './Button.module.scss';
 
 interface Props {
-    text?: string;
-    icon?: string;
+    children?: string;
     onClick?: () => void;
+    disabled?: boolean;
+    className?: string;
+    style?: React.CSSProperties;
 }
 
-export function Button(props: Props) {
-    const {text, icon, onClick} = props;
-    const ref = React.createRef<HTMLDivElement>();
+export const Button: React.FC<Props> = (props) => {
+    const {children, onClick, disabled = false, style, className = ''} = props;
+    const classNames = new ClassNameBuilder(Styles, 'button', ['disabled', disabled]);
+    classNames.add(className, undefined);
 
     const handleClick = (event: React.MouseEvent) => {
-        event.preventDefault();
         event.stopPropagation();
-        if (onClick) {
+
+        if (onClick && !disabled) {
             onClick();
         }
     };
 
-    usePreventMouseDownPropagating(ref);
+    const handleKeyPress = (event: React.KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            if (onClick && !disabled) {
+                onClick();
+            }
+        }
+    };
 
     return (
-        <div className="button single-line" onClickCapture={handleClick} ref={ref}>
-            <div className="value">
-                {icon && <img src={icon} alt="" />}
-                <span className="single-line">{text}</span>
-            </div>
+        <div
+            className={classNames.toString()}
+            onClick={handleClick}
+            style={style}
+            tabIndex={disabled ? -1 : 0}
+            onKeyPress={handleKeyPress}
+        >
+            {children}
         </div>
     );
-}
-
+};

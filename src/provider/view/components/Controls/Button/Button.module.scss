@@ -1,0 +1,30 @@
+.button {
+    padding: 0.5em 1em;
+    color: var(--color-foreground);
+    background: var(--color-highlight);
+    border-radius: 2em;
+    margin: 0.3em;
+    text-align: center;
+    font-weight: 700;
+    user-select: none;
+    box-shadow: 0 2px 4px var(--color-background-dark);
+    cursor: pointer;
+
+    &:focus {
+        outline: none;
+    }
+
+    &.disabled {
+        background: var(--color-light);
+        cursor: auto;
+
+        &:focus {
+            outline: none;
+            box-shadow: 0px 0px 2px var(--color-accent);
+        }
+    }
+
+    &:active:not(.disabled) {
+        transform: translateY(0.05em);
+    }
+}

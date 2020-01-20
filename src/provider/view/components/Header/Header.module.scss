@@ -1,0 +1,60 @@
+@import '../../styles/variables.scss';
+
+.header {
+    width: $window-width;
+    color: var(--primary-text-color);
+    user-select: none;
+
+    #lock-link {
+        visibility: hidden;
+    }
+
+    &:hover #lock-link {
+        visibility: visible;
+    }
+
+    .actions {
+        height: 50px;
+        width: 100%;
+        background: var(--color-background-normal);
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+
+        .buttons {
+            background: var(--color-background-dark);
+            height: 100%;
+            max-width: 50px;
+            width: 100%;
+            display: flex;
+            flex: 1;
+            align-self: flex-end;
+            justify-content: center;
+            align-content: center;
+            transform: rotate(180deg);
+
+            #hide-center {
+                margin: auto;
+            }
+
+            &.right {
+                margin-left: auto;
+                transform: rotate(0deg);
+            }
+        }
+    }
+
+    .strip {
+        min-height: 30px;
+        font-size: 14px;
+        height: 30px;
+        position: relative;
+        background: var(--strip-background-color);
+        display: flex;
+        flex: 1;
+        padding: 0 20px;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}

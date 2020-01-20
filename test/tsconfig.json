@@ -11,8 +11,12 @@
         "dom",
         "es7"
       ],
-      "types": ["node", "openfin"]
+      "types": ["node", "openfin"],
     },
+    "include": [
+        "../src/provider/custom-types.d.ts",
+        "./**/*"
+    ],
     "exclude": [
       "../node_modules",
     ]

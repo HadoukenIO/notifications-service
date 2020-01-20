@@ -2,6 +2,7 @@ import {Identity} from 'hadouken-js-adapter';
 
 import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {Injector} from '../../../src/provider/common/Injector';
+import {centerHistory} from '../../../src/provider/view/contexts/CenterHistory';
 
 import {OFPuppeteerBrowser, BaseWindowContext} from './ofPuppeteer';
 import {serviceIdentity} from './constants';
@@ -15,6 +16,7 @@ export interface ProviderContext extends BaseWindowContext {
     };
     store: ServiceStore;
     injector: typeof Injector;
+    centerHistory: typeof centerHistory;
 }
 
 const ofBrowser = new OFPuppeteerBrowser<ProviderContext>();
@@ -73,4 +75,22 @@ export async function providerReady(): Promise<void> {
     // TODO: Remove delay with SERVICE-729
     // Give the service one second to allow for any post injector initialization to process.
     await delay(1000);
+}
+
+export function isCenterLocked(): Promise<boolean> {
+    return ofBrowser.executeOnWindow(serviceIdentity, function () {
+        return this.store.state.centerLocked;
+    });
+}
+
+export function isCenterMuted(): Promise<boolean> {
+    return ofBrowser.executeOnWindow(serviceIdentity, function () {
+        return this.store.state.centerMuted;
+    });
+}
+
+export function navigateCenter(route: string): Promise<void> {
+    return ofBrowser.executeOnWindow(serviceIdentity, function (remoteRoute: string) {
+        return this.centerHistory.push(remoteRoute);
+    }, route);
 }

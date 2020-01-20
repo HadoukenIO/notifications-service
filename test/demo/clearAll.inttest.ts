@@ -6,7 +6,7 @@ import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {delay, Duration} from '../utils/int/delay';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
-import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {setupCenterBookends, CenterState, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 import {getCenterCardsByApp} from '../utils/int/centerUtils';
 import {getToastWindowsByApp} from '../utils/int/toastUtils';
@@ -69,6 +69,8 @@ const clearAllCallTestParam: ClearAllCallTestParam[] = [
         [{task: 'close-1'}, {task: 'close-2'}]
     ]
 ];
+
+setupCommonBookends();
 
 describe.each([
     ['When clearing all notifications with the Notification Center open', 'center-open'],

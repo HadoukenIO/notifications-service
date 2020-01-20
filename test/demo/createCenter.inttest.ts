@@ -3,7 +3,7 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
-import {getCenterCardsByNotification} from '../utils/int/centerUtils';
+import {getCenterCardsByNotification, toggleCenterMuted} from '../utils/int/centerUtils';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/int/storageRemote';
 import {delay, Duration} from '../utils/int/delay';
@@ -11,8 +11,10 @@ import {getToastWindow} from '../utils/int/toastUtils';
 import {assertDOMMatches, CardType, getCardMetadata} from '../utils/int/cardUtils';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
-import {setupOpenCenterBookends} from '../utils/int/common';
+import {setupOpenCenterBookends, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
+
+setupCommonBookends();
 
 describe('When creating a notification with the center showing', () => {
     let testApp: Application;
@@ -72,10 +74,29 @@ describe('When creating a notification with the center showing', () => {
         test('No toast is shown for the created notification', async () => {
             // The notification is created immediately before this, so we need
             // a slight delay to allow time for the toast to spawn.
-            await delay(Duration.TOAST_CREATE);
+            await delay(Duration.TOAST_DOM_LOADED);
 
             const toastWindow = await getToastWindow(testApp.identity.uuid, pregeneratedNote.id);
             expect(toastWindow).toBe(undefined);
+        });
+
+        describe('When the Notification Center is muted', () => {
+            beforeAll(toggleCenterMuted);
+            afterAll(toggleCenterMuted);
+
+            test('One card appears in the Notification Center', async () => {
+                const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, pregeneratedNote.id);
+                expect(noteCards).toHaveLength(1);
+            });
+
+            test('No toast is shown for the created notification', async () => {
+                // The notification is created immediately before this, so we need
+                // a slight delay to allow time for the toast to spawn.
+                await delay(Duration.TOAST_DOM_LOADED);
+
+                const toastWindow = await getToastWindow(testApp.identity.uuid, pregeneratedNote.id);
+                expect(toastWindow).toBe(undefined);
+            });
         });
 
         test.skip('Markdown inside of `body` gets rendered to HTML', async () => {

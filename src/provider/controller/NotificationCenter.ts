@@ -5,11 +5,14 @@ import {Inject} from '../common/Injectables';
 import {WebWindow, WebWindowFactory} from '../model/WebWindow';
 import {ToggleCenterVisibility, ToggleCenterVisibilitySource, BlurCenter} from '../store/Actions';
 import {ServiceStore} from '../store/ServiceStore';
-import {renderApp} from '../view/containers/NotificationCenterApp/NotificationCenterApp';
 import {MonitorModel} from '../model/MonitorModel';
 import {TrayIcon} from '../model/TrayIcon';
 import {Action} from '../store/Store';
 import {RootState} from '../store/State';
+import {renderRouterInWindow} from '../view/utils/RenderApp';
+import {CenterRoutes} from '../view/routeMappings';
+import {ROUTES} from '../view/routes';
+import {centerHistory} from '../view/contexts/CenterHistory';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -43,7 +46,7 @@ export class NotificationCenter extends AsyncInit {
     private _webWindow!: WebWindow;
 
     public constructor(
-        @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
+    @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
         @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
@@ -69,7 +72,9 @@ export class NotificationCenter extends AsyncInit {
             throw error;
         }
         await this.hideWindowOffscreen();
-        this._trayIcon.setIcon('https://openfin.co/favicon-32x32.png');
+
+        this._trayIcon.setIcon(`${window.location.href.split('/').slice(0, -1).join('/')}/ui/image/shapes/trayIcon.png`);
+
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
         });
@@ -87,7 +92,9 @@ export class NotificationCenter extends AsyncInit {
             this.showWindow();
         }
 
-        renderApp(this._webWindow, this._store);
+        const domTarget = this._webWindow.document.getElementById('react-app')!;
+        centerHistory.push(ROUTES.NOTIFICATIONS);
+        renderRouterInWindow(CenterRoutes, this._webWindow, this._store, centerHistory, domTarget);
     }
 
     /**

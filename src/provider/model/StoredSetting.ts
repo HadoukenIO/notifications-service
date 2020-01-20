@@ -2,6 +2,8 @@
  * List of available settings in the settings collection.
  */
 export const enum SettingsMap {
+    CenterLocked,
+    CenterMuted
 }
 
 /**
