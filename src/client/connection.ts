@@ -34,7 +34,7 @@ export const eventEmitter = new EventEmitter();
 /**
  * Promise to the channel object that allows us to connect to the client
  */
-export let channelPromise: Promise<ChannelClient> | null;
+let channelPromise: Promise<ChannelClient> | null;
 const hasDOMContentLoaded = new DeferredPromise<void>();
 let hasChannelDisconnectListener = false;
 
