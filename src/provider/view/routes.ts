@@ -1,4 +1,5 @@
 export const ROUTES = {
     NOTIFICATIONS: '/center/notifications',
-    SETTINGS: '/center/settings'
+    SETTINGS: '/center/settings',
+    FEEDS: '/center/feeds'
 };

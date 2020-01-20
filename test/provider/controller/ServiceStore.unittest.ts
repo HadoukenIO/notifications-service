@@ -13,6 +13,7 @@ import {RootState} from '../../../src/provider/store/State';
 import {Action} from '../../../src/provider/store/Store';
 import {resolvePromiseChain} from '../../utils/unit/time';
 import {StoredSetting} from '../../../src/provider/model/StoredSetting';
+import {mockFeeds} from '../../../src/provider/model/NotificationFeed';
 
 const mockDatabase = createMockDatabase();
 
@@ -66,7 +67,8 @@ describe('When the store is uninitialized', () => {
             applications: new Map([[app1.id, app1], [app2.id, app2], [app3.id, app3]]),
             centerVisible: false,
             centerLocked: true,
-            centerMuted: false
+            centerMuted: false,
+            feeds: mockFeeds
         }));
     });
 
@@ -81,7 +83,8 @@ describe('When the store is uninitialized', () => {
             applications: new Map([]),
             centerVisible: false,
             centerLocked: true,
-            centerMuted: false}));
+            centerMuted: false,
+            feeds: mockFeeds}));
     });
 });
 

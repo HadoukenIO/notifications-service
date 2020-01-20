@@ -21,10 +21,10 @@ export const SettingsPanel: React.FC<Props> = (props) => {
             <Header history={history}>
                 <div className={ClassNameBuilder.join(Styles, 'strip-content')}>
                     <span>Settings</span>
-                    <Icon className={ClassNameBuilder.join(Styles, 'icon')} src={SettingsIcon} />
+                    <Icon className={ClassNameBuilder.join(Styles, 'icon')} src={SettingsIcon} size={20} />
                 </div>
             </Header>
-            <SettingsView />
+            <SettingsView history={history} />
         </div>
     );
 };

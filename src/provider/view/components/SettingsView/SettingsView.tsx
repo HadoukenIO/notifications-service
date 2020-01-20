@@ -1,31 +1,35 @@
 import * as React from 'react';
+import {MemoryHistory} from 'history';
 import {connect} from 'react-redux';
 
-import {RootState} from '../../../store/State';
 import {ToggleCenterLocked, ToggleCenterMuted} from '../../../store/Actions';
 import {usePreduxStore} from '../../utils/usePreduxStore';
 import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 import {Toggle} from '../Controls/Toggle/Toggle';
-import {FeedSettings, Feed} from '../FeedSettings/FeedSettings';
+import {FeedSettings} from '../FeedSettings/FeedSettings';
 import {Button} from '../Controls/Button/Button';
+import {ROUTES} from '../../routes';
+import {RootState} from '../../../store/State';
+import {NotificationFeed} from '../../../model/NotificationFeed';
 
 import * as Styles from './SettingsView.module.scss';
 
-const mockFeed: Feed = {
-    name: 'FTSE',
-    icon: 'https://cdn.pixabay.com/photo/2016/01/26/17/15/gmail-1162901_960_720.png'
-};
-
-const mockFeeds = new Array(5).fill(mockFeed);
-
 interface Props {
+    history: MemoryHistory;
+    feeds: NotificationFeed[];
     centerLocked: boolean;
     centerMuted: boolean;
 }
 
-export const SettingsViewComponent: React.FC<Props> = (props) => {
-    const {centerLocked, centerMuted} = props;
+const SettingsViewComponent: React.FC<Props> = (props) => {
+    const {history, feeds, centerLocked, centerMuted} = props;
     const storeApi = usePreduxStore();
+
+    const subscibedFeeds = feeds.filter((feed) => feed.subscribed);
+
+    function onAddFeedButtonClick(): void {
+        history.push(ROUTES.FEEDS);
+    }
 
     return (
         <div className={ClassNameBuilder.join(Styles, 'settings-view')}>
@@ -48,9 +52,11 @@ export const SettingsViewComponent: React.FC<Props> = (props) => {
             <div className={ClassNameBuilder.join(Styles, 'feed', 'section')}>
                 <h1>Notifications</h1>
                 <ul>
-                    {mockFeeds.map((f, i) => <li key={i}><FeedSettings {...f} /></li>)}
+                    {subscibedFeeds.length > 0
+                        ? subscibedFeeds.map((f, i) => <li key={i}><FeedSettings {...f} /></li>)
+                        : <div className={ClassNameBuilder.join(Styles, 'no-feeds-text')}>You are not subscribed to any feeds</div>}
                 </ul>
-                <Button>Add a Feed</Button>
+                <Button onClick={onAddFeedButtonClick}>Add a Feed</Button>
             </div>
         </div>
     );
@@ -58,7 +64,8 @@ export const SettingsViewComponent: React.FC<Props> = (props) => {
 
 const mapStateToProps = (state: RootState) => ({
     centerLocked: state.centerLocked,
-    centerMuted: state.centerMuted
+    centerMuted: state.centerMuted,
+    feeds: state.feeds
 });
 
 export const SettingsView = connect(mapStateToProps)(SettingsViewComponent);

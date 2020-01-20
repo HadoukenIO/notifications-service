@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128px" height="128px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.2 (89653) - https://sketch.com -->
+    <title>icons/minus-circ</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M56.21,0 C87.2539258,0 112.42,25.1660742 112.42,56.21 C112.42,87.2539258 87.2539258,112.42 56.21,112.42 C25.1660742,112.42 0,87.2539258 0,56.21 C0,25.1660742 25.1660742,0 56.21,0 Z M23.1,50.82 L23.1,61.6 L90.86,61.6 L90.86,50.82 L23.1,50.82 Z" id="path-1"></path>
+    </defs>
+    <g id="icons/minus-circ" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="color" transform="translate(7.700000, 7.700000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="Combined-Shape" fill="#FFFFFF" xlink:href="#path-1"></use>
+            <g id="fills/comet" mask="url(#mask-2)" fill="#E7E7E7">
+                <g transform="translate(-7.700000, -7.700000)" id="Rectangle">
+                    <rect x="0" y="0" width="128" height="128"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

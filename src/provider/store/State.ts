@@ -1,5 +1,6 @@
 import {StoredNotification} from '../model/StoredNotification';
 import {StoredApplication} from '../model/Environment';
+import {NotificationFeed} from '../model/NotificationFeed';
 
 export type StoredApplicationMap = ReadonlyMap<string, StoredApplication>;
 
@@ -9,6 +10,7 @@ export type RootState = Readonly<{
     centerVisible: boolean;
     centerLocked: boolean;
     centerMuted: boolean;
+    feeds: NotificationFeed[];
 }>;
 
 export type Immutable<T> = {
