@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {RouteComponentProps} from 'react-router';
 import {MemoryHistory} from 'history';
 
 import {RootState} from '../../../../store/State';
@@ -10,8 +9,8 @@ import {FeedsView} from '../../../components/FeedsView/FeedsView';
 
 import * as Styles from './FeedsPanel.module.scss';
 
-interface Props extends RouteComponentProps {
-
+interface Props {
+    history: MemoryHistory;
 }
 
 const FeedsPanelComponent: React.FC<Props> = (props) => {
