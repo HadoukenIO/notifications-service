@@ -6,7 +6,6 @@ import {Header} from '../../../components/Header/Header';
 import {NotificationView} from '../../../components/NotificationView/NotificationView';
 import {RootState} from '../../../../store/State';
 import {usePreduxStore} from '../../../utils/usePreduxStore';
-import {WindowContext} from '../../../components/Wrappers/WindowContext';
 import {GroupingType} from '../../../utils/Grouping';
 import {ClassNameBuilder} from '../../../utils/ClassNameBuilder';
 import {ROUTES} from '../../../routes';
@@ -14,6 +13,7 @@ import {Icon} from '../../../components/Icon/Icon';
 import SettingsIcon from '../../../../../../res/provider/ui/image/shapes/Settings.svg';
 import {StoredNotification} from '../../../../model/StoredNotification';
 import {StoredApplication} from '../../../../model/Environment';
+import {WebWindowContext} from '../../../contexts/WebWindowContext';
 
 import * as Styles from './NotificationsPanel.module.scss';
 
@@ -28,7 +28,7 @@ const NotificationsPanelComponent: React.FC<Props> = (props) => {
     const {notifications, applications, history} = props;
     const storeApi = usePreduxStore();
     const [groupBy, setGroupBy] = React.useState(GroupingType.DATE);
-    const window = React.useContext(WindowContext);
+    const window = React.useContext(WebWindowContext);
 
     React.useEffect(() => {
         window.document.title = 'Center';
