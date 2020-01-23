@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {getDate} from '../../utils/Time';
-import {WindowContext} from '../Wrappers/WindowContext';
+import {WebWindowContext} from '../../contexts/WebWindowContext';
 
 interface Props {
     date: number;
@@ -9,7 +9,7 @@ interface Props {
 
 export function NotificationTime(props: Props) {
     const {date} = props;
-    const window = React.useContext(WindowContext);
+    const window = React.useContext(WebWindowContext).nativeWindow;
     const [formattedDate, setFormattedDate] = React.useState<string>(getDate(date));
 
     React.useEffect(() => {

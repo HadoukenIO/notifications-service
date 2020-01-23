@@ -6,10 +6,10 @@ import {ResizeWrapper} from '../../components/Wrappers/ResizeWrapper';
 import {RootState} from '../../../store/State';
 import {Point} from '../../../model/Toast';
 import {TitledNotification, Actionable} from '../../types';
-import {WindowContext} from '../../components/Wrappers/WindowContext';
 import '../../styles/main.scss';
 import './ToastApp.scss';
 import {StoredNotification} from '../../../model/StoredNotification';
+import {WebWindowContext} from '../../contexts/WebWindowContext';
 
 interface ToastAppProps extends Actionable {
     notification: StoredNotification;
@@ -18,7 +18,7 @@ interface ToastAppProps extends Actionable {
 
 const ToastAppComponent: React.FC<ToastAppProps> = (props) => {
     const {notification, setWindowSize, storeApi} = props;
-    const window = React.useContext(WindowContext);
+    const window = React.useContext(WebWindowContext);
     const titledNotification: TitledNotification = {
         ...notification,
         title: (storeApi.state.applications.get(notification.source.uuid) || {title: notification.source.name || ''}).title
