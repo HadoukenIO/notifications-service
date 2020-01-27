@@ -20,16 +20,18 @@ const ofBrowser = new OFPuppeteerBrowser<NotifsTestContext>();
 export async function create(executionTarget: Identity, options: NotificationOptions): Promise<Notification> {
     const result = await ofBrowser.executeOnWindow(executionTarget, async function (optionsRemote: NotificationOptions) {
         // Manually un-stringify Dates, as puppeteer will not do so on the runner-to-remote journey
-        const date =
-            (optionsRemote.date !== undefined)
-                ? new Date(optionsRemote.date)
-                : optionsRemote.date;
-        const expires =
-            (optionsRemote.expires !== undefined && optionsRemote.expires !== null)
-                ? new Date(optionsRemote.expires)
-                : optionsRemote.date;
+        if (optionsRemote !== undefined && optionsRemote !== null) {
+            const date =
+                (optionsRemote.date !== undefined)
+                    ? new Date(optionsRemote.date)
+                    : optionsRemote.date;
+            const expires =
+                (optionsRemote && optionsRemote.expires !== undefined && optionsRemote.expires !== null)
+                    ? new Date(optionsRemote.expires)
+                    : optionsRemote.expires;
 
-        optionsRemote = {...optionsRemote, date, expires};
+            optionsRemote = {...optionsRemote, date, expires};
+        }
 
         const note = await this.notifications.create(optionsRemote);
 

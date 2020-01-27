@@ -155,6 +155,10 @@ export class Main {
      * @returns Whether or not the removal of the notifications was successful.
      */
     private async clearNotification(payload: ClearPayload, sender: ProviderIdentity): Promise<boolean> {
+        if (typeof payload.id !== 'string') {
+            throw new Error('Invalid argument passed to clear: argument must be a string');
+        }
+
         const id = this.encodeID(payload.id, sender);
         const notification = this._store.state.notifications.find((n) => n.id === id);
         if (notification) {
@@ -250,9 +254,9 @@ export class Main {
         }
 
         if (problems.length === 1) {
-            throw new Error(`Invalid arguments passed to create: ${problems[0]}`);
+            throw new Error(`Invalid argument passed to create: ${problems[0]}`);
         } else if (problems.length > 1) {
-            throw new Error(`Invalid arguments passed to create:\n - ${problems.join('\n - ')}`);
+            throw new Error(`Invalid argument passed to create:\n - ${problems.join('\n - ')}`);
         }
 
         const notification: NotificationInternal = {
