@@ -37,11 +37,35 @@ export class Database extends AsyncInit {
             [CollectionMap.APPLICATIONS]: '&id'
         });
 
+        this._database.version(2).stores({
+            [CollectionMap.APPLICATIONS]: '&id'
+        }).upgrade((transaction: any) => {
+            transaction[CollectionMap.NOTIFICATIONS].toCollection().modify((notification: StoredNotification) => {
+                if (typeof notification.notification.expires !== 'number') {
+                    console.warn('*** Fixing non-expiring notif');
+                    (notification.notification as any)['expires'] = null;
+                }
+            });
+        });
+
         this.createCollections(this._database.tables);
     }
 
     protected async init(): Promise<void> {
-        await this._database.open();
+        try {
+            await this._database.open();
+        } catch (e) {
+            if (e instanceof Dexie.AbortError) {
+                console.warn('*** No apps store, fixing');
+
+                this._database.version(1).stores({
+                    [CollectionMap.NOTIFICATIONS]: '&id',
+                    [CollectionMap.SETTINGS]: '&id'
+                });
+
+                await this._database.open();
+            }
+        }
     }
 
     /**
