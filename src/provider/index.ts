@@ -7,6 +7,7 @@ import moment from 'moment';
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
 import {ActionDeclaration} from '../client/actions';
 import {ProviderStatus} from '../client/provider';
+import {ButtonOptions} from '../client';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -251,6 +252,14 @@ export class Main {
             problems.push('"buttons" must be an array or undefined');
         } else if (payload.buttons && payload.buttons.length > 4) {
             problems.push('notifications can have at-most four buttons');
+        }
+
+        if (payload.buttons !== undefined) {
+            if (payload.buttons.some((button: ButtonOptions) => typeof button !== 'object' || button === null)) {
+                problems.push('"buttons" must be an array of objects');
+            } else if (payload.buttons.some((button: ButtonOptions) => typeof button.title !== 'string')) {
+                problems.push('Every button in "buttons" must have a "title", and "title" must be a string');
+            }
         }
 
         if (problems.length === 1) {
