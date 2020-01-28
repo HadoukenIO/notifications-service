@@ -6,6 +6,7 @@ import {StoredNotification} from '../StoredNotification';
 import {StoredApplication} from '../Environment';
 import {AsyncInit} from '../../controller/AsyncInit';
 import {DatabaseError} from '../Errors';
+import {NotificationInternal} from '../../../client/internal';
 
 import {Collection} from './Collection';
 
@@ -33,19 +34,28 @@ export class Database extends AsyncInit {
 
         this._database.version(1).stores({
             [CollectionMap.NOTIFICATIONS]: '&id',
-            [CollectionMap.SETTINGS]: '&id',
-            [CollectionMap.APPLICATIONS]: '&id'
+            [CollectionMap.SETTINGS]: '&id'
         });
 
         this._database.version(2).stores({
             [CollectionMap.APPLICATIONS]: '&id'
-        }).upgrade((transaction: any) => {
-            transaction[CollectionMap.NOTIFICATIONS].toCollection().modify((notification: StoredNotification) => {
-                if (typeof notification.notification.expires !== 'number') {
-                    console.warn('*** Fixing non-expiring notif');
-                    (notification.notification as any)['expires'] = null;
+        }).upgrade((transaction: Dexie.Transaction) => {
+            console.group('Migrating to database version 2');
+
+            const typedTransaction = (transaction as Dexie.Transaction & {[CollectionMap.NOTIFICATIONS]: Dexie.Table<StoredNotification, string>});
+            const collection = typedTransaction[CollectionMap.NOTIFICATIONS].toCollection();
+
+            collection.modify((notification: StoredNotification) => {
+                // Notifications created before the expiration feature will have undefined "expiry", so we manually set it to null
+                if (typeof notification.notification.expires !== 'number' && notification.notification.expires !== null) {
+                    console.log(`Setting "expires" to null on notification ${notification.id}`);
+
+                    const note = notification.notification as NotificationInternal;
+                    note.expires = null;
                 }
             });
+
+            console.groupEnd();
         });
 
         this.createCollections(this._database.tables);
@@ -55,15 +65,19 @@ export class Database extends AsyncInit {
         try {
             await this._database.open();
         } catch (e) {
+            // Version 1 database may or may not have the Applications store, so we need to handle both cases
             if (e instanceof Dexie.AbortError) {
-                console.warn('*** No apps store, fixing');
+                console.warn('Failed to open database, reattempting with alternative version 1 schema');
 
                 this._database.version(1).stores({
                     [CollectionMap.NOTIFICATIONS]: '&id',
-                    [CollectionMap.SETTINGS]: '&id'
+                    [CollectionMap.SETTINGS]: '&id',
+                    [CollectionMap.APPLICATIONS]: '&id'
                 });
 
                 await this._database.open();
+            } else {
+                throw e;
             }
         }
     }
