@@ -7,6 +7,7 @@ import {StoredApplication} from '../Environment';
 import {AsyncInit} from '../../controller/AsyncInit';
 import {DatabaseError} from '../Errors';
 import {NotificationInternal} from '../../../client/internal';
+import {PartiallyWritable} from '../../utils/types';
 
 import {Collection} from './Collection';
 
@@ -42,16 +43,44 @@ export class Database extends AsyncInit {
         }).upgrade(async (transaction: Dexie.Transaction) => {
             console.groupCollapsed('Migrating to database version 2');
 
-            const typedTransaction = (transaction as Dexie.Transaction & {[CollectionMap.NOTIFICATIONS]: Dexie.Table<StoredNotification, string>});
-            const collection = typedTransaction[CollectionMap.NOTIFICATIONS].toCollection();
+            const typedTransaction = (transaction as Dexie.Transaction & {
+                [CollectionMap.NOTIFICATIONS]: Dexie.Table<StoredNotification, string>;
+                [CollectionMap.APPLICATIONS]: Dexie.Table<StoredApplication, string>;
+            });
+            const notificationsCollection = typedTransaction[CollectionMap.NOTIFICATIONS].toCollection();
+            const applicationsCollection = typedTransaction[CollectionMap.APPLICATIONS].toCollection();
 
-            await collection.modify((notification: StoredNotification) => {
+            await notificationsCollection.modify((notification: StoredNotification) => {
                 // Notifications created before the expiration feature will have undefined "expiry", so we manually set it to null
                 if (typeof notification.notification.expires !== 'number' && notification.notification.expires !== null) {
                     console.log(`Setting "expires" to null on notification ${notification.id}`);
 
-                    const note = notification.notification as NotificationInternal;
+                    const note = notification.notification as PartiallyWritable<NotificationInternal, 'expires'>;
                     note.expires = null;
+                }
+
+                // Notifications created before support of "onClose" and "onExpire" will have them undefined, so we manually set them to null
+                if (!notification.notification.onClose && notification.notification.onClose !== null) {
+                    console.log(`Setting "onClose" to null on notification ${notification.id}`);
+
+                    const note = notification.notification as PartiallyWritable<NotificationInternal, 'onClose'>;
+                    note.onClose = null;
+                }
+                if (!notification.notification.onExpire && notification.notification.onExpire !== null) {
+                    console.log(`Setting "onExpire" to null on notification ${notification.id}`);
+
+                    const note = notification.notification as PartiallyWritable<NotificationInternal, 'onExpire'>;
+                    note.onExpire = null;
+                }
+            });
+
+            await applicationsCollection.modify((application: StoredApplication) => {
+                // StoredApplication may have been created without a title, so copy from ID
+                if (application.title === undefined) {
+                    console.log(`Setting "title" on application ${application.id}`);
+
+                    const app = application as PartiallyWritable<StoredApplication, 'title'>;
+                    app.title = app.id;
                 }
             });
 
