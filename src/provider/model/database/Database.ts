@@ -66,7 +66,7 @@ export class Database extends AsyncInit {
             await this._database.open();
         } catch (e) {
             // Version 1 database may or may not have the Applications store, so we need to handle both cases
-            if (e instanceof Dexie.AbortError) {
+            if (e instanceof Dexie.DexieError) {
                 console.warn('Failed to open database, reattempting with alternative version 1 schema');
 
                 this._database.version(1).stores({
