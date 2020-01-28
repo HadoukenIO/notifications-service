@@ -39,13 +39,13 @@ export class Database extends AsyncInit {
 
         this._database.version(2).stores({
             [CollectionMap.APPLICATIONS]: '&id'
-        }).upgrade((transaction: Dexie.Transaction) => {
-            console.group('Migrating to database version 2');
+        }).upgrade(async (transaction: Dexie.Transaction) => {
+            console.groupCollapsed('Migrating to database version 2');
 
             const typedTransaction = (transaction as Dexie.Transaction & {[CollectionMap.NOTIFICATIONS]: Dexie.Table<StoredNotification, string>});
             const collection = typedTransaction[CollectionMap.NOTIFICATIONS].toCollection();
 
-            collection.modify((notification: StoredNotification) => {
+            await collection.modify((notification: StoredNotification) => {
                 // Notifications created before the expiration feature will have undefined "expiry", so we manually set it to null
                 if (typeof notification.notification.expires !== 'number' && notification.notification.expires !== null) {
                     console.log(`Setting "expires" to null on notification ${notification.id}`);
