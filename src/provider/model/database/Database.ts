@@ -33,7 +33,7 @@ export class Database extends AsyncInit {
         this._database = new Dexie('notifications-service');
         this._collections = new Map<CollectionMap, Collection<any>>();
 
-        // These database versions should never changed. Instead, create a new version with a migration method if necessary
+        // These database versions should never change. Instead, create a new version with a migration method if necessary
         this._database.version(1).stores({
             [CollectionMap.NOTIFICATIONS]: '&id',
             [CollectionMap.SETTINGS]: '&id'
