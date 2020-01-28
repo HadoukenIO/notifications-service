@@ -9,10 +9,8 @@ export async function ErrorAggregator(items: Promise<void>[]): Promise<void> {
     }
 }
 
-abstract class CustomError extends Error {
-    public readonly innerError?: Error;
-
-    constructor(name: string, message: string, innerError?: Error) {
+export abstract class CustomError extends Error {
+    constructor(name: string, message: string, public readonly innerError?: Error, public readonly metadata?: {[key: string]: any}) {
         super(`${message || innerError}`);
         this.innerError = innerError;
         this.name = name;
@@ -35,7 +33,19 @@ export class BatchError extends CustomError {
     }
 
     private static generateMessage(errors: Error[]): string {
-        return `${errors.map((e) => e.name).join(', ')}`;
+        const count = errors.length;
+
+        if (count === 0) {
+            // Should never happen. Only create a BatchError if an error occurred, and pass the error(s) into the batch.
+            return '<Empty>';
+        } else if (count === 1) {
+            return errors[0].message;
+        } else {
+            return `Batch (${count} errors):\n${errors.map((error, index) => {
+                const {name, message} = error;
+                return ` ${index + 1}/${count}) ${name}: ${message.includes('\n') ? `${message.split('\n')[0]}...` : message}`;
+            }).join('\n')}`;
+        }
     }
 }
 

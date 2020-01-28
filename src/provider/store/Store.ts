@@ -2,6 +2,7 @@ import {Signal} from 'openfin-service-signal';
 
 import {AsyncInit} from '../controller/AsyncInit';
 import {ErrorAggregator} from '../model/Errors';
+import {ErrorHandler} from '../model/ErrorHandler';
 
 export abstract class Action<S> {
     public async dispatch(store: StoreAPI<S>): Promise<void> {
@@ -50,7 +51,11 @@ export class Store<S> extends AsyncInit {
     }
 
     public dispatch(action: Action<S>): Promise<void> {
-        return this.reduceAndSignal(action);
+        return this.reduceAndSignal(action).catch((error) => {
+            // Log and propagate
+            ErrorHandler.for(error).log();
+            throw error;
+        });
     }
 
     protected async init(): Promise<void> {}
