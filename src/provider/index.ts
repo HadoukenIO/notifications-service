@@ -160,7 +160,7 @@ export class Main {
             throw new Error('Invalid argument passed to clear: argument must be a string');
         }
 
-        const id = this.encodeID(payload.id, sender);
+        const id = this.encodeId(payload.id, sender);
         const notification = this._store.state.notifications.find((n) => n.id === id);
         if (notification) {
             await new RemoveNotifications([notification]).dispatch(this._store);
@@ -204,7 +204,7 @@ export class Main {
      * @param id Id of the notification..
      * @param source The sender of the notification.
      */
-    private encodeID(id: string, source: Identity): string {
+    private encodeId(id: string, source: Identity): string {
         return `${source.uuid}:${id}`;
     }
 
@@ -291,7 +291,7 @@ export class Main {
         };
 
         const storedNotification: StoredNotification = {
-            id: this.encodeID(notification.id, sender),
+            id: this.encodeId(notification.id, sender),
             notification,
             source: sender
         };
