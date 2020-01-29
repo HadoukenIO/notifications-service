@@ -7,9 +7,9 @@ import {Events} from './internal';
 /**
  * Validates and returns the provided function
  */
-export function sanitizeFunction<T, U extends any[]>(value: (...args: U) => T, source: string): (...args: U) => T {
+export function sanitizeFunction<T, U extends any[]>(value: (...args: U) => T): (...args: U) => T {
     if (typeof value !== 'function') {
-        throw new Error(`Invalid argument passed to ${source}: ${safeStringify(value, 'The provided value')} is not a valid function`);
+        throw new Error(`Invalid argument passed: ${safeStringify(value, 'The provided value')} is not a valid function`);
     }
 
     return value;
@@ -18,12 +18,12 @@ export function sanitizeFunction<T, U extends any[]>(value: (...args: U) => T, s
 /**
  * Validates the provided event type
  */
-export function sanitizeEventType<E extends Events>(eventType: E['type'], source: string): E['type'] {
+export function sanitizeEventType<E extends Events>(eventType: E['type']): E['type'] {
     if (eventType === 'notification-action' || eventType === 'notification-created' || eventType === 'notification-closed') {
         return eventType;
     }
 
-    throw new Error(`Invalid argument passed to ${source}: ${safeStringify(eventType, 'The provided event type')} is not a valid Notifications event type`);
+    throw new Error(`Invalid argument passed: ${safeStringify(eventType, 'The provided event type')} is not a valid Notifications event type`);
 }
 
 /**

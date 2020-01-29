@@ -331,8 +331,8 @@ export function addEventListener(eventType: 'notification-closed', listener: (ev
  */
 export function addEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
     validateEnvironment();
-    eventType = sanitizeEventType(eventType, 'addEventListener');
-    listener = sanitizeFunction(listener, 'addEventListener');
+    eventType = sanitizeEventType(eventType);
+    listener = sanitizeFunction(listener);
 
     const count = eventEmitter.listenerCount(eventType);
     eventEmitter.addListener(eventType, listener);
@@ -355,8 +355,8 @@ export function removeEventListener(eventType: 'notification-closed', listener: 
  */
 export function removeEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
     validateEnvironment();
-    eventType = sanitizeEventType(eventType, 'removeEventListener');
-    listener = sanitizeFunction(listener, 'removeEventListener');
+    eventType = sanitizeEventType(eventType);
+    listener = sanitizeFunction(listener);
 
     const count = eventEmitter.listenerCount(eventType);
     eventEmitter.removeListener(eventType, listener);
