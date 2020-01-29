@@ -248,17 +248,19 @@ export class Main {
             problems.push('"date" must be a valid Date object');
         }
 
-        if (payload.buttons !== undefined && !Array.isArray(payload.buttons)) {
-            problems.push('"buttons" must be an array or undefined');
-        } else if (payload.buttons && payload.buttons.length > 4) {
-            problems.push('notifications can have at-most four buttons');
-        }
-
         if (payload.buttons !== undefined) {
-            if (payload.buttons.some((button: ButtonOptions) => typeof button !== 'object' || button === null)) {
-                problems.push('"buttons" must be an array of objects');
-            } else if (payload.buttons.some((button: ButtonOptions) => typeof button.title !== 'string')) {
-                problems.push('Every button in "buttons" must have a "title", and "title" must be a string');
+            if (Array.isArray(payload.buttons)) {
+                if (payload.buttons.length > 4) {
+                    problems.push('notifications can have at-most four buttons');
+                }
+
+                if (payload.buttons.some((button: ButtonOptions) => typeof button !== 'object' || button === null)) {
+                    problems.push('"buttons" must be an array of objects');
+                } else if (payload.buttons.some((button: ButtonOptions) => typeof button.title !== 'string')) {
+                    problems.push('Every button in "buttons" must have a "title", and "title" must be a string');
+                }
+            } else {
+                problems.push('"buttons" must be an array or undefined');
             }
         }
 
