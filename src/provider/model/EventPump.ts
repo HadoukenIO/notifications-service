@@ -38,11 +38,14 @@ export class EventPump {
      */
     public async push<T extends Events>(targetUuid: string, event: Targeted<Transport<T>>): Promise<void> {
         if (event.type !== 'notification-action' || this._clientRegistry.isAppActionReady(targetUuid)) {
-            const connectedAppWindows = this._apiHandler.getClientConnections().filter((client: Identity) => client.uuid === targetUuid);
+            // We may get called as soon as all injected components are initialized, which may be before APIHandler is initialized. See [SERVICE-729]
+            if (this._apiHandler.channel) {
+                const connectedAppWindows = this._apiHandler.getClientConnections().filter((client: Identity) => client.uuid === targetUuid);
 
-            connectedAppWindows.forEach((window) => {
-                this._apiHandler.dispatchEvent(window, event);
-            });
+                connectedAppWindows.forEach((window) => {
+                    this._apiHandler.dispatchEvent(window, event);
+                });
+            }
         } else {
             this._deferredEvents.push({targetUuid, event: event as DeferrableEvent});
             await this._clientRegistry.tryLaunchApplication(targetUuid);

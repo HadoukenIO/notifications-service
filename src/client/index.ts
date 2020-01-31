@@ -14,6 +14,7 @@ import {ButtonOptions, ControlOptions} from './controls';
 import {APITopic, Events, NotificationInternal, Omit} from './internal';
 import {EventRouter, Transport} from './EventRouter';
 import * as provider from './provider';
+import {validateEnvironment, sanitizeEventType, sanitizeFunction} from './validation';
 
 export * from './actions';
 export * from './controls';
@@ -329,9 +330,9 @@ export function addEventListener(eventType: 'notification-closed', listener: (ev
  * @param listener The callback function to add
  */
 export function addEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
-    if (typeof fin === 'undefined') {
-        throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
-    }
+    validateEnvironment();
+    eventType = sanitizeEventType(eventType);
+    listener = sanitizeFunction(listener);
 
     const count = eventEmitter.listenerCount(eventType);
     eventEmitter.addListener(eventType, listener);
@@ -347,15 +348,15 @@ export function removeEventListener(eventType: 'notification-closed', listener: 
 /**
  * Removes a listener previously added with {@link addEventListener}.
  *
- * Has no effect if `eventType` isn't a valid event, or `listener` isn't a callback registered against `eventType`.
+ * Has no effect if `listener` isn't a callback registered against `eventType`.
  *
  * @param eventType The event being unsubscribed from
  * @param listener The callback function to remove, must be strictly-equal (`===` equivilance) to a listener previously passed to {@link addEventListener} to have an effect
  */
 export function removeEventListener<E extends Events>(eventType: E['type'], listener: (event: E) => void): void {
-    if (typeof fin === 'undefined') {
-        throw new Error('fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.');
-    }
+    validateEnvironment();
+    eventType = sanitizeEventType(eventType);
+    listener = sanitizeFunction(listener);
 
     const count = eventEmitter.listenerCount(eventType);
     eventEmitter.removeListener(eventType, listener);
@@ -388,12 +389,16 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
 export async function create(options: NotificationOptions): Promise<Notification> {
     // Most validation logic is handled on the provider, but need an early check here
     // As we call date.valueOf when converting into a CreatePayload
+    if ((typeof options !== 'object') || (options === null)) {
+        throw new Error('Invalid argument passed to create: argument must be an object and must not be null');
+    }
+
     if (options.date !== undefined && !(options.date instanceof Date)) {
-        throw new Error('Invalid arguments passed to create: "date" must be a valid Date object');
+        throw new Error('Invalid argument passed to create: "date" must be a valid Date object');
     }
 
     if (options.expires !== undefined && options.expires !== null && !(options.expires instanceof Date)) {
-        throw new Error('Invalid arguments passed to create: "expires" must be null or a valid Date object');
+        throw new Error('Invalid argument passed to create: "expires" must be null or a valid Date object');
     }
 
     const response = await tryServiceDispatch(APITopic.CREATE_NOTIFICATION, {

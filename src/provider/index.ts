@@ -7,6 +7,7 @@ import moment from 'moment';
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
 import {ActionDeclaration} from '../client/actions';
 import {ProviderStatus} from '../client/provider';
+import {ButtonOptions} from '../client';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -155,7 +156,11 @@ export class Main {
      * @returns Whether or not the removal of the notifications was successful.
      */
     private async clearNotification(payload: ClearPayload, sender: ProviderIdentity): Promise<boolean> {
-        const id = this.encodeID(payload.id, sender);
+        if (typeof payload.id !== 'string') {
+            throw new Error('Invalid argument passed to clear: argument must be a string');
+        }
+
+        const id = this.encodeId(payload.id, sender);
         const notification = this._store.state.notifications.find((n) => n.id === id);
         if (notification) {
             await new RemoveNotifications([notification]).dispatch(this._store);
@@ -199,7 +204,7 @@ export class Main {
      * @param id Id of the notification..
      * @param source The sender of the notification.
      */
-    private encodeID(id: string, source: Identity): string {
+    private encodeId(id: string, source: Identity): string {
         return `${source.uuid}:${id}`;
     }
 
@@ -243,16 +248,26 @@ export class Main {
             problems.push('"date" must be a valid Date object');
         }
 
-        if (payload.buttons !== undefined && !Array.isArray(payload.buttons)) {
-            problems.push('"buttons" must be an array or undefined');
-        } else if (payload.buttons && payload.buttons.length > 4) {
-            problems.push('notifications can have at-most four buttons');
+        if (payload.buttons !== undefined) {
+            if (Array.isArray(payload.buttons)) {
+                if (payload.buttons.length > 4) {
+                    problems.push('notifications can have at-most four buttons');
+                }
+
+                if (payload.buttons.some((button: ButtonOptions) => typeof button !== 'object' || button === null)) {
+                    problems.push('"buttons" must be an array of objects');
+                } else if (payload.buttons.some((button: ButtonOptions) => typeof button.title !== 'string')) {
+                    problems.push('Every button in "buttons" must have a "title", and "title" must be a string');
+                }
+            } else {
+                problems.push('"buttons" must be an array or undefined');
+            }
         }
 
         if (problems.length === 1) {
-            throw new Error(`Invalid arguments passed to create: ${problems[0]}`);
+            throw new Error(`Invalid argument passed to create: ${problems[0]}`);
         } else if (problems.length > 1) {
-            throw new Error(`Invalid arguments passed to create:\n - ${problems.join('\n - ')}`);
+            throw new Error(`Invalid argument passed to create:\n - ${problems.join('\n - ')}`);
         }
 
         const notification: NotificationInternal = {
@@ -278,7 +293,7 @@ export class Main {
         };
 
         const storedNotification: StoredNotification = {
-            id: this.encodeID(notification.id, sender),
+            id: this.encodeId(notification.id, sender),
             notification,
             source: sender
         };

@@ -3,7 +3,7 @@ import 'jest';
 import {Application, Window} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions} from '../../src/client';
-import {getCenterCardsByNotification, toggleCenterMuted} from '../utils/int/centerUtils';
+import {getCenterCardsByNotification, toggleCenterMuted, getCenterCardsByApp} from '../utils/int/centerUtils';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import {assertNotificationStored, getStoredNotificationsByApp} from '../utils/int/storageRemote';
 import {delay, Duration} from '../utils/int/delay';
@@ -13,6 +13,19 @@ import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {assertHydratedCorrectly} from '../utils/int/hydrateNotification';
 import {setupOpenCenterBookends, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
+
+const invalidOptionsTestParams: [string, any, RegExp][] = [
+    [
+        'is undefined',
+        undefined,
+        /Invalid argument passed to create:.*argument must be an object and must not be null/s
+    ],
+    [
+        'does not include title and body',
+        {id: 'invalid-notification'},
+        /Invalid argument passed to create:.*"title" must have a value.*"body" must have a value/s
+    ]
+];
 
 setupCommonBookends();
 
@@ -117,9 +130,9 @@ describe('When creating a notification with the center showing', () => {
         });
     });
 
-    describe('When options does not include title and body', () => {
+    describe.each(invalidOptionsTestParams)('When options %s', (titleParam: string, value: any, error: RegExp) => {
         // Intentionally circumventing type check with cast for testing purposes
-        const options: NotificationOptions = {id: 'invalid-notification'} as NotificationOptions;
+        const options: NotificationOptions = value as NotificationOptions;
 
         let createPromise: Promise<Notification>;
         beforeEach(async () => {
@@ -128,15 +141,15 @@ describe('When creating a notification with the center showing', () => {
 
         afterEach(async () => {
             // Cleanup the created notification (just in case it does get made)
-            await notifsRemote.clear(testWindow.identity, options.id!);
+            await notifsRemote.clearAll(testWindow.identity);
         });
 
         test('The promise rejects with a suitable error message', async () => {
-            await expect(createPromise).rejects.toThrow(/Invalid arguments passed to create:.*"title" must have a value.*"body" must have a value/s);
+            await expect(createPromise).rejects.toThrow(error);
         });
 
         test('A card is not added to the Notification Center', async () => {
-            const noteCards = await getCenterCardsByNotification(testApp.identity.uuid, options.id!);
+            const noteCards = await getCenterCardsByApp(testApp.identity.uuid);
             expect(noteCards).toEqual([]);
         });
 

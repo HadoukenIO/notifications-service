@@ -236,3 +236,16 @@ describe('When attempting to clear a notification that does not exist', () => {
         });
     });
 });
+
+describe('When attempting to clear a notification by passing an invalid ID', () => {
+    test('When the ID is undefined, the promise rejects with a suitable error message', async () => {
+        const promise = notifsRemote.clear(testManagerIdentity, undefined as unknown as string);
+        await expect(promise).rejects.toThrow('Invalid argument passed to clear: argument must be a string');
+    });
+
+    test('When the ID the wrong type, the promise rejects with a suitable error message', async () => {
+        const promise = notifsRemote.clear(testManagerIdentity, 1234 as unknown as string);
+        await expect(promise).rejects.toThrow('Invalid argument passed to clear: argument must be a string');
+    });
+});
+
