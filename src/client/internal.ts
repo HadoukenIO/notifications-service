@@ -14,8 +14,6 @@ import {ProviderStatus} from './provider';
 
 import {NotificationOptions, Notification, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
 
-export type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
-
 /**
  * The identity of the main application window of the service provider
  */

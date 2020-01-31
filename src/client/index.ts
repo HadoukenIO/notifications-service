@@ -11,7 +11,7 @@
 import {ActionDeclaration, NotificationActionResult, ActionTrigger} from './actions';
 import {tryServiceDispatch, eventEmitter, getEventRouter} from './connection';
 import {ButtonOptions, ControlOptions} from './controls';
-import {APITopic, Events, NotificationInternal, Omit} from './internal';
+import {APITopic, Events, NotificationInternal} from './internal';
 import {EventRouter, Transport} from './EventRouter';
 import * as provider from './provider';
 import {validateEnvironment, sanitizeEventType, sanitizeFunction} from './validation';
