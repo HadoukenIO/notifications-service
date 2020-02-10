@@ -17,7 +17,7 @@ import {ServiceStore} from '../store/ServiceStore';
 @injectable()
 export class ClientEventController {
     constructor(
-    @inject(Inject.EVENT_PUMP) eventPump: EventPump,
+        @inject(Inject.EVENT_PUMP) eventPump: EventPump,
         @inject(Inject.STORE) store: ServiceStore
     ) {
         store.onAction.add(async (action: Action<RootState>): Promise<void> => {

@@ -37,8 +37,14 @@ export interface ProviderStatus {
  * ```ts
  * import {getStatus} from 'openfin-notifications';
  *
- * getStatus();
+ * const status: ProviderStatus = getStatus();
+ * console.log(status.connected ? `Conencted to provider (version ${status.version})` : 'Not connected to provider');
  * ```
+ *
+ * Note: Connection status is only available when the connected provider is verison 0.11.2 or later. For earlier
+ * versions, this API will indicate that the provider is disconnected.
+ *
+ * @since 0.11.2
  */
 export function getStatus(): Promise<ProviderStatus> {
     // We need to race a timeout here as we never reject if the provider is not connected.
@@ -61,10 +67,17 @@ export function getStatus(): Promise<ProviderStatus> {
  * ```ts
  * import {isConnectedToAtLeast, VERSION} from 'openfin-notifications';
  *
- * isConnectedToAtLeast(VERSION);
+ * const hasMatchingProvider: boolean = isConnectedToAtLeast(VERSION);
+ * if (!hasMatchingProvider) {
+ *     console.warn('Connected to an older provider version. Some functionality may not be available.');
+ * }
  * ```
  *
+ * Note: Version information is only available when the connected provider is verison 0.11.2 or later. For earlier
+ * versions, this API will indicate that the provider is disconnected.
+ *
  * @param version Version to compare against the Provider version. This should be in semvar format.
+ * @since 0.11.2
  */
 export async function isConnectedToAtLeast(version: string): Promise<boolean> {
     const status = await getStatus();

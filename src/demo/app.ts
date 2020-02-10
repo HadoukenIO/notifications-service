@@ -1,7 +1,7 @@
 import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
 
 import * as api from '../client/index';
-// eslint-disable-next-line
+// eslint-disable-next-line no-duplicate-imports
 import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll, toggleNotificationCenter, ActionTrigger} from '../client/index';
 import {Events} from '../client/internal';
 

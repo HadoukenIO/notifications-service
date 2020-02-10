@@ -1,7 +1,6 @@
-/* eslint-disable */
-
 import {Container} from 'inversify';
 import {interfaces as inversify} from 'inversify/dts/interfaces/interfaces';
+import {DeferredPromise} from 'openfin-service-async';
 
 import {APITopic, Events} from '../../client/internal';
 import {AsyncInit} from '../controller/AsyncInit';
@@ -26,7 +25,6 @@ import {ExpiryController} from '../controller/ExpiryController';
 import {ClientEventController} from '../controller/ClientEventController';
 
 import {Inject, InjectableMap} from './Injectables';
-import {DeferredPromise} from 'openfin-service-async';
 
 /**
  * For each entry in `Inject`, defines the type that will be injected for that key.

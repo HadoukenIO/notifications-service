@@ -2,6 +2,12 @@
  * @hidden
  */
 
+/**
+ * Need a comment block here so that the comment block above is interpreted as a file comment, and not a comment on the
+ * import below.
+ *
+ * @hidden
+ */
 import {Events} from './internal';
 
 /**

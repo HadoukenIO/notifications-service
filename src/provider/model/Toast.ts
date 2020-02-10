@@ -206,7 +206,7 @@ export class Toast implements LayoutItem {
             const expectingAnimation = (state === ToastState.ACTIVE || state === ToastState.TRANSITION_OUT);
             if (expectingAnimation && this._currentTransition === null) {
                 // We want the return value of this promise to capture the animation that will be triggered by this state
-                // Change, but it hasn't yet started. Pre-create the transition promise in expectation of call to animate
+                // change, but it hasn't yet started. Pre-create the transition promise in expectation of call to animate
                 this._currentTransition = new DeferredPromise();
             }
 
@@ -318,7 +318,7 @@ export class Toast implements LayoutItem {
                 Object.assign(this._size, size);
 
                 // Note: State change will intentionally fail (to become a no-op) in cases
-                // Where the toast was destroyed immediately after creation
+                // where the toast was destroyed immediately after creation
                 this.setState(ToastState.QUEUED);
             },
             storeApi: store

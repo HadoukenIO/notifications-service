@@ -22,6 +22,7 @@ export interface LayoutItem {
 @injectable()
 export class Layouter extends AsyncInit {
     public onLayoutRequired: Signal<[]> = new Signal();
+
     private readonly _monitorModel: MonitorModel;
     private _availableRect!: ReadonlyRectangle;
     private _spawnPosition!: Point;
