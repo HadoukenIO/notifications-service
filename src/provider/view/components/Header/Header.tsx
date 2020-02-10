@@ -1,12 +1,11 @@
 import * as React from 'react';
 import {MemoryHistory} from 'history';
 
+import {CircleButton, IconType, Size} from '../CircleButton/CircleButton';
 import {ToggleCenterVisibility, ToggleCenterVisibilitySource} from '../../../store/Actions';
 import {ROUTES} from '../../routes';
 import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 import {usePreduxStore} from '../../utils/usePreduxStore';
-import {Icon} from '../Icon/Icon';
-import ArrowIcon from '../../../../../res/provider/ui/image/shapes/arrow-circ.svg';
 
 import * as Styles from './Header.module.scss';
 
@@ -33,7 +32,7 @@ export const Header: React.FC<Props> = (props) => {
         <div className={ClassNameBuilder.join(Styles, 'header')}>
             <div className={ClassNameBuilder.join(Styles, 'actions')}>
                 <div className={navigateButtonClassName.toString()}>
-                    <Icon id={navigateIsHide ? 'hide-center' : ''} src={ArrowIcon} onClick={handleNavigateClick} title={tooltip} size={25} />
+                    <CircleButton id="hide-center" type={IconType.HIDE} size={Size.NORMAL} onClick={handleNavigateClick} alt={tooltip} />
 
                 </div>
             </div>

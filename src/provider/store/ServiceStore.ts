@@ -6,7 +6,6 @@ import {Database, CollectionMap} from '../model/database/Database';
 import {Collection} from '../model/database/Collection';
 import {StoredApplication} from '../model/Environment';
 import {StoredSetting, SettingsMap} from '../model/StoredSetting';
-import {mockFeeds, NotificationFeed} from '../model/NotificationFeed';
 
 import {RootState} from './State';
 import {Store} from './Store';
@@ -18,8 +17,7 @@ export class ServiceStore extends Store<RootState> {
         applications: new Map<string, StoredApplication>(),
         centerVisible: false,
         centerLocked: true,
-        centerMuted: false,
-        feeds: []
+        centerMuted: false
     };
 
     private readonly _database: Database;
@@ -45,16 +43,12 @@ export class ServiceStore extends Store<RootState> {
         const storedCenterLocked = await settingsCollection.get(SettingsMap.CenterLocked);
         const storedCenterMuted = await settingsCollection.get(SettingsMap.CenterMuted);
 
-        // TODO [SERVICE-897]: Make this actually get the list of feeds from somewhere once the server side is built
-        const feeds: NotificationFeed[] = mockFeeds;
-
         return {
             ...ServiceStore.INITIAL_STATE,
             notifications,
             applications,
             centerLocked: storedCenterLocked ? storedCenterLocked.value as boolean : ServiceStore.INITIAL_STATE.centerLocked,
-            centerMuted: storedCenterMuted ? storedCenterMuted.value as boolean : ServiceStore.INITIAL_STATE.centerMuted,
-            feeds
+            centerMuted: storedCenterMuted ? storedCenterMuted.value as boolean : ServiceStore.INITIAL_STATE.centerMuted
         };
     }
 }
