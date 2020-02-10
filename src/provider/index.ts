@@ -52,7 +52,7 @@ export class Main {
     private readonly _webWindowFactory: WebWindowFactory;
 
     constructor(
-    @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
+        @inject(Inject.API_HANDLER) apiHandler: APIHandler<APITopic, Events>,
         @inject(Inject.CLIENT_EVENT_CONTROLLER) clientEventController: ClientEventController,
         @inject(Inject.CLIENT_REGISTRY) clientRegistry: ClientRegistry,
         @inject(Inject.DATABASE) database: Database,

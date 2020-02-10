@@ -26,7 +26,7 @@ export class CreateNotification extends Action<RootState> {
         const notifications: StoredNotification[] = state.notifications.slice();
 
         // All notification IDs must be unique. The custom dispatch logic of the `CreateNotification` event should
-        // Ensure this, but to avoid significant side-effects, also adding a sanity check here.
+        // ensure this, but to avoid significant side-effects, also adding a sanity check here.
         const index: number = state.notifications.findIndex((n) => n.id === notification.id);
         if (index >= 0) {
             // Replace existing notification with this ID
@@ -141,7 +141,7 @@ export class BlurCenter extends Action<RootState> {
 
     public async dispatch(store: StoreAPI<RootState>): Promise<void> {
         // TODO: We only need to check `recordBlur` here due to spurious blur events generated from windows in a different runtime. Investigate
-        // Properly [SERVICE-614]
+        // properly [SERVICE-614]
         if (toggleFilter.recordBlur()) {
             await super.dispatch(store);
         }

@@ -388,7 +388,7 @@ export function removeEventListener<E extends Events>(eventType: E['type'], list
  */
 export async function create(options: NotificationOptions): Promise<Notification> {
     // Most validation logic is handled on the provider, but need an early check here
-    // As we call date.valueOf when converting into a CreatePayload
+    // as we call date.valueOf when converting into a CreatePayload
     if ((typeof options !== 'object') || (options === null)) {
         throw new Error('Invalid argument passed to create: argument must be an object and must not be null');
     }
