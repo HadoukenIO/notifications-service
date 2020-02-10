@@ -14,7 +14,7 @@
     }
 
     .actions {
-        height: 60px;
+        height: 50px;
         width: 100%;
         background: var(--color-background-normal);
         display: flex;
@@ -24,26 +24,30 @@
         .buttons {
             background: var(--color-background-dark);
             height: 100%;
-            max-width: 60px;
+            max-width: 50px;
             width: 100%;
             display: flex;
             flex: 1;
             align-self: flex-end;
             justify-content: center;
-            align-items: center;
-            transform: rotate(0deg);
+            align-content: center;
+            transform: rotate(180deg);
+
+            #hide-center {
+                margin: auto;
+            }
 
             &.right {
                 margin-left: auto;
-                transform: rotate(180deg);
+                transform: rotate(0deg);
             }
         }
     }
 
     .strip {
-        min-height: 25px;
+        min-height: 30px;
         font-size: 14px;
-        height: 25px;
+        height: 30px;
         position: relative;
         background: var(--strip-background-color);
         display: flex;

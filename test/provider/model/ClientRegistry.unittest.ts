@@ -35,8 +35,7 @@ describe('When attempting to launch an app through the client registry', () => {
             applications: new Map<string, StoredApplication>(),
             centerVisible: false,
             centerLocked: false,
-            centerMuted: false,
-            feeds: []
+            centerMuted: false
         };
 
         state.applications.set(storedApp.id, storedApp);
