@@ -8,7 +8,7 @@ import {delay, Duration} from '../utils/int/delay';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {getToastWindow, getToastWindowsByApp} from '../utils/int/toastUtils';
-import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {setupCenterBookends, CenterState, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const notificationWithoutOnCloseActionResult: NotificationOptions = {
@@ -70,12 +70,14 @@ const clearCallTestParams: ClearCallTestParam[] = [
     ]
 ];
 
+setupCommonBookends();
+
 describe.each([
     ['When clearing a notification with the Notification Center open', 'center-open'],
     ['When clearing a notification with the Notification Center closed', 'center-closed']
 ] as EnvironmentTestParam[])('%s', (
     titleParam: string,
-    centerVisibility: CenterState,
+    centerVisibility: CenterState
 ) => {
     let testApp: Application;
     let testWindow: Window;
@@ -102,7 +104,7 @@ describe.each([
     });
 
     describe.each(clearCallTestParams)('%s', (
-        titleParam: string,
+        title: string,
         noteOptions: NotificationOptions[],
         indexToClear: number,
         expectedResults: (CustomData | undefined)[]
@@ -127,7 +129,7 @@ describe.each([
 
                 await expect(getCenterCardsByNotification(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual([]);
 
-                for (const note of notes.filter((note, index) => index !== indexToClear)) {
+                for (const note of notes.filter((search, index) => index !== indexToClear)) {
                     await expect(getCenterCardsByNotification(testApp.identity.uuid, note.id)).resolves.toBeTruthy();
                 }
             });
@@ -139,7 +141,7 @@ describe.each([
 
                 await expect(getToastWindow(testApp.identity.uuid, notes[indexToClear].id)).resolves.toEqual(undefined);
 
-                for (const note of notes.filter((note, index) => index !== indexToClear)) {
+                for (const note of notes.filter((search, index) => index !== indexToClear)) {
                     await expect(getToastWindow(testApp.identity.uuid, note.id)).resolves.toBeTruthy();
                 }
             });
@@ -177,7 +179,7 @@ describe.each([
 
             expect(result).toHaveLength(notes.length - 1);
 
-            for (const note of notes.filter((note, index) => index !== indexToClear)) {
+            for (const note of notes.filter((search, index) => index !== indexToClear)) {
                 expect(result).toContainEqual(note);
             }
         });
@@ -234,3 +236,16 @@ describe('When attempting to clear a notification that does not exist', () => {
         });
     });
 });
+
+describe('When attempting to clear a notification by passing an invalid ID', () => {
+    test('When the ID is undefined, the promise rejects with a suitable error message', async () => {
+        const promise = notifsRemote.clear(testManagerIdentity, undefined as unknown as string);
+        await expect(promise).rejects.toThrow('Invalid argument passed to clear: argument must be a string');
+    });
+
+    test('When the ID the wrong type, the promise rejects with a suitable error message', async () => {
+        const promise = notifsRemote.clear(testManagerIdentity, 1234 as unknown as string);
+        await expect(promise).rejects.toThrow('Invalid argument passed to clear: argument must be a string');
+    });
+});
+

@@ -11,7 +11,7 @@ import {ServiceStore} from '../store/ServiceStore';
 type ExpiringNotification = {
     notification: {
         expires: number;
-    }
+    };
 } & StoredNotification;
 
 interface ScheduledExpiry {
@@ -60,7 +60,7 @@ export class ExpiryController {
     private removeNotifications(notes: StoredNotification[]): void {
         const expiringNotificationsToRemove = notes.filter(doesExpire);
 
-        if (this._nextExpiry && expiringNotificationsToRemove.some(note => note.id === this._nextExpiry!.note.id)) {
+        if (this._nextExpiry && expiringNotificationsToRemove.some((note) => note.id === this._nextExpiry!.note.id)) {
             window.clearTimeout(this._nextExpiry.timerHandle);
             this._nextExpiry = null;
 

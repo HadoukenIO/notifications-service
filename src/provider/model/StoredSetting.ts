@@ -2,12 +2,14 @@
  * List of available settings in the settings collection.
  */
 export const enum SettingsMap {
+    CenterLocked,
+    CenterMuted
 }
 
 /**
  * Shape of the internal settings stored in the database.
  */
 export interface StoredSetting {
-    id: SettingsMap,
+    id: SettingsMap;
     value: any;
 }

@@ -1,6 +1,7 @@
 import {addSpawnListeners, createApp, createWindow} from 'openfin-service-tooling/spawn';
 
 import * as api from '../client/index';
+// eslint-disable-next-line no-duplicate-imports
 import {NotificationOptions, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent, create, addEventListener, clear, getAll, toggleNotificationCenter, ActionTrigger} from '../client/index';
 import {Events} from '../client/internal';
 
@@ -70,7 +71,7 @@ function makeNoteOfType(index: number) {
     } else if (index % 3 === 2) {
         options = {id: `1q2w3e4r${index}`, date: new Date(), ...longNote};
     } else if (index === 6) {
-        options = {id: `1q2w3e4r${index}`, date: new Date(), expires: new Date(Date.now() + 30 * 1000), onExpire: {foo: 'bar'}, ...buttonNote};
+        options = {id: `1q2w3e4r${index}`, date: new Date(), expires: new Date(Date.now() + (30 * 1000)), onExpire: {foo: 'bar'}, ...buttonNote};
     } else {
         options = {id: `1q2w3e4r${index}`, date: new Date(), ...buttonNote};
     }

@@ -7,7 +7,7 @@ console.log(`creating ${numApps} apps at: ${baseUrl}`);
 
 (async () => {
     const uuids: string[] = [];
-    for (let i=0; i<numApps; i++) {
+    for (let i = 0; i < numApps; i++) {
         uuids.push(`notifications-demoapp-${i}`);
     }
 
@@ -31,8 +31,8 @@ console.log(`creating ${numApps} apps at: ${baseUrl}`);
 
     // Close this launcher app once all launched programs have exited
     fin.System.addListener('application-closed', async () => {
-        const apps: Application[] = uuids.map(uuid => fin.Application.wrapSync({uuid}));
-        const appsRunning: boolean[] = await Promise.all(apps.map(app => app.isRunning()));
+        const apps: Application[] = uuids.map((uuid) => fin.Application.wrapSync({uuid}));
+        const appsRunning: boolean[] = await Promise.all(apps.map((app) => app.isRunning()));
         const numAppsRunning: number = appsRunning.reduce((count, isRunning) => count + (isRunning ? 1 : 0), 0);
 
         console.log(`App closed, ${numAppsRunning} test apps running`);

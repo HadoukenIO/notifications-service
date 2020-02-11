@@ -2,10 +2,9 @@ import {Signal} from 'openfin-service-signal';
 
 import {AsyncInit} from '../controller/AsyncInit';
 import {ErrorAggregator} from '../model/Errors';
+import {ErrorHandler} from '../model/ErrorHandler';
 
 export abstract class Action<S> {
-    public abstract readonly type: string;
-
     public async dispatch(store: StoreAPI<S>): Promise<void> {
         await store.dispatch(this);
     }
@@ -13,6 +12,8 @@ export abstract class Action<S> {
     public reduce(state: S): S {
         return state;
     }
+
+    public abstract readonly type: string;
 }
 
 export class Init<S> extends Action<S> {
@@ -50,7 +51,11 @@ export class Store<S> extends AsyncInit {
     }
 
     public dispatch(action: Action<S>): Promise<void> {
-        return this.reduceAndSignal(action);
+        return this.reduceAndSignal(action).catch((error) => {
+            // Log and propagate
+            ErrorHandler.for(error).log();
+            throw error;
+        });
     }
 
     protected async init(): Promise<void> {}
@@ -67,7 +72,7 @@ export class Store<S> extends AsyncInit {
 
     private reduce(action: Action<S>): void {
         this._currentState = action.reduce(this.state);
-        this._listeners.forEach(listener => listener(() => this._currentState));
+        this._listeners.forEach((listener) => listener(() => this._currentState));
     }
 
     // Intended to be used by react-redux only - use `state` instead

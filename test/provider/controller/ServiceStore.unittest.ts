@@ -1,21 +1,24 @@
 import 'reflect-metadata';
 
+import {DeferredPromise} from 'openfin-service-async';
+
 import {ServiceStore} from '../../../src/provider/store/ServiceStore';
 import {createMockDatabase, createMockCollection, getterMock, createMockAction} from '../../utils/unit/mocks';
 import {StoredNotification} from '../../../src/provider/model/StoredNotification';
 import {StoredApplication} from '../../../src/provider/model/Environment';
 import {CollectionMap, Database} from '../../../src/provider/model/database/Database';
-import {DeferredPromise} from '../../../src/provider/common/DeferredPromise';
 import {createFakeStoredNotification, createFakeStoredApplication, createFakeEmptyRootState} from '../../utils/unit/fakes';
 import {normalizeRootState} from '../../utils/unit/normalization';
 import {RootState} from '../../../src/provider/store/State';
 import {Action} from '../../../src/provider/store/Store';
 import {resolvePromiseChain} from '../../utils/unit/time';
+import {StoredSetting} from '../../../src/provider/model/StoredSetting';
 
 const mockDatabase = createMockDatabase();
 
 const mockNotificationsCollection = createMockCollection<StoredNotification>();
 const mockApplicationsCollection = createMockCollection<StoredApplication>();
+const mockSettingsCollection = createMockCollection<StoredSetting>();
 
 let databaseInitializedDeferredPromise: DeferredPromise<jest.Mocked<Database>>;
 
@@ -33,6 +36,8 @@ beforeEach(() => {
             return mockNotificationsCollection;
         } else if (collectionName === CollectionMap.APPLICATIONS) {
             return mockApplicationsCollection;
+        } else if (collectionName === CollectionMap.SETTINGS) {
+            return mockSettingsCollection;
         } else {
             throw new Error('Attempting to get unknown collection');
         }
@@ -60,7 +65,9 @@ describe('When the store is uninitialized', () => {
             notifications: [note1, note2, note3],
             applications: new Map([[app1.id, app1], [app2.id, app2], [app3.id, app3]]),
             centerVisible: false,
-            centerLocked: false}));
+            centerLocked: true,
+            centerMuted: false
+        }));
     });
 
     test('When creating the store, and the database is empty, the state is set from the database', async () => {
@@ -73,7 +80,8 @@ describe('When the store is uninitialized', () => {
             notifications: [],
             applications: new Map([]),
             centerVisible: false,
-            centerLocked: false}));
+            centerLocked: true,
+            centerMuted: false}));
     });
 });
 
@@ -146,7 +154,10 @@ describe('When the store is initialized', () => {
 
             let resolved = false;
 
-            const promise = serviceStore.dispatch(mockAction).then(() => resolved = true);
+            const promise = serviceStore.dispatch(mockAction).then(() => {
+                resolved = true;
+                return resolved;
+            });
             await resolvePromiseChain();
             expect(resolved).toBeFalsy();
 

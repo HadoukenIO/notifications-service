@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import {Signal} from 'openfin-service-signal';
 import {Identity} from 'openfin/_v2/main';
+import {ChannelProvider} from 'openfin/_v2/api/interappbus/channel/provider';
 
 import {EventPump} from '../../../src/provider/model/EventPump';
 import {NotificationClosedEvent, NotificationActionEvent} from '../../../src/client';
@@ -23,6 +24,7 @@ const fakeWindow2 = {...createFakeIdentity(), uuid: fakeAppUuid};
 let eventPump: EventPump;
 
 beforeEach(() => {
+    getterMock(mockApiHandler, 'channel').mockReturnValue({} as ChannelProvider);
     getterMock(mockClientRegistry, 'onAppActionReady').mockReturnValue(new Signal<[Identity]>());
 
     eventPump = new EventPump(mockClientRegistry, mockApiHandler);

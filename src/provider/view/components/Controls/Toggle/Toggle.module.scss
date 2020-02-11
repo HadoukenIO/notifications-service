@@ -1,0 +1,96 @@
+$size: 20px;
+$height: 50px;
+$width: 70px;
+$fontSize: 16px;
+
+.toggle {
+    position: relative;
+    width: $width;
+    min-width: $width;
+    max-width: $width;
+    background: var(--color-background-dark);
+    border-radius: $size;
+    padding: 5px;
+    cursor: pointer;
+    margin: 2px;
+    display: table;
+    flex: 1;
+    align-content: center;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+    transition: background 0.2s ease-in;
+
+    &:focus {
+        outline: none;
+    }
+
+    &.on {
+        &:before {
+            content: 'on';
+            text-align: left;
+            right: 0px;
+            color: var(--color-background-dark);
+        }
+
+        background: var(--color-accent);
+
+        .inner .knob {
+            background: var(--color-background-dark);
+        }
+    }
+
+    &.off {
+        &:before {
+            content: 'off';
+            text-align: right;
+            right: 0px;
+            color: var(--color-foreground);
+        }
+    }
+
+    &:before {
+        text-transform: uppercase;
+        position: absolute;
+        display: table-cell;
+        top: 0px;
+        left: 0px;
+        font-size: $fontSize;
+        font-weight: 600;
+        height: 100%;
+        padding: 0 #{($width/4 - 8)};
+        vertical-align: middle;
+        line-height: $size + 10px;
+    }
+
+    &.on .knob {
+        left: calc(100% - #{$size});
+    }
+
+    &.off .knob {
+        left: 0%;
+    }
+
+    .inner {
+        position: relative;
+        width: 100%;
+        height: $size;
+
+        .knob {
+            position: absolute;
+            background: var(--text-secondary-color);
+            transition: background 0.3s ease-in !important;
+            height: $size;
+            width: $size;
+            border-radius: $size;
+            transition: left 0.1s ease-out;
+        }
+    }
+
+    &:hover {
+        .inner {
+            .knob {
+                background: var(--color-foreground);
+            }
+        }
+    }
+}

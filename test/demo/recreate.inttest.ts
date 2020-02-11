@@ -10,7 +10,7 @@ import {fin} from '../utils/int/fin';
 import {getToastIdentity} from '../utils/int/toastUtils';
 import {assertDOMMatches, CardType} from '../utils/int/cardUtils';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
-import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {setupCenterBookends, CenterState, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const firstOptions: NotificationOptions = {
@@ -27,8 +27,10 @@ const secondOptions: NotificationOptions = {
     category: 'Test Notification Category'
 };
 
+setupCommonBookends();
+
 describe('When creating a notification with an ID that already exists but different options', () => {
-    describe.each(['center-open', 'center-closed'] as CenterState[])('Center showing: %s', centerVisibility => {
+    describe.each(['center-open', 'center-closed'] as CenterState[])('Center showing: %s', (centerVisibility) => {
         let testApp: Application;
         let testWindow: Window;
 
@@ -42,7 +44,7 @@ describe('When creating a notification with an ID that already exists but differ
 
             // Quick sanity check that there is not already a notification with that ID
             const notes = await notifsRemote.getAll(testWindow.identity);
-            expect(notes.some(note => note.id === firstOptions.id)).not.toBeTruthy();
+            expect(notes.some((note) => note.id === firstOptions.id)).not.toBeTruthy();
 
             // Create the "existing" notification
             existingNote = await notifsRemote.create(testWindow.identity, firstOptions);
@@ -56,6 +58,7 @@ describe('When creating a notification with an ID that already exists but differ
 
         test('The promise resolves to the new notification object', async () => {
             const newNotePromise = notifsRemote.create(testWindow.identity, secondOptions);
+            // eslint-disable-next-line
             expect(newNotePromise).resolves;
 
             expect(await newNotePromise).toMatchObject(secondOptions);
@@ -106,7 +109,7 @@ describe('When creating a notification with an ID that already exists but differ
                     await fin.System.addListener('window-closed', finCloseListener);
                 });
 
-                afterEach(async () =>{
+                afterEach(async () => {
                     // Tidy up the listeners when we're done
                     await fin.System.removeListener('window-created', finOpenListener);
                     await fin.System.removeListener('window-closed', finCloseListener);

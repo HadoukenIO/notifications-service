@@ -14,6 +14,7 @@
 import {EventEmitter} from 'events';
 
 import {ChannelClient} from 'openfin/_v2/api/interappbus/channel/client';
+import {DeferredPromise} from 'openfin-service-async';
 
 import {APITopic, SERVICE_CHANNEL, API, SERVICE_IDENTITY, Events} from './internal';
 import {EventRouter, Targeted, Transport} from './EventRouter';
@@ -33,13 +34,21 @@ export const eventEmitter = new EventEmitter();
 /**
  * Promise to the channel object that allows us to connect to the client
  */
-export let channelPromise: Promise<ChannelClient>;
+let channelPromise: Promise<ChannelClient> | null;
+const hasDOMContentLoaded = new DeferredPromise<void>();
+let hasChannelDisconnectListener = false;
+let reconnect = false;
 
 if (typeof fin !== 'undefined') {
     getServicePromise();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        hasDOMContentLoaded.resolve();
+    });
 }
 
-export function getServicePromise(): Promise<ChannelClient> {
+export async function getServicePromise(): Promise<ChannelClient> {
+    await hasDOMContentLoaded.promise;
     if (!channelPromise) {
         if (typeof fin === 'undefined') {
             const msg: string = 'fin is not defined. The openfin-notifications module is only intended for use in an OpenFin application.';
@@ -49,16 +58,44 @@ export function getServicePromise(): Promise<ChannelClient> {
             // that includes this, but for now it is easier to put a guard in place.
             channelPromise = Promise.reject(new Error('Trying to connect to provider from provider'));
         } else {
-            channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
+            const timeoutHandle = window.setTimeout(() => {
+                console.warn('Taking a long time to connect to Notifications service. Is the Notifications service running?');
+            }, 5000);
+
+            channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {
+                wait: true,
+                payload: {version: PACKAGE_VERSION}
+            }).then((channel: ChannelClient) => {
+                window.clearTimeout(timeoutHandle);
+
                 const eventRouter = getEventRouter();
 
                 // Register service listeners
-                channel.register('WARN', (payload: any) => console.warn(payload));
+                channel.register('WARN', (payload: unknown) => console.warn(payload));
                 channel.register('event', (event: Targeted<Transport<Events>>) => {
                     eventRouter.dispatchEvent(event);
                 });
                 // Any unregistered action will simply return false
                 channel.setDefaultAction(() => false);
+
+                if (!hasChannelDisconnectListener) {
+                    channel.onDisconnection(() => {
+                        console.warn('Disconnected from Notifications service');
+                        reconnect = true;
+                        channelPromise = null;
+                        setTimeout(() => {
+                            console.log('Attempting to reconnect to Notifications service');
+                            getServicePromise();
+                        }, 300);
+                    });
+                    hasChannelDisconnectListener = true;
+                }
+
+                if (reconnect) {
+                    console.log('Reconnected to Notifications service');
+                } else {
+                    console.log('Connected to Notifications service');
+                }
 
                 return channel;
             });
@@ -74,7 +111,7 @@ export function getServicePromise(): Promise<ChannelClient> {
  * @param payload Data payload to send to the provider.
  */
 export async function tryServiceDispatch<T extends APITopic>(action: T, payload: API[T][0]): Promise<API[T][1]> {
-    const channel: ChannelClient = await channelPromise;
+    const channel: ChannelClient = await getServicePromise();
     return channel.dispatch(action, payload) as Promise<API[T][1]>;
 }
 

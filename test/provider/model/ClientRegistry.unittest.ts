@@ -14,7 +14,7 @@ const mockApiHandler = createMockApiHandler();
 const mockEnvironment = createMockEnvironment();
 const mockServiceStore = createMockServiceStore();
 
-beforeEach(async () => {
+beforeEach(() => {
     jest.resetAllMocks();
 
     getterMock(mockApiHandler, 'onConnection').mockReturnValue(new Signal<[Identity]>());
@@ -27,14 +27,15 @@ describe('When attempting to launch an app through the client registry', () => {
 
     let clientRegistry: ClientRegistry;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         storedApp = createFakeStoredApplication();
 
         const state = {
             notifications: [],
             applications: new Map<string, StoredApplication>(),
             centerVisible: false,
-            centerLocked: false
+            centerLocked: false,
+            centerMuted: false
         };
 
         state.applications.set(storedApp.id, storedApp);

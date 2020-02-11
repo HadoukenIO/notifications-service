@@ -1,14 +1,14 @@
 import * as React from 'react';
 
 import {NotificationTime} from '../NotificationTime/NotificationTime';
-import {Button} from '../Controls/Button/Button';
+import {Button} from '../NotificationButton/NotificationButton';
 import {CircleButton, IconType} from '../CircleButton/CircleButton';
 import {RemoveNotifications, ClickButton, ClickNotification, MinimizeToast} from '../../../store/Actions';
 import {useOnClickOnly} from '../../hooks/Clicks';
-import {ClassNames} from '../../utils/ClassNames';
 import {TitledNotification, Actionable} from '../../types';
 import {LaunchApplicationError} from '../../../model/Errors';
 import {ErrorHandler} from '../../../model/ErrorHandler';
+import {ClassNameBuilder} from '../../utils/ClassNameBuilder';
 
 import {Body} from './Body';
 import {Loading} from './Loading';
@@ -79,7 +79,7 @@ export function NotificationCard(props: Props) {
         finishedClick();
     };
 
-    const classNames = new ClassNames('notification-card', 'no-select', ['uninteractable', (loading || uninteractable)], ['toast', isToast]);
+    const classNames = new ClassNameBuilder(undefined, 'notification-card', 'no-select', ['uninteractable', (loading || uninteractable)], ['toast', isToast]);
 
     return (
         <div
@@ -94,10 +94,10 @@ export function NotificationCard(props: Props) {
                 <div className="time-close">
                     <NotificationTime date={data.date} />
                     <div className="actions">
-                        {isToast &&
-                            <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationMinimize} alt="Minimize Toast" />
+                        {isToast
+                            ? <CircleButton type={IconType.MINIMIZE} onClick={handleNotificationMinimize} alt="Minimize Toast" />
+                            : <CircleButton type={IconType.CLOSE} onClick={handleNotificationClose} alt="Clear notification" />
                         }
-                        <CircleButton type={IconType.CLOSE} onClick={handleNotificationClose} alt="Clear notification" />
                     </div>
                 </div>
             </div>

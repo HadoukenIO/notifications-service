@@ -1,4 +1,4 @@
-import {BatchError, ErrorConstructor} from './Errors';
+import {BatchError, ErrorConstructor, CustomError} from './Errors';
 
 /**
  * Util for consicely handling both errors (both singular and batches).
@@ -8,15 +8,15 @@ export class ErrorHandler {
         return new ErrorHandler(error);
     }
 
-    private errors: Error[];
-    private handledErrors: Error[];
-    private unhandledErrors: Error[];
+    private readonly errors: Error[];
+    private readonly handledErrors: Error[];
+    private readonly unhandledErrors: Error[];
 
     private constructor(error: Error) {
         if (error instanceof BatchError) {
             this.errors = [];
 
-            error.errors.forEach(value => {
+            error.errors.forEach((value) => {
                 if (value instanceof Error) {
                     this.errors.push(value);
                 } else {
@@ -83,7 +83,7 @@ export class ErrorHandler {
      *
      * Will only throw if there are unhandled errors.
      */
-    public throwRemaining(): void {
+    public throwRemaining(): this {
         const unhandledErrors = this.unhandledErrors;
 
         if (unhandledErrors.length > 1) {
@@ -91,21 +91,48 @@ export class ErrorHandler {
         } else if (unhandledErrors.length === 1) {
             throw unhandledErrors[0];
         }
+
+        return this;
     }
 
-    public log(): void {
+    public log(): this {
         const ERROR_CSS = 'border: 1px solid #FFD6D6; background: #FFF0F0; color: blue; width: 100%;';
-        console.groupCollapsed(`%cError (${this.errors.length})`, ERROR_CSS);
-        this.errors.forEach(error => {
+        function logError(error: Error) {
             if (error instanceof BatchError) {
                 new ErrorHandler(error).log();
             } else {
-                console.groupCollapsed(error.name, error.message);
-                console.log(error.stack);
+                // Print error name, message and stack trace (stack trace also contains name+message, omit first line of stack)
+                console.groupCollapsed(`${error.name}: ${error.message}`);
+
+                if (error.stack) {
+                    console.log(error.stack.replace(/^[^\n]*\n/, ''));
+                }
+
+                // If this is a CustomError, also print any available metadata
+                if (error instanceof CustomError && error.metadata) {
+                    const {metadata} = error;
+                    console.groupCollapsed('Additional Metadata...');
+                    for (const key in metadata) {
+                        console.group(key);
+                        console.log(metadata[key]);
+                        console.groupEnd();
+                    }
+                    console.groupEnd();
+                }
+
                 console.groupEnd();
             }
-        });
-        console.groupEnd();
+        }
+
+        if (this.errors.length > 1) {
+            console.groupCollapsed(`%cError (${this.errors.length})`, ERROR_CSS);
+            this.errors.forEach(logError);
+            console.groupEnd();
+        } else {
+            logError(this.errors[0]);
+        }
+
+        return this;
     }
 
     /**

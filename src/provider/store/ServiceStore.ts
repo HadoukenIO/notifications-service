@@ -5,17 +5,19 @@ import {StoredNotification} from '../model/StoredNotification';
 import {Database, CollectionMap} from '../model/database/Database';
 import {Collection} from '../model/database/Collection';
 import {StoredApplication} from '../model/Environment';
+import {StoredSetting, SettingsMap} from '../model/StoredSetting';
 
 import {RootState} from './State';
 import {Store} from './Store';
 
 @injectable()
 export class ServiceStore extends Store<RootState> {
-    private static INITIAL_STATE: RootState = {
+    private static readonly INITIAL_STATE: RootState = {
         notifications: [],
         applications: new Map<string, StoredApplication>(),
         centerVisible: false,
-        centerLocked: false
+        centerLocked: true,
+        centerMuted: false
     };
 
     private readonly _database: Database;
@@ -35,8 +37,18 @@ export class ServiceStore extends Store<RootState> {
         const notifications: StoredNotification[] = await notificationCollection.getAll();
 
         const applicationsCollection: Collection<StoredApplication> = this._database.get(CollectionMap.APPLICATIONS);
-        const applications = new Map<string, StoredApplication>((await applicationsCollection.getAll()).map(application => [application.id, application]));
+        const applications = new Map<string, StoredApplication>((await applicationsCollection.getAll()).map((application) => [application.id, application]));
 
-        return Object.assign({}, ServiceStore.INITIAL_STATE, {notifications, applications});
+        const settingsCollection: Collection<StoredSetting> = this._database.get(CollectionMap.SETTINGS);
+        const storedCenterLocked = await settingsCollection.get(SettingsMap.CenterLocked);
+        const storedCenterMuted = await settingsCollection.get(SettingsMap.CenterMuted);
+
+        return {
+            ...ServiceStore.INITIAL_STATE,
+            notifications,
+            applications,
+            centerLocked: storedCenterLocked ? storedCenterLocked.value as boolean : ServiceStore.INITIAL_STATE.centerLocked,
+            centerMuted: storedCenterMuted ? storedCenterMuted.value as boolean : ServiceStore.INITIAL_STATE.centerMuted
+        };
     }
 }

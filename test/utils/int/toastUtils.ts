@@ -14,18 +14,18 @@ export function getToastIdentity(sourceUuid: string, notificationId: string): Id
 
 export async function getAllToastWindows(): Promise<Window[]> {
     const childWindows = await fin.Application.wrapSync(SERVICE_IDENTITY).getChildWindows();
-    return childWindows.filter(win => win.identity.name && win.identity.name.startsWith('Notification-Toast:'));
+    return childWindows.filter((win) => win.identity.name && win.identity.name.startsWith('Notification-Toast:'));
 }
 
 export async function getToastWindowsByApp(sourceUuid: string): Promise<Window[]> {
     const childWindows = await fin.Application.wrapSync(SERVICE_IDENTITY).getChildWindows();
-    return childWindows.filter(win => win.identity.name && win.identity.name.startsWith(`Notification-Toast:${sourceUuid}:`));
+    return childWindows.filter((win) => win.identity.name && win.identity.name.startsWith(`Notification-Toast:${sourceUuid}:`));
 }
 
 export async function getToastWindow(sourceUuid: string, notificationId: string): Promise<Window | undefined> {
     const toastIdentity = getToastIdentity(sourceUuid, notificationId);
     const childWindows = await fin.Application.wrapSync(SERVICE_IDENTITY).getChildWindows();
-    return childWindows.find(win => win.identity.uuid === toastIdentity.uuid && win.identity.name === toastIdentity.name);
+    return childWindows.find((win) => win.identity.uuid === toastIdentity.uuid && win.identity.name === toastIdentity.name);
 }
 
 const ofBrowser = new OFPuppeteerBrowser();

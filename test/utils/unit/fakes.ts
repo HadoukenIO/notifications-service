@@ -56,7 +56,7 @@ export function createFakeStoredApplication(): StoredApplication {
 }
 
 // Prefer `createFakeStoredApplication`, unless your test absolutely depends on the type of stored application
-export function createFakeManifestStoredApplication(): StoredApplication & {type: 'manifest', manifestUrl: string} {
+export function createFakeManifestStoredApplication(): StoredApplication & {type: 'manifest'; manifestUrl: string} {
     return {
         type: 'manifest',
         id: `test-app-${idString()}`,
@@ -66,7 +66,7 @@ export function createFakeManifestStoredApplication(): StoredApplication & {type
 }
 
 // Prefer `createFakeStoredApplication`, unless your test absolutely depends on the type of stored application
-export function createFakeProgrammaticApplication(): StoredApplication & {type: 'programmatic', initialOptions: ApplicationOption} {
+export function createFakeProgrammaticApplication(): StoredApplication & {type: 'programmatic'; initialOptions: ApplicationOption} {
     const uuid = idString();
 
     return {
@@ -83,7 +83,8 @@ export function createFakeEmptyRootState(): RootState {
         notifications: [],
         applications: new Map<string, StoredApplication>(),
         centerVisible: false,
-        centerLocked: false
+        centerLocked: true,
+        centerMuted: false
     };
 }
 

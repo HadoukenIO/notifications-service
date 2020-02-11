@@ -1,10 +1,10 @@
 import {ElementHandle} from 'puppeteer';
+import {parallelMap} from 'openfin-service-async';
 
 import {Notification} from '../../../src/client';
 import {getDate} from '../../../src/provider/view/utils/Time';
 import {renderMarkdown} from '../../../src/provider/view/utils/Markdown';
 
-import {promiseMap} from './asyncUtils';
 import {getToastCards} from './toastUtils';
 import {getCenterCardsByNotification} from './centerUtils';
 
@@ -17,7 +17,7 @@ export interface NotificationCardMetadata {
     sourceApp?: string;
     timeString?: string;
     icon: string;
-    buttons?: ButtonMetadata[]
+    buttons?: ButtonMetadata[];
 }
 
 /**
@@ -45,7 +45,7 @@ export async function assertDOMMatches(type: CardType, sourceUuid: string, note:
     const expectedMetadata: NotificationCardMetadata = {
         title: note.title,
         body: renderMarkdown(note.body),
-        buttons: note.buttons.map(button => ({title: button.title, iconUrl: button.iconUrl || ''})),
+        buttons: note.buttons.map((button) => ({title: button.title, iconUrl: button.iconUrl || ''})),
         icon: note.icon,
         sourceApp: sourceUuid,
         timeString: getDate(note.date)
@@ -70,7 +70,7 @@ export async function getCardMetadata(card: ElementHandle): Promise<Notification
     const icon = (await getStyleBySelector(card, '.app-icon', 'background-image')) || '';
 
     const buttonElements = await card.$$('.button');
-    const buttons = await promiseMap(buttonElements, async (button): Promise<ButtonMetadata> => {
+    const buttons = await parallelMap(buttonElements, async (button): Promise<ButtonMetadata> => {
         return {
             title: await getPropertyBySelector(button, 'span', 'innerText'),
             iconUrl: (await getPropertyBySelector(button, 'img', 'src')) || ''
@@ -102,11 +102,11 @@ async function getStyleBySelector(rootElement: ElementHandle, selectorString: st
         return undefined;
     }
 
-    const style = await (await queryElement.getProperty('style'));
+    const style = await queryElement.getProperty('style');
     const styleProp = await style.getProperty(styleAttribute);
     let value: string = await styleProp.jsonValue() || '';
     // strip url(\"\") from strings
-    value = value.match(/\(['"](.*?)['"]\)/)![1];
+    value = /\(['"](.*?)['"]\)/.exec(value)![1];
 
     return value;
 }

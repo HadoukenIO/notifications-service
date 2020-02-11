@@ -9,7 +9,7 @@ import * as providerRemote from '../utils/int/providerRemote';
 import {delay, Duration} from '../utils/int/delay';
 import {getToastCards} from '../utils/int/toastUtils';
 import {testManagerIdentity, testAppUrlListenersOnStartup} from '../utils/int/constants';
-import {waitForAppToBeRunning} from '../utils/int/common';
+import {waitForAppToBeRunning, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 
 const relaunchNotificationOptions: NotificationOptions = {
@@ -26,6 +26,8 @@ const nonRelaunchNotificationOptions: NotificationOptions = {
     title: 'Test Notification Title',
     category: 'Test Notification Category'
 };
+
+setupCommonBookends();
 
 describe('When an app that uses notification-service is created', () => {
     let testApp: Application;

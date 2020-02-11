@@ -19,7 +19,7 @@ export function assertHydratedCorrectly(options: NotificationOptions, fullNote: 
         icon: options.icon || '',
         customData: options.customData !== undefined ? options.customData : {},
         expires: options.expires !== undefined && options.expires !== null ? new Date(options.expires) : null,
-        buttons: options.buttons ? options.buttons.map(btn => ({...btn, iconUrl: btn.iconUrl || ''})) : []
+        buttons: options.buttons ? options.buttons.map((btn) => ({...btn, iconUrl: btn.iconUrl || ''})) : []
     };
     expect(fullNote).toMatchObject(expectedValues);
 }

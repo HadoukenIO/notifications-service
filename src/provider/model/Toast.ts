@@ -1,9 +1,10 @@
 import {Signal, Aggregators} from 'openfin-service-signal';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
 import {Opacity} from 'openfin/_v2/shapes';
+import {DeferredPromise} from 'openfin-service-async';
 
-import {renderApp} from '../view/containers/ToastApp/ToastApp';
-import {DeferredPromise} from '../common/DeferredPromise';
+import {ToastApp} from '../view/containers/ToastApp/ToastApp';
+import {renderComponentInWindow} from '../view/utils/RenderApp';
 import {LayoutItem} from '../controller/Layouter';
 import {LayouterConfig} from '../controller/LayouterConfig';
 import {ServiceStore} from '../store/ServiceStore';
@@ -116,15 +117,15 @@ export class Toast implements LayoutItem {
     public readonly onStateChange: Signal<[Toast, ToastState], Promise<void>> = new Signal(Aggregators.AWAIT_VOID);
 
     private _state: ToastState;
-    private _webWindow: Readonly<Promise<WebWindow>>;
+    private readonly _webWindow: Readonly<Promise<WebWindow>>;
     private _timeout: number;
-    private _id: string;
+    private readonly _id: string;
 
-    private _origin: Point;
-    private _size: Point;
+    private readonly _origin: Point;
+    private readonly _size: Point;
 
     private _currentTransition: DeferredPromise | null;
-    private _activeTransitions: Promise<void>[];
+    private readonly _activeTransitions: Promise<void>[];
 
     /**
      * The id of the notification this Toast represents.
@@ -309,47 +310,46 @@ export class Toast implements LayoutItem {
 
         // Show window offscreen so it can render and then hide it
         const {virtualScreen} = monitorModel.monitorInfo;
-        await webWindow.showAt(virtualScreen.left - windowOptions.defaultWidth! * 2, virtualScreen.top - windowOptions.defaultHeight! * 2);
+        await webWindow.showAt(virtualScreen.left - (windowOptions.defaultWidth! * 2), virtualScreen.top - (windowOptions.defaultHeight! * 2));
         await webWindow.hide();
-
-        // Wait for the React component to render and then get the dimensions of it to resize the window.
-        renderApp(
+        const props = {
             notification,
-            webWindow,
-            store,
-            (size: Point) => {
+            setWindowSize: (size: Point) => {
                 Object.assign(this._size, size);
 
                 // Note: State change will intentionally fail (to become a no-op) in cases
                 // where the toast was destroyed immediately after creation
                 this.setState(ToastState.QUEUED);
-            }
-        );
+            },
+            storeApi: store
+        };
 
+        // Wait for the React component to render and then get the dimensions of it to resize the window.
+        renderComponentInWindow(ToastApp, webWindow, store, webWindow.document.getElementById('react-app')!, props);
         return webWindow;
     }
 
-    private async freeze(): Promise<void> {
+    private freeze(): void {
         clearTimeout(this._timeout);
         this._timeout = 0;
     }
 
-    private async unfreeze(): Promise<void> {
+    private unfreeze(): void {
         if (this._state <= ToastState.ACTIVE) {
             this._timeout = window.setTimeout(this.timeoutHandler, Toast.TIMEOUT);
         }
     }
 
-    private timeoutHandler = (): void => {
+    private readonly timeoutHandler = (): void => {
         this._timeout = 0;
         this.setState(ToastState.TRANSITION_OUT);
     };
 
-    private mouseEnterHandler = (): void => {
+    private readonly mouseEnterHandler = (): void => {
         Toast.onFreezeToggle.emit(true);
     };
 
-    private mouseLeaveHandler = (): void => {
+    private readonly mouseLeaveHandler = (): void => {
         Toast.onFreezeToggle.emit(false);
     };
 

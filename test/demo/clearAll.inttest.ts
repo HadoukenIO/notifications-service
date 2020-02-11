@@ -6,7 +6,7 @@ import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {delay, Duration} from '../utils/int/delay';
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
-import {setupCenterBookends, CenterState} from '../utils/int/common';
+import {setupCenterBookends, CenterState, setupCommonBookends} from '../utils/int/common';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
 import {getCenterCardsByApp} from '../utils/int/centerUtils';
 import {getToastWindowsByApp} from '../utils/int/toastUtils';
@@ -70,6 +70,8 @@ const clearAllCallTestParam: ClearAllCallTestParam[] = [
     ]
 ];
 
+setupCommonBookends();
+
 describe.each([
     ['When clearing all notifications with the Notification Center open', 'center-open'],
     ['When clearing all notifications with the Notification Center closed', 'center-closed']
@@ -101,7 +103,7 @@ describe.each([
         await testApp.quit();
     });
 
-    describe.each(clearAllCallTestParam)('%s', (titleParam: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
+    describe.each(clearAllCallTestParam)('%s', (title: string, noteOptions: NotificationOptions[], expectedResults: (CustomData | undefined)[]) => {
         const notes: Notification[] = [];
 
         beforeEach(async () => {
@@ -131,7 +133,7 @@ describe.each([
         });
 
         test('The `notification-action` event has been fired with the expected payload', async () => {
-            expect(actionListener).toBeCalledTimes(expectedResults.filter(result => result !== undefined).length);
+            expect(actionListener).toBeCalledTimes(expectedResults.filter((result) => result !== undefined).length);
 
             for (let i = 0; i < notes.length; i++) {
                 const note = notes[i];

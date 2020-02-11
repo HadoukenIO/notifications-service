@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import {Identity, System} from 'openfin/_v2/main';
 import {TrayInfo, Application} from 'openfin/_v2/api/application/application';
 import {WindowOption} from 'openfin/_v2/api/window/windowOption';
@@ -37,13 +39,13 @@ import {RootState} from '../../../src/provider/store/State';
 /**
  * Incomplete type representing a mock `fin` object. This should be expanded as tests require.
  */
-export type MockFin = {
+export interface MockFin {
     Application: {
         wrapSync: jest.Mock<Promise<Application>, [Identity]>;
         createFromManifest: jest.Mock<Promise<Application>, [string]>;
         create: jest.Mock<Promise<Application>, [ApplicationOption]>;
     };
- };
+}
 
 const apiHandlerPath = '../../../src/provider/model/APIHandler';
 const clientEventControllerPath = '../../../src/provider/controller/ClientEventController';
@@ -209,7 +211,7 @@ export function createMockCollection<T extends Collections[keyof Collections]>()
 export function createMockAction(): jest.Mocked<Action<RootState>> {
     const {Action} = jest.requireMock(actionPath);
 
-    return new Action;
+    return new Action();
 }
 
 /**
@@ -264,7 +266,7 @@ export function useMocksInInjector(): void {
         [Inject.WEB_WINDOW_FACTORY]: createMockWebWindowFactory()
     };
 
-    Object.keys(bindings).forEach(k => {
+    Object.keys(bindings).forEach((k) => {
         const key = k as keyof InjectableMap;
         Injector.rebind(key).toConstantValue(bindings[key]);
     });

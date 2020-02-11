@@ -10,10 +10,9 @@
  */
 
 import {NotificationActionResult, ActionTrigger} from './actions';
+import {ProviderStatus} from './provider';
 
 import {NotificationOptions, Notification, NotificationActionEvent, NotificationClosedEvent, NotificationCreatedEvent} from './index';
-
-export type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
 
 /**
  * The identity of the main application window of the service provider
@@ -35,10 +34,11 @@ export const enum APITopic {
     CLEAR_APP_NOTIFICATIONS = 'clear-app-notifications',
     TOGGLE_NOTIFICATION_CENTER = 'toggle-notification-center',
     ADD_EVENT_LISTENER = 'add-event-listener',
-    REMOVE_EVENT_LISTENER = 'remove-event-listener'
+    REMOVE_EVENT_LISTENER = 'remove-event-listener',
+    GET_PROVIDER_STATUS = 'get-provider-status'
 }
 
-export type API = {
+export interface API {
     [APITopic.CREATE_NOTIFICATION]: [CreatePayload, NotificationInternal];
     [APITopic.CLEAR_NOTIFICATION]: [ClearPayload, boolean];
     [APITopic.CLEAR_APP_NOTIFICATIONS]: [undefined, number];
@@ -46,16 +46,17 @@ export type API = {
     [APITopic.TOGGLE_NOTIFICATION_CENTER]: [undefined, void];
     [APITopic.ADD_EVENT_LISTENER]: [Events['type'], void];
     [APITopic.REMOVE_EVENT_LISTENER]: [Events['type'], void];
-};
+    [APITopic.GET_PROVIDER_STATUS]: [undefined, ProviderStatus];
+}
 
 export type Events = NotificationActionEvent | NotificationClosedEvent | NotificationCreatedEvent;
 
 export type TransportMappings<T> =
     T extends NotificationActionEvent ? NotificationActionEventTransport :
-    never;
+        never;
 export type TransportMemberMappings<T> =
     T extends Notification ? NotificationInternal :
-    T;
+        T;
 
 export interface CreatePayload extends Omit<NotificationOptions, 'date' | 'expires'> {
     date?: number;
@@ -73,7 +74,7 @@ export interface ClearPayload {
 
 export interface NotificationActionEventTransport {
     type: 'notification-action';
-    notification: Readonly<NotificationInternal>
+    notification: Readonly<NotificationInternal>;
     result: NotificationActionResult;
     trigger: ActionTrigger;
 

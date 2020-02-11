@@ -6,6 +6,8 @@ import moment from 'moment';
 
 import {APITopic, API, ClearPayload, CreatePayload, NotificationInternal, Events} from '../client/internal';
 import {ActionDeclaration} from '../client/actions';
+import {ProviderStatus} from '../client/provider';
+import {ButtonOptions} from '../client';
 
 import {Injector} from './common/Injector';
 import {Inject} from './common/Injectables';
@@ -27,10 +29,12 @@ import {WebWindowFactory} from './model/WebWindow';
 import {Environment} from './model/Environment';
 import {Layouter} from './controller/Layouter';
 import {MonitorModel} from './model/MonitorModel';
+import {getVersion} from './utils/version';
+import {centerHistory} from './view/contexts/CenterHistory';
 
 @injectable()
 export class Main {
-    private _config = null;
+    private readonly _config = null;
     private readonly _apiHandler: APIHandler<APITopic, Events>;
     private readonly _clientEventController: ClientEventController;
     private readonly _clientRegistry: ClientRegistry;
@@ -101,7 +105,8 @@ export class Main {
             store: this._store,
             toast: this._toastManager,
             trayIcon: this._trayIcon,
-            webWindowFactory: this._webWindowFactory
+            webWindowFactory: this._webWindowFactory,
+            centerHistory
         });
 
         // Wait for creation of any injected components that require async initialization
@@ -115,14 +120,15 @@ export class Main {
             [APITopic.CLEAR_APP_NOTIFICATIONS]: this.clearAppNotifications.bind(this),
             [APITopic.TOGGLE_NOTIFICATION_CENTER]: this.toggleNotificationCenter.bind(this),
             [APITopic.ADD_EVENT_LISTENER]: this._clientRegistry.onAddEventListener.bind(this._clientRegistry),
-            [APITopic.REMOVE_EVENT_LISTENER]: this._clientRegistry.onRemoveEventListener.bind(this._clientRegistry)
+            [APITopic.REMOVE_EVENT_LISTENER]: this._clientRegistry.onRemoveEventListener.bind(this._clientRegistry),
+            [APITopic.GET_PROVIDER_STATUS]: this.getStatus.bind(this)
         });
 
         console.log('Service Initialised');
     }
 
     /**
-     * createNotification Create the notification and dispatch it to the UI
+     * Create the notification and dispatch it to the UI
      * @param payload The contents to be dispatched to the UI
      * @param sender Window info for the sending client. This can be found in the relevant app.json within the demo folder.
      */
@@ -150,8 +156,12 @@ export class Main {
      * @returns Whether or not the removal of the notifications was successful.
      */
     private async clearNotification(payload: ClearPayload, sender: ProviderIdentity): Promise<boolean> {
-        const id = this.encodeID(payload.id, sender);
-        const notification = this._store.state.notifications.find(n => n.id === id);
+        if (typeof payload.id !== 'string') {
+            throw new Error('Invalid argument passed to clear: argument must be a string');
+        }
+
+        const id = this.encodeId(payload.id, sender);
+        const notification = this._store.state.notifications.find((n) => n.id === id);
         if (notification) {
             await new RemoveNotifications([notification]).dispatch(this._store);
             return true;
@@ -167,7 +177,7 @@ export class Main {
     private fetchAppNotifications(payload: undefined, sender: ProviderIdentity): NotificationInternal[] {
         const notifications = this.getAppNotifications(sender.uuid);
 
-        return notifications.map(notification => mutable(notification.notification));
+        return notifications.map((notification) => mutable(notification.notification));
     }
 
     private async clearAppNotifications(payload: undefined, sender: ProviderIdentity): Promise<number> {
@@ -179,7 +189,14 @@ export class Main {
 
     private getAppNotifications(uuid: string): StoredNotification[] {
         const notifications = this._store.state.notifications;
-        return notifications.filter(n => n.source.uuid === uuid);
+        return notifications.filter((n) => n.source.uuid === uuid);
+    }
+
+    private getStatus(): ProviderStatus {
+        return {
+            connected: true,
+            version: getVersion()
+        };
     }
 
     /**
@@ -187,7 +204,7 @@ export class Main {
      * @param id Id of the notification..
      * @param source The sender of the notification.
      */
-    private encodeID(id: string, source: Identity): string {
+    private encodeId(id: string, source: Identity): string {
         return `${source.uuid}:${id}`;
     }
 
@@ -231,16 +248,26 @@ export class Main {
             problems.push('"date" must be a valid Date object');
         }
 
-        if (payload.buttons !== undefined && !Array.isArray(payload.buttons)) {
-            problems.push('"buttons" must be an array or undefined');
-        } else if (payload.buttons && payload.buttons.length > 4) {
-            problems.push('notifications can have at-most four buttons');
+        if (payload.buttons !== undefined) {
+            if (Array.isArray(payload.buttons)) {
+                if (payload.buttons.length > 4) {
+                    problems.push('notifications can have at-most four buttons');
+                }
+
+                if (payload.buttons.some((button: ButtonOptions) => typeof button !== 'object' || button === null)) {
+                    problems.push('"buttons" must be an array of objects');
+                } else if (payload.buttons.some((button: ButtonOptions) => typeof button.title !== 'string')) {
+                    problems.push('Every button in "buttons" must have a "title", and "title" must be a string');
+                }
+            } else {
+                problems.push('"buttons" must be an array or undefined');
+            }
         }
 
         if (problems.length === 1) {
-            throw new Error(`Invalid arguments passed to create: ${problems[0]}`);
+            throw new Error(`Invalid argument passed to create: ${problems[0]}`);
         } else if (problems.length > 1) {
-            throw new Error(`Invalid arguments passed to create:\n - ${problems.join('\n - ')}`);
+            throw new Error(`Invalid argument passed to create:\n - ${problems.join('\n - ')}`);
         }
 
         const notification: NotificationInternal = {
@@ -255,16 +282,18 @@ export class Main {
             onSelect: this.hydrateAction(payload.onSelect),
             onExpire: this.hydrateAction(payload.onExpire),
             onClose: this.hydrateAction(payload.onClose),
-            buttons: payload.buttons ? payload.buttons.map(btn => ({
-                ...btn,
-                type: 'button',
-                iconUrl: btn.iconUrl || '',
-                onClick: this.hydrateAction(btn.onClick)
-            })) : []
+            buttons: payload.buttons
+                ? payload.buttons.map((btn) => ({
+                    ...btn,
+                    type: 'button',
+                    iconUrl: btn.iconUrl || '',
+                    onClick: this.hydrateAction(btn.onClick)
+                }))
+                : []
         };
 
         const storedNotification: StoredNotification = {
-            id: this.encodeID(notification.id, sender),
+            id: this.encodeId(notification.id, sender),
             notification,
             source: sender
         };
@@ -279,7 +308,7 @@ export class Main {
      * IDs to be.
      */
     private generateId(): string {
-        return Math.floor((Math.random() * 9 + 1) * 1e8).toString();
+        return Math.floor(((Math.random() * 9) + 1) * 1e8).toString();
     }
 
     private hydrateAction(action: ActionDeclaration<never, never> | null | undefined): ActionDeclaration<never, never> | null {

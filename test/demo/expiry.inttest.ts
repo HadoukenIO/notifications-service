@@ -9,12 +9,12 @@ import {testManagerIdentity, testAppUrlListenersOnStartup} from '../utils/int/co
 import * as notifsRemote from '../utils/int/notificationsRemote';
 import * as providerRemote from '../utils/int/providerRemote';
 import {delay, Duration} from '../utils/int/delay';
-import {waitForAppToBeRunning} from '../utils/int/common';
+import {waitForAppToBeRunning, setupCommonBookends} from '../utils/int/common';
 
 let testApp: Application;
 let testWindow: _Window;
 
-let eventLog: {event: Events, time: number}[];
+let eventLog: {event: Events; time: number}[];
 let closedListener: jest.Mock<void, [NotificationClosedEvent]>;
 let actionListener: jest.Mock<void, [NotificationActionEvent]>;
 
@@ -23,6 +23,8 @@ const options: NotificationOptions = {
     title: 'Test Notification Title',
     category: 'Test Notification Category'
 };
+
+setupCommonBookends();
 
 beforeEach(async () => {
     jest.resetAllMocks();
@@ -317,6 +319,6 @@ function past(duration: number): Date {
     return new Date(Date.now() - duration);
 }
 
-function seconds(seconds: number): Duration {
-    return (seconds * 1000) as Duration;
+function seconds(duration: number): Duration {
+    return (duration * 1000) as Duration;
 }

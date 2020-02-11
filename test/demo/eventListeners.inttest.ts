@@ -3,10 +3,11 @@ import {Application, Window as FinWindow} from 'hadouken-js-adapter';
 
 import {Notification, NotificationOptions, NotificationCreatedEvent, NotificationActionEvent, NotificationClosedEvent} from '../../src/client';
 import * as notifsRemote from '../utils/int/notificationsRemote';
-import {getCenterCardsByNotification, isCenterShowing} from '../utils/int/centerUtils';
+import {getCenterCardsByNotification} from '../utils/int/centerUtils';
 import {delay, Duration} from '../utils/int/delay';
 import {testManagerIdentity, testAppUrlDefault} from '../utils/int/constants';
 import {createAppInServiceRealm} from '../utils/int/spawnRemote';
+import {setupOpenCenterBookends, setupCommonBookends} from '../utils/int/common';
 
 const defaultNoteOptions: NotificationOptions = {
     body: 'Test Notification Body',
@@ -19,13 +20,10 @@ const defaultNoteOptions: NotificationOptions = {
     ]
 };
 
+setupCommonBookends();
+
 describe('Click listeners', () => {
-    beforeAll(async () => {
-        // Make sure the center is showing
-        if (!(await isCenterShowing())) {
-            await notifsRemote.toggleNotificationCenter(testManagerIdentity);
-        }
-    });
+    setupOpenCenterBookends();
 
     describe('With one app running', () => {
         let testApp: Application;

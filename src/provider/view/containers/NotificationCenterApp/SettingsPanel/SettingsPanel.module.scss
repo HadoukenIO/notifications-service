@@ -1,0 +1,17 @@
+.strip-content {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 1px;
+
+    span {
+        text-transform: uppercase;
+    }
+
+    .icon {
+        background-color: var(--color-foreground);
+        margin-left: auto;
+        max-width: 1.5em;
+    }
+}

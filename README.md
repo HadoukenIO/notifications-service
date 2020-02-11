@@ -13,7 +13,7 @@ This project consist of 3 parts:
 
 ### Dependencies
 - OpenFin version for applications using the Notifications Service >= 9.61.38.41
-- OpenFin version used by the Notifications Provider = 13.76.44.17
+- OpenFin version used by the Notifications Provider = 14.78.45.31
 - RVM >= 4.7
 
 ### Features
@@ -59,7 +59,7 @@ The client library is also available as a resource which can be included via `<s
 ```
 This will expose the global variable `notifications` with the API methods documented in the link below.  Example:
 ```js
-const notifications = await notifications.getAll();
+const notes = await notifications.getAll();
 ```
 
 The client module exports a set of functions, documented in the [API docs](https://cdn.openfin.co/docs/services/notifications/stable/api/).

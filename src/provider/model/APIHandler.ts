@@ -93,10 +93,10 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
     }
 
     public async registerListeners<S extends APISpecification<T>>(actionHandlerMap: APIImplementation<T, S>): Promise<void> {
-        const providerChannel: ChannelProvider = this._providerChannel = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
+        this._providerChannel = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
 
-        providerChannel.onConnection(this.onConnectionHandler.bind(this));
-        providerChannel.onDisconnection(this.onDisconnectionHandler.bind(this));
+        this._providerChannel.onConnection(this.onConnectionHandler.bind(this));
+        this._providerChannel.onDisconnection(this.onDisconnectionHandler.bind(this));
 
         for (const action in actionHandlerMap) {
             if (actionHandlerMap.hasOwnProperty(action)) {
@@ -108,9 +108,9 @@ export class APIHandler<T extends Enum, E extends EventSpecification> {
     // TODO?: Remove the need for this any by defining connection payload type?
     private onConnectionHandler(app: Identity, payload?: any): void {
         if (payload && payload.version && payload.version.length > 0) {
-            console.log(`connection from client: ${app.name}, version: ${payload.version}`);
+            console.log(`Connection from client: ${app.name}, version: ${payload.version}`);
         } else {
-            console.log(`connection from client: ${app.name}, unable to determine version`);
+            console.log(`Connection from client: ${app.name}, unable to determine version`);
         }
         // The 'onConnection' callback fires *just before* the channel is ready.
         // Delaying the firing of our signal slightly, to ensure client is definitely contactable.

@@ -6,7 +6,7 @@ import {fin} from './fin';
 import {serviceRealm} from './constants';
 
 interface SpawnEnabledContext extends BaseWindowContext {
-    createWindow: CreateWindowType,
+    createWindow: CreateWindowType;
     createApp: CreateAppType;
 }
 
@@ -15,7 +15,7 @@ type CreateAppType = typeof createAppRemote;
 
 const ofBrowser = new OFPuppeteerBrowser<SpawnEnabledContext>();
 export async function createApp(executionTarget: Identity, ...spawnArgs: Parameters<CreateAppType>): Promise<Application> {
-    const identity: Identity = await ofBrowser.executeOnWindow(executionTarget, async function(...remoteArgs: Parameters<CreateAppType>) {
+    const identity: Identity = await ofBrowser.executeOnWindow(executionTarget, async function (...remoteArgs: Parameters<CreateAppType>) {
         const remoteApp = await this.createApp(...remoteArgs);
         return remoteApp.identity;
     }, ...spawnArgs);
@@ -34,7 +34,7 @@ export async function createAppInServiceRealm(executionTarget: Identity, options
 }
 
 export async function createWindow(executionTarget: Identity, ...spawnArgs: Parameters<CreateWindowType>): Promise<Window> {
-    const identity: Identity = await ofBrowser.executeOnWindow(executionTarget, async function(...remoteArgs: Parameters<CreateWindowType>) {
+    const identity: Identity = await ofBrowser.executeOnWindow(executionTarget, async function (...remoteArgs: Parameters<CreateWindowType>) {
         const remoteWindow = await this.createWindow(...remoteArgs);
         return remoteWindow.identity;
     }, ...spawnArgs);
