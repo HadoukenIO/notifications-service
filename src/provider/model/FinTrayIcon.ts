@@ -26,6 +26,10 @@ export class FinTrayIcon implements TrayIcon {
         return this._application.setTrayIcon(url);
     }
 
+    public async removeIcon(): Promise<void> {
+        return this._application.removeTrayIcon();
+    }
+
     /**
      * Retrieves information about the provider tray icon.
      */

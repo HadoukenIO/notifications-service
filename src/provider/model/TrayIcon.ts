@@ -8,4 +8,6 @@ export interface TrayIcon {
     setIcon(url: string): Promise<void>;
 
     getInfo(): Promise<TrayInfo>;
+
+    removeIcon(): Promise<void>;
 }
