@@ -23,6 +23,7 @@ import {TrayIcon} from '../model/TrayIcon';
 import {FinTrayIcon} from '../model/FinTrayIcon';
 import {ExpiryController} from '../controller/ExpiryController';
 import {ClientEventController} from '../controller/ClientEventController';
+import {ControlCenterMonitor} from '../model/ControlCenterMonitor';
 
 import {Inject, InjectableMap} from './Injectables';
 
@@ -33,6 +34,7 @@ interface Types {
     [Inject.API_HANDLER]: APIHandler<APITopic, Events>;
     [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController;
     [Inject.CLIENT_REGISTRY]: ClientRegistry;
+    [Inject.CONTROL_CENTER_MONITOR]: ControlCenterMonitor;
     [Inject.DATABASE]: Database;
     [Inject.ENVIRONMENT]: Environment;
     [Inject.EVENT_PUMP]: EventPump;
@@ -57,6 +59,7 @@ const Bindings: InjectableMap = {
     [Inject.API_HANDLER]: APIHandler,
     [Inject.CLIENT_EVENT_CONTROLLER]: ClientEventController,
     [Inject.CLIENT_REGISTRY]: ClientRegistry,
+    [Inject.CONTROL_CENTER_MONITOR]: ControlCenterMonitor,
     [Inject.DATABASE]: Database,
     [Inject.ENVIRONMENT]: FinEnvironment,
     [Inject.EVENT_PUMP]: EventPump,

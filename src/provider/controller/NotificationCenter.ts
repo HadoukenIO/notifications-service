@@ -13,6 +13,7 @@ import {renderRouterInWindow} from '../view/utils/RenderApp';
 import {CenterRoutes} from '../view/routeMappings';
 import {ROUTES} from '../view/routes';
 import {centerHistory} from '../view/contexts/CenterHistory';
+import {ControlCenterMonitor} from '../model/ControlCenterMonitor';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -42,6 +43,7 @@ export class NotificationCenter extends AsyncInit {
     private readonly _store: ServiceStore;
     private readonly _trayIcon: TrayIcon;
     private readonly _webWindowFactory: WebWindowFactory;
+    private readonly _controlCenterMonitor: ControlCenterMonitor;
 
     private _webWindow!: WebWindow;
 
@@ -49,7 +51,8 @@ export class NotificationCenter extends AsyncInit {
         @inject(Inject.MONITOR_MODEL) monitorModel: MonitorModel,
         @inject(Inject.STORE) store: ServiceStore,
         @inject(Inject.TRAY_ICON) trayIcon: TrayIcon,
-        @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory
+        @inject(Inject.WEB_WINDOW_FACTORY) webWindowFactory: WebWindowFactory,
+        @inject(Inject.CONTROL_CENTER_MONITOR) controlCenterMonitor: ControlCenterMonitor
     ) {
         super();
 
@@ -58,6 +61,7 @@ export class NotificationCenter extends AsyncInit {
         this._store.onAction.add(this.onAction, this);
         this._trayIcon = trayIcon;
         this._webWindowFactory = webWindowFactory;
+        this._controlCenterMonitor = controlCenterMonitor;
     }
 
     protected async init() {
@@ -73,7 +77,10 @@ export class NotificationCenter extends AsyncInit {
         }
         await this.hideWindowOffscreen();
 
-        this._trayIcon.setIcon(`${window.location.href.split('/').slice(0, -1).join('/')}/ui/image/shapes/trayIcon.png`);
+        const setTrayIcon = () => this._trayIcon.setIcon(`${window.location.href.split('/').slice(0, -1).join('/')}/ui/image/shapes/trayIcon.png`);
+        const removeTrayIcon = () => this._trayIcon.removeIcon();
+        this._controlCenterMonitor.add('started', removeTrayIcon);
+        this._controlCenterMonitor.add('closed', setTrayIcon);
 
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
