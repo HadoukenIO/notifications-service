@@ -5,15 +5,15 @@ import {Signal} from 'openfin-service-signal';
 @injectable()
 export class ControlCenterMonitor {
     private static readonly controlCenterIdentity: Identity = {uuid: 'control-center'};
-    private readonly onStart: Signal<[]>;
-    private readonly onClosed: Signal<[]>;
+    private readonly _onStart: Signal<[]>;
+    private readonly _onClosed: Signal<[]>;
     private readonly _application: Application;
     private _isRunning: boolean = false;
 
     constructor() {
         this._application = fin.Application.wrapSync(ControlCenterMonitor.controlCenterIdentity);
-        this.onStart = new Signal<[]>();
-        this.onClosed = new Signal<[]>();
+        this._onStart = new Signal<[]>();
+        this._onClosed = new Signal<[]>();
 
         this._application.isRunning()
             .then((res) => {
@@ -24,13 +24,13 @@ export class ControlCenterMonitor {
 
     public add(event: 'started'|'closed', listener: () => void) {
         if (event === 'started') {
-            this.onStart.add(listener);
+            this._onStart.add(listener);
 
             if (this._isRunning) {
                 listener();
             }
         } else if (event === 'closed') {
-            this.onClosed.add(listener);
+            this._onClosed.add(listener);
 
             if (!this._isRunning) {
                 listener();
@@ -40,12 +40,12 @@ export class ControlCenterMonitor {
 
     private addListeners(): void {
         this._application.addListener('started', () => {
-            this.onStart.emit();
+            this._onStart.emit();
             this._isRunning = true;
         });
 
         this._application.addListener('closed', () => {
-            this.onClosed.emit();
+            this._onClosed.emit();
             this._isRunning = false;
         });
     }
