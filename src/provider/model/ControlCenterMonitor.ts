@@ -2,8 +2,14 @@ import {injectable} from 'inversify';
 import {Application, Identity} from 'openfin/_v2/main';
 import {Signal} from 'openfin-service-signal';
 
+import {AsyncInit} from '../controller/AsyncInit';
+
+export enum ControlCenterEvent {
+    STARTED = 'started',
+    CLOSED = 'closed'
+}
 @injectable()
-export class ControlCenterMonitor {
+export class ControlCenterMonitor extends AsyncInit {
     private static readonly controlCenterIdentity: Identity = {uuid: 'control-center'};
     private readonly _onStart: Signal<[]>;
     private readonly _onClosed: Signal<[]>;
@@ -11,25 +17,26 @@ export class ControlCenterMonitor {
     private _isRunning: boolean = false;
 
     constructor() {
+        super();
         this._application = fin.Application.wrapSync(ControlCenterMonitor.controlCenterIdentity);
         this._onStart = new Signal<[]>();
         this._onClosed = new Signal<[]>();
 
-        this._application.isRunning()
-            .then((res) => {
-                this._isRunning = res;
-            })
-            .then(() => this.addListeners());
+        this.addListeners();
     }
 
-    public add(event: 'started'|'closed', listener: () => void) {
-        if (event === 'started') {
+    protected async init() {
+        this._isRunning = await this._application.isRunning();
+    }
+
+    public add(event: ControlCenterEvent, listener: () => void) {
+        if (event === ControlCenterEvent.STARTED) {
             this._onStart.add(listener);
 
             if (this._isRunning) {
                 listener();
             }
-        } else if (event === 'closed') {
+        } else if (event === ControlCenterEvent.CLOSED) {
             this._onClosed.add(listener);
 
             if (!this._isRunning) {

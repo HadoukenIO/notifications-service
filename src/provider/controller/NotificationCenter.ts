@@ -13,7 +13,7 @@ import {renderRouterInWindow} from '../view/utils/RenderApp';
 import {CenterRoutes} from '../view/routeMappings';
 import {ROUTES} from '../view/routes';
 import {centerHistory} from '../view/contexts/CenterHistory';
-import {ControlCenterMonitor} from '../model/ControlCenterMonitor';
+import {ControlCenterMonitor, ControlCenterEvent} from '../model/ControlCenterMonitor';
 
 import {AsyncInit} from './AsyncInit';
 
@@ -79,8 +79,8 @@ export class NotificationCenter extends AsyncInit {
 
         const setTrayIcon = () => this._trayIcon.setIcon(`${window.location.href.split('/').slice(0, -1).join('/')}/ui/image/shapes/trayIcon.png`);
         const removeTrayIcon = () => this._trayIcon.removeIcon();
-        this._controlCenterMonitor.add('started', removeTrayIcon);
-        this._controlCenterMonitor.add('closed', setTrayIcon);
+        this._controlCenterMonitor.add(ControlCenterEvent.STARTED, removeTrayIcon);
+        this._controlCenterMonitor.add(ControlCenterEvent.CLOSED, setTrayIcon);
 
         this._trayIcon.onLeftClick.add(() => {
             new ToggleCenterVisibility(ToggleCenterVisibilitySource.TRAY).dispatch(this._store);
